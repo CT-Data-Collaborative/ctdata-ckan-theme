@@ -3,10 +3,10 @@
 {% block title %}CTdata{% endblock %}
 
 {% block content %}
-{% block maintag %}<div class="main_div">{% endblock %}
-<section  class="banner">
+{% block maintag %}{{ super() }}{% endblock %}
+<section  class="ctdata-banner">
 <ul class="slider">
-<li><img src="common/images/slideimg1.jpg" alt="" /></li>
+<li><img src="/common/images/slideimg1.jpg" alt="" /></li>
 </ul>
 <ul class="bullet">
 <li class="active"><a href="#"></a></li>
@@ -17,7 +17,7 @@
 </ul>
 
 <div class="overlay_text">
-<div class="wrapper">
+<div class="ctdata-wrapper">
 <h2>Early Childhood Portal</h2>
 <p>Lorem ipsum dolor sit amet consectetur adipiscing </p>
 </div>
@@ -25,29 +25,29 @@
 </section> <!-- BANNER SECTION ENDS HERE -->
 
 <section class="about">
-<div class="wrapper">
+<div class="ctdata-wrapper">
 <h2>Changing the way Connecticut uses data.</h2>
 <p> CTDC is a public-private partnership working to increase the quality and availability of data for effective planning and policy. <a href="#">Learn More...</a></p>
 </div>
 </section> <!-- about section ends here -->
 
 <section class="topics">
-<div class="wrapper">
+<div class="ctdata-wrapper">
 <h2>Explore Data by Topic</h2>
 <ul>
-<li><a href="#"><img src="common/images/topic1.png" alt="" />Civic Vitality</a></li>
-<li><a href="#"><img src="common/images/topic2.png" alt="" />Demographics</a></li>
-<li><a href="#"><img src="common/images/topic3.png" alt="" />Economy</a></li>
-<li><a href="#"><img src="common/images/topic4.png" alt="" />Health</a></li>
-<li><a href="#"><img src="common/images/topic5.png" alt="" />Education</a></li>
-<li><a href="#"><img src="common/images/topic6.png" alt="" />Housing</a></li>
-<li><a href="#"><img src="common/images/topic7.png" alt="" />Safety</a></li>
+<li><a href="#"><img src="/common/images/topic1.png" alt="" />Civic Vitality</a></li>
+<li><a href="#"><img src="/common/images/topic2.png" alt="" />Demographics</a></li>
+<li><a href="#"><img src="/common/images/topic3.png" alt="" />Economy</a></li>
+<li><a href="#"><img src="/common/images/topic4.png" alt="" />Health</a></li>
+<li><a href="#"><img src="/common/images/topic5.png" alt="" />Education</a></li>
+<li><a href="#"><img src="/common/images/topic6.png" alt="" />Housing</a></li>
+<li><a href="#"><img src="/common/images/topic7.png" alt="" />Safety</a></li>
 </ul>
 </div>
 </section>
 
 <section class="location">
-<div class="wrapper">
+<div class="ctdata-wrapper">
 <h2>Explore Data by Location</h2>
 <select class="custom-select">
 <option selected >-- Select Location --</option>
@@ -60,7 +60,7 @@
 </section> <!-- explore location section ends here -->
 
 <section class="news">
-<div class="wrapper">
+<div class="ctdata-wrapper">
 <h2>Latest News</h2>
 
 <ul>
