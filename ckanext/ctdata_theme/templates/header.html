@@ -5,26 +5,53 @@
 <ul>
 <li><a href="#"><img src="/common/images/twitter.png" alt="" /></a></li>
 <li><a href="#"><img src="/common/images/fb_icon.png" alt="" /></a></li>
-<li><a href="#">About </a></li>
-<li><a href="#">News </a></li>
-<li><a href="#">Knowledge Center</a></li>
-<li><a href="#">Guides and Tutorials</a></li>
-<li><a href="#">Contact</a></li>
-<li><a href="#">Login</a></li>
-<li><a href="#">Register</a></li>
+<li><a href="/pages/about">About </a></li>
+<li><a href="/pages/news">News</a></li>
+<li><a href="http://know.ctdata.org/index.php/CTData">Knowledge Center</a></li>
+<li><a href="http://know.ctdata.org/index.php/CTData">Guides and Tutorials</a></li>
+<li><a href="mailto:info@ctdata.org">Contact</a></li>
+{% if c.userobj %}
+    <li>
+        <a href="{{ h.url_for(controller='user', action='read', id=c.userobj.name) }}" class="image" title="{{ _('View profile') }}">
+          {{ h.gravatar((c.userobj.email_hash if c and c.userobj else ''), size=22) }}
+            <span class="username">{{ c.userobj.display_name }}</span>
+        </a>
+    </li>
+    {% set new_activities = h.new_activities() %}
+    <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
+    {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)', 'Dashboard (%(num)d new items)', new_activities) %}
+    <a href="{{ h.url_for(controller='user', action='dashboard') }}" title="{{ notifications_tooltip }}">
+        <i class="icon-dashboard"></i>
+        <span>{{ new_activities }}</span>
+    </a>
+    </li>
+    <li>
+        <a href="{{ h.url_for(controller='user', action='edit', id=c.userobj.name) }}" title="{{ _('Edit settings') }}">
+            <i class="icon-cog"></i>
+        </a>
+    </li>
+    <li>
+        <a href="{{ h.url_for('/user/_logout') }}" title="{{ _('Log out') }}">
+            <i class="icon-signout"></i>
+        </a>
+    </li>
+{% else %}
+<li>{% link_for _('Login'), controller='user', action='login' %}</li>
+<li>{% link_for _('Register'), controller='user', action='register', class_='sub' %}</li>
+{% endif %}
 </ul>
 </div>
 </div>
 
 <div class="ctdata-wrapper">
-<figure class="logo"><a href="index.html"><img src="/common/images/logo.png" alt="" /></a></figure>
+<figure class="logo"><a href="/"><img src="/common/images/logo.png" alt="" /></a></figure>
 <nav>
 <ul>
 <li><a href="#">Data by Topic</a></li>
 <li><a href="#">Data by Location</a></li>
 <li><a href="#">Data Gallery</a></li>
-<li><a href="#">Special Projects</a></li>
-<li><a href="#">CT Nonprofit Strategy Platform</a></li>
+<li><a href="/pages/special-projects">Special Projects</a></li>
+<li><a href="http://nccsweb.urban.org/communityplatform/ct">CT Nonprofit Strategy Platform</a></li>
 </ul>
 </nav>
 </div>

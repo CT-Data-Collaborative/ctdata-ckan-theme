@@ -1,0 +1,73 @@
+{% ckan_extends %}
+
+{% block subtitle %}{{ _('About') }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li class="active">{% link_for _('About'), controller='home', action='about' %}</li>
+{% endblock %}
+
+{% block page_name %}About{% endblock %}
+{% block page_description %}Who We Are and What We Aim For{% endblock %}
+
+{% block content %}
+    {% block maintag %}{{ super() }}{% endblock %}
+    {% block underheader %}{{ super() }}{% endblock %}
+    <div class="container">
+        <div class="row">
+            <div class="span11 about-text">
+                <h2>About Us</h2>
+                <p>
+                    The Connecticut Data Collaborative is a collaborative public-private effort to improve the quality of and access to policy-related data in the state.
+                </p>
+                <h2>Our Goals</h2>
+                <p>
+                    Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
+                </p>
+                <h2>More About Us</h2>
+                <p>
+                    Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
+                </p>
+            </div>
+            <div class="span4 about-news">
+                <h3 class="news-header">LATEST NEWS</h3>
+                <div class="inline-date">
+                    <span class="day">03</span>
+                    <span class="rest">08.2014</span>
+                </div>
+                <h3><a href="#">NEW DATA Available</a></h3>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+                </p>
+
+                <div class="inline-date">
+                    <span class="day">03</span>
+                    <span class="rest">08.2014</span>
+                </div>
+                <h3><a href="#">NEW DATA Available</a></h3>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+                </p>
+
+                <div class="inline-date">
+                    <span class="day">03</span>
+                    <span class="rest">08.2014</span>
+                </div>
+                <h3><a href="#">NEW DATA Available</a></h3>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+                </p>
+
+                <h3 class="news-header">GET IN TOUCH</h3>
+                <p>
+                    Consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
+                    <a href="mailto:example@example.com">Some email</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block primary %}{% endblock %}
+
+{% block secondary %}{% endblock %}
