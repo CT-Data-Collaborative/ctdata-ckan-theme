@@ -15,4 +15,4 @@ content of modified_pages_template.html (located in the same as this readme file
 4. Go to the http://your_ckan_instance_url/pages, and create respective pages with the content of the files in the
 ckanext-ctdata_theme/ckanext/ctdata_theme/templates/ folder (news.html, special_projects.html) and use the content of the
 ckanext-ctdata_theme/ckanext/ctdata_theme/templates/home/about.html file for the About page. Important: Only copy the html,
-don't copy ninja2 tags from those files.
+don't copy jinja2 tags from those files.
