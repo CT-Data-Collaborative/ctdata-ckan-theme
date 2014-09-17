@@ -1,0 +1,59 @@
+<div class="additional_info">
+    <h2>Additional Info</h2>
+
+    {% if pkg_dict.url %}
+      <div class="con_row">
+        <label>{{ _('Source') }}</label>
+        <p>{{ h.link_to(pkg_dict.url, pkg_dict.url, rel='foaf:homepage', target='_blank') }}</p>
+      </div>
+    {% endif %}
+
+    {% if pkg_dict.author_email %}
+      <div class="con_row">
+        <label>{{ _("Author") }}</label>
+        <p>{{ h.mail_to(email_address=pkg_dict.author_email, name=pkg_dict.author) }}</p>
+      </div>
+    {% elif pkg_dict.author %}
+      <div class="con_row">
+        <label>{{ _("Author") }}</label>
+        <p>{{ pkg_dict.author }}</p>
+      </div>
+    {% endif %}
+
+    {% if pkg_dict.maintainer_email %}
+      <div class="con_row">
+        <label>{{ _('Maintainer') }}</label>
+        <p>{{ h.mail_to(email_address=pkg_dict.maintainer_email, name=pkg_dict.maintainer) }}</p>
+      </div>
+    {% elif pkg_dict.maintainer %}
+      <div class="con_row">
+        <label>{{ _('Maintainer') }}</label>
+        <p>{{ pkg_dict.maintainer }}</p>
+      </div>
+    {% endif %}
+
+    {% if pkg_dict.version %}
+      <div class="con_row">
+        <label>{{ _("Version") }}</label>
+        <p>{{ pkg_dict.version }}</p>
+      </div>
+    {% endif %}
+
+    {% if h.check_access('package_update',{'id':pkg_dict.id}) %}
+      <div class="con_row">
+        <label>{{ _("State") }}</label>
+        <p>{{ pkg_dict.state }}</p>
+      </div>
+    {% endif %}
+
+    {% block extras scoped %}
+        {% for extra in h.sorted_extras(pkg_dict.extras) %}
+            {% set key, value = extra %}
+            <div class="con_row">
+                <label>{{ _(key) }}</label>
+                <p>{{ value }}</p>
+            </div>
+        {% endfor %}
+    {% endblock %}
+
+</div>

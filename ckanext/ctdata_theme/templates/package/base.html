@@ -1,0 +1,36 @@
+{% ckan_extends %}
+
+
+{% block page_name %}Raw Data{% endblock %}
+{% block page_description %}Explore all our datasets in raw format{% endblock %}
+
+
+{% block main_content %}
+    <section class="raw_data">
+        <div class="ctdata-wrapper">
+    {% block flash %}{% endblock %}
+    {% block toolbar %}
+        {% block breadcrumb %}
+            <div class="bread_crumb">
+                {{ super() }}
+            </div>
+        {% endblock %}
+    {% endblock %}
+    {% block pre_primary %}{% endblock %}
+            <div class="raw_content">
+                <div class="raw_left">
+    {% block secondary %}{{ super() }}{% endblock %}
+                </div>
+    {% block primary %}
+                <div class="raw_right">
+        {% block primary_content %}
+            {% block page_header %}{{ super() }}{% endblock %}
+            {% block page_primary_action %}{{ super() }}{% endblock %}
+            {% block primary_content_inner %}{{ super() }}{% endblock %}
+        {% endblock %}
+                </div>
+    {% endblock %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

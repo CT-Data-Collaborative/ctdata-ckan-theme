@@ -1,0 +1,18 @@
+{% with truncate=truncate or 0, url=h.url_for(controller='organization', action='read', id=organization.name) %}
+    <div class="readdata">
+        <img src="/common/images/raw_img.png" alt="" />
+        <h2>{{ organization.title or organization.name }}</h2>
+        {% if organization.description %}
+            <p>{{ h.markdown_extract(organization.description, 180) }}</p>
+            {% link_for _('read more'), controller='organization', action='about', id=organization.name %}
+        {% else %}
+            <p class="empty">{{ _('There is no description for this organization') }}</p>
+        {% endif %}
+    </div>
+
+    {% if show_nums %}
+    <div class="raw_report">
+        <h2>{{ organization.num_followers }}<span>Followers</span></h2>
+    </div>
+    {% endif %}
+{% endwith %}
