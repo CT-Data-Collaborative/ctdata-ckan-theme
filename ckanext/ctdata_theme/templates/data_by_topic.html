@@ -1,0 +1,153 @@
+{% extends "page.html" %}
+
+{% block page_name %}Data by Topic{% endblock %}
+{% block page_description %}Explore Data by Individual Topic{% endblock %}
+
+{% block content %}
+{% block underheader %}{{ super() }}{% endblock %}
+<section class="topics" id="topics">
+<div class="triangle_wrapper">
+<div class="ctdata-wrapper">
+<h2>Explore Data by Topic or See <a id="all_data_link" href="#topics" style="text-decoration: underline;">All Data</a></h2>
+<ul>
+<li><a href="#topics" id="topic_civic_vitality_link"><img src="/common/images/topic1.png" alt=""/>Civic Vitality</a></li>
+<li><a href="#topics" id="topic_demographics_link"><img src="/common/images/topic2.png" alt=""/>Demographics</a></li>
+<li><a href="#topics" id="topic_economy_link"><img src="/common/images/topic3.png" alt=""/>Economy</a></li>
+<li><a href="#topics" id="topic_health_link"><img src="/common/images/topic4.png" alt=""/>Health</a></li>
+<li><a href="#topics" id="topic_education_link" ><img src="/common/images/topic5.png" alt=""/>Education</a></li>
+<li><a href="#topics" id="topic_housing_link"><img src="/common/images/topic6.png" alt=""/>Housing</a></li>
+<li><a href="#topics" id="topic_safety_link"><img src="/common/images/topic7.png" alt=""/>Safety</a></li>
+</ul>
+</div>
+<img id="triangle" src="/common/images/selection_triangle.png">
+</div>
+</section>
+
+<style>
+    .subtopic {
+        display: inline-block;
+        margin-right: 30px;
+    }
+
+    .subtopic h2 {
+        color: #275BA6;
+        line-height: normal;
+    }
+
+    .topics_list {
+        display: none;
+        margin: 50px 50px;
+        float: left;
+        width: 100%;
+        color: #464646
+    }
+
+    .subtopic_col {
+        border-left: 4px solid #EEEEEE;
+        padding: 0px 10px;
+    }
+
+    li.dataset {
+        margin-bottom: 5px;
+    }
+
+    #all_data h2.subtopic_title {
+        color: #275BA6;
+        line-height: normal;
+        margin-left: 20px;
+    }
+
+    #all_data li {
+         margin-left: 40px;
+    }
+
+    #triangle {
+        margin: 0;
+        bottom: -46px;
+        position: absolute;
+        display: none;
+    }
+
+    .triangle_wrapper {
+        position: relative;
+    }
+</style>
+
+{% for domain in domains %}
+<section id="topic_{{ domain['id'] }}" class="topics_list">
+    <div class="ctdata-wrapper">
+        <ul>
+        {% for subdomain in domain['subdomains'] %}
+        <li class="subtopic">
+            <div class="subtopic_col">
+            <h2>{{ subdomain['title'] }}</h2>
+                <ul>
+                    {% for dataset in subdomain['datasets'] %}
+                    <li><a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </li>
+        {% else %}
+            There's no data for this topic yet.
+        {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endfor %}
+
+<section id="all_data" class="topics_list">
+    <div class="ctdata-wrapper">
+        {% for domain in domains %}
+            {% if domain['subdomains']|length > 0 %}
+            <h2>{{ domain['title'] }}</h2>
+                {% for subdomain in domain['subdomains'] %}
+                <h2 class="subtopic_title">{{ subdomain['title'] }}</h2>
+                    <ul>
+                        {% for dataset in subdomain['datasets'] %}
+                        <li><a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        $(document).ready(function(){
+            $('#data_by_topic_link').addClass('header_link_active');
+
+            var topics = ['civic_vitality', 'demographics', 'economy', 'health', 'education', 'housing', 'safety'];
+
+            $('#all_data_link').click(function() {
+                $('.topics_list').css({display: "none"});
+                $('#all_data').css({display: "block"});
+                $('#triangle').css({display: "none"});
+            });
+
+            topics.forEach(function(topic) {
+                $('#topic_' + topic + '_link').click(function() {
+                    $('.topics_list').css({display: "none"});
+                    $('#topic_' + topic).css({display: "block"});
+                    $("#triangle").offset({left: $("#topic_" + topic + "_link").offset().left + 40})
+                    $('#triangle').css({display: "block"});
+                });
+            });
+
+            $( window ).resize(function() {
+
+            });
+
+            var current_hash = $(location).attr('hash');
+
+            if (current_hash && current_hash.length > 0) {
+                $(current_hash + "_link").trigger('click');
+            }
+        });
+    </script>
+{% endblock %}

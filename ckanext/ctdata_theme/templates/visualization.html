@@ -1,0 +1,194 @@
+{% extends "page.html" %}
+
+{% block page_name %}{{ dataset.title }}{% endblock %}
+{% block page_description %}Profile info{% endblock %}
+
+
+{% block main_content %}
+<section class="main_body_content">
+<section class="visualisation">
+<div class="ctdata-wrapper">
+
+<div class="refine_wrap">
+<h2>Refine This Indicator <img src="/common/images/arrowimg.png" alt="" /></h2>
+<ul>
+<li>
+<a href="javascript:void(0)" class="togglebtn">Location</a>
+</li>
+<li>
+<a href="javascript:void(0)" class="togglebtn">Measure Type</a>
+</li>
+<li>
+<a href="javascript:void(0)" class="togglebtn toggleup">Variable</a>
+<div class="refine_options">
+<div class="input_row"><input type="checkbox"> <label>Quartile 1</label></div>
+<div class="input_row"><input type="checkbox"> <label>Quartile 2</label></div>
+<div class="input_row"><input type="checkbox"> <label>Quartile 3</label></div>
+<div class="input_row"><input type="checkbox"> <label>Quartile 4</label></div>
+</div>
+</li>
+</ul>
+</div>
+
+<div class="visual_right">
+<div class="option_row">
+<div class="customselectinner">
+<select class="custom">
+<option selected>Kindergarten Inventory Quartiles</option>
+<option>Kindergarten Inventory Quartiles</option>
+<option>Kindergarten Inventory Quartiles</option>
+</select>
+</div>
+
+<div class="display_options">
+<label>Display As</label>
+<ul>
+<li><a href="#"><img src="/common/images/displayopt1.png" alt="" /></a></li>
+<li><a href="#"><img src="/common/images/displayopt2.png" alt="" /></a></li>
+<li><a href="#"><img src="/common/images/displayopt3.png" alt="" /></a></li>
+<li><a href="#"><img src="/common/images/displayopt4.png" alt="" /></a></li>
+</ul>
+</div>
+
+<div class="operations">
+<label>Operations</label>
+<ul>
+<li><a href="#"><img src="/common/images/operation1.png" alt="" /></a></li>
+<li><a href="#"><img src="/common/images/operation2.png" alt="" /></a></li>
+<li><a href="#"><img src="/common/images/operation3.png" alt="" /></a></li>
+</ul>
+</div>
+
+</div>
+
+<div class="results_table">
+<ul class="table_head">
+<li class="col-1">Location</li>
+<li class="col-2">Variable</li>
+<li class="col-3">Data Type</li>
+<li class="col-4">2008</li>
+<li class="col-5">2009</li>
+<li class="col-6">2010</li>
+<li class="col-7">2011</li>
+<li class="col-8">2013</li>
+</ul>
+
+<ul class="table_data">
+<li class="col-1">Connecticut</li>
+<li class="col-2">Quartile 1</li>
+<li class="col-3">Percent</li>
+<li class="col-4">23.1%</li>
+<li class="col-5">14.2%</li>
+<li class="col-6">10.7%</li>
+<li class="col-7">23.1%</li>
+<li class="col-8">14.2%</li>
+</ul>
+
+<ul class="table_data">
+<li class="col-1">Bridgeport</li>
+<li class="col-2">Quartile 1</li>
+<li class="col-3">Percent</li>
+<li class="col-4">26.2%</li>
+<li class="col-5">19.5%</li>
+<li class="col-6">16%</li>
+<li class="col-7">26.2%</li>
+<li class="col-8">19.5%</li>
+</ul>
+
+<ul class="table_data">
+<li class="col-1">Hartford</li>
+<li class="col-2">Quartile 1</li>
+<li class="col-3">Percent</li>
+<li class="col-4">27.3%</li>
+<li class="col-5">17%</li>
+<li class="col-6">18.7%</li>
+<li class="col-7">27.3%</li>
+<li class="col-8">17%</li>
+</ul>
+
+<ul class="table_data">
+<li class="col-1">New Haven</li>
+<li class="col-2">Quartile 1</li>
+<li class="col-3">Percent</li>
+<li class="col-4">29.98%</li>
+<li class="col-5">24.44%</li>
+<li class="col-6">22.18%</li>
+<li class="col-7">29.98%</li>
+<li class="col-8">24.44%</li>
+</ul>
+
+<ul class="table_data">
+<li class="col-1">Waterbury</li>
+<li class="col-2">Quartile 1</li>
+<li class="col-3">Percent</li>
+<li class="col-4">n/a</li>
+<li class="col-5">25.33%</li>
+<li class="col-6">34.47%</li>
+<li class="col-7">n/a</li>
+<li class="col-8">25.33%</li>
+</ul>
+
+<ul class="table_data">
+<li class="col-1">Connecticut</li>
+<li class="col-2">Quartile 1</li>
+<li class="col-3">Percent</li>
+<li class="col-4">23.1%</li>
+<li class="col-5">14.2%</li>
+<li class="col-6">10.7%</li>
+<li class="col-7">23.1%</li>
+<li class="col-8">14.2%</li>
+</ul>
+
+<ul class="table_data">
+<li class="col-1">Bridgeport</li>
+<li class="col-2">Quartile 1</li>
+<li class="col-3">Percent</li>
+<li class="col-4">26.2%</li>
+<li class="col-5">19.5%</li>
+<li class="col-6">16%</li>
+<li class="col-7">26.2%</li>
+<li class="col-8">19.5%</li>
+</ul>
+
+<ul class="table_data">
+<li class="col-1">Hartford</li>
+<li class="col-2">Quartile 1</li>
+<li class="col-3">Percent</li>
+<li class="col-4">27.3%</li>
+<li class="col-5">17%</li>
+<li class="col-6">18.7%</li>
+<li class="col-7">27.3%</li>
+<li class="col-8">17%</li>
+</ul>
+
+<ul class="table_data">
+<li class="col-1">New Haven</li>
+<li class="col-2">Quartile 1</li>
+<li class="col-3">Percent</li>
+<li class="col-4">29.98%</li>
+<li class="col-5">24.44%</li>
+<li class="col-6">22.18%</li>
+<li class="col-7">29.98%</li>
+<li class="col-8">24.44%</li>
+</ul>
+
+<ul class="table_data">
+<li class="col-1">Waterbury</li>
+<li class="col-2">Quartile 1</li>
+<li class="col-3">Percent</li>
+<li class="col-4">n/a</li>
+<li class="col-5">25.33%</li>
+<li class="col-6">34.47%</li>
+<li class="col-7">n/a</li>
+<li class="col-8">25.33%</li>
+</ul>
+
+</div>
+
+</div>
+
+</div>
+</section>
+
+</section>
+{% endblock %}
