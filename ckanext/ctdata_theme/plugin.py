@@ -1,3 +1,5 @@
+from pylons.controllers.util import abort
+
 import routes.mapper
 
 import ckan.plugins as plugins
@@ -73,9 +75,19 @@ class CTDataController(base.BaseController):
                         domains.append({'title': domain,
                                         'subdomains': [{'title': subdomain, 'datasets': [dataset_obj]}],
                                         'id': "_".join(map(lambda x: x.lower(), domain.split(" ")))})
+
         domains.sort(key=lambda x: x['title'])
+
+        for domain in domains:
+            domain['subdomains'].sort(key=lambda x: x['title'])
+
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def visualization(self, dataset_name):
-        dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+        dataset = None
+        try:
+            dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+        except toolkit.ObjectNotFound:
+            abort(404)
+
         return base.render('visualization.html', extra_vars={'dataset': dataset})
