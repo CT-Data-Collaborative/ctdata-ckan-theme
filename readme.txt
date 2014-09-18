@@ -4,8 +4,9 @@ functionality.
 
 Installing the theme:
 1. Activate virtualenv
-2. go to the ckanext-ctdata_theme/ directory
+2. go to the ctdata/ directory
 3. run the following command: "python setup.py develop"
+4. in your ckan config file, add ctdata_theme to ckan.plugins
 
 Creating About, News and Special Project pages using the Pages plugin:
 1. Make sure you have the Pages plugin installed
