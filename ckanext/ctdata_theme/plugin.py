@@ -6,21 +6,58 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.base as base
 
+import psycopg2
+
+
+class Singleton(type):
+    def __init__(cls, name, bases, dict):
+        super(Singleton, cls).__init__(name, bases, dict)
+        cls.instance = None
+
+    def __call__(cls, *args, **kw):
+        if cls.instance is None:
+            cls.instance = super(Singleton, cls).__call__(*args, **kw)
+        return cls.instance
+
+
+class Database(object):
+    __metaclass__ = Singleton
+
+    def __init__(self):
+        self.connection = None
+
+    def connect(self,  connection_string):
+        try:
+            self.connection = psycopg2.connect(connection_string)
+        except:
+            print "connection error"
+
+    def cursor(self):
+        return self.connection.cursor()
+
 
 class CTDataThemePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IConfigurable)
     plugins.implements(plugins.IRoutes)
 
     def update_config(self, config):
         toolkit.add_template_directory(config, 'templates')
         toolkit.add_public_directory(config, 'public')
+        toolkit.add_resource('fanstatic', 'ctdata_theme')
+
+    def configure(self, config):
+        postgres_url = config['ckan.datastore.write_url']
+        d = Database()
+        d.connect(postgres_url)
 
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
             m.connect('news', '/news', action='news')
             m.connect('special_projects', '/special_projects', action='special_projects')
-            m.connect('special_projects', '/data_by_topic', action='data_by_topic')
-            m.connect('special_projects', '/visualization/{dataset_name}', action='visualization')
+            m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
+            m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
+            m.connect('get_series', '/series/{dataset_name}/{town}', action='get_series')
         return route_map
 
     def after_map(self, route_map):
@@ -91,3 +128,26 @@ class CTDataController(base.BaseController):
             abort(404)
 
         return base.render('visualization.html', extra_vars={'dataset': dataset})
+
+    def get_series(self, dataset_name, town):
+        d = Database()
+        curr = d.cursor()
+
+        dataset = None
+        try:
+            dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+        except toolkit.ObjectNotFound:
+            abort(404)
+
+        resource = None
+        if dataset:
+            for res in dataset['resources']:
+                if res['format'].lower() == 'csv':
+                    resource = res
+
+        if resource:
+            table_name = resource['id']
+            curr.execute('select Year, Value from public."' + table_name + '" where Town = ?', town)
+            rows = curr.fetchall()
+            for row in rows:
+                print row

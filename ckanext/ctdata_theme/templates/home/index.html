@@ -93,3 +93,9 @@
 </section> <!-- latest news section ends -->
 </div>
 {% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+
+    {% resource 'ctdata_theme/scripts.js' %}
+{% endblock %}
