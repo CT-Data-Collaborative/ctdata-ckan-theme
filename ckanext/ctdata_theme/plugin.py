@@ -1,3 +1,5 @@
+import json
+
 from pylons.controllers.util import abort
 
 import routes.mapper
@@ -5,6 +7,7 @@ import routes.mapper
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.base as base
+from ckan.common import response as http_response, request as http_request
 
 import psycopg2
 
@@ -25,15 +28,17 @@ class Database(object):
 
     def __init__(self):
         self.connection = None
+        self.last_error = ""
+        self.connection_string = ""
 
-    def connect(self,  connection_string):
+    def set_connection_string(self, connection_string):
+        self.connection_string = connection_string
+
+    def connect(self):
         try:
-            self.connection = psycopg2.connect(connection_string)
-        except:
-            print "connection error"
-
-    def cursor(self):
-        return self.connection.cursor()
+            return psycopg2.connect(self.connection_string)
+        except psycopg2.Error:
+            self.last_error = "Unable to connect to the database"
 
 
 class CTDataThemePlugin(plugins.SingletonPlugin):
@@ -49,7 +54,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
     def configure(self, config):
         postgres_url = config['ckan.datastore.write_url']
         d = Database()
-        d.connect(postgres_url)
+        d.set_connection_string(postgres_url)
 
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
@@ -57,7 +62,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('special_projects', '/special_projects', action='special_projects')
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
-            m.connect('get_series', '/series/{dataset_name}/{town}', action='get_series')
+            m.connect('get_series', '/series/{dataset_name}', action='get_series')
         return route_map
 
     def after_map(self, route_map):
@@ -129,15 +134,27 @@ class CTDataController(base.BaseController):
 
         return base.render('visualization.html', extra_vars={'dataset': dataset})
 
-    def get_series(self, dataset_name, town):
+    def get_series(self, dataset_name):
         d = Database()
-        curr = d.cursor()
+
+        json_body = json.loads(http_request.body, encoding=http_request.charset)
+        towns = json_body['towns']
 
         dataset = None
         try:
             dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
         except toolkit.ObjectNotFound:
             abort(404)
+
+        default_dimensions = self._dict_with_key_value('key', 'Default Dimensions', dataset['extras'])['value']
+        default_dimensions = default_dimensions.split(',')
+        defaults = {}
+        for dd in default_dimensions:
+            defaults[dd] = self._dict_with_key_value('key', dd, dataset['extras'])['value']
+
+        default_values = defaults.values()
+        default_string = " and ".join(['t."%s" = %%s' % k for k in defaults.keys()])
+        print default_string
 
         resource = None
         if dataset:
@@ -147,7 +164,61 @@ class CTDataController(base.BaseController):
 
         if resource:
             table_name = resource['id']
-            curr.execute('select Year, Value from public."' + table_name + '" where Town = ?', town)
-            rows = curr.fetchall()
-            for row in rows:
-                print row
+            if table_name:
+                print table_name
+                conn = d.connect()
+
+                # curr = conn.cursor()
+                # curr.execute('''
+                #     select t."Year", t."Value", t."Town" from public."%s" t
+                #     where t."Town" in (%s) and t."Grade" = 'Grade 3' and t."Subject" = 'Reading' and t."Race" = 'White'
+                #     order by t."Town", t."Year"
+                # ''' % (table_name, ",".join(["%s"]*len(towns))), tuple(towns))
+
+                print '''
+                    select t."Year", t."Value", t."Town" from public."%s" t
+                    where t."Town" in (%s) and %s
+                    order by t."Town", t."Year"
+                ''' % (table_name, ",".join(["%s"]*len(towns)), default_string)
+                print default_values
+
+                curr = conn.cursor()
+                curr.execute('''
+                    select t."Year", t."Value", t."Town" from public."%s" t
+                    where t."Town" in (%s) and %s
+                    order by t."Town", t."Year"
+                ''' % (table_name, ",".join(["%s"]*len(towns)), default_string), tuple(towns) + tuple(default_values))
+
+                rows = curr.fetchall()
+                print rows
+
+                conn.commit()
+                conn.close()
+
+                response = {'data': []}
+
+                current_series = None
+                current_town = None
+                longest_years_series = []
+                for row in rows:
+                    print row[2]
+                    if row[2] != current_town:
+                        current_town = row[2]
+                        if current_series:
+                            if len(current_series['years']) > len(longest_years_series):
+                                longest_years_series = current_series['years']
+                            del current_series['years']
+                            response['data'].append(current_series)
+                        current_series = {'town': current_town, 'years': [], 'values': []}
+                    current_series['years'].append(int(row[0]))
+                    current_series['values'].append(float(row[1]))
+                if len(current_series['years']) > len(longest_years_series):
+                    longest_years_series = current_series['years']
+                del current_series['years']
+                response['data'].append(current_series)
+
+                response['years'] = longest_years_series
+
+                http_response.headers['Content-type'] = 'application/json'
+
+                return json.dumps(response)

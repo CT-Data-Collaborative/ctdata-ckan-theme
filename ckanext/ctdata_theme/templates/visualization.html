@@ -5,7 +5,12 @@
 
 
 {% block main_content %}
-<section class="main_body_content">
+
+<form>
+    <input type="hidden" id="dataset_id" value="{{ dataset.id }}">
+    <input type="hidden" id="dataset_title" value="{{ dataset.title }}">
+</form>
+
 <section class="visualisation">
 <div class="ctdata-wrapper">
 
@@ -68,8 +73,6 @@
 </div>
 
 </div>
-</section>
-
 </section>
 {% endblock %}
 
