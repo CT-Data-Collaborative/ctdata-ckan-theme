@@ -1,0 +1,63 @@
+To request the data from the backend for any of the views, send a post request with the following json body to the
+/data/{dataset_id} endpoint:
+{"view": "map"|"table"|"chart",
+ "filters": [{"field": "field value", "values": ["option 1", "option 2]},
+             ...]}
+"map" view isn't implemented yet, since I'm not sure in which form I should return the data.
+
+For the "table" view the reply would be (for example) (assuming there were selected several values for the 'town',
+'grade' and 'measure type' dimensions):
+{
+    'multifield': 'grade',
+    'years': ['2013'],
+	'data': [
+	    {'town': 'town1 name',
+        'multifield': [
+            {'value': 'Grade 3', 'data': [{'measure_type': 'number', 'data': [*list of values, one for every year*]},
+                                          {'measure_type': 'percent', 'data': [...]}]},
+            {'value': 'Grade 4', 'data': [{'measure_type': 'number', 'data': [...]},
+                                          {'measure_type': 'percent', 'data': [...]}]}
+        ]]},
+	    {'town': 'town2 name',
+        'multifield': [
+            {'value': 'Grade 3', 'data': [{'measure_type': 'number', 'data': [*list of values, one for every year*]},
+                                          {'measure_type': 'percent', 'data': [...]}]},
+            {'value': 'Grade 4', 'data': [{'measure_type': 'number', 'data': [...]},
+                                          {'measure_type': 'percent', 'data': [...]}]}
+        ]]}
+    ]
+}
+
+This can be easily translated into an html representation (pseudocode):
+<table>
+    <th>
+        <td>Location</td>
+        <td>global['multifield']</td>
+        <td>Data Type</td>
+        for year in data['years']
+            <td>year</td>
+    </th>
+for town in data['data']:
+    for mf in town['multifield']:
+        for mt in mf['data']:
+            <tr>
+                <td>town['town']</td>
+                <td>mf['value']</td>
+                <td>mt['measuretype']</td>
+                for value in mt['data']:
+                    <td>value</td>
+            </tr>
+<table>
+
+
+
+For the chart views (bar and line both), the reply would be:
+{
+    'years': ['2012', '2013'],
+	'data': [
+	    {'town': 'town1 name',
+         'data': [*list of values, one for every year*]},
+	    {'town': 'town2 name',
+         'data': [*list of values, one for every year*]},
+    ]
+}

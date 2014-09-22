@@ -9,36 +9,11 @@ import ckan.plugins.toolkit as toolkit
 import ckan.lib.base as base
 from ckan.common import response as http_response, request as http_request
 
-import psycopg2
-
-
-class Singleton(type):
-    def __init__(cls, name, bases, dict):
-        super(Singleton, cls).__init__(name, bases, dict)
-        cls.instance = None
-
-    def __call__(cls, *args, **kw):
-        if cls.instance is None:
-            cls.instance = super(Singleton, cls).__call__(*args, **kw)
-        return cls.instance
-
-
-class Database(object):
-    __metaclass__ = Singleton
-
-    def __init__(self):
-        self.connection = None
-        self.last_error = ""
-        self.connection_string = ""
-
-    def set_connection_string(self, connection_string):
-        self.connection_string = connection_string
-
-    def connect(self):
-        try:
-            return psycopg2.connect(self.connection_string)
-        except psycopg2.Error:
-            self.last_error = "Unable to connect to the database"
+from ctdata.database import Database
+from ctdata.visualization.datasets import Dataset
+from ctdata.visualization.querybuilders import QueryBuilderFactory
+from ctdata.visualization.views import ViewFactory
+from ctdata.utils import dict_with_key_value
 
 
 class CTDataThemePlugin(plugins.SingletonPlugin):
@@ -62,7 +37,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('special_projects', '/special_projects', action='special_projects')
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
-            m.connect('get_series', '/series/{dataset_name}', action='get_series')
+            m.connect('get_data', '/data/{dataset_name}', action='get_data')
         return route_map
 
     def after_map(self, route_map):
@@ -75,12 +50,6 @@ class CTDataController(base.BaseController):
 
     def special_projects(self):
         return base.render('special_projects.html')
-
-    def _dict_with_key_value(self, key, value, lst):
-        for dictionary in lst:
-            if dictionary[key].lower() == value.lower():
-                return dictionary
-        return None
 
     def data_by_topic(self):
         dataset_names = toolkit.get_action('package_list')(data_dict={})
@@ -106,9 +75,9 @@ class CTDataController(base.BaseController):
 
                 if domain and subdomain:
                     dataset_obj = {'name': dataset['name'], 'title': dataset['title']}
-                    dmn = self._dict_with_key_value('title', domain, domains)
+                    dmn = dict_with_key_value('title', domain, domains)
                     if dmn:
-                        subdmn = self._dict_with_key_value('title', subdomain, dmn['subdomains'])
+                        subdmn = dict_with_key_value('title', subdomain, dmn['subdomains'])
                         if subdmn:
                             subdmn['datasets'].append(dataset_obj)
                         else:
@@ -134,27 +103,18 @@ class CTDataController(base.BaseController):
 
         return base.render('visualization.html', extra_vars={'dataset': dataset})
 
-    def get_series(self, dataset_name):
+    def get_data(self, dataset_name):
+        print dataset_name
         d = Database()
 
         json_body = json.loads(http_request.body, encoding=http_request.charset)
-        towns = json_body['towns']
+        view, filters = json_body['view'], json_body['filters']
 
         dataset = None
         try:
             dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
         except toolkit.ObjectNotFound:
             abort(404)
-
-        default_dimensions = self._dict_with_key_value('key', 'Default Dimensions', dataset['extras'])['value']
-        default_dimensions = default_dimensions.split(',')
-        defaults = {}
-        for dd in default_dimensions:
-            defaults[dd] = self._dict_with_key_value('key', dd, dataset['extras'])['value']
-
-        default_values = defaults.values()
-        default_string = " and ".join(['t."%s" = %%s' % k for k in defaults.keys()])
-        print default_string
 
         resource = None
         if dataset:
@@ -164,61 +124,26 @@ class CTDataController(base.BaseController):
 
         if resource:
             table_name = resource['id']
+
             if table_name:
                 print table_name
-                conn = d.connect()
+                ds = Dataset(table_name)
+                qb = QueryBuilderFactory.get_query_builder('chart', ds)
+                view = ViewFactory.get_view('chart', qb)
 
-                # curr = conn.cursor()
-                # curr.execute('''
-                #     select t."Year", t."Value", t."Town" from public."%s" t
-                #     where t."Town" in (%s) and t."Grade" = 'Grade 3' and t."Subject" = 'Reading' and t."Race" = 'White'
-                #     order by t."Town", t."Year"
-                # ''' % (table_name, ",".join(["%s"]*len(towns))), tuple(towns))
+                # ds = Dataset(table_name)
+                # qb = QueryBuilderFactory.get_query_builder(view, ds)
+                # view = ViewFactory.get_view(view, qb)
 
-                print '''
-                    select t."Year", t."Value", t."Town" from public."%s" t
-                    where t."Town" in (%s) and %s
-                    order by t."Town", t."Year"
-                ''' % (table_name, ",".join(["%s"]*len(towns)), default_string)
-                print default_values
-
-                curr = conn.cursor()
-                curr.execute('''
-                    select t."Year", t."Value", t."Town" from public."%s" t
-                    where t."Town" in (%s) and %s
-                    order by t."Town", t."Year"
-                ''' % (table_name, ",".join(["%s"]*len(towns)), default_string), tuple(towns) + tuple(default_values))
-
-                rows = curr.fetchall()
-                print rows
-
-                conn.commit()
-                conn.close()
-
-                response = {'data': []}
-
-                current_series = None
-                current_town = None
-                longest_years_series = []
-                for row in rows:
-                    print row[2]
-                    if row[2] != current_town:
-                        current_town = row[2]
-                        if current_series:
-                            if len(current_series['years']) > len(longest_years_series):
-                                longest_years_series = current_series['years']
-                            del current_series['years']
-                            response['data'].append(current_series)
-                        current_series = {'town': current_town, 'years': [], 'values': []}
-                    current_series['years'].append(int(row[0]))
-                    current_series['values'].append(float(row[1]))
-                if len(current_series['years']) > len(longest_years_series):
-                    longest_years_series = current_series['years']
-                del current_series['years']
-                response['data'].append(current_series)
-
-                response['years'] = longest_years_series
+                data = view.get_data([{'field': 'Year', 'values': ['2012', '2013']},
+                                      {'field': 'Town', 'values': ['Andover', 'Ansonia']},
+                                      {'field': 'Measure Type', 'values': ['Percent']},
+                                      {'field': 'Variable', 'values': ['Proficient or Above']},
+                                      {'field': 'Subject', 'values': ['Reading']},
+                                      {'field': 'Grade', 'values': ['Grade 3']},
+                                      {'field': 'Race', 'values': ['White']}])
+                print data, len(data['data'])
 
                 http_response.headers['Content-type'] = 'application/json'
 
-                return json.dumps(response)
+                return json.dumps(data)

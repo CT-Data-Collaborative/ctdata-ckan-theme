@@ -3,8 +3,10 @@ $(function () {
         dataset_title = $("dataset_title").val();
 
     $.ajax({type: "POST",
-            url: "/series/" + dataset_id,
-            data: JSON.stringify({towns: ['Bridgeport', 'Hartford', 'New Haven']}),
+            url: "/data/" + dataset_id,
+            data: JSON.stringify({view: 'chart',
+                                  filters: [{'field': 'Town',
+                                             'values': ['Bridgeport', 'Hartford', 'New Haven']}]}),
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         var series = [],
             years = data['years'];
