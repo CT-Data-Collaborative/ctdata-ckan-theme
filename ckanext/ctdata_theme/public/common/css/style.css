@@ -21,13 +21,13 @@ body { font-family: 'Questrial', sans-serif; font-size:18px; color:#888888; back
 
 header { width:100%; float:left; padding-bottom:20px; background-color: white;}
 header .ctdata-wrapper { clear:both;}
-.top_bar { width:100%; background:#00baf2; float:left; border-bottom:1px solid #00abdf; margin-bottom:15px; }
+.top_bar { width:100%; background:#3970ba; float:left; margin-bottom:15px; }
 .top_bar ul { float:right;}
 .top_bar ul li { float:left;}
 .top_bar ul li a { color:#fff; margin-left:15px; font-size:14px; padding:6px 0 2px; display:inline-block;}
 .top_bar ul li:first-child + li a { margin-right:5px;}
 .top_bar ul li img:hover { opacity:0.5;}
-.top_bar ul li a:hover { color:#333;}
+.top_bar ul li a:hover { color:#aaa;}
 .logo { float:left;}
 header nav { float:right; margin-top:20px;	}
 header nav ul li { float:left; margin-left:28px;}
@@ -47,10 +47,11 @@ line-height: normal; margin-top: 0px}
 .about a { color:#33bdf2; margin-left:10px;}
 .about a:hover { text-decoration:underline;}
 
-.topics { float:left; width:100%; background:#33bdf2; padding:35px 0 45px; text-align:center;}
+.topics { float:left; width:100%; background:#3970ba; padding:35px 0 45px; text-align:center;}
 .topics h2 { font-size:30px; color:#ffffff; margin-bottom:50px; text-transform:uppercase;}
 .topics ul li { display:inline-block; vertical-align:bottom; width:11%; color:#cceffc; font-size:21px; margin:0 1%;}
 .topics ul li a { display:block;}
+.topics ul li a:hover { color: #aaa; text-decoration: none;}
 .topics ul li img { display:block; margin:0px auto 15px; vertical-align:top;  transition:all linear 0.2s 0s;}
 .topics ul li:hover img { transform:scale(1.1);}
 
@@ -337,6 +338,7 @@ label {font-weight: normal; cursor: auto}
 .subtopic_col h2 {
     margin: 0 0 10px 0;
     color: #275BA6;
+    min-height: 66px;
 }
 .subtopic::before {
     content: '';
@@ -389,11 +391,16 @@ label {font-weight: normal; cursor: auto}
 
 #triangle {
     margin: 0;
-    bottom: -46px;
+    bottom: -57px;
     position: absolute;
     display: none;
 }
 
 .triangle_wrapper {
     position: relative;
+}
+
+#graphOptions li input[type=checkbox], #graphOptions li input[type=radio] {
+  margin: 0 5px 10px 0;
+  top: 4px;
 }
