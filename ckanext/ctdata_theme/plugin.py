@@ -108,7 +108,10 @@ class CTDataController(base.BaseController):
         d = Database()
 
         json_body = json.loads(http_request.body, encoding=http_request.charset)
-        view, filters = json_body['view'], json_body['filters']
+        request_view, request_filters = json_body['view'], json_body['filters']
+        print json_body['filters']
+        if not request_view or not request_filters:
+            abort(400, detail='No view and/or filters specified')
 
         dataset = None
         try:
@@ -131,18 +134,12 @@ class CTDataController(base.BaseController):
                 qb = QueryBuilderFactory.get_query_builder('chart', ds)
                 view = ViewFactory.get_view('chart', qb)
 
-                # ds = Dataset(table_name)
-                # qb = QueryBuilderFactory.get_query_builder(view, ds)
-                # view = ViewFactory.get_view(view, qb)
+                dataset = Dataset(table_name)
+                query_builder = QueryBuilderFactory.get_query_builder(request_view, dataset)
+                view = ViewFactory.get_view(request_view, query_builder)
 
-                data = view.get_data([{'field': 'Year', 'values': ['2012', '2013']},
-                                      {'field': 'Town', 'values': ['Andover', 'Ansonia']},
-                                      {'field': 'Measure Type', 'values': ['Percent']},
-                                      {'field': 'Variable', 'values': ['Proficient or Above']},
-                                      {'field': 'Subject', 'values': ['Reading']},
-                                      {'field': 'Grade', 'values': ['Grade 3']},
-                                      {'field': 'Race', 'values': ['White']}])
-                print data, len(data['data'])
+                data = view.get_data(request_filters)
+                print data
 
                 http_response.headers['Content-type'] = 'application/json'
 

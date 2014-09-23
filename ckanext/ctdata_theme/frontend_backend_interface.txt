@@ -1,9 +1,12 @@
-To request the data from the backend for any of the views, send a post request with the following json body to the
+To request the data from the backend for any of the views, send a POST request with the following json body to the
 /data/{dataset_id} endpoint:
 {"view": "map"|"table"|"chart",
  "filters": [{"field": "field value", "values": ["option 1", "option 2]},
              ...]}
+Even if you have a single value for filter you should enclose it in a list syntax.
 "map" view isn't implemented yet, since I'm not sure in which form I should return the data.
+It's possible to specify "all" as a filter value, the values would be properly aggreagted by the backend (the structure
+of replies wouldn't be changed, only the values would be affected)
 
 For the "table" view the reply would be (for example) (assuming there were selected several values for the 'town',
 'grade' and 'measure type' dimensions):
@@ -50,7 +53,6 @@ for town in data['data']:
 <table>
 
 
-
 For the chart views (bar and line both), the reply would be:
 {
     'years': ['2012', '2013'],
@@ -61,3 +63,9 @@ For the chart views (bar and line both), the reply would be:
          'data': [*list of values, one for every year*]},
     ]
 }
+
+About building checkboxes for filters on the frontend: I can create an endpoint just like the one that's currently
+implemented in the feature_bar_chart branch (/data/{resource_id}, "get_resource_data") or we can genrate the controls
+in the visualization.html template itself, using jinja. The second approach seems better to me (since there's no need
+to make additional http-queries and this way the presentation is better separated from the logic), but let me know if
+there're any objections.

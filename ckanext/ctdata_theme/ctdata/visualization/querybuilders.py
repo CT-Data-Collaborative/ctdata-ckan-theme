@@ -1,3 +1,6 @@
+from ckanext.ctdata_theme.ctdata.utils import OrderedSet
+
+
 class QueryBuilder(object):
     """
     Builds the query which is later used by a View to get data.
@@ -8,28 +11,44 @@ class QueryBuilder(object):
     def get_query(self, filters):
         multivalue_dimensions = ['Year', 'Town', 'Measure Type']
 
-        columns_string = ','.join('"%s"' % col for col in self.get_columns(filters))
+        groupby_fields = None
 
         processed_filters = []
         for fltr in filters:
             column_name, values = fltr['field'], fltr['values']
 
-            if column_name in multivalue_dimensions or len(values) > 1:
+            if "all" in map(lambda x: x.lower(), values):
+                # if some of the filters have "all" value, than we don't include them in the WHERE clause,
+                # and group all the selected columns except Value.
+                if not groupby_fields:
+                    # exclude Value from the GROUP BY clause
+                    groupby_fields = list(OrderedSet(self.get_columns(filters)) - OrderedSet(['Value']))
+                    print self.get_columns(filters)
+                    print groupby_fields
+                continue
+            elif column_name in multivalue_dimensions or len(values) > 1:
                 filter_string = '"%s" in (%s)' % (column_name, ','.join(['%s'] * len(values)))
             else:
                 filter_string = '"%s" = %%s' % column_name
 
             processed_filters.append(filter_string)
         filters_string = ' and '.join(processed_filters)
-        filters_values = reduce(lambda acc, f: acc + f['values'], filters, [])
+        filters_values = reduce(lambda acc, f: acc + f['values'] if not 'all' in f['values'] else acc, filters, [])
 
-        query = '''
-            Select %s From public."%s" Where %s
-        ''' % (columns_string, self.dataset.table_name, filters_string)
+        if groupby_fields:
+            columns_string = ','.join('"%s"' % col for col in groupby_fields)
+            columns_string += ',SUM("Value")'
+        else:
+            columns_string = ','.join('"%s"' % col for col in self.get_columns(filters))
+
+        query = '''SELECT %s FROM public."%s" WHERE %s\n''' % (columns_string, self.dataset.table_name, filters_string)
+
+        if groupby_fields:
+            query += "GROUP BY %s\n" % ",".join('"%s"' % f for f in groupby_fields)
 
         orderby_fields = self.get_order_by(filters)
         if orderby_fields:
-            query += 'order by %s' % ",".join('"%s"' % f for f in orderby_fields)
+            query += 'ORDER BY %s\n' % ",".join('"%s"' % f for f in orderby_fields)
 
         return query, filters_values
 
@@ -62,8 +81,9 @@ class TableQueryBuilder(QueryBuilder):
 
     def get_columns(self, filters):
         table_columns = super(TableQueryBuilder, self).get_columns(filters)
+        table_columns.insert(1, self.determine_multifield(filters))
 
-        return table_columns + [self.determine_multifield(filters)]
+        return table_columns
 
     def get_order_by(self, filters):
         mult_field = self.determine_multifield(filters)

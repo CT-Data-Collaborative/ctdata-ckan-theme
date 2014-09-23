@@ -6,8 +6,12 @@ class View(object):
     """
     Gets a query from the QueryBuilder and uses it to retrieve the data from the DB.
     """
-    def __init__(self, query_builder):
+    def __init__(self, query_builder, database=None):
         self.query_builder = query_builder
+        if not database:
+            self.database = Database()
+        else:
+            self.database = database
 
     def convert_data(self, data, filters):
         """
@@ -22,8 +26,7 @@ class View(object):
 
         print query, values
 
-        d = Database()
-        conn = d.connect()
+        conn = self.database.connect()
         if conn:
             curs = conn.cursor()
             curs.execute(query, values)
@@ -36,9 +39,6 @@ class View(object):
 
 
 class TableView(View):
-    def __init__(self, query_builder):
-        super(TableView, self).__init__(query_builder)
-
     def convert_data(self, data, filters):
         result = super(TableView, self).convert_data(data, filters)
         multifield = self.query_builder.determine_multifield(filters)
@@ -111,8 +111,8 @@ class ChartView(View):
 
 class ViewFactory(object):
     @staticmethod
-    def get_view(name, querybuilder):
+    def get_view(name, querybuilder, database=None):
         if name == 'table':
-            return TableView(querybuilder)
+            return TableView(querybuilder, database)
         elif name == 'chart':
-            return ChartView(querybuilder)
+            return ChartView(querybuilder, database)
