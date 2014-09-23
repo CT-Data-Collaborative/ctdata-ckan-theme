@@ -39,7 +39,6 @@ class Dataset(object):
             conn.commit()
 
 
-
 class Dimension(object):
     def __init__(self, name, possible_values):
         self.name = name

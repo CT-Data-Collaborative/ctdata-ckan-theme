@@ -1,4 +1,7 @@
 class QueryBuilder(object):
+    """
+    Builds the query which is later used by a View to get data.
+    """
     def __init__(self, dataset):
         self.dataset = dataset
 
@@ -31,24 +34,36 @@ class QueryBuilder(object):
         return query, filters_values
 
     def get_columns(self, filters):
+        """
+        Columns used in the SELECT clause. Descendants may override those according to their needs.
+        """
         return ['Town', 'Year', 'Measure Type', 'Value']
 
     def get_order_by(self, filters):
+        """
+        Columns used in the ORDER BY clause. Descendants may override those according to their needs.
+        """
         return None
 
 
 class TableQueryBuilder(QueryBuilder):
 
     def determine_multifield(self, filters):
+        """
+        Returns a field for which there's specified several filter values (multifield).
+        it's not one of the 'Year', 'Town' or 'Measure Type' fields. If there're no filters
+        with several values for a field, it returns the first field other than 'Year', 'Town' or 'Measure type'
+        """
         dimension_names = map(lambda dim: dim.name, self.dataset.dimensions)
         can_be_multifield = list(set(dimension_names) - set(['Year', 'Town', 'Measure Type']))
         valid_filters = filter(lambda f: f['field'] in can_be_multifield, filters)
+        # either field with several values or the first field if there's no such
         return (filter(lambda f: len(f['values']) > 1, valid_filters) or valid_filters)[0]['field']
 
     def get_columns(self, filters):
         table_columns = super(TableQueryBuilder, self).get_columns(filters)
 
-        return table_columns + ['Variable']
+        return table_columns + [self.determine_multifield(filters)]
 
     def get_order_by(self, filters):
         mult_field = self.determine_multifield(filters)

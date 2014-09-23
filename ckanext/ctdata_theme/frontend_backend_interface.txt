@@ -55,9 +55,9 @@ For the chart views (bar and line both), the reply would be:
 {
     'years': ['2012', '2013'],
 	'data': [
-	    {'town': 'town1 name',
+	    {'name': 'town1 name',
          'data': [*list of values, one for every year*]},
-	    {'town': 'town2 name',
+	    {'name': 'town2 name',
          'data': [*list of values, one for every year*]},
     ]
 }

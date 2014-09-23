@@ -3,10 +3,17 @@ from ckanext.ctdata_theme.ctdata.database import Database
 
 
 class View(object):
+    """
+    Gets a query from the QueryBuilder and uses it to retrieve the data from the DB.
+    """
     def __init__(self, query_builder):
         self.query_builder = query_builder
 
     def convert_data(self, data, filters):
+        """
+        Converts data retrieved from the DB into a python data tructure (lists, dicts).
+        Intended to be overriden by descendants.
+        """
         result = {'years': dict_with_key_value('field', 'Year', filters)['values']}
         return result
 
@@ -91,7 +98,7 @@ class ChartView(View):
         current_town = None
         for row in map(lambda r: dict(zip(cols, r)), data):
             if row['Town'] != last_town:
-                current_town = {'town': row['Town'], 'data': []}
+                current_town = {'name': row['Town'], 'data': []}
                 last_town = row['Town']
 
                 result['data'].append(current_town)
