@@ -54,6 +54,7 @@ class TableView(View):
         current_town = None
         current_mf = None  # current multifield
         current_mt = None  # current measure type
+        # groups data first by Town, then by multifield and then by Measure Type
         for row in map(lambda r: dict(zip(cols, r)), data):
             if row['Town'] != last_town:
                 current_mt = {'measure_type': row['Measure Type'], 'data': []}
@@ -62,7 +63,7 @@ class TableView(View):
                 current_mf = {'value': row[multifield], 'data': [current_mt]}
                 last_mf = row[multifield]
 
-                current_town = {'town': row['Town'], 'multi_field': [current_mf]}
+                current_town = {'town': row['Town'], 'multifield': [current_mf]}
                 last_town = row['Town']
 
                 result['data'].append(current_town)
