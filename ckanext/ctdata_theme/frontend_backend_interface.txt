@@ -4,7 +4,6 @@ To request the data from the backend for any of the views, send a POST request w
  "filters": [{"field": "field value", "values": ["option 1", "option 2]},
              ...]}
 Even if you have a single value for filter you should enclose it in a list syntax.
-"map" view isn't implemented yet, since I'm not sure in which form I should return the data.
 It's possible to specify "all" as a filter value, the values would be properly aggreagted by the backend (the structure
 of replies wouldn't be changed, only the values would be affected)
 
@@ -64,8 +63,14 @@ For the chart views (bar and line both), the reply would be:
     ]
 }
 
-About building checkboxes for filters on the frontend: I can create an endpoint just like the one that's currently
-implemented in the feature_bar_chart branch (/data/{resource_id}, "get_resource_data") or we can genrate the controls
-in the visualization.html template itself, using jinja. The second approach seems better to me (since there's no need
-to make additional http-queries and this way the presentation is better separated from the logic), but let me know if
-there're any objections.
+
+For the map view, the reply would be (the 'years' field isn't requiredq):
+{
+    'years': ['2013'],
+	'data': [
+	    {'code': 'town1 name',
+         'value': *value for that town*},
+	    {'code': 'town2 name',
+         'value': *value for that town*},
+    ]
+}

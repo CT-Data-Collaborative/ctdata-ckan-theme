@@ -113,6 +113,9 @@ class CTDataController(base.BaseController):
         if not request_view or not request_filters:
             abort(400, detail='No view and/or filters specified')
 
+        if not request_view in ('map', 'chart', 'table'):
+            abort(400, detail='No such view')
+
         dataset = None
         try:
             dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
@@ -144,3 +147,5 @@ class CTDataController(base.BaseController):
                 http_response.headers['Content-type'] = 'application/json'
 
                 return json.dumps(data)
+        else:
+            abort(404)
