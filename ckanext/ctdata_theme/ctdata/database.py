@@ -1,6 +1,7 @@
 import urlparse
 
 import psycopg2
+import sqlalchemy
 
 from .utils import Singleton
 
