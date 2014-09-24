@@ -17,6 +17,9 @@ class View(object):
         """
         Converts data retrieved from the DB into a python data tructure (lists, dicts).
         Intended to be overriden by descendants.
+
+        :param data: rows of data from the db with information about column names
+        ([{'column name': 'column value', ...}, ...]
         """
         result = {'years': dict_with_key_value('field', 'Year', filters)['values']}
         return result
@@ -31,7 +34,8 @@ class View(object):
             curs = conn.cursor()
             curs.execute(query, values)
 
-            result = self.convert_data(curs.fetchall(), filters)
+            cols = self.query_builder.get_columns(filters)
+            result = self.convert_data(map(lambda r: dict(zip(cols, r)), curs.fetchall()), filters)
 
             conn.commit()
 
@@ -45,7 +49,6 @@ class TableView(View):
 
         result['multifield'] = multifield
         result['data'] = []
-        cols = self.query_builder.get_columns(filters)
 
         last_town = None
         last_mf = None  # last multifield
@@ -55,7 +58,7 @@ class TableView(View):
         current_mf = None  # current multifield
         current_mt = None  # current measure type
         # groups data first by Town, then by multifield and then by Measure Type
-        for row in map(lambda r: dict(zip(cols, r)), data):
+        for row in data:
             if row['Town'] != last_town:
                 current_mt = {'measure_type': row['Measure Type'], 'data': []}
                 last_mt = row['Measure Type']
@@ -93,11 +96,9 @@ class ChartView(View):
         result = super(ChartView, self).convert_data(data, filters)
         result['data'] = []
 
-        cols = self.query_builder.get_columns(filters)
-
         last_town = None
         current_town = None
-        for row in map(lambda r: dict(zip(cols, r)), data):
+        for row in data:
             if row['Town'] != last_town:
                 current_town = {'name': row['Town'], 'data': []}
                 last_town = row['Town']
@@ -109,6 +110,15 @@ class ChartView(View):
         return result
 
 
+class ProfileView(ChartView):
+    def convert_data(self, data, filters):
+        result = super(ProfileView, self).convert_data(data, filters)
+        # there should only be one measure type for all the rows
+        result['data_type'] = data[0]['Measure Type']
+
+        return result
+
+
 class ViewFactory(object):
     @staticmethod
     def get_view(name, querybuilder, database=None):
@@ -116,3 +126,5 @@ class ViewFactory(object):
             return TableView(querybuilder, database)
         elif name == 'chart':
             return ChartView(querybuilder, database)
+        elif name == 'profile':
+            return ProfileView(querybuilder, database)

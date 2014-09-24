@@ -2,8 +2,11 @@ import urlparse
 
 import psycopg2
 import sqlalchemy
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from .utils import Singleton
+from community.models import Base, CommunityProfile
 
 
 class Database(object):
@@ -13,21 +16,34 @@ class Database(object):
         self.connection = None
         self.last_error = ""
         self.connection_string = ""
+        self.engine = None
+        self.session_factory = None
 
     def set_connection_string(self, connection_string):
         self.connection_string = connection_string
 
     def connect(self):
-        try:
-            parsed_url = urlparse.urlparse(self.connection_string)
+        parsed_url = urlparse.urlparse(self.connection_string)
 
-            # we can't just connect using the connection string, because it doesn't work with older versions
-            # of Postgres (and there's an older version on the staging server)
-            return psycopg2.connect(
-                database=parsed_url.path[1:],
-                user=parsed_url.username,
-                password=parsed_url.password,
-                host=parsed_url.hostname
-            )
-        except psycopg2.Error:
-            self.last_error = "Unable to connect to the database"
+        # we can't just connect using the connection string, because it doesn't work with older versions
+        # of Postgres (and there's an older version on the staging server)
+        return psycopg2.connect(
+            database=parsed_url.path[1:],
+            user=parsed_url.username,
+            password=parsed_url.password,
+            host=parsed_url.hostname
+        )
+
+    def init_sa(self, connection_string):
+        self.engine = create_engine(connection_string)
+        Base.metadata.create_all(self.engine)
+
+    def init_community_data(self, table_name):
+        self.session_factory = sessionmaker(bind=self.engine)
+        session = self.session_factory()
+
+        if session.query(CommunityProfile).count() == 0:
+            session.add(CommunityProfile('Andover'))
+            session.add(CommunityProfile('Ansonia'))
+
+        session.commit()

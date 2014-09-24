@@ -102,3 +102,5 @@ class QueryBuilderFactory(object):
             return TableQueryBuilder(dataset)
         if name == 'chart':
             return ChartQueryBuilder(dataset)
+        if name == 'default':
+            return QueryBuilder(dataset)

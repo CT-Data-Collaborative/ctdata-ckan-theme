@@ -13,6 +13,7 @@ from ctdata.database import Database
 from ctdata.visualization.datasets import Dataset
 from ctdata.visualization.querybuilders import QueryBuilderFactory
 from ctdata.visualization.views import ViewFactory
+from ctdata.community.models import CommunityProfile, ProfileIndicator, ProfileIndicatorField
 from ctdata.utils import dict_with_key_value
 
 
@@ -27,9 +28,12 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         toolkit.add_resource('fanstatic', 'ctdata_theme')
 
     def configure(self, config):
-        postgres_url = config['ckan.datastore.write_url']
-        d = Database()
-        d.set_connection_string(postgres_url)
+        db = Database()
+        db.set_connection_string(config['ckan.datastore.write_url'])
+
+        db.init_sa(config['sqlalchemy.url'])
+        if 'ctdata.communities_source' in config:
+            db.init_community_data(config['ctdata.communities_source'])
 
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
@@ -38,6 +42,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_data', '/data/{dataset_name}', action='get_data')
+            m.connect('community_profiles', '/community/{community_name}', action='get_community_profile')
         return route_map
 
     def after_map(self, route_map):
@@ -144,3 +149,49 @@ class CTDataController(base.BaseController):
                 http_response.headers['Content-type'] = 'application/json'
 
                 return json.dumps(data)
+
+    def get_community_profile(self, community_name):
+        db = Database()
+        sess = db.session_factory()
+
+        community = sess.query(CommunityProfile).filter(CommunityProfile.name == community_name).first()
+        if not community:
+            abort(404)
+
+        if http_request.method == 'POST':
+            json_body = json.loads(http_request.body, encoding=http_request.charset)
+            filters = json_body['filters']
+            dataset_id = json_body['dataset_id']
+
+            dataset = None
+            try:
+                dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_id})
+            except toolkit.ObjectNotFound:
+                abort(404)
+
+            resource = None
+            if dataset:
+                for res in dataset['resources']:
+                    if res['format'].lower() == 'csv':
+                        resource = res
+
+            qb = QueryBuilderFactory.get_query_builder('default', Dataset(resource['id']))
+            view = ViewFactory.get_view('profile', qb)
+
+            data = view.get_data(filters)
+
+            indicator = ProfileIndicator(community, dataset['title'], data['data_type'], data['years'][0])
+            sess.add(indicator)
+
+            for value in data['data']:
+                town = ProfileIndicatorField(indicator, value['name'], value['data'][0])
+                sess.add(town)
+
+            sess.commit()
+
+        indicators = sess.query(ProfileIndicator).filter(ProfileIndicator.community_profile == community).all()
+
+        print indicators
+
+        return base.render('community_profile.html', extra_vars={'community_name': community_name,
+                                                                 'indicators': indicators})
