@@ -1,3 +1,21 @@
+function get_filters(){
+  var filters = [];
+  dimensions = $("li.filter");
+ 
+  $.each(dimensions, function(i){
+    var cur_dim = $(dimensions[i]);
+    var cur_filter = {'field': cur_dim.find('a').text(), 'values': []};
+    var checked = cur_dim.find("input:checked")
+  
+    $.each(checked, function(option){
+      cur_filter['values'].push(checked[option].value);
+    });
+    
+    filters.push(cur_filter);
+  });
+  return filters;
+}
+
 $(function () {
     var dataset_id = $("#dataset_id").val(),
         dataset_title = $("dataset_title").val();
@@ -45,3 +63,4 @@ $(function () {
         });
     })
 });
+

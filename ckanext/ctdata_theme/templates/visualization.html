@@ -19,13 +19,13 @@
 <ul>
 {% for dimension in dimensions %}
 {% if dimension.possible_values %}
-<li>
+<li class="filter">
   <a href="#collapse{{dimension.name|replace(" ", "")}}" data-toggle="collapse" class="togglebtn">{{dimension.name}}</a>
   <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
   <ul>
   {% for value in dimension.possible_values %}
     <li>
-        <input type="checkbox" id="{{value}}Check">
+        <input type="checkbox" id="{{value}}Check" value="{{value}}">
         <label for="{{value}}Check">{{value}}</label>
     </li>
   {% endfor %}
