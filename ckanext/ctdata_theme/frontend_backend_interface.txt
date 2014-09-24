@@ -69,3 +69,7 @@ implemented in the feature_bar_chart branch (/data/{resource_id}, "get_resource_
 in the visualization.html template itself, using jinja. The second approach seems better to me (since there's no need
 to make additional http-queries and this way the presentation is better separated from the logic), but let me know if
 there're any objections.
+
+I generated the checkboxes in the visualization template, much better than
+the old way. Also, a good reply for the map view is just the same as for
+the reply for the chart views
