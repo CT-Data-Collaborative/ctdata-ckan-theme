@@ -64,7 +64,7 @@ For the chart views (bar and line both), the reply would be:
 }
 
 
-For the map view, the reply would be (the 'years' field isn't requiredq):
+For the map view, the reply would be (the 'years' field isn't required, but I left it just to be consistent):
 {
     'years': ['2013'],
 	'data': [
