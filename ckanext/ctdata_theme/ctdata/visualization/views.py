@@ -124,9 +124,7 @@ class MapView(View):
         result = super(MapView, self).convert_data(data, filters)
         result['data'] = []
 
-        cols = self.query_builder.get_columns(filters)
-
-        for row in map(lambda r: dict(zip(cols, r)), data):
+        for row in data:
             result['data'].append({'code': row['Town'], 'value': float(row['Value'])})
 
         return result
@@ -140,6 +138,6 @@ class ViewFactory(object):
         elif name == 'chart':
             return ChartView(querybuilder, database)
         elif name == 'profile':
-            return ProfileView(querybuilder, database)           return ChartView(querybuilder, database)
+            return ProfileView(querybuilder, database)
         elif name == 'map':
             return MapView(querybuilder, database)

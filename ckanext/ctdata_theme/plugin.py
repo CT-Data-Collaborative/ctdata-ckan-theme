@@ -32,7 +32,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         db.set_connection_string(config['ckan.datastore.write_url'])
 
         db.init_sa(config['sqlalchemy.url'])
-        db.init_community_data()
+        db.init_community_data(config['ctdata.communities_source'])
 
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
@@ -104,7 +104,7 @@ class CTDataController(base.BaseController):
         except toolkit.ObjectNotFound:
             abort(404)
 
-        return base.render('visualization.html', extra_vars={'dataset': dataset, 'dimensions': dataset.dimensions})
+        return base.render('visualization.html', extra_vars={'dataset': dataset.info, 'dimensions': dataset.dimensions})
 
     def get_data(self, dataset_name):        
         json_body = json.loads(http_request.body, encoding=http_request.charset)

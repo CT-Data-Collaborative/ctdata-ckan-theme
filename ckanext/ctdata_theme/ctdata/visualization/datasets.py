@@ -8,8 +8,9 @@ from models import DatasetCache
 
 
 class Dataset(object):
-    def __init__(self, table_name, meta_url=None):
+    def __init__(self, table_name, info, meta_url=None):
         self.table_name = table_name
+        self.info = info
         self.meta_url = meta_url
         self.dimensions = []
         self.default_indicator = []
@@ -135,6 +136,6 @@ class DatasetFactory(object):
             table_name = resource['id']
             if meta:
                 meta = meta.get('url')
-            return Dataset(table_name, meta)
+            return Dataset(table_name, dataset, meta)
         else:
             raise toolkit.ObjectNotFound("There's no resource for the given dataset")
