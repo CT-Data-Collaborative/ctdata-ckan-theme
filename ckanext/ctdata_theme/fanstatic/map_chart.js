@@ -43,6 +43,8 @@ chart = new Highcharts.Chart({
   colorAxis: {
   },
   xAxis:{
+    labels: {enabled: false},
+    gridLineWidth: 0,
     max: -71.787239,
     min: -73.727775,
     minRange: 1,
@@ -58,6 +60,9 @@ chart = new Highcharts.Chart({
     }
   },
   yAxis:{
+    title:{text:''},
+    labels: {enabled: false},
+    gridLineWidth: 0,
     max: -40.950943,
     min: -42.050587,
     minRange: 1,
