@@ -39,6 +39,51 @@ function get_filters(){
   return filters;
 }
 
+function draw_table(){
+  var dataset_id = $("#dataset_id").val(),
+      dataset_title = $("dataset_title").val();
+  $.ajax({type: "POST",
+          url: "/data/"+dataset_id,
+          data: JSON.stringify({view: 'table',
+                               filters: get_filters()
+                               }),
+          contentType: 'application/json; charset=utf-8'}).done(function(data) {
+
+      console.log(data);
+      var multifield = data['multifield'];
+      var html = "<table>"+
+                   "<tr>"+
+                     "<th>Location</th>"+
+                     "<th>Year</th>"+
+                     "<th>"+multifield+"</th>"+
+                     "<th>Measure Type</th>"+
+                     "<th>Value</th>"+
+                   "</tr>";
+      $.each(data['data'], function(town_index){
+        town = data['data'][town_index];
+        $.each(town['multifield'], function(mf_index){
+          mf = town['multifield'][mf_index];
+            $.each(mf['data'], function(mt_index){ 
+              mt = mf['data'][mt_index];
+              $.each(mt['data'], function(value_index){
+              value = mt['data'][value_index];
+              html = html+
+                 "<tr>"+
+                   "<td>"+town['town']+"</td>"+
+                   "<td>"+data['years'][value_index]+"</td>"+
+                   "<td>"+mf['value']+"</td>"+
+                   "<td>"+mt['measure_type']+"</td>"+
+                   "<td>"+value+"</td>"+
+                 "</tr>";
+              });
+            });
+        });
+      });
+      html = html+"</table>";
+      $("#container").html(html);
+});
+}
+
 function draw_chart(){
   var dataset_id = $("#dataset_id").val(),
       dataset_title = $("dataset_title").val();
@@ -89,10 +134,10 @@ $(function () {
     check_defaults()
     $('input[type="checkbox"]').change(function(){
         //Only one checkbox per dimension can be checked 
-        if($(this).prop('checked')){
-           $(this).parent().parent().find('input').prop('checked', false);
-           $(this).prop('checked', true);
-        }
+//        if($(this).prop('checked')){
+//           $(this).parent().parent().find('input').prop('checked', false);
+//           $(this).prop('checked', true);
+//        }
         display_data();
     });
     display_data();
