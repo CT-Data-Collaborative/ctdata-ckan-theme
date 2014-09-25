@@ -26,8 +26,8 @@ chart = new Highcharts.Chart({
   chart: {
     renderTo: 'container',
     type: 'map',
-    width: 560, //-99
-    height: 400 //-139
+    width: 800, //-99
+    height: 520 //-139
   },
   title : {
     text : dataset_title
