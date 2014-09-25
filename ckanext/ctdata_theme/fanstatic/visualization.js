@@ -56,14 +56,14 @@ function draw_table(){
 
       console.log(data);
       var multifield = data['multifield'];
-      var html = '<table id="table">'+
+      var html = '<table id="table" class="results_table">'+
                  "<thead>"+
                    "<tr>"+
-                     "<th>Location</th>"+
-                     "<th>Year</th>"+
-                     "<th>"+multifield+"</th>"+
-                     "<th>Measure Type</th>"+
-                     "<th>Value</th>"+
+                     "<th class='col-1'>Location</th>"+
+                     "<th class='col-2'>Year</th>"+
+                     "<th class='col-3'>"+multifield+"</th>"+
+                     "<th class='col-4'>Measure Type</th>"+
+                     "<th class='col-5'>Value</th>"+
                    "</tr>"+
                  "</thead>"+
                  "<tbody>";
@@ -77,11 +77,11 @@ function draw_table(){
               value = mt['data'][value_index];
               html = html+
                  "<tr>"+
-                   "<td>"+town['town']+"</td>"+
-                   "<td>"+data['years'][value_index]+"</td>"+
-                   "<td>"+mf['value']+"</td>"+
-                   "<td>"+mt['measure_type']+"</td>"+
-                   "<td>"+value+"</td>"+
+                   "<td class='col-1'>"+town['town']+"</td>"+
+                   "<td class='col-2'>"+data['years'][value_index]+"</td>"+
+                   "<td class='col-3'>"+mf['value']+"</td>"+
+                   "<td class='col-4'>"+mt['measure_type']+"</td>"+
+                   "<td class='col-5'>"+value+"</td>"+
                  "</tr>";
               });
             });

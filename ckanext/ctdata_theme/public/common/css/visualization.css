@@ -5,26 +5,3 @@ div.panel-collapse.collapse.in{
 input[type="checkbox"]{
   -webkit-appearance: checkbox;
 }
-th{
-  border-top: 2px solid black;
-  border-bottom: 2px solid black;
-}
-tr td:first-child,th:first-child{
-  border-left: 2px solid black;
-}
-tr td:last-child, th:last-child{
-  border-right: 2px solid black;
-}
-tr td, th{
-  border-right: 1px solid black;
-  text-align: center;
-}
-td{
-  border-top: 2px solid black;
-}
-table tr:last-child{
-  border-bottom: 2px solid black;
-}
-table{
-  width: 75%;
-}

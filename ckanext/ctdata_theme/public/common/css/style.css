@@ -223,24 +223,24 @@ _noFocusLine: expression(this.hideFocus=true); -ms-filter:"progid:DXImageTransfo
 .results_table ul.table_head li.col-7{ width:93px; }
 .results_table ul.table_head li.col-8{ width:93px; color:#00adef;}
 
-.results_table ul.table_head li.col-1, .results_table ul.table_head li.col-3, .results_table ul.table_head li.col-5, .results_table ul.table_head li.col-7 { border-bottom:5px solid #66cef5;}
-.results_table ul.table_head li.col-2, .results_table ul.table_head li.col-4, .results_table ul.table_head li.col-6, .results_table ul.table_head li.col-8{ border-bottom:5px solid #00adef;}
+.results_table th.col-1, .results_table th.col-3, .results_table th.col-5, .results_table th.col-7 { border-bottom:5px solid #66cef5;}
+.results_table th.col-2, .results_table th.col-4, .results_table th.col-6, .results_table th.col-8{ border-bottom:5px solid #00adef;}
 
 .results_table ul.table_data {text-align:center; height:42px; display:table;}
-.results_table ul.table_data li { color:#444; font-family:'roboto'; font-size:14px; display:table-cell; vertical-align:middle;}
+.results_table td { color:#444; font-family:'roboto'; font-size:14px; display:table-cell; vertical-align:middle;}
 
-.results_table ul.table_data li.col-1, .results_table ul.table_data li.col-3, .results_table ul.table_data li.col-5, .results_table ul.table_data li.col-7 {background:#f9f9f9;}
-.results_table ul.table_data li.col-2, .results_table ul.table_data li.col-4, .results_table ul.table_data li.col-6, .results_table ul.table_data li.col-8{ background:#fff;}
+.results_table td.col-1, .results_table td.col-3, .results_table td.col-5, .results_table td.col-7 {background:#f9f9f9;}
+.results_table td.col-2, .results_table td.col-4, .results_table td.col-6, .results_table td.col-8{ background:#fff;}
 
-.results_table ul.table_data li.col-1{ width:162px; text-align:left; padding:0 10px; color:#444; font-family:'roboto'; line-height:1; font-weight:600;  border-bottom:1px solid #eee;}
-.results_table ul.table_data li.col-1 span { display:block; color:#888888; font-size:12px; margin-top:3px; font-weight:normal;}
-.results_table ul.table_data li.col-2{ border-bottom:1px solid #eee;  width:128px;}
-.results_table ul.table_data li.col-3{ border-bottom:1px solid #eee;  width:112px;}
-.results_table ul.table_data li.col-4{ border-bottom:1px solid #eee;  width:92px;}
-.results_table ul.table_data li.col-5{ border-bottom:1px solid #eee;  width:93px; }
-.results_table ul.table_data li.col-6{ border-bottom:1px solid #eee;  width:94px;}
-.results_table ul.table_data li.col-7{ border-bottom:1px solid #eee;  width:93px;}
-.results_table ul.table_data li.col-8{ border-bottom:1px solid #eee;  width:93px;}
+.results_table td.col-1{ width:162px; text-align:left; padding:0 10px; color:#444; font-family:'roboto'; line-height:1; font-weight:600;  border-bottom:1px solid #eee;}
+.results_table td.col-1 span { display:block; color:#888888; font-size:12px; margin-top:3px; font-weight:normal;}
+.results_table td.col-2{ border-bottom:1px solid #eee;  width:128px;}
+.results_table td.col-3{ border-bottom:1px solid #eee;  width:112px;}
+.results_table td.col-4{ border-bottom:1px solid #eee;  width:92px;}
+.results_table td.col-5{ border-bottom:1px solid #eee;  width:93px; }
+.results_table td.col-6{ border-bottom:1px solid #eee;  width:94px;}
+.results_table td.col-7{ border-bottom:1px solid #eee;  width:93px;}
+.results_table td.col-8{ border-bottom:1px solid #eee;  width:93px;}
 
 .customselectinner { float:left;}
 .customselectinner select {   background: none; color: #888888; ; left: -999999px; padding: 14px 20px 13px; position: absolute;  width: 450px;}
