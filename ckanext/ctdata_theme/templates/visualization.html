@@ -89,10 +89,12 @@
 {% block scripts %}
 {{ super() }}
 <link rel="stylesheet" type="text/css" href="/common/css/visualization.css">
+<link rel="stylesheet" type="text/css" href="/common/css/jquery.dataTables.css">
 {% resource 'ctdata_theme/highcharts.js' %}
 {% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/map.js' %}
 {% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/data.js' %}
 {% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/exporting.js' %}
 {% resource 'ctdata_theme/visualization.js' %}
+{% resource 'ctdata_theme/jquery.dataTables.js' %}
 {% resource 'ctdata_theme/map_chart.js' %}
 {% endblock %}

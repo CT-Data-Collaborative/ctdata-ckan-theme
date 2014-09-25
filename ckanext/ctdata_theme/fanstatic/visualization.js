@@ -51,14 +51,17 @@ function draw_table(){
 
       console.log(data);
       var multifield = data['multifield'];
-      var html = "<table>"+
+      var html = '<table id="table">'+
+                 "<thead>"+
                    "<tr>"+
                      "<th>Location</th>"+
                      "<th>Year</th>"+
                      "<th>"+multifield+"</th>"+
                      "<th>Measure Type</th>"+
                      "<th>Value</th>"+
-                   "</tr>";
+                   "</tr>"+
+                 "</thead>"+
+                 "<tbody>";
       $.each(data['data'], function(town_index){
         town = data['data'][town_index];
         $.each(town['multifield'], function(mf_index){
@@ -79,8 +82,9 @@ function draw_table(){
             });
         });
       });
-      html = html+"</table>";
+      html = html+"</tbody></table>";
       $("#container").html(html);
+      $("#table").DataTable()
 });
 }
 
