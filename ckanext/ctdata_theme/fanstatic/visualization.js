@@ -7,10 +7,15 @@ function set_display_type(new_type){
 }
 
 function display_data(){
-  if(display_type == "map"){
-    draw_map();
-  } else {
-    draw_chart();
+  switch(display_type){
+    case "map":
+      draw_map();
+      break;
+    case "table":
+      draw_table();
+      break;
+    default:
+      draw_chart();
   }
 }
 
