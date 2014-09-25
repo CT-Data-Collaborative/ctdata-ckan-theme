@@ -5,6 +5,7 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from visualization.models import VisualizationOrmBase
 from .utils import Singleton
 from community.models import Base, CommunityProfile
 
@@ -37,9 +38,11 @@ class Database(object):
     def init_sa(self, connection_string):
         self.engine = create_engine(connection_string)
         Base.metadata.create_all(self.engine)
+        VisualizationOrmBase.metadata.create_all(self.engine)
+        
+        self.session_factory = sessionmaker(bind=self.engine)
 
     def init_community_data(self, table_name):
-        self.session_factory = sessionmaker(bind=self.engine)
         session = self.session_factory()
 
         if session.query(CommunityProfile).count() == 0:

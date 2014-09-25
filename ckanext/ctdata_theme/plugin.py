@@ -10,7 +10,7 @@ import ckan.lib.base as base
 from ckan.common import response as http_response, request as http_request
 
 from ctdata.database import Database
-from ctdata.visualization.datasets import Dataset
+from ctdata.visualization.datasets import DatasetFactory
 from ctdata.visualization.querybuilders import QueryBuilderFactory
 from ctdata.visualization.views import ViewFactory
 from ctdata.community.models import CommunityProfile, ProfileIndicator, ProfileIndicatorField
@@ -32,8 +32,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         db.set_connection_string(config['ckan.datastore.write_url'])
 
         db.init_sa(config['sqlalchemy.url'])
-        if 'ctdata.communities_source' in config:
-            db.init_community_data(config['ctdata.communities_source'])
+        db.init_community_data()
 
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
@@ -100,56 +99,38 @@ class CTDataController(base.BaseController):
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def visualization(self, dataset_name):
-        dataset = None
         try:
-            dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+            dataset = DatasetFactory.get_dataset(dataset_name)
         except toolkit.ObjectNotFound:
             abort(404)
 
-        return base.render('visualization.html', extra_vars={'dataset': dataset})
+        return base.render('visualization.html', extra_vars={'dataset': dataset, 'dimensions': dataset.dimensions})
 
-    def get_data(self, dataset_name):
-        print dataset_name
-        d = Database()
-
+    def get_data(self, dataset_name):        
         json_body = json.loads(http_request.body, encoding=http_request.charset)
-        request_view, request_filters = json_body['view'], json_body['filters']
-        print json_body['filters']
+        request_view, request_filters = json_body.get('view'), json_body.get('filters')
+
         if not request_view or not request_filters:
             abort(400, detail='No view and/or filters specified')
 
-        dataset = None
+        if not request_view in ('map', 'chart', 'table'):
+            abort(400, detail='No such view')
+
         try:
-            dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+            dataset = DatasetFactory.get_dataset(dataset_name)
         except toolkit.ObjectNotFound:
             abort(404)
 
-        resource = None
-        if dataset:
-            for res in dataset['resources']:
-                if res['format'].lower() == 'csv':
-                    resource = res
+        query_builder = QueryBuilderFactory.get_query_builder(request_view, dataset)
+        view = ViewFactory.get_view(request_view, query_builder)
 
-        if resource:
-            table_name = resource['id']
+        data = view.get_data(request_filters)
+        print data
 
-            if table_name:
-                print table_name
-                ds = Dataset(table_name)
-                qb = QueryBuilderFactory.get_query_builder('chart', ds)
-                view = ViewFactory.get_view('chart', qb)
+        http_response.headers['Content-type'] = 'application/json'
 
-                dataset = Dataset(table_name)
-                query_builder = QueryBuilderFactory.get_query_builder(request_view, dataset)
-                view = ViewFactory.get_view(request_view, query_builder)
-
-                data = view.get_data(request_filters)
-                print data
-
-                http_response.headers['Content-type'] = 'application/json'
-
-                return json.dumps(data)
-
+        return json.dumps(data)
+    
     def get_community_profile(self, community_name):
         db = Database()
         sess = db.session_factory()
@@ -163,19 +144,12 @@ class CTDataController(base.BaseController):
             filters = json_body['filters']
             dataset_id = json_body['dataset_id']
 
-            dataset = None
             try:
-                dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_id})
+                dataset = DatasetFactory.get_dataset(dataset_id)
             except toolkit.ObjectNotFound:
                 abort(404)
 
-            resource = None
-            if dataset:
-                for res in dataset['resources']:
-                    if res['format'].lower() == 'csv':
-                        resource = res
-
-            qb = QueryBuilderFactory.get_query_builder('default', Dataset(resource['id']))
+            qb = QueryBuilderFactory.get_query_builder('default',dataset)
             view = ViewFactory.get_view('profile', qb)
 
             data = view.get_data(filters)

@@ -78,6 +78,29 @@ class TestQueryBuilders(object):
         assert v == ['2012', '2013', 'Andover', 'Ansonia', 'Percent', 'Basic', 'White', 'Black']
         assert q.strip() == '''SELECT "Town","Race","Year","Measure Type","Value" FROM public."testtable" WHERE "Year" in (%s,%s) and "Town" in (%s,%s) and "Measure Type" in (%s) and "Variable" = %s and "Race" in (%s,%s)\nORDER BY "Town","Race","Measure Type","Year"''', 'TableQueryBuilder returns wrong sql (multifield value)'
 
+    def test_map_builder_basic(self):
+        b = QueryBuilderFactory.get_query_builder('map', self.ds)
+        filters = [{'field': 'Year', 'values': ['2012']},
+                   {'field': 'Town', 'values': ['Andover', 'Ansonia']},
+                   {'field': 'Measure Type', 'values': ['Percent']},
+                   {'field': 'Variable', 'values': ['Basic']},
+                   {'field': 'Race', 'values': ['White']}]
+        q, v = b.get_query(filters)
+        assert v == ['2012', 'Andover', 'Ansonia', 'Percent', 'Basic', 'White']
+        assert q.strip() == '''SELECT "Town","Value" FROM public."testtable" WHERE "Year" in (%s) and "Town" in (%s,%s) and "Measure Type" in (%s) and "Variable" = %s and "Race" = %s''', 'MapQueryBuilder returns wrong sql (basic filter values)'
+
+    def test_map_builder_all(self):
+        b = QueryBuilderFactory.get_query_builder('map', self.ds)
+        filters = [{'field': 'Year', 'values': ['2012']},
+                   {'field': 'Town', 'values': ['Andover', 'Ansonia']},
+                   {'field': 'Measure Type', 'values': ['Percent']},
+                   {'field': 'Variable', 'values': ['Basic']},
+                   {'field': 'Race', 'values': ['all']}]
+        q, v = b.get_query(filters)
+        assert v == ['2012', 'Andover', 'Ansonia', 'Percent', 'Basic']
+        print q
+        assert q.strip() == '''SELECT "Town",SUM("Value") FROM public."testtable" WHERE "Year" in (%s) and "Town" in (%s,%s) and "Measure Type" in (%s) and "Variable" = %s\nGROUP BY "Town"''', 'MapQueryBuilder returns wrong sql (one "all" value)'
+
 
 class TestViews(object):
 
@@ -258,4 +281,30 @@ class TestViews(object):
                  ]},
             ]
         }
+        assert data == res
+
+    def test_map_view(self):
+        self.db.set_data([["Andover", 100],
+                          ["Ansonia", 200]])
+
+        filters = [{'field': 'Year', 'values': ['2012']},
+                   {'field': 'Town', 'values': ['Andover', 'Ansonia']},
+                   {'field': 'Measure Type', 'values': ['Percent']},
+                   {'field': 'Variable', 'values': ['Basic']},
+                   {'field': 'Race', 'values': ['White']}]
+
+        qb = QueryBuilderFactory.get_query_builder('map', self.ds)
+        view = ViewFactory.get_view('map', qb, self.db)
+
+        data = view.get_data(filters)
+        res = {
+            'years': ['2012'],
+            'data': [
+                {'code': 'Andover',
+                 'value': 100},
+                {'code': 'Ansonia',
+                 'value': 200},
+            ]
+        }
+
         assert data == res

@@ -1,48 +1,140 @@
-from ckanext.ctdata_theme.ctdata.database import Database
+import urllib2
+import json
+
+import ckan.plugins.toolkit as toolkit
+
+from ..database import Database
+from models import DatasetCache
 
 
 class Dataset(object):
-    def __init__(self, table_name):
+    def __init__(self, table_name, meta_url=None):
         self.table_name = table_name
+        self.meta_url = meta_url
         self.dimensions = []
         self.default_indicator = []
         self._get_dimensions()
 
     def _get_dimensions(self):
-        d = Database()
-        conn = d.connect()
-        if conn:
-            curs = conn.cursor()
-            ignored_columns = ["_id", "_full_text"]
-            query = '''
-                Select column_name from information_schema.columns
-                where table_name = '%s' and column_name not in (%s)
-            ''' % (self.table_name, ",".join(["'%s'" % c for c in ignored_columns]))
-            curs.execute(query, (self.table_name,))
+        db = Database()
+        sess = db.session_factory()
+        # get the cached metadata from the db
+        cached = sess.query(DatasetCache).filter(DatasetCache.table_name == self.table_name).first()
 
-            ignored_dims = ["Value", "Town", "FIPS"]
-            for row in curs.fetchall():
-                dim_name, dim_values = row[0], []
+        # if the cached copy doesn't contain the info about incompatibilities and we were provided this info
+        # we wouldn't use the cached copy but compute all the metadata once more, adding incompat. info
+        if cached and not (not cached.has_incs and self.meta_url):
+            # it's ok, we have the cached copy and either it has the icompat. data or it doesn't but there was none
+            # provided anyway
+            parsed_json = json.loads(cached.meta)
+            for dim in parsed_json:
+                self.dimensions.append(Dimension(dim['dimension'], dim['values'], dim['incompatible']))
+        else:
+            # computing the cache for the first time or adding info about incompatibilities
+            conn = db.connect()
 
-                if not dim_name in ignored_dims:
-                    dim_values_query = '''
-                        Select distinct "%s" from public."%s" t order by "%s"
-                    ''' % (dim_name, self.table_name, dim_name)
+            # data about incompatibilities stored as an additional json resource in the dataset.
+            # Dataset instance gets an url to that resource, so we download its content and parse it
+            incompatibilities = []
+            if self.meta_url:
+                response = urllib2.urlopen(self.meta_url)
+                raw_json = response.read()
+                incompatibilities = json.loads(raw_json)
+                # source data contains dots as delimeters, so we need to convert dots to spaces
+                for inc in incompatibilities:
+                    inc['dimension'] = inc['dimension'].replace('.', ' ')
+                    inc['dimVal'] = inc['dimVal'].replace('.', ' ')
+                    inc['incompatible'] = map(lambda x: x.replace('.', ' '), inc['incompatible'])
 
-                    curs.execute(dim_values_query)
-                    res = curs.fetchall()
+            if conn:
+                # get the info about columns in the dataset from the db
+                # self.table_name is the name of the table used by Datastore to store dataset's data
+                curs = conn.cursor()
+                ignored_columns = ["_id", "_full_text"]
+                query = '''
+                    Select column_name from information_schema.columns
+                    where table_name = '%s' and column_name not in (%s)
+                ''' % (self.table_name, ",".join(["'%s'" % c for c in ignored_columns]))
+                curs.execute(query, (self.table_name,))
 
-                    dim_values = [d[0] for d in filter(lambda x: str(x[0]) != 'NA', res)]
+                meta_data = []
+                ignored_dims = ["Value", "FIPS"]
+                for row in curs.fetchall():
+                    dim_name, dim_values, joined_incs = row[0], [], {}
 
-                self.dimensions.append(Dimension(dim_name, dim_values))
+                    # for every dimension, except "Value" and "FIPS", we determine the possible values that dimension
+                    # could have
+                    if not dim_name in ignored_dims:
+                        dim_values_query = '''
+                            Select distinct "%s" from public."%s" t order by "%s"
+                        ''' % (dim_name, self.table_name, dim_name)
 
-            conn.commit()
+                        curs.execute(dim_values_query)
+                        res = curs.fetchall()
+
+                        dim_values = [str(db[0]) for db in filter(lambda x: str(x[0]) != 'NA', res)]
+
+                        # also determine incompatibilities for that dimension
+                        dim_incs = filter(lambda x: x['dimension'] == dim_name, incompatibilities)
+                        # since in the source data for incompatibilities each ("dimension name", "dimension value")
+                        # pair could have several lists of incompatible dimensions, we combine all those lists
+                        for inc in dim_incs:
+                            if inc['dimVal'] in joined_incs:
+                                joined_incs[inc['dimVal']] |= set(inc['incompatible'])
+                            else:
+                                joined_incs[inc['dimVal']] = set(inc['incompatible'])
+
+                        # convert sets into lists to make them json-serializable
+                        for ji in joined_incs:
+                            joined_incs[ji] = list(joined_incs[ji])
+
+                        meta_data.append({'dimension': dim_name, 'values': dim_values, 'incompatible': joined_incs})
+
+                    # add info about the fetched dimension and its possible values
+                    self.dimensions.append(Dimension(dim_name, dim_values, joined_incs))
+
+                # check whether we have info about incompatibles
+                has_inc = True if self.meta_url else False
+                # caching the metadata so we don't have to compute it for every request
+                if cached:
+                    # if a cached copy alredy exists, we update it
+                    cached.has_incs = has_inc
+                    cached.meta = json.dumps(meta_data)
+                else:
+                    sess.add(DatasetCache(self.table_name, has_inc, json.dumps(meta_data)))
+                sess.commit()
+
+                conn.commit()
 
 
 class Dimension(object):
-    def __init__(self, name, possible_values):
+    def __init__(self, name, possible_values, incompat):
         self.name = name
         self.possible_values = possible_values
+        self.incompat = incompat  # incompatibilities
 
     def __repr__(self):
         return "Dimension: %s" % self.name
+
+
+class DatasetFactory(object):
+    @staticmethod
+    def get_dataset(datset_id):
+        dataset = toolkit.get_action('package_show')(data_dict={'id': datset_id})
+
+        resource = None
+        meta = None
+        if dataset:
+            for res in dataset['resources']:
+                if res['format'].lower() == 'csv':
+                    resource = res
+                if res['format'].lower() == 'json' and res['name'].lower() == 'meta':
+                    meta = res
+
+        if resource:
+            table_name = resource['id']
+            if meta:
+                meta = meta.get('url')
+            return Dataset(table_name, meta)
+        else:
+            raise toolkit.ObjectNotFound("There's no resource for the given dataset")

@@ -95,12 +95,19 @@ class ChartQueryBuilder(QueryBuilder):
         return ['Town', 'Year']
 
 
+class MapQueryBuilder(QueryBuilder):
+    def get_columns(self, filters):
+        return ['Town', 'Value']
+
+
 class QueryBuilderFactory(object):
     @staticmethod
     def get_query_builder(name, dataset):
         if name == 'table':
             return TableQueryBuilder(dataset)
-        if name == 'chart':
+        elif name == 'chart':
             return ChartQueryBuilder(dataset)
-        if name == 'default':
+        elif name == 'map':
+            return MapQueryBuilder(dataset)        
+        elif name == 'default':
             return QueryBuilder(dataset)
