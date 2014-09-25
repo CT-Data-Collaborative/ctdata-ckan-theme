@@ -20,7 +20,7 @@ class Dataset(object):
             ''' % (self.table_name, ",".join(["'%s'" % c for c in ignored_columns]))
             curs.execute(query, (self.table_name,))
 
-            ignored_dims = ["Value", "Town", "FIPS"]
+            ignored_dims = ["Value", "FIPS"]
             for row in curs.fetchall():
                 dim_name, dim_values = row[0], []
 

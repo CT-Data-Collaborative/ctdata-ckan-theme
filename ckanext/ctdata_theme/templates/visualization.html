@@ -17,14 +17,24 @@
 <div class="refine_wrap">
 <h2>Refine This Indicator <img src="/common/images/arrowimg.png" alt="" /></h2>
 <ul>
-<li>
-<a href="javascript:void(0)" class="togglebtn">Location</a>
+{% for dimension in dimensions %}
+{% if dimension.possible_values %}
+<li class="filter">
+  <a href="#collapse{{dimension.name|replace(" ", "")}}" data-toggle="collapse" class="togglebtn">{{dimension.name}}</a>
+  <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
+  <ul>
+  {% for value in dimension.possible_values %}
+    <li>
+        <input type="checkbox" id="{{value}}Check" value="{{value}}">
+        <label for="{{value}}Check">{{value}}</label>
+    </li>
+  {% endfor %}
+  </ul>
+  </div>
 </li>
+{% endif %}
+{% endfor %}
 <li>
-<a href="javascript:void(0)" class="togglebtn">Measure Type</a>
-</li>
-<li>
-<a href="javascript:void(0)" class="togglebtn toggleup">Variable</a>
 <div class="refine_options">
 <div class="input_row"><input type="checkbox"> <label>Quartile 1</label></div>
 <div class="input_row"><input type="checkbox"> <label>Quartile 2</label></div>
@@ -78,7 +88,7 @@
 
 {% block scripts %}
 {{ super() }}
-
+<link rel="stylesheet" type="text/css" href="/common/css/visualization.css">
 {% resource 'ctdata_theme/highcharts.js' %}
 {% resource 'ctdata_theme/visualization.js' %}
 {% endblock %}
