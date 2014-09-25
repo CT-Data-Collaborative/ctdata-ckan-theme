@@ -1,4 +1,18 @@
-var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "1", "Percent", "Students absent 20 or more days"];
+var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "K through 12", "1", "Percent", "Students absent 20 or more days"];
+var display_type = "line";
+
+function set_display_type(new_type){
+  display_type = new_type;
+  display_data();
+}
+
+function display_data(){
+  if(display_type == "map"){
+    draw_map();
+  } else {
+    draw_chart();
+  }
+}
 
 function check_defaults(){
   $.each(default_filters, function(i){
@@ -25,12 +39,11 @@ function get_filters(){
   return filters;
 }
 
-$(function () {
-    check_defaults()
-    var dataset_id = $("#dataset_id").val(),
-        dataset_title = $("dataset_title").val();
+function draw_chart(){
+  var dataset_id = $("#dataset_id").val(),
+      dataset_title = $("dataset_title").val();
 
-    $.ajax({type: "POST",
+  $.ajax({type: "POST",
             url: "/data/" + dataset_id,
             data: JSON.stringify({view: 'chart',
                                   filters: get_filters()
@@ -43,6 +56,9 @@ $(function () {
         console.log(series);
 
         $('#container').highcharts({
+            chart: {
+              type: display_type
+            },
             title: {
                 text: dataset_title,
                 x: -20 //center
@@ -66,4 +82,18 @@ $(function () {
             series: series
         });
     })
+
+}
+
+$(function () {
+    check_defaults()
+    $('input[type="checkbox"]').change(function(){
+        //Only one checkbox per dimension can be checked 
+        if($(this).prop('checked')){
+           $(this).parent().parent().find('input').prop('checked', false);
+           $(this).prop('checked', true);
+        }
+        display_data();
+    });
+    display_data();
 });
