@@ -100,8 +100,20 @@ class CTDataController(base.BaseController):
             dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
         except toolkit.ObjectNotFound:
             abort(404)
+     
+        resource = None
+        if dataset:
+            for res in dataset['resources']:
+                if res['format'].lower() == 'csv':
+                    resource = res
 
-        return base.render('visualization.html', extra_vars={'dataset': dataset})
+        if resource:
+            table_name = resource['id']
+
+            if table_name:
+                d = Dataset(table_name)
+
+        return base.render('visualization.html', extra_vars={'dataset': dataset, 'dimensions': d.dimensions})
 
     def get_data(self, dataset_name):
         print dataset_name
