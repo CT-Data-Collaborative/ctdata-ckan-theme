@@ -60,7 +60,7 @@ class TableView(View):
                 current_mt = {'measure_type': row['Measure Type'], 'data': []}
                 last_mt = row['Measure Type']
 
-                current_mf = {'value': row[multifield], 'data': [current_mt]}
+                current_mf = {'value': str(row[multifield]), 'data': [current_mt]}
                 last_mf = row[multifield]
 
                 current_town = {'town': row['Town'], 'multifield': [current_mf]}
