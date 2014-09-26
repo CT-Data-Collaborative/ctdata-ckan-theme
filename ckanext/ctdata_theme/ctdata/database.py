@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 from visualization.models import VisualizationOrmBase
 from .utils import Singleton
-from community.models import Base, CommunityProfile
+from community.models import Base, CommunityProfile, Town
 
 
 class Database(object):
@@ -46,7 +46,17 @@ class Database(object):
         session = self.session_factory()
 
         if session.query(CommunityProfile).count() == 0:
-            session.add(CommunityProfile('Andover'))
-            session.add(CommunityProfile('Ansonia'))
+            conn = self.connect()
+            curr = conn.cursor()
+
+            curr.execute('''SELECT DISTINCT "Town","FIPS" FROM "public"."%s"''' % table_name)
+
+            towns = curr.fetchall()
+
+            for town in towns:
+                comm_prof = CommunityProfile(town[0])
+                new_town = Town(town[1], town[0])
+                comm_prof.towns.append(new_town)
+                session.add_all([comm_prof, new_town])
 
         session.commit()

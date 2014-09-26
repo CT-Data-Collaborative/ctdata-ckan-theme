@@ -10,10 +10,10 @@ import ckan.lib.base as base
 from ckan.common import response as http_response, request as http_request
 
 from ctdata.database import Database
-from ctdata.visualization.datasets import DatasetFactory
+from ctdata.visualization.services import DatasetService
 from ctdata.visualization.querybuilders import QueryBuilderFactory
 from ctdata.visualization.views import ViewFactory
-from ctdata.community.models import CommunityProfile, ProfileIndicator, ProfileIndicatorField
+from ctdata.community.services import CommunityProfileService
 from ctdata.utils import dict_with_key_value
 
 
@@ -41,7 +41,14 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_data', '/data/{dataset_name}', action='get_data')
-            m.connect('community_profiles', '/community/{community_name}', action='get_community_profile')
+            m.connect('community_profiles', '/community/{community_name}', action='community_profile')
+            m.connect('community_add_towns', '/community/{community_name}/add_towns', action='add_community_towns')
+            m.connect('community_add_indicator',
+                      '/community/{community_name}/add_indicator',
+                      action='add_community_indicator')
+            m.connect('community_remove_indicator',
+                      '/community/remove_indicator/{indicator_id}',
+                      action='remove_community_indicator')
         return route_map
 
     def after_map(self, route_map):
@@ -100,14 +107,18 @@ class CTDataController(base.BaseController):
 
     def visualization(self, dataset_name):
         try:
-            dataset = DatasetFactory.get_dataset(dataset_name)
+            dataset = DatasetService.get_dataset(dataset_name)
         except toolkit.ObjectNotFound:
             abort(404)
 
-        return base.render('visualization.html', extra_vars={'dataset': dataset.info, 'dimensions': dataset.dimensions})
+        return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta, 'dimensions': dataset.dimensions})
 
-    def get_data(self, dataset_name):        
-        json_body = json.loads(http_request.body, encoding=http_request.charset)
+    def get_data(self, dataset_name):
+        try:
+            json_body = json.loads(http_request.body, encoding=http_request.charset)
+        except ValueError:
+            abort(400)
+
         request_view, request_filters = json_body.get('view'), json_body.get('filters')
 
         if not request_view or not request_filters:
@@ -117,7 +128,7 @@ class CTDataController(base.BaseController):
             abort(400, detail='No such view')
 
         try:
-            dataset = DatasetFactory.get_dataset(dataset_name)
+            dataset = DatasetService.get_dataset(dataset_name)
         except toolkit.ObjectNotFound:
             abort(404)
 
@@ -125,47 +136,68 @@ class CTDataController(base.BaseController):
         view = ViewFactory.get_view(request_view, query_builder)
 
         data = view.get_data(request_filters)
-        print data
 
         http_response.headers['Content-type'] = 'application/json'
-
         return json.dumps(data)
-    
-    def get_community_profile(self, community_name):
-        db = Database()
-        sess = db.session_factory()
 
-        community = sess.query(CommunityProfile).filter(CommunityProfile.name == community_name).first()
-        if not community:
-            abort(404)
-
+    def add_community_towns(self, community_name):
         if http_request.method == 'POST':
-            json_body = json.loads(http_request.body, encoding=http_request.charset)
-            filters = json_body['filters']
-            dataset_id = json_body['dataset_id']
+            session = Database().session_factory()
+            community_profile_service = CommunityProfileService(session)
 
             try:
-                dataset = DatasetFactory.get_dataset(dataset_id)
+                json_body = json.loads(http_request.body, encoding=http_request.charset)
+            except ValueError:
+                abort(400)
+            towns = json_body.get('towns')
+
+            if not towns:
+                abort(400, detail='No towns specified')
+
+            try:
+                community_profile_service.add_profile_town(community_name, towns)
             except toolkit.ObjectNotFound:
                 abort(404)
 
-            qb = QueryBuilderFactory.get_query_builder('default',dataset)
-            view = ViewFactory.get_view('profile', qb)
+            session.commit()
 
-            data = view.get_data(filters)
+            http_response.headers['Content-type'] = 'application/json'
+            return json.dumps({'success': True})
 
-            indicator = ProfileIndicator(community, dataset['title'], data['data_type'], data['years'][0])
-            sess.add(indicator)
+    def add_community_indicator(self, community_name):
+        if http_request.method == 'POST':
+            session = Database().session_factory()
+            community_profile_service = CommunityProfileService(session)
 
-            for value in data['data']:
-                town = ProfileIndicatorField(indicator, value['name'], value['data'][0])
-                sess.add(town)
+            json_body = json.loads(http_request.body, encoding=http_request.charset)
+            filters, dataset_id = json_body.get('filters'), json_body.get('dataset_id')
 
-            sess.commit()
+            if not filters or not dataset_id:
+                abort(400)
 
-        indicators = sess.query(ProfileIndicator).filter(ProfileIndicator.community_profile == community).all()
+            try:
+                community_profile_service.create_profile_indicator(community_name, filters, dataset_id)
+            except toolkit.ObjectNotFound:
+                abort(404)
 
-        print indicators
+            session.commit()
 
-        return base.render('community_profile.html', extra_vars={'community_name': community_name,
-                                                                 'indicators': indicators})
+            http_response.headers['Content-type'] = 'application/json'
+            return json.dumps({'success': True})
+
+    def remove_community_indicator(self, indicator_id):
+        pass
+    
+    def community_profile(self, community_name):
+        session = Database().session_factory()
+        community_profile_service = CommunityProfileService(session)
+
+        try:
+            community = community_profile_service.get_community_profile(community_name)
+        except toolkit.ObjectNotFound:
+            abort(404)
+
+        print community.indicators
+
+        session.commit()
+        return base.render('community_profile.html', extra_vars={'community': community})

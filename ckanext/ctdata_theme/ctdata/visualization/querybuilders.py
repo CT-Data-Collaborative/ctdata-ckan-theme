@@ -100,6 +100,16 @@ class MapQueryBuilder(QueryBuilder):
         return ['Town', 'Value']
 
 
+class ProfileQueryBuilder(QueryBuilder):
+    def get_columns(self, filters):
+        columns = super(ProfileQueryBuilder, self).get_columns(filters)
+        columns.insert(len(columns)-1, 'FIPS')
+        return columns
+
+    def get_order_by(self, filters):
+        return ['FIPS']
+
+
 class QueryBuilderFactory(object):
     @staticmethod
     def get_query_builder(name, dataset):
@@ -111,3 +121,5 @@ class QueryBuilderFactory(object):
             return MapQueryBuilder(dataset)        
         elif name == 'default':
             return QueryBuilder(dataset)
+        elif name == 'profile':
+            return ProfileQueryBuilder(dataset)

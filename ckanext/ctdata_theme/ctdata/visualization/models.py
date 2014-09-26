@@ -9,9 +9,7 @@ class DatasetCache(VisualizationOrmBase):
 
     table_name = Column(String, primary_key=True)
     has_incs = Column(Boolean)
-    meta = Column(Text)  # contains a json document with following structure:
-                         # {'incompatibilites': *list of incompatibilities*,
-                         #  'possible_values': *list of possible values*}
+    meta = Column(Text)
 
     def __init__(self, table_name, has_incs, meta):
         self.table_name = table_name

@@ -8,10 +8,14 @@ from models import DatasetCache
 
 
 class Dataset(object):
-    def __init__(self, table_name, info, meta_url=None):
+    def __init__(self, table_name, ckan_meta, incs_meta_url=None):
         self.table_name = table_name
-        self.info = info
-        self.meta_url = meta_url
+        # there're two kinds of metadata: CKAN's info about dataset (id, title, list of resources, extrafields, etc.)
+        # and dataset's data metadata (list of dimensions, possible values for dimensions, list of incompatibilites)
+        # ckan_meta contains CKAN's meta, we don't store it in our tables, it's already stored by CKAN
+        self.ckan_meta = ckan_meta
+        # dataset's data metadata stored in our own tables, and we load it from the db in form of Dimensions
+        self.incs_meta_url = incs_meta_url
         self.dimensions = []
         self.default_indicator = []
         self._get_dimensions()
@@ -24,7 +28,7 @@ class Dataset(object):
 
         # if the cached copy doesn't contain the info about incompatibilities and we were provided this info
         # we wouldn't use the cached copy but compute all the metadata once more, adding incompat. info
-        if cached and not (not cached.has_incs and self.meta_url):
+        if cached and not (not cached.has_incs and self.incs_meta_url):
             # it's ok, we have the cached copy and either it has the icompat. data or it doesn't but there was none
             # provided anyway
             parsed_json = json.loads(cached.meta)
@@ -37,8 +41,8 @@ class Dataset(object):
             # data about incompatibilities stored as an additional json resource in the dataset.
             # Dataset instance gets an url to that resource, so we download its content and parse it
             incompatibilities = []
-            if self.meta_url:
-                response = urllib2.urlopen(self.meta_url)
+            if self.incs_meta_url:
+                response = urllib2.urlopen(self.incs_meta_url)
                 raw_json = response.read()
                 incompatibilities = json.loads(raw_json)
                 # source data contains dots as delimeters, so we need to convert dots to spaces
@@ -95,7 +99,7 @@ class Dataset(object):
                     self.dimensions.append(Dimension(dim_name, dim_values, joined_incs))
 
                 # check whether we have info about incompatibles
-                has_inc = True if self.meta_url else False
+                has_inc = True if self.incs_meta_url else False
                 # caching the metadata so we don't have to compute it for every request
                 if cached:
                     # if a cached copy alredy exists, we update it
@@ -116,26 +120,3 @@ class Dimension(object):
 
     def __repr__(self):
         return "Dimension: %s" % self.name
-
-
-class DatasetFactory(object):
-    @staticmethod
-    def get_dataset(datset_id):
-        dataset = toolkit.get_action('package_show')(data_dict={'id': datset_id})
-
-        resource = None
-        meta = None
-        if dataset:
-            for res in dataset['resources']:
-                if res['format'].lower() == 'csv':
-                    resource = res
-                if res['format'].lower() == 'json' and res['name'].lower() == 'meta':
-                    meta = res
-
-        if resource:
-            table_name = resource['id']
-            if meta:
-                meta = meta.get('url')
-            return Dataset(table_name, dataset, meta)
-        else:
-            raise toolkit.ObjectNotFound("There's no resource for the given dataset")

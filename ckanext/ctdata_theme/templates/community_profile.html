@@ -1,6 +1,6 @@
 {% extends "page.html" %}
 
-{% block page_name %}Data by Location - {{community_name}}{% endblock %}
+{% block page_name %}Data by Location - {{community.name}}{% endblock %}
 {% block page_description %}Create a Profile for Your Community{% endblock %}
 
 {% block main_content %}
@@ -8,18 +8,34 @@
 
 <section class="locationdata">
 <ul class="opt_btn">
-<li class="btn_blue"><a href="#">Add Towns</a></li>
-<li class="btn_blue"><a href="#">Add Indicator</a></li>
+<li class="btn_blue"><a href="#" id="add_towns">Add Towns</a></li>
+<li class="btn_blue"><a href="#" id="add_ind">Add Indicator</a></li>
 <li class="download_btn"><a href="#">Download Profile</a></li>
 </ul>
 
 <div class="locaton_table">
-    {% for indicator in indicators %}
-        {% for field in indicator.fields %}
-            {{field.name}}
-            {{field.value}}
+{% if community.indicators %}
+    <table>
+        <tr>
+            <th>Dataset</th>
+            <th>Data Type</th>
+            <th>Year</th>
+            {% for town in community.towns %}
+                <th>{{town.name}}</th>
+            {% endfor %}
+        </tr>
+    {% for indicator in community.indicators %}
+        <tr>
+            <td>{{indicator.dataset_name}}</td>
+            <td>{{indicator.data_type}}</td>
+            <td>{{indicator.year}}</td>
+        {% for value in indicator.values %}
+            <td>{{value.value}}</td>
         {% endfor %}
+        </tr>
     {% endfor %}
+    </table>
+{% endif %}
 </div>
 
 </section>
@@ -28,22 +44,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://code.jquery.com/jquery-2.1.1.js"></script>
-<script type="text/javascript">
-    $(function(){
-        $.ajax({type: "POST",
-                url: "/community/Andover",
-                data: JSON.stringify({dataset_id: 'cmt2',
-                                      filters: [{'field': 'Year', 'values': ['2008', '2009', '2010', '2011', '2012', '2013']},
-                                                 {'field': 'Town', 'values': ['Andover', 'Ansonia', 'New Haven']},
-                                                 {'field': 'Measure Type', 'values': ['Number']},
-                                                 {'field': 'Variable', 'values': ['Proficient or Above']},
-                                                 {'field': 'Subject', 'values': ['Reading']},
-                                                 {'field': 'Grade', 'values': ['Grade 3']},
-                                                 {'field': 'Race', 'values': ['all']}]
-                                      }),
-                contentType: 'application/json; charset=utf-8'
-                })
-    });
-</script>
+    {{ super() }}
+    {% resource 'ctdata_theme/communities.js' %}
 {% endblock %}
