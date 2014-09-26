@@ -1,7 +1,11 @@
 import urlparse
 
 import psycopg2
+import sqlalchemy
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
+from visualization.models import VisualizationOrmBase
 from .utils import Singleton
 
 
@@ -12,6 +16,8 @@ class Database(object):
         self.connection = None
         self.last_error = ""
         self.connection_string = ""
+        self.engine = None
+        self.session_factory = None
 
     def set_connection_string(self, connection_string):
         self.connection_string = connection_string
@@ -30,3 +36,9 @@ class Database(object):
             )
         except psycopg2.Error:
             self.last_error = "Unable to connect to the database"
+
+    def init_sa(self, connection_string):
+        self.engine = create_engine(connection_string)
+        VisualizationOrmBase.metadata.create_all(self.engine)
+
+        self.session_factory = sessionmaker(bind=self.engine)

@@ -10,7 +10,7 @@ import ckan.lib.base as base
 from ckan.common import response as http_response, request as http_request
 
 from ctdata.database import Database
-from ctdata.visualization.datasets import Dataset
+from ctdata.visualization.datasets import DatasetFactory
 from ctdata.visualization.querybuilders import QueryBuilderFactory
 from ctdata.visualization.views import ViewFactory
 from ctdata.utils import dict_with_key_value
@@ -28,8 +28,10 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
     def configure(self, config):
         postgres_url = config['ckan.datastore.write_url']
-        d = Database()
-        d.set_connection_string(postgres_url)
+        db = Database()
+        db.set_connection_string(postgres_url)
+
+        db.init_sa(config['sqlalchemy.url'])
 
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
@@ -95,64 +97,34 @@ class CTDataController(base.BaseController):
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def visualization(self, dataset_name):
-        dataset = None
         try:
-            dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+            dataset = DatasetFactory.get_dataset(dataset_name)
         except toolkit.ObjectNotFound:
             abort(404)
      
-        resource = None
-        if dataset:
-            for res in dataset['resources']:
-                if res['format'].lower() == 'csv':
-                    resource = res
-
-        if resource:
-            table_name = resource['id']
-
-            if table_name:
-                d = Dataset(table_name)
-
-        return base.render('visualization.html', extra_vars={'dataset': dataset, 'dimensions': d.dimensions})
+        return base.render('visualization.html', extra_vars={'dataset': dataset, 'dimensions': dataset.dimensions})
 
     def get_data(self, dataset_name):
-        print dataset_name
-        d = Database()
-
         json_body = json.loads(http_request.body, encoding=http_request.charset)
-        request_view, request_filters = json_body['view'], json_body['filters']
-        print json_body['filters']
+        request_view, request_filters = json_body.get('view'), json_body.get('filters')
+
         if not request_view or not request_filters:
             abort(400, detail='No view and/or filters specified')
 
-        dataset = None
+        if not request_view in ('map', 'chart', 'table'):
+            abort(400, detail='No such view')
+
         try:
-            dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+            dataset = DatasetFactory.get_dataset(dataset_name)
         except toolkit.ObjectNotFound:
             abort(404)
 
-        resource = None
-        if dataset:
-            for res in dataset['resources']:
-                if res['format'].lower() == 'csv':
-                    resource = res
+        query_builder = QueryBuilderFactory.get_query_builder(request_view, dataset)
+        view = ViewFactory.get_view(request_view, query_builder)
 
-        if resource:
-            table_name = resource['id']
+        data = view.get_data(request_filters)
+        print data
 
-            if table_name:
-                print table_name
-                ds = Dataset(table_name)
-                qb = QueryBuilderFactory.get_query_builder('chart', ds)
-                view = ViewFactory.get_view('chart', qb)
+        http_response.headers['Content-type'] = 'application/json'
 
-                dataset = Dataset(table_name)
-                query_builder = QueryBuilderFactory.get_query_builder(request_view, dataset)
-                view = ViewFactory.get_view(request_view, query_builder)
-
-                data = view.get_data(request_filters)
-                print data
-
-                http_response.headers['Content-type'] = 'application/json'
-
-                return json.dumps(data)
+        return json.dumps(data)
