@@ -1,4 +1,4 @@
-var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "K through 12", "1", "Percent", "Students absent 20 or more days"];
+var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "K through 12", "1", "Percent", "Students absent 20 or more days", "8"];
 var display_type = "table";
 
 function set_display_type(new_type){

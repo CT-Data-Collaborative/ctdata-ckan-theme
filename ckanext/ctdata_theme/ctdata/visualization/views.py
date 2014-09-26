@@ -83,8 +83,10 @@ class TableView(View):
 
                 current_mf['data'].append(current_mt)
 
-            current_mt['data'].append(float(row['Value']))
-
+            try:
+                current_mt['data'].append(float(row['Value']))
+            except ValueError:
+                current_mt['data'].append(None)
         return result
 
 
@@ -103,9 +105,10 @@ class ChartView(View):
                 last_town = row['Town']
 
                 result['data'].append(current_town)
-
-            current_town['data'].append(float(row['Value']))
-
+            try:
+                current_town['data'].append(float(row['Value']))
+            except ValueError:
+                current_town['data'].append(None)
         return result
 
 
