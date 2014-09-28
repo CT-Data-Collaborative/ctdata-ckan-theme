@@ -1,9 +1,38 @@
-var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "K through 12", "1", "Percent", "Students absent 20 or more days", "8"];
+var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013"];//, "K through 12", "1", "Percent", "Students absent 20 or more days", "8"];
 var display_type = "table";
+var test_incompat = { 
+    "Grade":["Race\\\\\/ethnicity","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","StudentswithDisabilities"],
+    "Race\\\\\/ethnicity":["Grade","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","StudentswithDisabilities"],
+    "EligibleforFreeandReducedPriceMeals":["Race\\\\\/ethnicity","Grade","EnglishLanguageLearner","StudentswithDisabilities"],
+    "EnglishLanguageLearner":["Race\\\\\/ethnicity","EligibleforFreeandReducedPriceMeals","Grade","StudentswithDisabilities"],
+    "StudentswithDisabilities":["Race\\\\\/ethnicity","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","Grade"],
+    "Town":[],
+    "Year":[],
+    "MeasureType":[],
+    "Variable":[]
+     };
+var incompat = {};
 
 function set_display_type(new_type){
   display_type = new_type;
   display_data();
+}
+
+function handle_incompatibilities(){
+  cur_incompat = [];
+  cur_checked = $("input:checked");
+  $.each(cur_checked, function(i){
+    $.merge(cur_incompat, incompat[$(cur_checked[i]).attr('class')]);
+  });
+  all_dims = $('a.dimension');
+  $.each(all_dims, function(i){
+    $(all_dims[i]).css("pointer-events", "auto").css("color", "black");
+  });
+  $.each(cur_incompat, function(i){
+    $('a[href="#collapse'+cur_incompat[i]+'"]').css("pointer-events", "None");
+    $('a[href="#collapse'+cur_incompat[i]+'"]').css("color", "#D0D0D0");
+    $('div.collapse#collapse'+cur_incompat[i]).collapse('hide');
+  });
 }
 
 function display_data(){
@@ -99,13 +128,25 @@ function draw_chart(){
 
   $.ajax({type: "POST",
             url: "/data/" + dataset_id,
-            data: JSON.stringify({view: 'chart',
+            data: JSON.stringify({view: 'table',
                                   filters: get_filters()
                                   }),
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
-        var series = data['data'],
-            years = data['years'];
-
+        //var series = data['data'],
+        //    years = data['years'];
+        var series = []
+        var multifield = data['multifield'];
+        var years = data['years'];
+        var mf_data = data['data'];
+        $.each(mf_data, function(town_index){
+          var cur_town_name = mf_data[town_index]['town'];
+          var cur_town = mf_data[town_index]['multifield'];
+          $.each(cur_town, function(mf_index){
+            var cur_mf_value = cur_town[mf_index]['value'];
+            series.push({name: cur_town_name + ", "+multifield+": "+cur_mf_value,
+                         data: cur_town[mf_index]['data'][0]['data']});
+          });
+        });
         console.log(years);
         console.log(series);
 
@@ -142,12 +183,10 @@ function draw_chart(){
 $(function () {
     check_defaults()
     $('input[type="checkbox"]').change(function(){
-        //Only one checkbox per dimension can be checked 
-//        if($(this).prop('checked')){
-//           $(this).parent().parent().find('input').prop('checked', false);
-//           $(this).prop('checked', true);
-//        }
         display_data();
+        handle_incompatibilities();  
     });
+    incompat = test_incompat;
+    handle_incompatibilities();
     display_data();
 });

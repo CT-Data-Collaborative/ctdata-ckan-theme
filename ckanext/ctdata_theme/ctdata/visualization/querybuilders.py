@@ -77,7 +77,10 @@ class TableQueryBuilder(QueryBuilder):
         can_be_multifield = list(set(dimension_names) - set(['Year', 'Town', 'Measure Type']))
         valid_filters = filter(lambda f: f['field'] in can_be_multifield, filters)
         # either field with several values or the first field if there's no such
-        return (filter(lambda f: len(f['values']) > 1, valid_filters) or valid_filters)[0]['field']
+        try:
+          return (filter(lambda f: len(f['values']) > 1, valid_filters) or valid_filters)[0]['field']
+        except IndexError:
+          return can_be_multifield[0]
 
     def get_columns(self, filters):
         table_columns = super(TableQueryBuilder, self).get_columns(filters)

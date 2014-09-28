@@ -20,12 +20,12 @@
 {% for dimension in dimensions %}
 {% if dimension.possible_values %}
 <li class="filter">
-  <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")}}" data-toggle="collapse" class="togglebtn">{{dimension.name}}</a>
+  <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
   <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
   <ul>
   {% for value in dimension.possible_values %}
     <li>
-        <input type="checkbox" id="{{value}}Check" value="{{value}}">
+        <input type="checkbox" id="{{value}}Check" value="{{value}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}">
         <label for="{{value}}Check">{{value}}</label>
     </li>
   {% endfor %}
@@ -97,4 +97,13 @@
 {% resource 'ctdata_theme/visualization.js' %}
 {% resource 'ctdata_theme/jquery.dataTables.js' %}
 {% resource 'ctdata_theme/map_chart.js' %}
+
+<script>
+  var incompat = {};
+  {% for dimension in dimensions %}
+    {% if dimension.possible_values %}
+      incompat['{{dimension.name}}'] = {{dimension.incompat}};
+    {% endif %}
+  {% endfor %}
+</script>
 {% endblock %}
