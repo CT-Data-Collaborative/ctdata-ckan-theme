@@ -7,6 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 from visualization.models import VisualizationOrmBase
 from .utils import Singleton
+from community.models import Base, CommunityProfile, Town
 
 
 class Database(object):
@@ -23,22 +24,39 @@ class Database(object):
         self.connection_string = connection_string
 
     def connect(self):
-        try:
-            parsed_url = urlparse.urlparse(self.connection_string)
+        parsed_url = urlparse.urlparse(self.connection_string)
 
-            # we can't just connect using the connection string, because it doesn't work with older versions
-            # of Postgres (and there's an older version on the staging server)
-            return psycopg2.connect(
-                database=parsed_url.path[1:],
-                user=parsed_url.username,
-                password=parsed_url.password,
-                host=parsed_url.hostname
-            )
-        except psycopg2.Error:
-            self.last_error = "Unable to connect to the database"
+        # we can't just connect using the connection string, because it doesn't work with older versions
+        # of Postgres (and there's an older version on the staging server)
+        return psycopg2.connect(
+            database=parsed_url.path[1:],
+            user=parsed_url.username,
+            password=parsed_url.password,
+            host=parsed_url.hostname
+        )
 
     def init_sa(self, connection_string):
         self.engine = create_engine(connection_string)
+        Base.metadata.create_all(self.engine)
         VisualizationOrmBase.metadata.create_all(self.engine)
-
+        
         self.session_factory = sessionmaker(bind=self.engine)
+
+    def init_community_data(self, table_name):
+        session = self.session_factory()
+
+        if session.query(CommunityProfile).count() == 0:
+            conn = self.connect()
+            curr = conn.cursor()
+
+            curr.execute('''SELECT DISTINCT "Town","FIPS" FROM "public"."%s"''' % table_name)
+
+            towns = curr.fetchall()
+
+            for town in towns:
+                comm_prof = CommunityProfile(town[0])
+                new_town = Town(town[1], town[0])
+                comm_prof.towns.append(new_town)
+                session.add_all([comm_prof, new_town])
+
+        session.commit()

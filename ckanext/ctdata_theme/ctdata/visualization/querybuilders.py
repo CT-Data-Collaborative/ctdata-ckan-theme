@@ -23,8 +23,6 @@ class QueryBuilder(object):
                 if not groupby_fields:
                     # exclude Value from the GROUP BY clause
                     groupby_fields = list(OrderedSet(self.get_columns(filters)) - OrderedSet(['Value']))
-                    print self.get_columns(filters)
-                    print groupby_fields
                 continue
             elif column_name in multivalue_dimensions or len(values) > 1:
                 filter_string = '"%s" in (%s)' % (column_name, ','.join(['%s'] * len(values)))
@@ -103,6 +101,16 @@ class MapQueryBuilder(QueryBuilder):
         return ['Town', 'Value']
 
 
+class ProfileQueryBuilder(QueryBuilder):
+    def get_columns(self, filters):
+        columns = super(ProfileQueryBuilder, self).get_columns(filters)
+        columns.insert(len(columns)-1, 'FIPS')
+        return columns
+
+    def get_order_by(self, filters):
+        return ['FIPS']
+
+
 class QueryBuilderFactory(object):
     @staticmethod
     def get_query_builder(name, dataset):
@@ -111,4 +119,8 @@ class QueryBuilderFactory(object):
         elif name == 'chart':
             return ChartQueryBuilder(dataset)
         elif name == 'map':
-            return MapQueryBuilder(dataset)
+            return MapQueryBuilder(dataset)        
+        elif name == 'default':
+            return QueryBuilder(dataset)
+        elif name == 'profile':
+            return ProfileQueryBuilder(dataset)

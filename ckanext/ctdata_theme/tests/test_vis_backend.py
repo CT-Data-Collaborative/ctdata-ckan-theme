@@ -98,7 +98,6 @@ class TestQueryBuilders(object):
                    {'field': 'Race', 'values': ['all']}]
         q, v = b.get_query(filters)
         assert v == ['2012', 'Andover', 'Ansonia', 'Percent', 'Basic']
-        print q
         assert q.strip() == '''SELECT "Town",SUM("Value") FROM public."testtable" WHERE "Year" in (%s) and "Town" in (%s,%s) and "Measure Type" in (%s) and "Variable" = %s\nGROUP BY "Town"''', 'MapQueryBuilder returns wrong sql (one "all" value)'
 
 

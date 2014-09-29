@@ -1,0 +1,82 @@
+{% extends "page.html" %}
+
+{% block page_name %}Data by Location - {{community.name}}{% endblock %}
+{% block page_description %}Create a Profile for Your Community{% endblock %}
+
+{% block main_content %}
+<div class="wrapper">
+
+<section class="locationdata">
+<ul class="opt_btn">
+<li class="btn_blue"><a href="#" id="add_towns">Add Towns</a></li>
+<li class="btn_blue"><a href="#" id="add_ind">Add Indicator</a></li>
+<li class="download_btn"><a href="#">Download Profile</a></li>
+</ul>
+
+<div class="locaton_table">
+{% if indicators %}
+        <ul class="table_head">
+            <li class="col-1">Dataset</li>
+            <li class="col-2">Data Type</li>
+            <li class="col-3">Year</li>
+            {% for town in community.towns %}
+                <li class="col-4">{{town.name}}</li>
+            {% endfor %}
+        </ul>
+    {% for indicator in indicators %}
+        <ul class="table_data">
+            <li class="col-1">
+                {{indicator['dataset']}}, {{indicator['indicator'].variable}}
+                <span>
+                    {% for filter in indicator['filters'] %}
+                        {{ filter['field'] }}: {{filter['value']}}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                </span>
+            </li>
+            <li class="col-2">{{indicator['indicator'].data_type}}</li>
+            <li class="col-3">{{indicator['indicator'].year}}</li>
+        {% for value in indicator['values'] %}
+            <li class="col-4">{{value}}</li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+    </table>
+{% else %}
+    There're no indicators for this community yet.
+{% endif %}
+    <form style="display: none">
+        <input type="hidden" id="community_name" value="{{community.name}}">
+    </form>
+</div>
+
+<ul style="display: none">
+{% for topic in topics %}
+    <li>
+    <h3>{{ topic['title'] }}</h3>
+    <ul>
+        {% for subtopic in topic['subdomains'] %}
+        <li>
+            <div style="margin-left: 10px">
+            <h3>{{ subtopic['title'] }}</h3>
+                <ul>
+                    {% for dataset in subtopic['datasets'] %}
+                    <li style="margin-left: 20px"><a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    </li>
+{% endfor %}
+</ul>
+
+</section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {% resource 'ctdata_theme/communities.js' %}
+{% endblock %}
