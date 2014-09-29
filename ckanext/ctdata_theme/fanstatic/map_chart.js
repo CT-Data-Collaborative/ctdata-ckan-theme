@@ -78,7 +78,7 @@ chart = new Highcharts.Chart({
     }
 
   },
-
+  exporting: {enabled: false},
   series : [{
     data : data.data,
     mapData: geojson,
@@ -86,7 +86,8 @@ chart = new Highcharts.Chart({
     joinBy: ['NAME', 'name'],
     states: {
       hover: {
-        color: '#BADA55'
+        color: '#BADA55',
+        enabled: false
       }
     },
     dataLabels: {
