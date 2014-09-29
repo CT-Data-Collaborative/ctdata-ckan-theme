@@ -26,8 +26,10 @@ chart = new Highcharts.Chart({
   chart: {
     renderTo: 'container',
     type: 'map',
-    width: 800, //-99
-    height: 520 //-139
+    width: 634, //-99
+    height: 606, //-139
+    backgroundColor:null,
+    //plotBackgroundImage: '/common/images/graymap.png',
   },
   title : {
     text : dataset_title
@@ -89,8 +91,8 @@ chart = new Highcharts.Chart({
     joinBy: ['NAME', 'name'],
     states: {
       hover: {
-        color: 'initial',
-        enabled: false
+        color: 'transparent',
+  //      enabled: false
       }
     },
      dataLabels: {
@@ -102,6 +104,11 @@ chart = new Highcharts.Chart({
 chart.xAxis[0].setExtremes(-74, -71.5, false);
 chart.yAxis[0].setExtremes(-42.2, -40.8, false);
 chart.redraw();
+$(".highcharts-container").css({
+      backgroundImage: "url('/common/images/graymap.png')",
+      backgroundSize: "1076px 700px",
+      backgroundPosition: "-224px -45px"
+      });
 });
 });
 }
