@@ -21,7 +21,7 @@ body { font-family: 'Questrial', sans-serif; font-size:18px; color:#888888; back
 
 header { width:100%; float:left; padding-bottom:20px; background-color: white;}
 header .ctdata-wrapper { clear:both;}
-.top_bar { width:100%; background:#3970ba; float:left;  margin-bottom:15px; }
+.top_bar { width:100%; background:#3970ba; float:left; margin-bottom:15px; }
 .top_bar ul { float:right;}
 .top_bar ul li { float:left;}
 .top_bar ul li a { color:#fff; margin-left:15px; font-size:14px; padding:6px 0 2px; display:inline-block;}
@@ -398,4 +398,9 @@ label {font-weight: normal; cursor: auto}
 
 .triangle_wrapper {
     position: relative;
+}
+
+#graphOptions li input[type=checkbox], #graphOptions li input[type=radio] {
+  margin: 0 5px 10px 0;
+  top: 4px;
 }
