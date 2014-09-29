@@ -148,7 +148,7 @@ function draw_chart(){
           $.each(cur_town, function(mf_index){
             var cur_mf_value = cur_town[mf_index]['value'];
             series.push({name: cur_town_name + ", "+multifield+": "+cur_mf_value,
-                         data: cur_town[mf_index]['data'][0]['data']});
+                         data: cur_town[mf_index]['data'][0]['data'].slice(0, years.length)});
           });
         });
         console.log(years);
