@@ -15,7 +15,7 @@ $.ajax({type: "POST",
                               filters: filters
                              }),
         contentType: 'application/json; charset=utf-8'}).done(function(    data) {
-
+console.log(data);
 $.each(data.data, function(i){
   data.data[i]['value'] = data.data[i]['data'][0];
 });
@@ -39,7 +39,6 @@ chart = new Highcharts.Chart({
       verticalAlign: 'bottom'
     }
   },
-
   colorAxis: {
   },
   xAxis:{
@@ -76,12 +75,16 @@ chart = new Highcharts.Chart({
         }
     }
     }
-
   },
   exporting: {enabled: false},
-  series : [{
+   labels: {items:[
+               {html: "<div id='mapLegend'>THIS IS A TEST</div>",
+                style:{left: '100px', top: '100px'}}
+                ]},
+    series : [{
     data : data.data,
     mapData: geojson,
+    borderColor: '#666666',
     name: data['years'][0],
     joinBy: ['NAME', 'name'],
     states: {
@@ -90,7 +93,7 @@ chart = new Highcharts.Chart({
         enabled: false
       }
     },
-    dataLabels: {
+     dataLabels: {
 //        enabled: true,
 //       format: '{point.properties.postal}'
     }
