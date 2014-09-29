@@ -27,15 +27,14 @@ class View(object):
     def get_data(self, filters):
         query, values = self.query_builder.get_query(filters)
 
-        print query, values
-
         conn = self.database.connect()
         if conn:
             curs = conn.cursor()
             curs.execute(query, values)
 
             cols = self.query_builder.get_columns(filters)
-            result = self.convert_data(map(lambda r: dict(zip(cols, r)), curs.fetchall()), filters)
+            rows = curs.fetchall()
+            result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
 
             conn.commit()
 
@@ -114,7 +113,8 @@ class ProfileView(ChartView):
     def convert_data(self, data, filters):
         result = super(ProfileView, self).convert_data(data, filters)
         # there should only be one measure type for all the rows
-        result['data_type'] = data[0]['Measure Type']
+        if data:
+            result['data_type'] = data[0]['Measure Type']
 
         return result
 

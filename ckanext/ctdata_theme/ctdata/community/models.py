@@ -15,10 +15,13 @@ class CommunityProfile(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    towns = relationship("Town", secondary=lambda: communitytowns_tables)
+    towns = relationship("Town", secondary=lambda: communitytowns_tables, order_by='Town.fips')
 
     def __init__(self, name):
         self.name = name
+
+    def __repr__(self):
+        return "Community %s" % (self.name,)
 
 
 class Town(Base):
@@ -31,39 +34,49 @@ class Town(Base):
         self.fips = fips
         self.name = name
 
+    def __repr__(self):
+        return "Town %s (%d)" % (self.name, self.fips)
+
 
 class ProfileIndicator(Base):
     __tablename__ = 'ctdata_profile_indicators'
 
     id = Column(Integer, primary_key=True)
     dataset_id = Column(String)
-    profile_id = Column(Integer, ForeignKey('ctdata_community_profiles.id'))
     data_type = Column(String)
     year = Column(Integer)
+    variable = Column(String)
     filters = Column(Text)
 
-    community_profile = relationship("CommunityProfile", backref=backref('indicators', order_by=id))
-
-    def __init__(self, profile, filters, dataset_id, data_type, year):
+    def __init__(self, filters, dataset_id, data_type, year, variable):
         self.filters = filters
-        self.community_profile = profile
         self.dataset_id = dataset_id
         self.data_type = data_type
         self.year = year
+        self.variable = variable
+
+    def __repr__(self):
+        return "[Indicator: %s; %s; %s;]" % (self.dataset_id, self.data_type, self.year)
 
 
 class ProfileIndicatorValue(Base):
     __tablename__ = 'ctdata_profile_indicator_values'
 
     id = Column(Integer, primary_key=True)
+    community_id = Column(Integer, ForeignKey('ctdata_community_profiles.id'))
     indicator_id = Column(Integer, ForeignKey('ctdata_profile_indicators.id'))
     town_id = Column(Integer, ForeignKey('ctdata_towns.fips'))
     value = Column(String)
 
+    community = relationship("CommunityProfile", backref=backref('values', order_by=id))
     indicator = relationship("ProfileIndicator", backref=backref('values', order_by=id))
     town = relationship("Town", backref=backref('values', order_by=id))
 
-    def __init__(self, indicator, town, value):
+    def __init__(self, community, indicator, town, value):
+        self.community = community
         self.indicator = indicator
         self.town = town
         self.value = value
+
+    def __repr__(self):
+        return "[Value: %s; %s; %s; %s]" % (self.town, self.community, self.indicator, self.value)

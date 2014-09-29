@@ -19,6 +19,7 @@ class DatasetService(object):
 
         if resource:
             table_name = resource['id']
+            print table_name
             if incs:
                 incs = incs.get('url')
             return Dataset(table_name, dataset, incs)

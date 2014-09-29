@@ -23,8 +23,6 @@ class QueryBuilder(object):
                 if not groupby_fields:
                     # exclude Value from the GROUP BY clause
                     groupby_fields = list(OrderedSet(self.get_columns(filters)) - OrderedSet(['Value']))
-                    print self.get_columns(filters)
-                    print groupby_fields
                 continue
             elif column_name in multivalue_dimensions or len(values) > 1:
                 filter_string = '"%s" in (%s)' % (column_name, ','.join(['%s'] * len(values)))

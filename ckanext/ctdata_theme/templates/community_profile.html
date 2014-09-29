@@ -14,29 +14,62 @@
 </ul>
 
 <div class="locaton_table">
-{% if community.indicators %}
-    <table>
-        <tr>
-            <th>Dataset</th>
-            <th>Data Type</th>
-            <th>Year</th>
+{% if indicators %}
+        <ul class="table_head">
+            <li class="col-1">Dataset</li>
+            <li class="col-2">Data Type</li>
+            <li class="col-3">Year</li>
             {% for town in community.towns %}
-                <th>{{town.name}}</th>
+                <li class="col-4">{{town.name}}</li>
             {% endfor %}
-        </tr>
-    {% for indicator in community.indicators %}
-        <tr>
-            <td>{{indicator.dataset_name}}</td>
-            <td>{{indicator.data_type}}</td>
-            <td>{{indicator.year}}</td>
-        {% for value in indicator.values %}
-            <td>{{value.value}}</td>
+        </ul>
+    {% for indicator in indicators %}
+        <ul class="table_data">
+            <li class="col-1">
+                {{indicator['dataset']}}, {{indicator['indicator'].variable}}
+                <span>
+                    {% for filter in indicator['filters'] %}
+                        {{ filter['field'] }}: {{filter['value']}}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                </span>
+            </li>
+            <li class="col-2">{{indicator['indicator'].data_type}}</li>
+            <li class="col-3">{{indicator['indicator'].year}}</li>
+        {% for value in indicator['values'] %}
+            <li class="col-4">{{value}}</li>
         {% endfor %}
-        </tr>
+        </ul>
     {% endfor %}
     </table>
+{% else %}
+    There're no indicators for this community yet.
 {% endif %}
+    <form style="display: none">
+        <input type="hidden" id="community_name" value="{{community.name}}">
+    </form>
 </div>
+
+<ul style="display: none">
+{% for topic in topics %}
+    <li>
+    <h3>{{ topic['title'] }}</h3>
+    <ul>
+        {% for subtopic in topic['subdomains'] %}
+        <li>
+            <div style="margin-left: 10px">
+            <h3>{{ subtopic['title'] }}</h3>
+                <ul>
+                    {% for dataset in subtopic['datasets'] %}
+                    <li style="margin-left: 20px"><a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    </li>
+{% endfor %}
+</ul>
 
 </section>
 
