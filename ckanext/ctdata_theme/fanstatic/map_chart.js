@@ -89,7 +89,7 @@ chart = new Highcharts.Chart({
     joinBy: ['NAME', 'name'],
     states: {
       hover: {
-        color: '#BADA55',
+        color: 'initial',
         enabled: false
       }
     },
