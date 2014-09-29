@@ -1,11 +1,11 @@
 var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013"];//, "K through 12", "1", "Percent", "Students absent 20 or more days", "8"];
 var display_type = "table";
 var test_incompat = { 
-    "Grade":["Race\\\\\/ethnicity","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","StudentswithDisabilities"],
-    "Race\\\\\/ethnicity":["Grade","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","StudentswithDisabilities"],
-    "EligibleforFreeandReducedPriceMeals":["Race\\\\\/ethnicity","Grade","EnglishLanguageLearner","StudentswithDisabilities"],
-    "EnglishLanguageLearner":["Race\\\\\/ethnicity","EligibleforFreeandReducedPriceMeals","Grade","StudentswithDisabilities"],
-    "StudentswithDisabilities":["Race\\\\\/ethnicity","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","Grade"],
+    "Grade":["Race\\\\\/ethnicity","Race\\\/ethnicity","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","StudentswithDisabilities"],
+    "Race\\\/ethnicity":["Grade","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","StudentswithDisabilities"],
+    "EligibleforFreeandReducedPriceMeals":["Race\\\\\/ethnicity","Race\\\/ethnicity","Grade","EnglishLanguageLearner","StudentswithDisabilities"],
+    "EnglishLanguageLearner":["Race\\\\\/ethnicity","Race\\\/ethnicity","EligibleforFreeandReducedPriceMeals","Grade","StudentswithDisabilities"],
+    "StudentswithDisabilities":["Race\\\\\/ethnicity","Race\\\/ethnicity","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","Grade"],
     "Town":[],
     "Year":[],
     "MeasureType":[],
@@ -31,8 +31,12 @@ function handle_incompatibilities(){
   $.each(cur_incompat, function(i){
     $('a[href="#collapse'+cur_incompat[i]+'"]').css("pointer-events", "None");
     $('a[href="#collapse'+cur_incompat[i]+'"]').css("color", "#D0D0D0");
-    $('div.collapse#collapse'+cur_incompat[i]).collapse('hide');
+    $("div.collapse[id='collapse"+cur_incompat[i]+"']").collapse('hide');
   });
+}
+
+function collapse_all(){
+  $("div.collapse").collapse('hide');
 }
 
 function display_data(){
@@ -182,11 +186,13 @@ function draw_chart(){
 
 $(function () {
     check_defaults()
+    $('div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         display_data();
         handle_incompatibilities();  
     });
+    
     incompat = test_incompat;
-    handle_incompatibilities();
+
     display_data();
 });
