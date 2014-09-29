@@ -26,7 +26,7 @@
   {% for value in dimension.possible_values %}
     <li>
         <input type="checkbox" id="{{value}}Check" value="{{value}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}">
-        <label for="{{value}}Check">{{value}}</label>
+        <label for="{{value}}Check" class="checkLabel">{{value}}</label>
     </li>
   {% endfor %}
   </ul>
