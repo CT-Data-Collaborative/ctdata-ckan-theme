@@ -89,34 +89,38 @@ function draw_table(){
 
       console.log(data);
       var multifield = data['multifield'];
+      var years = data['years'];
       var html = '<table id="table" class="results_table">'+
                  "<thead>"+
                    "<tr>"+
                      "<th class='col-1'>Location</th>"+
-                     "<th class='col-2'>Year</th>"+
-                     "<th class='col-3'>"+multifield+"</th>"+
-                     "<th class='col-4'>Measure Type</th>"+
-                     "<th class='col-5'>Value</th>"+
-                   "</tr>"+
+                     "<th class='col-2'>"+multifield+"</th>"+
+                     "<th class='col-3'>Measure Type</th>";
+                 $.each(years, function(i){
+                     html = html+"<th class='col-"+(i+4)+"'>"+years[i]+"</th>";
+                 });
+                 html+=  "</tr>"+
                  "</thead>"+
                  "<tbody>";
       $.each(data['data'], function(town_index){
         town = data['data'][town_index];
         $.each(town['multifield'], function(mf_index){
           mf = town['multifield'][mf_index];
+          if(mf['value']=='NA') return "skip to next mf";
             $.each(mf['data'], function(mt_index){ 
               mt = mf['data'][mt_index];
-              $.each(mt['data'], function(value_index){
-              value = mt['data'][value_index];
               html = html+
                  "<tr>"+
                    "<td class='col-1'>"+town['town']+"</td>"+
-                   "<td class='col-2'>"+data['years'][value_index]+"</td>"+
-                   "<td class='col-3'>"+mf['value']+"</td>"+
-                   "<td class='col-4'>"+mt['measure_type']+"</td>"+
-                   "<td class='col-5'>"+value+"</td>"+
-                 "</tr>";
+                   "<td class='col-2'>"+mf['value']+"</td>"+
+                   "<td class='col-3'>"+mt['measure_type']+"</td>";
+              //For each year
+              $.each(years, function(value_index){
+               value = mt['data'][value_index];
+               if(value == undefined) value="-";
+               html += "<td class='col-"+(value_index+4)+"'>"+value+"</td>";
               });
+               html +=  "</tr>";
             });
         });
       });
