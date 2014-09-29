@@ -74,7 +74,7 @@ class TableQueryBuilder(QueryBuilder):
         with several values for a field, it returns the first field other than 'Year', 'Town' or 'Measure type'
         """
         dimension_names = map(lambda dim: dim.name, self.dataset.dimensions)
-        can_be_multifield = list(set(dimension_names) - set(['Year', 'Town', 'Measure Type']))
+        can_be_multifield = list(set(dimension_names) - set(['Year', 'Town', 'Measure Type', 'Variable']))
         valid_filters = filter(lambda f: f['field'] in can_be_multifield, filters)
         # either field with several values or the first field if there's no such
         try:
