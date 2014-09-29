@@ -56,6 +56,9 @@ class TableView(View):
         current_mt = None  # current measure type
         # groups data first by Town, then by multifield and then by Measure Type
         for row in map(lambda r: dict(zip(cols, r)), data):
+            #Don't include row if it doesn't have a value for the multifield
+            if row[multifield] == "NA":
+              continue
             if row['Town'] != last_town:
                 current_mt = {'measure_type': row['Measure Type'], 'data': []}
                 last_mt = row['Measure Type']
