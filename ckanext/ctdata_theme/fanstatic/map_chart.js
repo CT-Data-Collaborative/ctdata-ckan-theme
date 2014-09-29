@@ -91,7 +91,7 @@ chart = new Highcharts.Chart({
     joinBy: ['NAME', 'name'],
     states: {
       hover: {
-        color: 'transparent',
+        color: 'highlight',
   //      enabled: false
       }
     },
