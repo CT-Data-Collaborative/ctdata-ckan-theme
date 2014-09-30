@@ -3,7 +3,7 @@ div.panel-collapse.collapse.in{
   overflow-x: hidden;
   overflow-y: scroll;
 }
-input[type="checkbox"]{
+input[type="checkbox"],input[type="radio"]{
   -webkit-appearance: checkbox;
   float: left;
 }
@@ -11,4 +11,11 @@ label.checkLabel{
   float:left;
   padding-top: 4px;
   padding-left: 5px;
+}
+span.checkLabel {
+  padding-top: 4px;
+  padding-left: 5px;
+  font-weight: normal;
+  font-size: 16px;
+  color: black;
 }

@@ -1,13 +1,8 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Table, BigInteger
 from sqlalchemy.orm import relationship, backref
 
 Base = declarative_base()
-
-communitytowns_tables = Table('ctdata_communities_towns', Base.metadata,
-    Column('community_id', Integer, ForeignKey('ctdata_community_profiles.id')),
-    Column('town_id', Integer, ForeignKey('ctdata_towns.fips')),
-)
 
 
 class CommunityProfile(Base):
@@ -15,7 +10,9 @@ class CommunityProfile(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    towns = relationship("Town", secondary=lambda: communitytowns_tables, order_by='Town.fips')
+    town_id = Column(BigInteger, ForeignKey('ctdata_towns.fips'))
+
+    town = relationship("Town", uselist=False, backref="community")
 
     def __init__(self, name):
         self.name = name
@@ -63,17 +60,14 @@ class ProfileIndicatorValue(Base):
     __tablename__ = 'ctdata_profile_indicator_values'
 
     id = Column(Integer, primary_key=True)
-    community_id = Column(Integer, ForeignKey('ctdata_community_profiles.id'))
     indicator_id = Column(Integer, ForeignKey('ctdata_profile_indicators.id'))
-    town_id = Column(Integer, ForeignKey('ctdata_towns.fips'))
+    town_id = Column(BigInteger, ForeignKey('ctdata_towns.fips'))
     value = Column(String)
 
-    community = relationship("CommunityProfile", backref=backref('values', order_by=id))
     indicator = relationship("ProfileIndicator", backref=backref('values', order_by=id))
     town = relationship("Town", backref=backref('values', order_by=id))
 
-    def __init__(self, community, indicator, town, value):
-        self.community = community
+    def __init__(self, indicator, town, value):
         self.indicator = indicator
         self.town = town
         self.value = value

@@ -56,7 +56,7 @@ class Database(object):
             for town in towns:
                 comm_prof = CommunityProfile(town[0])
                 new_town = Town(town[1], town[0])
-                comm_prof.towns.append(new_town)
+                comm_prof.town = new_town
                 session.add_all([comm_prof, new_town])
 
         session.commit()

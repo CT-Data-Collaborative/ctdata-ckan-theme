@@ -1,4 +1,4 @@
-from ckanext.ctdata_theme.ctdata.utils import OrderedSet
+from ..utils import OrderedSet, dict_with_key_value
 
 
 class QueryBuilder(object):
@@ -35,7 +35,13 @@ class QueryBuilder(object):
 
         if groupby_fields:
             columns_string = ','.join('"%s"' % col for col in groupby_fields)
-            columns_string += ',SUM("Value")'
+            measure_type = dict_with_key_value('field', 'Measure Type', filters)
+            aggregate = ',SUM("Value")'
+            if measure_type:
+                # we have a problem if both Percent and Number are specified for Measure Type
+                if len(measure_type['values']) == 1 and measure_type['values'][0] == 'Percent':
+                    aggregate = ',round(AVG("Value"),2)'
+            columns_string += aggregate
         else:
             columns_string = ','.join('"%s"' % col for col in self.get_columns(filters))
 
