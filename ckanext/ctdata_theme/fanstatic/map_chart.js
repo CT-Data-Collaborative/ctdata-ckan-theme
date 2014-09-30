@@ -46,6 +46,7 @@ chart = new Highcharts.Chart({
     width: 634, //-99
     height: 606, //-139
     backgroundColor:null,
+    animation: false
     //plotBackgroundImage: '/common/images/graymap.png',
   },
   title : {

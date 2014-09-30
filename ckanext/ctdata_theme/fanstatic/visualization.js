@@ -15,6 +15,10 @@ var incompat = {};
 
 function set_display_type(new_type){
   display_type = new_type;
+  if (display_type == 'map')
+      set_map_year_checkbox();
+  else
+      reset_year_checkbox();
   display_data();
 }
 
@@ -38,6 +42,29 @@ function handle_incompatibilities(){
 function collapse_all(){
   $("div.collapse").collapse('hide');
 }
+
+//If showing map, only allow one year to be checked at a time
+function set_map_year_checkbox(){
+  $("input.Year[type='checkbox']").click(function(){
+    var val = $(this).prop('checked');
+    $(this).parent().parent().find("input[type='checkbox']").prop('checked', false);
+    $(this).prop('checked', val);
+    display_data();
+    handle_incompatibilities();
+  });
+  $("input.Year[type='checkbox']").unbind("change");
+  //Uncheck all but the first checked year
+  $("input.Year[type='checkbox']:checked").slice(1).prop('checked', false);
+}
+
+//When not showing map, allow multiple years to be checked
+function reset_year_checkbox(){
+  $("input.Year[type='checkbox']").unbind("click");
+  $('input.Year[type="checkbox"]').change(function(){
+      display_data();
+      handle_incompatibilities();  
+  });
+} 
 
 function display_data(){
   switch(display_type){
