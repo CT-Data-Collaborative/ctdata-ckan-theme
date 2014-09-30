@@ -175,8 +175,11 @@ class CTDataController(base.BaseController):
 
         result = []
         for dim in dataset.dimensions:
-            if dim.name not in ('Town',):
-                print dim.name
+            # use reasonably good hardcoded "required" dimensions for now (will be changed after metadata for optional
+            # dimensions added)
+            if dim.name in ('Year', 'Measure Type', 'Variable', 'Subject', 'Grade', 'Race'):
+                if dim.name == 'Race':
+                    dim.possible_values.append('all')
                 result.append({'name': dim.name, 'values': dim.possible_values})
 
         return json.dumps({'success': True, 'result': result})

@@ -24,7 +24,7 @@ class CommunityProfile(Base):
 class Town(Base):
     __tablename__ = 'ctdata_towns'
 
-    fips = Column(Integer, primary_key=True)
+    fips = Column(BigInteger, primary_key=True)
     name = Column(String)
 
     def __init__(self, fips, name):
