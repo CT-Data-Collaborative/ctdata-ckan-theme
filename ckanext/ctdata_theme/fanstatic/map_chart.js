@@ -16,9 +16,26 @@ $.ajax({type: "POST",
                              }),
         contentType: 'application/json; charset=utf-8'}).done(function(    data) {
 console.log(data);
+var max = -Infinity;
+var min = Infinity;
 $.each(data.data, function(i){
   data.data[i]['value'] = data.data[i]['data'][0];
+  if(data.data[i]['data'][0] > max)
+    max = data.data[i]['data'][0];
+  if(data.data[i]['data'][0] < min)
+    min = data.data[i]['data'][0];
 });
+
+var numClasses = 8;
+var range = max-min;
+var step = Math.ceil(range/numClasses);
+var dataClasses = []
+
+for(i = 0; i < numClasses; i++){
+  dataClasses.push({from: Math.floor(min+(step*i)),
+                    to:   Math.floor(min+(step*(i+1)))
+                    });
+}
 
 $.getJSON('/common/map.json', function (geojson) {
 // Initiate the chart
@@ -42,6 +59,11 @@ chart = new Highcharts.Chart({
     }
   },
   colorAxis: {
+    dataClasses: dataClasses
+  },
+  legend: {
+    backgroundColor: 'white',
+    valueDecimals: 0
   },
   xAxis:{
     labels: {enabled: false},
