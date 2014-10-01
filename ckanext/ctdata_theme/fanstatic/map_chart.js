@@ -80,7 +80,8 @@ chart = new Highcharts.Chart({
     backgroundColor: 'white',
     borderWidth:1,
     borderRadius:3,
-    useHTML: true
+    useHTML: true,
+    y: 30
   },
 
   legend: {
