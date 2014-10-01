@@ -54,7 +54,7 @@
     </form>
 </div>
 
-<div id="towns_popup" class="modal fade">
+<div id="towns_popup" class="modal fade" style="display: none">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
@@ -86,7 +86,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-body">
-                <div id="indicators" style="width: 230px; border-right: 1px solid; float: left; margin-right: 10px">
+                <div id="indicators" class="indicator-topics">
                     <ul>
                     {% for topic in topics %}
                         <li>
@@ -113,8 +113,8 @@
                     {% endfor %}
                     </ul>
                 </div>
-                <div id="filters">
-                    filters
+                <div id="filters" class="indicator-filters">
+                    Choose a dataset from the leftside menu.
                 </div>
             </div>
             <div class="modal-footer">

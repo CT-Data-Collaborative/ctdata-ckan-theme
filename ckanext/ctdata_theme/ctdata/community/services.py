@@ -136,13 +136,14 @@ class CommunityProfileService(object):
 
             dataset = DatasetService.get_dataset(indicator.dataset_id)
 
-            qb = QueryBuilderFactory.get_query_builder('profile', dataset)
+            # Chart query builder suits Profile view just fine
+            qb = QueryBuilderFactory.get_query_builder('chart', dataset)
             view = ViewFactory.get_view('profile', qb)
 
             filters.append({'field': 'Town', 'values': map(lambda t: t.name, towns)})
             data = view.get_data(filters)
 
-            for value, town in zip(data['data'], sorted(towns, key=lambda x: x.fips)):
+            for value, town in zip(data['data'], sorted(towns, key=lambda x: x.name)):
                 print value, town
                 val = ProfileIndicatorValue(indicator, town, value['data'][0])
                 self.session.add(val)

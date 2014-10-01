@@ -19,7 +19,7 @@ class QueryBuilder(object):
 
             if "all" in map(lambda x: x.lower(), values):
                 # if some of the filters have "all" value, than we don't include them in the WHERE clause,
-                # and group all the selected columns except Value.
+                # and group by all the selected columns except Value.
                 if not groupby_fields:
                     # exclude Value from the GROUP BY clause
                     groupby_fields = list(OrderedSet(self.get_columns(filters)) - OrderedSet(['Value']))
@@ -31,16 +31,21 @@ class QueryBuilder(object):
 
             processed_filters.append(filter_string)
         filters_string = ' and '.join(processed_filters)
-        filters_values = reduce(lambda acc, f: acc + f['values'] if not 'all' in f['values'] else acc, filters, [])
+        filters_values = reduce(lambda acc, f: acc + f['values']
+                                if not 'all' in map(lambda x: x.lower(), f['values'])
+                                else acc, filters, [])
 
         if groupby_fields:
             columns_string = ','.join('"%s"' % col for col in groupby_fields)
             measure_type = dict_with_key_value('field', 'Measure Type', filters)
-            aggregate = ',SUM("Value")'
+            aggregate = ',SUM(CAST("Value" as DECIMAL))'  # some of the datasets have text values in the 'Value' column
+                                                          # so we need to cast values to decimals first
+            filters_string += ' and CAST("Value" as VARCHAR) <> %s'  # and then exclude all the non-castable values from
+            filters_values.append('NA')                              # the result
             if measure_type:
                 # we have a problem if both Percent and Number are specified for Measure Type
                 if len(measure_type['values']) == 1 and measure_type['values'][0] == 'Percent':
-                    aggregate = ',round(AVG("Value"),2)'
+                    aggregate = ',round(AVG(CAST("Value" as Decimal)),2)'  # don't forget to cast average values as well
             columns_string += aggregate
         else:
             columns_string = ','.join('"%s"' % col for col in self.get_columns(filters))
@@ -76,15 +81,19 @@ class TableQueryBuilder(QueryBuilder):
         Returns a field for which there's specified several filter values (multifield).
         it's not one of the 'Year', 'Town' or 'Measure Type' fields. If there're no filters
         with several values for a field, it returns the first field other than 'Year', 'Town' or 'Measure type'
+
+        And apparently 'Variable' was later added to the list of fields that can't be multifields. In the prototype it's
+         possible for 'Variable' to be multifield, but I'm not going to remove it from the non-multifields list, because
+         I'm afraid I can break something.
         """
         dimension_names = map(lambda dim: dim.name, self.dataset.dimensions)
         can_be_multifield = list(set(dimension_names) - set(['Year', 'Town', 'Measure Type', 'Variable']))
         valid_filters = filter(lambda f: f['field'] in can_be_multifield, filters)
         # either field with several values or the first field if there's no such
         try:
-          return (filter(lambda f: len(f['values']) > 1, valid_filters) or valid_filters)[0]['field']
+            return (filter(lambda f: len(f['values']) > 1, valid_filters) or valid_filters)[0]['field']
         except IndexError:
-          return can_be_multifield[0]
+            return can_be_multifield[0]
 
     def get_columns(self, filters):
         table_columns = super(TableQueryBuilder, self).get_columns(filters)
@@ -107,16 +116,6 @@ class MapQueryBuilder(QueryBuilder):
         return ['Town', 'Value']
 
 
-class ProfileQueryBuilder(QueryBuilder):
-    def get_columns(self, filters):
-        columns = super(ProfileQueryBuilder, self).get_columns(filters)
-        columns.insert(len(columns)-1, 'FIPS')
-        return columns
-
-    def get_order_by(self, filters):
-        return ['FIPS']
-
-
 class QueryBuilderFactory(object):
     @staticmethod
     def get_query_builder(name, dataset):
@@ -128,5 +127,3 @@ class QueryBuilderFactory(object):
             return MapQueryBuilder(dataset)        
         elif name == 'default':
             return QueryBuilder(dataset)
-        elif name == 'profile':
-            return ProfileQueryBuilder(dataset)

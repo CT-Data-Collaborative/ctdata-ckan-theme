@@ -2,12 +2,12 @@ function build_filters(filter_data) {
     var filters_html = '<ul>';
     $.each(filter_data, function(i, fltr) {
         filters_html += '<li>';
-        filters_html += '<h3 class="">' + fltr.name + '</h3>';
+        filters_html += '<h3 class="indicator-filter-name">' + fltr.name + '</h3>';
         filters_html += '<ul>';
         $.each(fltr.values, function(j, val) {
-            filters_html += '<li>';
-            filters_html += '<span>' + val + '</span>';
-            filters_html += '<input type="radio" class="filter-radio" name="' + fltr.name + '" value="' + val + '"';
+            filters_html += '<li class="indicator-filter">';
+            filters_html += '<span class="indicator-filter-value">' + val + '</span>';
+            filters_html += '<input type="radio" class="indicator-filter-radio" name="' + fltr.name + '" value="' + val + '"';
             if (j == 0)
                 filters_html += ' checked';
             filters_html += '>';
