@@ -17,9 +17,9 @@ function set_display_type(new_type){
   set_icon(new_type);
   display_type = new_type;
   if (display_type == 'map')
-      set_map_year_checkbox();
+      set_map_checkbox();
   else
-      reset_year_checkbox();
+      reset_checkbox();
   display_data();
 }
 
@@ -67,24 +67,27 @@ function collapse_all(){
   $("div.collapse").collapse('hide');
 }
 
-//If showing map, only allow one year to be checked at a time
-function set_map_year_checkbox(){
-  $("input.Year[type='checkbox']").click(function(){
+//If showing map, only allow one of each filter to be checked at a time
+function set_map_checkbox(){
+  $("input[type='checkbox']:not(.Town)").click(function(){
     var val = $(this).prop('checked');
     $(this).parent().parent().find("input[type='checkbox']").prop('checked', false);
     $(this).prop('checked', val);
     display_data();
     handle_incompatibilities();
   });
-  $("input.Year[type='checkbox']").unbind("change");
-  //Uncheck all but the first checked year
-  $("input.Year[type='checkbox']:checked").slice(1).prop('checked', false);
+  $("input[type='checkbox']:not(.Town)").unbind("change");
+  //Uncheck all but the first checked for each filter
+  filter_lists = $('.filter');
+  $.each(filter_lists, function(i){
+    $(filter_lists[i]).find("input:checked:not(.Town)").slice(1).prop('checked', false);
+  });
 }
 
-//When not showing map, allow multiple years to be checked
-function reset_year_checkbox(){
-  $("input.Year[type='checkbox']").unbind("click");
-  $('input.Year[type="checkbox"]').change(function(){
+//When not showing map, allow multiple filters to be checked
+function reset_checkbox(){
+  $("input[type='checkbox']:not(.Town)").unbind("click");
+  $('input[type="checkbox"]:not(.Town)').change(function(){
       display_data();
       handle_incompatibilities();  
   });
@@ -108,6 +111,8 @@ function check_defaults(){
   $.each(default_filters, function(i){
     $("li.filter").find("input[value='"+default_filters[i]+"']").prop('checked', true);
     });
+  $(".MeasureType").first().prop('checked', true);
+  $(".Variable").first().prop('checked', true);
 }
 
 function get_filters(){

@@ -57,6 +57,13 @@ $.each(cur_filters, function(i){
 legend_html = legend_html.substring(0, legend_html.length-2);
 legend_html += "</div></div>"
 
+var cur_mt = $(".MeasureType:checked").first().val();
+var units = "";
+if (cur_mt == "percent" || cur_mt == "Percent")
+  units = "%";
+if (cur_mt == "number" || cur_mt == "Number")
+  units = " Students";
+
 // Initiate the chart
 chart = new Highcharts.Chart({
   chart: {
@@ -72,6 +79,9 @@ chart = new Highcharts.Chart({
   },
   colorAxis: {
     dataClasses: dataClasses
+  },
+  tooltip:{
+    valueSuffix: units
   },
   title : {
     text : legend_html,
