@@ -34,7 +34,7 @@ class CommunityProfileService(object):
         all.remove(conn)
         return [conn] + all
 
-    def create_profile_indicator(self, filters, dataset_id):
+    def create_profile_indicator(self, filters, dataset_id, owner=None):
         dataset = DatasetService.get_dataset(dataset_id)
 
         # check that there're currently no such indicators in the db
@@ -63,8 +63,11 @@ class CommunityProfileService(object):
         except ValueError:
             raise toolkit.ObjectNotFound("'Year' filter value must be an integer")
 
-        indicator = ProfileIndicator(json.dumps(filters), dataset.ckan_meta['id'], data_type, int(years),
+        # TODO: check owner's priviligies there, when adding support for global indicators
+        is_global = False if owner else True
+        indicator = ProfileIndicator(json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
                                      variable)
+        owner.indicators.append(indicator)
         self.session.add(indicator)
 
         self.session.commit()

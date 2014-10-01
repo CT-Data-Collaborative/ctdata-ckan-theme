@@ -14,7 +14,7 @@ from ctdata.visualization.services import DatasetService
 from ctdata.visualization.querybuilders import QueryBuilderFactory
 from ctdata.visualization.views import ViewFactory
 from ctdata.community.services import CommunityProfileService, ProfileAlreadyExists
-from ctdata.community.models import CommunityProfile
+from ctdata.community.models import CommunityProfile, UserInfo
 from ctdata.topic.services import TopicSerivce
 
 
@@ -142,9 +142,18 @@ class CTDataController(base.BaseController):
             return json.dumps({'success': True})
 
     def add_indicator(self):
+        user = http_request.environ.get("REMOTE_USER")
+        if not user:
+            abort(401)
         if http_request.method == 'POST':
             session = Database().session_factory()
             community_profile_service = CommunityProfileService(session)
+
+            # TODO: extract to service
+            user_info = session.query(UserInfo).filter(UserInfo.ckan_user_id == user).first()
+            if not user_info:
+                user_info = UserInfo(user)
+                session.add(user_info)
 
             json_body = json.loads(http_request.body, encoding=http_request.charset)
             filters, dataset_id = json_body.get('filters'), json_body.get('dataset_id')
@@ -153,7 +162,7 @@ class CTDataController(base.BaseController):
                 abort(400)
 
             try:
-                community_profile_service.create_profile_indicator(filters, dataset_id)
+                community_profile_service.create_profile_indicator(filters, dataset_id, user_info)
             except toolkit.ObjectNotFound:
                 abort(404)
             except ProfileAlreadyExists, e:

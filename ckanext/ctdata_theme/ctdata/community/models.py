@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Table, BigInteger
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Boolean, Table
 from sqlalchemy.orm import relationship, backref
 
 Base = declarative_base()
@@ -40,14 +40,16 @@ class ProfileIndicator(Base):
 
     id = Column(Integer, primary_key=True)
     dataset_id = Column(String)
+    is_global = Column(Boolean)
     data_type = Column(String)
     year = Column(Integer)
     variable = Column(String)
     filters = Column(Text)
 
-    def __init__(self, filters, dataset_id, data_type, year, variable):
+    def __init__(self, filters, dataset_id, is_global, data_type, year, variable):
         self.filters = filters
         self.dataset_id = dataset_id
+        self.is_global = is_global
         self.data_type = data_type
         self.year = year
         self.variable = variable
@@ -74,3 +76,19 @@ class ProfileIndicatorValue(Base):
 
     def __repr__(self):
         return "[Value: %s; %s; %s; %s]" % (self.town, self.community, self.indicator, self.value)
+
+
+table_users_indicators = Table('ctdata_users_indicators', Base.metadata,
+    Column('user_id', String, ForeignKey('ctdata_user_info.ckan_user_id')),
+    Column('indicator_id', Integer, ForeignKey('ctdata_profile_indicators.id'))
+)
+
+
+class UserInfo(Base):
+    __tablename__ = 'ctdata_user_info'
+
+    ckan_user_id = Column(String, primary_key=True)
+    indicators = relationship("ProfileIndicator", secondary=lambda: table_users_indicators)
+
+    def __init__(self, ckan_user_id):
+        self.ckan_user_id = ckan_user_id
