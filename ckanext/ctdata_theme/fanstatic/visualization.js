@@ -23,7 +23,7 @@ function set_display_type(new_type){
   display_data();
 }
 
-function set_icon(new_type){
+function set_icon(type){
   if (type == "map") {
     $("#map_icon").attr("src", "/common/images/displayopt4-inv.png");
   } else {
