@@ -23,7 +23,7 @@ function set_display_type(new_type){
   display_data();
 }
 
-function set_icon(new_type){
+function set_icon(type){
   if (type == "map") {
     $("#map_icon").attr("src", "/common/images/displayopt4-inv.png");
   } else {
@@ -209,6 +209,8 @@ function draw_chart(){
         });
         console.log(years);
         console.log(series);
+        yAxisLabel = $(".Variable:checked").first().val() + " (" +
+                     $(".MeasureType:checked").first().val() + ")";
 
         $('#container').highcharts({
             chart: {
@@ -226,7 +228,8 @@ function draw_chart(){
                     value: 0,
                     width: 1,
                     color: '#808080'
-                }]
+                }],
+                title: {text: yAxisLabel}
             },
             legend: {
                 layout: 'vertical',
