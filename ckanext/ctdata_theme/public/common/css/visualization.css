@@ -12,3 +12,15 @@ label.checkLabel{
   padding-top: 4px;
   padding-left: 5px;
 }
+#mapTitle{
+  font-size: 24px;
+  background-color: white;
+  border-radius: 2px;
+  padding: 10px;
+  text-align: center;
+  border: 1px lightgray;
+  border-style:solid;
+}
+#mapSubtitle{
+  font-size: 12px;
+}

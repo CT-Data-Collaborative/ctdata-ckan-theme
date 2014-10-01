@@ -20,6 +20,10 @@ $.ajax({type: "POST",
 var max = -Infinity;
 var min = Infinity;
 $.each(data.data, function(i){
+  if (data.data[i]['name'] == "Connecticut"){
+    delete data.data[i];
+    return "Skip data for all of connecticut"
+  }
   data.data[i]['value'] = data.data[i]['data'][0];
   if(data.data[i]['data'][0] > max)
     max = data.data[i]['data'][0];
@@ -42,8 +46,8 @@ dataClasses[dataClasses.length-1]['to'] = max+1;
 $.getJSON('/common/map.json', function (geojson) {
 
 //Create legend to display current filters
-var legend_html = '<div id="mapLabel">'+$("#dataset_title").val()+"<br>"+
-  '<div style="font-size:9px">';
+var legend_html = '<div id="mapTitle">'+$("#dataset_title").val()+"<br>"+
+  '<div id="mapSubtitle">';
 var cur_filters = get_filters();
 $.each(cur_filters, function(i){
   if (cur_filters[i].field == 'Town') return "Skip this filter";
@@ -63,28 +67,32 @@ chart = new Highcharts.Chart({
     backgroundColor:null,
     animation: false
   },
-  title : {
-    text : dataset_title
-  },
-
-  mapNavigation: {
+   mapNavigation: {
     enabled: false,
   },
   colorAxis: {
     dataClasses: dataClasses
   },
+  title : {
+    text : legend_html,
+    style: {opacity: "70%", fontFamily: "Questrial, sans-serif", textWrap: "normal"},
+    floating: true,
+    backgroundColor: 'white',
+    borderWidth:1,
+    borderRadius:3,
+    useHTML: true
+  },
+
   legend: {
-    title: {text: legend_html,
-            style: {fontFamily: "Questrial, sans-serif", textWrap: "normal"}},
     useHTML: true,
     floating: true,
     backgroundColor: 'white',
     valueDecimals: 0,
-    width: 430,
+    width: 520,
     align: "right",
     borderWidth:1,
     borderRadius:3,
-    itemWidth:100,
+    itemWidth:130,
     y: -10
   },
   xAxis:{
