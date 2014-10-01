@@ -93,6 +93,8 @@ chart = new Highcharts.Chart({
     max: -71.787239,
     min: -73.727775,
     minRange: 1,
+    lineColor: 'transparent',
+    tickColor: 'transparent'
   },
   yAxis:{
     title:{text:''},
@@ -101,6 +103,8 @@ chart = new Highcharts.Chart({
     max: -40.950943,
     min: -42.050587,
     minRange: 1,
+    lineColor: 'transparent',
+    tickColor: 'transparent'
   },
   exporting: {enabled: false},
    series : [{
