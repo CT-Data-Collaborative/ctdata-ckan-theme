@@ -54,9 +54,9 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_data', '/data/{dataset_name}', action='get_data')
+            m.connect('community_get_filters', '/community/get_filters/{dataset_id}', action='get_filters')
             m.connect('community_add_indicator', '/community/add_indicator', action='add_indicator')
             m.connect('community_profiles', '/community/{community_name}', action='community_profile')
-            m.connect('community_add_towns', '/community/{community_name}/add_towns', action='add_community_towns')
             m.connect('community_remove_indicator',
                       '/community/remove_indicator/{indicator_id}',
                       action='remove_community_indicator')
@@ -165,6 +165,25 @@ class CTDataController(base.BaseController):
             http_response.headers['Content-type'] = 'application/json'
             return json.dumps({'success': True})
 
+    def get_filters(self, dataset_id):
+        http_response.headers['Content-type'] = 'application/json'
+
+        try:
+            dataset = DatasetService.get_dataset(dataset_id)
+        except toolkit.ObjectNotFound:
+            return json.dumps({'success': False, 'error': 'No datasets with this id'})
+
+        result = []
+        for dim in dataset.dimensions:
+            # use reasonably good hardcoded "required" dimensions for now (will be changed after metadata for optional
+            # dimensions added)
+            if dim.name in ('Year', 'Measure Type', 'Variable', 'Subject', 'Grade', 'Race'):
+                if dim.name == 'Race':
+                    dim.possible_values.append('all')
+                result.append({'name': dim.name, 'values': dim.possible_values})
+
+        return json.dumps({'success': True, 'result': result})
+
     def remove_community_indicator(self, indicator_id):
         pass
     
@@ -172,13 +191,24 @@ class CTDataController(base.BaseController):
         session = Database().session_factory()
         community_profile_service = CommunityProfileService(session)
 
+        towns_raw, towns_names = http_request.GET.get('towns'), []
+        if towns_raw:
+            # parse town name
+            towns_names = map(lambda x: x.strip(), towns_raw.split(','))
+
         try:
-            community, indicators = community_profile_service.get_community_indicators(community_name)
+            community, indicators, displayed_towns = community_profile_service.get_indicators(community_name,
+                                                                                              towns_names)
             topics = TopicSerivce.get_topics()
         except toolkit.ObjectNotFound as e:
             abort(404, detail=str(e))
 
+        towns = community_profile_service.get_all_towns()
+        displayed_towns_names = map(lambda t: t.name, displayed_towns)
+
         session.commit()
         return base.render('community_profile.html', extra_vars={'community': community,
                                                                  'indicators': indicators,
-                                                                 'topics': topics})
+                                                                 'topics': topics,
+                                                                 'displayed_towns': displayed_towns_names,
+                                                                 'towns': towns})

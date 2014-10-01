@@ -25,6 +25,9 @@ class CommunityProfileService(object):
 
         return community
 
+    def get_all_towns(self):
+        return self.session.query(Town).order_by(Town.name).all()
+
     def get_all_profiles(self):
         all = self.session.query(CommunityProfile).order_by(CommunityProfile.name).all()
         conn = self.session.query(CommunityProfile).filter(CommunityProfile.name == 'Connecticut').first()
@@ -51,6 +54,7 @@ class CommunityProfileService(object):
             raise toolkit.ObjectNotFound("There must be values for the 'Measure Type' and 'Year' filters")
 
         variable_fltr = dict_with_key_value("field", "Variable", filters)
+        variable = ''
         if variable_fltr:
             variable = variable_fltr["values"][0] if "values" in variable_fltr else None
 
@@ -65,11 +69,20 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
-    def get_community_indicators(self, community_name):
+    def get_indicators(self, community_name, towns_names):
         community = self.get_community_profile(community_name)
+        print community.town
+
+        towns = set()
+        if towns_names:
+            towns.update(self.session.query(Town).filter(Town.name.in_(set(towns_names))).all())
+        towns.update([community.town])
+        towns_fipses = map(lambda x: x.fips, list(towns))
+        print towns
 
         existing_towns, existing_indicators = set(), set()
-        existing_values = community.values
+        existing_values = self.session.query(ProfileIndicatorValue).\
+            filter(ProfileIndicatorValue.town_id.in_(towns_fipses)).all()
         for val in existing_values:
             existing_towns.update([val.town])
             existing_indicators.update([val.indicator])
@@ -77,23 +90,29 @@ class CommunityProfileService(object):
         all_indicators = self.session.query(ProfileIndicator).all()
 
         new_indicators = list(set(all_indicators) - existing_indicators)
-        new_towns = list(set(community.towns) - existing_towns)
+        new_towns = list(towns - existing_towns)
 
-        existing_towns, existing_indicators = list(existing_towns), list(existing_indicators)
+        # convert sets back to lists
+        existing_towns, existing_indicators, towns = list(existing_towns), list(existing_indicators), list(towns)
 
-        # there may had been added new towns to the community profile or new global indicators
-        # so we're adding new towns for the existing indicators
+        # values for the requested towns may not have been added to the db yet
         if new_towns and existing_indicators:
-            self._add_community_values(community, existing_indicators, new_towns)
+            self._add_indicator_values(existing_indicators, new_towns)
 
-        # and then adding new indicators for all the towns in the community profile
+        # also there may had been added indicators
+        # adding values for those also
         if new_indicators:
-            self._add_community_values(community, new_indicators, community.towns)
+            self._add_indicator_values(new_indicators, towns)
+
+        # TODO: following code should be extracted somewhere, service should only return the data and some other entity
+        # (controller?) should convert it for views to use.
 
         # gather the indicators data for the frontend
         result, last_id, current_ind = [], None, None
-        community_values = community.values[:]
-        for val in sorted(community_values, key=lambda x: x.town.fips):
+        indicators_values = self.session.query(ProfileIndicatorValue).\
+            filter(ProfileIndicatorValue.town_id.in_(towns_fipses)).\
+            order_by(ProfileIndicatorValue.indicator_id, ProfileIndicatorValue.town_id).all()
+        for val in indicators_values:
             if val.indicator.id != last_id:
                 filters = filter(lambda fl: fl['field'] not in ('Town', 'Year', 'Variable', 'Measure Type'),
                                  json.loads(val.indicator.filters))
@@ -107,30 +126,26 @@ class CommunityProfileService(object):
                 last_id = val.indicator.id
             current_ind['values'].append(val.value)
 
-        return community, result
+        towns.sort(key=lambda t: t.fips)
 
-    def _add_community_values(self, community, indicators, towns):
+        return community, result, towns
+
+    def _add_indicator_values(self, indicators, towns):
         for indicator in indicators:
-            print indicator
             filters = json.loads(indicator.filters)
 
             dataset = DatasetService.get_dataset(indicator.dataset_id)
 
-            qb = QueryBuilderFactory.get_query_builder('profile', dataset)
+            # Chart query builder suits Profile view just fine
+            qb = QueryBuilderFactory.get_query_builder('chart', dataset)
             view = ViewFactory.get_view('profile', qb)
 
             filters.append({'field': 'Town', 'values': map(lambda t: t.name, towns)})
             data = view.get_data(filters)
 
-            for value, town in zip(data['data'], towns):
-                val = ProfileIndicatorValue(community, indicator, town, value['data'][0])
+            for value, town in zip(data['data'], sorted(towns, key=lambda x: x.name)):
+                print value, town
+                val = ProfileIndicatorValue(indicator, town, value['data'][0])
                 self.session.add(val)
 
-        self.session.commit()
-
-    def add_profile_town(self, community_name, towns):
-        community = self.get_community_profile(community_name)
-        towns_from_db = self.session.query(Town).filter(Town.name.in_(towns)).order_by(Town.fips).all()
-        community.towns = list(set(community.towns) | set(towns_from_db))
-        community.towns.sort(key=lambda x: x.fips)
         self.session.commit()

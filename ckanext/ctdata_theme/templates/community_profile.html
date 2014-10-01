@@ -1,5 +1,10 @@
 {% extends "page.html" %}
 
+{% block styles %}
+{{ super() }}
+<link href='/common/css/visualization.css' rel='stylesheet' type='text/css'>
+{% endblock %}
+
 {% block page_name %}Data by Location - {{community.name}}{% endblock %}
 {% block page_description %}Create a Profile for Your Community{% endblock %}
 
@@ -8,8 +13,8 @@
 
 <section class="locationdata">
 <ul class="opt_btn">
-<li class="btn_blue"><a href="#" id="add_towns">Add Towns</a></li>
-<li class="btn_blue"><a href="#" id="add_ind">Add Indicator</a></li>
+<li class="btn_blue"><a href="javascript:void(0)" id="add_towns">Add Towns</a></li>
+<li class="btn_blue"><a href="javascript:void(0)" id="add_indicator">Add Indicator</a></li>
 <li class="download_btn"><a href="#">Download Profile</a></li>
 </ul>
 
@@ -19,8 +24,8 @@
             <li class="col-1">Dataset</li>
             <li class="col-2">Data Type</li>
             <li class="col-3">Year</li>
-            {% for town in community.towns %}
-                <li class="col-4">{{town.name}}</li>
+            {% for town_name in displayed_towns %}
+                <li class="col-4">{{town_name}}</li>
             {% endfor %}
         </ul>
     {% for indicator in indicators %}
@@ -49,27 +54,79 @@
     </form>
 </div>
 
-<ul style="display: none">
-{% for topic in topics %}
-    <li>
-    <h3>{{ topic['title'] }}</h3>
-    <ul>
-        {% for subtopic in topic['subdomains'] %}
-        <li>
-            <div style="margin-left: 10px">
-            <h3>{{ subtopic['title'] }}</h3>
-                <ul>
-                    {% for dataset in subtopic['datasets'] %}
-                    <li style="margin-left: 20px"><a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }}</a></li>
-                    {% endfor %}
-                </ul>
+<div id="towns_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                Add towns
             </div>
-        </li>
-        {% endfor %}
-    </ul>
-    </li>
-{% endfor %}
-</ul>
+            <div class="modal-body">
+                <div id="towns">
+                    <ul style="">
+                        {% for town in towns %}
+                            <li>
+                                <input type="checkbox" value="{{town.name}}" {% if town.name in displayed_towns %}checked{% endif %}>
+                                <span class="checkLabel">{{town.name}}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button id="save_towns" class="btn btn-primary">Add</button>
+                    <button id="close_towns_popup" class="btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="indicator_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="indicators" class="indicator-topics">
+                    <ul>
+                    {% for topic in topics %}
+                        <li>
+                        <h3>{{ topic['title'] }}</h3>
+                        <ul>
+                            {% for subtopic in topic['subdomains'] %}
+                            <li>
+                                <div>
+                                <h3 style="color: #000000">{{ subtopic['title'] }}</h3>
+                                    <ul>
+                                        {% for dataset in subtopic['datasets'] %}
+                                        <li>
+                                            <a href="javascript:void(0)" id="{{dataset['id']}}" class="dataset_chooser">
+                                                {{ dataset['title'] }}
+                                            </a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                <div id="filters" class="indicator-filters">
+                    Choose a dataset from the leftside menu.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button id="save_indicator" class="btn btn-primary">Add measure to profile</button>
+                    <button id="close_indicator_popup" class="btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 </section>
 

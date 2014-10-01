@@ -28,7 +28,7 @@ class TopicSerivce(object):
                         subdomain = extra['value']
 
                 if domain and subdomain:
-                    dataset_obj = {'name': dataset['name'], 'title': dataset['title']}
+                    dataset_obj = {'name': dataset['name'], 'title': dataset['title'], 'id': dataset['id']}
                     dmn = dict_with_key_value('title', domain, domains)
                     if dmn:
                         subdmn = dict_with_key_value('title', subdomain, dmn['subdomains'])

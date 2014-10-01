@@ -3,7 +3,7 @@ div.panel-collapse.collapse.in{
   overflow-x: hidden;
   overflow-y: scroll;
 }
-input[type="checkbox"]{
+input[type="checkbox"],input[type="radio"]{
   -webkit-appearance: checkbox;
   float: left;
 }
@@ -12,6 +12,40 @@ label.checkLabel{
   padding-top: 4px;
   padding-left: 5px;
 }
+
+span.checkLabel {
+  padding-top: 4px;
+  padding-left: 5px;
+  font-weight: normal;
+  font-size: 16px;
+  color: black;
+}
+
+.indicator-filter-value {
+    color: #464646;
+}
+
+.indicator-filter-radio {
+    /* !important because we need to overwrite CKAN's default styles */
+    top: 0 !important;
+    margin-top: 3px !important;
+    margin-right: 5px !important;
+}
+
+.indicator-topics {
+    width: 230px;
+    border-right: 1px solid;
+    float: left;
+}
+
+.indicator-filter-name {
+    color: #1F58B1;
+}
+
+.indicator-filters {
+    margin-left: 240px;
+}
+
 #mapTitle{
   font-size: 24px;
   background-color: white;
