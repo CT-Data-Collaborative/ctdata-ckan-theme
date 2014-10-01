@@ -14,12 +14,36 @@ var test_incompat = {
 var incompat = {};
 
 function set_display_type(new_type){
+  set_icon(new_type);
   display_type = new_type;
   if (display_type == 'map')
       set_map_year_checkbox();
   else
       reset_year_checkbox();
   display_data();
+}
+
+function set_icon(new_type){
+  if (type == "map") {
+    $("#map_icon").attr("src", "/common/images/displayopt4-inv.png");
+  } else {
+    $("#map_icon").attr("src", "/common/images/displayopt4.png");
+  }
+  if (type == "column") {
+    $("#bar_icon").attr("src", "/common/images/displayopt2-inv.png");
+  } else {
+    $("#bar_icon").attr("src", "/common/images/displayopt2.png");
+  }
+  if (type == "line") {
+    $("#line_icon").attr("src", "/common/images/displayopt3-inv.png");
+  } else {
+    $("#line_icon").attr("src", "/common/images/displayopt3.png");
+  }
+  if (type == "table") {
+    $("#table_icon").attr("src", "/common/images/displayopt1-inv.png");
+  } else {
+    $("#table_icon").attr("src", "/common/images/displayopt1.png");
+  }
 }
 
 function handle_incompatibilities(){
