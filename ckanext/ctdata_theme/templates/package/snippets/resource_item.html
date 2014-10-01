@@ -6,7 +6,7 @@
     <span class="format-label" property="dc:format" data-format="{{ res.format.lower() or 'data' }}">{{ res.format }}</span>
     <span><a href="{{ url }}">{{ h.resource_display_name(res) | truncate(50) }}</a></span>
     <div class="buttons">
-        <a href="{{ url }}" class="blue_btn">PREVIEW</a>
+        <a href="/visualization/{{ res.name }}" class="blue_btn">PREVIEW</a>
         <a href="{{ res.url }}" class="grey_btn">DOWNLOAD</a>
     </div>
 </li>
