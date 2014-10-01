@@ -67,6 +67,7 @@ function reset_year_checkbox(){
 } 
 
 function display_data(){
+  display_filters();
   switch(display_type){
     case "map":
       draw_map();
@@ -213,6 +214,17 @@ function draw_chart(){
         });
     })
 
+}
+
+function display_filters(){
+  filters = get_filters();
+  filter_text = "";
+  $.each(filters, function(i){
+    if (filters[i]['field'] == "Town") return "Skip town";
+    filter_text += filters[i]['field']+": "+filters[i]['values'] + " | ";
+  });
+  filter_text = filter_text.substring(0, filter_text.length - 2);
+  $("#pageDescription").text(filter_text);
 }
 
 $(function () {
