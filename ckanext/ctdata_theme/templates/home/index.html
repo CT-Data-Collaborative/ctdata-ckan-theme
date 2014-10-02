@@ -1,12 +1,13 @@
 {% ckan_extends %}
 
-{% block title %}CTdata{% endblock %}
+{% block title %}Connecticut Data Collaborative{% endblock %}
 
 {% block content %}
 {% block maintag %}{{ super() }}{% endblock %}
+
 <section  class="ctdata-banner">
 <ul class="slider">
-<li><img src="/common/images/slideimg1.jpg" alt="" /></li>
+<li><img src="/common/images/banner-image.png" alt="" /></li>
 </ul>
 <ul class="bullet">
 <li class="active"><a href="#"></a></li>
@@ -18,8 +19,7 @@
 
 <div class="overlay_text">
 <div class="ctdata-wrapper">
-<h2>Early Childhood Portal</h2>
-<p>Lorem ipsum dolor sit amet consectetur adipiscing </p>
+<h2>Welcome to the new CTData.org</h2>
 </div>
 </div>
 </section> <!-- BANNER SECTION ENDS HERE -->
@@ -48,7 +48,7 @@
 
 <section class="location">
 <div class="ctdata-wrapper">
-<h2>Explore Data by Location</h2>
+<a name="data-by-location"><h2>Explore Data by Location</h2></a>
 <select class="custom-select">
 <option selected >-- Select Location --</option>
     {% set community_profiles = h.communities_helper() %}
@@ -65,34 +65,7 @@
 
 <section class="news">
 <div class="ctdata-wrapper">
-<h2>Latest News</h2>
-
-<ul>
-<li>
-<div class="date"> <span class="day">03</span> <span class="month">08.2014</span> </div>
-<div class="news_con">
-<h3><a href="#">NEW DATA available</a></h3>
-<p>NEW DATA available on reading levels and summer learning loss (DRA2) and on Child Abuse and Neglect rates by TOWN. While we process it, you can access the files at Data For Download.</p>
-</div>
-</li>
-
-<li>
-<div class="date"> <span class="day">31</span> <span class="month">03.2014</span> </div>
-<div class="news_con">
-<h3><a href="#">Open Data Portal Launch</a></h3>
-<p>Connecticut Launches it's Open Data Portal with March 31, 2014. See <a href="https://data.ct.gov">https://data.ct.gov</a></p>
-</div>
-</li>
-
-<li>
-<div class="date"> <span class="day">03</span> <span class="month">08.2014</span> </div>
-<div class="news_con">
-<h3><a href="#">March 2014 Forum</a></h3>
-<p>View the Proceedings of CT Data Collaborative March 3 Forum on Open Data <a href="#">here</a></p>
-</div>
-</li>
-</ul>
-
+<a href="/pages/news"><h2>Latest News</h2></a>
 </div>
 </section> <!-- latest news section ends -->
 </div>
