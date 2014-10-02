@@ -63,7 +63,8 @@ option { padding:0 24px;}
 
 
 .news { width:100%; float:left; background:#fff; padding:35px 0 45px;}
-.news h2 { text-align:center; color:#3970ba; font-size:30px; margin-bottom:50px; text-transform:uppercase;}
+.news h2 { text-align:center; color:#3970ba; font-size:30px; margin-bottom:50px; text-transform:uppercase; text-decoration: underline;}
+.news h2:hover { text-decoration: none;}
 .news ul li { float:left; width:33.33%; padding-right:32px;}
 .date { float:left; width:70px; text-align:center; font-family: 'Roboto', sans-serif;line-height:1; margin-right:12px;}
 .date .day { background:#33bdf2; color:#fff; font-weight:900; font-size:30px; display:block;  padding:11px 0; margin-bottom:2px;}
