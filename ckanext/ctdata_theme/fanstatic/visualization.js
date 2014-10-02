@@ -1,4 +1,5 @@
-var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013"];//, "K through 12", "1", "Percent", "Students absent 20 or more days", "8"];
+var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "Percent"];//, "K through 12", "1", "Percent", "Students absent 20 or more days", "8"];
+
 var display_type = "table";
 var test_incompat = { 
     "Grade":["Race\\\\\/ethnicity","Race\\\/ethnicity","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","StudentswithDisabilities"],
@@ -303,7 +304,11 @@ function display_filters(){
 }
 
 $(function () {
+    if ($("#dataset_id").val() == 'cmt-results'){
+      default_filters = ["2008", "2009", "2010", "Math", "Reading", "Ashford", "Ansonia", "New Haven", "Grade 3", "Advanced", "Percent"];
+    }
     check_defaults()
+      $("#NumberCheck").prop('checked', false);
     $('div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         display_data();
