@@ -62,3 +62,6 @@ span.checkLabel {
 #mapSubtitle{
   font-size: 12px;
 }
+#legendDims{
+  text-align: right;
+}

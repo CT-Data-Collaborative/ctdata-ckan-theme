@@ -18,6 +18,10 @@ function set_display_type(new_type){
   display_type = new_type;
   if (display_type == 'map')
       set_map_checkbox();
+  else if (display_type == 'column' || display_type == 'line'){
+      reset_checkbox();
+      set_chart_checkbox();
+  }
   else
       reset_checkbox();
   display_data();
@@ -65,6 +69,18 @@ function handle_incompatibilities(){
 
 function collapse_all(){
   $("div.collapse").collapse('hide');
+}
+
+//Charts can't have more than one measure type at a time
+function set_chart_checkbox(){
+  $("input.MeasureType").click(function(){
+    $(this).parent().parent().find("input[type='checkbox']").prop('checked', false);
+    $(this).prop('checked', true);
+    display_data();
+    handle_incompatibilities();
+  });
+  $("input.MeasureType").unbind("change");
+  $("input.MeasureType:checked").slice(1).prop('checked', false);
 }
 
 //If showing map, only allow one of each filter to be checked at a time
@@ -152,9 +168,10 @@ function draw_table(){
                    "<tr>"+
                      "<th class='col-1'>Location</th>"+
                      "<th class='col-2'>"+multifield+"</th>"+
-                     "<th class='col-3'>Measure Type</th>";
+                     "<th class='col-3'>Variable</th>"+
+                     "<th class='col-4'>Measure Type</th>";
                  $.each(years, function(i){
-                     html = html+"<th class='col-"+(i+4)+"'>"+years[i]+"</th>";
+                     html = html+"<th class='col-"+(i+5)+"'>"+years[i]+"</th>";
                  });
                  html+=  "</tr>"+
                  "</thead>"+
@@ -170,12 +187,13 @@ function draw_table(){
                  "<tr>"+
                    "<td class='col-1'>"+town['town']+"</td>"+
                    "<td class='col-2'>"+mf['value']+"</td>"+
-                   "<td class='col-3'>"+mt['measure_type']+"</td>";
+                   "<td class='col-3'>"+mt['variable']+"</td>"+
+                   "<td class='col-4'>"+mt['measure_type']+"</td>";
               //For each year
               $.each(years, function(value_index){
                value = mt['data'][value_index];
                if(value == undefined) value="-";
-               html += "<td class='col-"+(value_index+4)+"'>"+value+"</td>";
+               html += "<td class='col-"+(value_index+5)+"'>"+value+"</td>";
               });
                html +=  "</tr>";
             });
@@ -193,25 +211,44 @@ function draw_chart(){
 
   $.ajax({type: "POST",
             url: "/data/" + dataset_id,
-            data: JSON.stringify({view: 'table',
+            data: JSON.stringify({view: 'chart',
                                   filters: get_filters()
                                   }),
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         //var series = data['data'],
         //    years = data['years'];
+        console.log("HERE IS CHART DATA");
+        console.log(data);
+        var suffix = '';
         var series = []
-        var multifield = data['multifield'];
         var years = data['years'];
-        var mf_data = data['data'];
-        $.each(mf_data, function(town_index){
-          var cur_town_name = mf_data[town_index]['town'];
-          var cur_town = mf_data[town_index]['multifield'];
-          $.each(cur_town, function(mf_index){
-            var cur_mf_value = cur_town[mf_index]['value'];
-            series.push({name: cur_town_name + ", "+multifield+": "+cur_mf_value,
-                         data: cur_town[mf_index]['data'][0]['data'].slice(0, years.length)});
+        var series_data = data['data'];
+        $.each(series_data, function(i){
+          if (!series_data[i]['dims'])
+            return "This series doesn't exist"
+          cur_series_data = series_data[i]['data'];
+          cur_series_dims = series_data[i]['dims'];
+          cur_series = {};
+          cur_series['data'] = cur_series_data;
+          suffix = cur_series_dims['Measure Type'];
+          if (suffix == 'percent' || suffix == 'Percent')
+            suffix = '%';
+          if (suffix == 'number' || suffix == 'Number')
+            suffix = ' People';
+          delete cur_series_dims['Measure Type'];
+          name = /*"<div id='legendTown'>"+*/cur_series_dims['Town'] + " -  <br> <div id='legendDims'>";
+          delete cur_series_dims['Town'];
+          var first_flag = 0;
+          $.each(cur_series_dims, function(dim_index){
+            if (cur_series_dims[dim_index] == "NA")
+              return "No value for this dimension"
+            name += dim_index + ": "+cur_series_dims[dim_index]+"<br> ";
           });
+          name += "</div>";
+          cur_series['name'] = name;
+          series.push(cur_series);
         });
+
         console.log(years);
         console.log(series);
         yAxisLabel = $(".Variable:checked").first().val() + " (" +
@@ -240,7 +277,13 @@ function draw_chart(){
                 layout: 'vertical',
                 align: 'right',
                 verticalAlign: 'middle',
-                borderWidth: 0
+                borderWidth: 0,
+                //useHTML: true,
+                itemMarginBottom: 10
+            },
+            tooltip: {
+                useHTML: true,
+                valueSuffix: suffix
             },
             series: series
         });
