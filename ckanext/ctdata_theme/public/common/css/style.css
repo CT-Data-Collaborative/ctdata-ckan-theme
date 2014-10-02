@@ -37,7 +37,7 @@ header nav ul li a:hover { color:#333;}
 .ctdata-banner .slider li { width:100%;}
 .ctdata-banner .slider li img { width:100%; display:block;}
 .ctdata-banner .overlay_text { position:absolute; top:130px; width:100%; left:0; color:#fff;}
-.ctdata-banner .overlay_text h2 { background-color: rgba(57, 112, 186, 0.7); padding:12px 35px; display:inline-block; font-size:30px; margin-bottom:1px;
+.ctdata-banner .overlay_text h2 { background-color: rgba(57, 112, 186, 0.85); padding:12px 35px; display:inline-block; font-size:30px; margin-bottom:1px;
 line-height: normal; margin-top: 0px}
 .ctdata-banner .overlay_text p { background:url(../images/whitepng.png) repeat; display:table; font-size:22px; color:#3380bd; padding:12px 32px; margin-bottom: 0px}
 
