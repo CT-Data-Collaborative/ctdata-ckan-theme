@@ -56,6 +56,7 @@ class TableView(View):
         last_town = None
         last_mf = None  # last multifield
         last_mt = None  # last measure type
+        last_var = None # last variable
 
         current_town = None
         current_mf = None  # current multifield
@@ -66,8 +67,9 @@ class TableView(View):
             if row[multifield] == "NA":
               continue
             if row['Town'] != last_town:
-                current_mt = {'measure_type': row['Measure Type'], 'data': []}
+                current_mt = {'measure_type': row['Measure Type'], 'variable': row['Variable'], 'data': []}
                 last_mt = row['Measure Type']
+                last_var = row['Variable']
 
                 current_mf = {'value': str(row[multifield]), 'data': [current_mt]}
                 last_mf = row[multifield]
@@ -78,17 +80,19 @@ class TableView(View):
                 result['data'].append(current_town)
 
             if row[multifield] != last_mf:
-                current_mt = {'measure_type': row['Measure Type'], 'data': []}
+                current_mt = {'measure_type': row['Measure Type'], 'variable': row['Variable'], 'data': []}
                 last_mt = row['Measure Type']
+                last_var = row['Variable']
 
                 current_mf = {'value': str(row[multifield]), 'data': [current_mt]}
                 last_mf = row[multifield]
 
                 current_town['multifield'].append(current_mf)
 
-            if row['Measure Type'] != last_mt:
-                current_mt = {'measure_type': row['Measure Type'], 'data': []}
+            if (row['Measure Type'], row['Variable']) != (last_mt, last_var):
+                current_mt = {'measure_type': row['Measure Type'], 'variable': row['Variable'], 'data': []}
                 last_mt = row['Measure Type']
+                last_var = row['Variable']
 
                 current_mf['data'].append(current_mt)
 
@@ -119,11 +123,18 @@ class ChartView(View):
         # advise anybody who'll continue working on the project to add them. The algorithm, basically, makes sure
         # that for every town and year specified in the filters, there would be some value (actual value or None) in the
         # result, even if db didn't return the values for these towns or years.
-        last_town_name = None
+        last_row_dims = None
+        current_row = None
+        last_dims = None
+        next_row_dims = None
+        cur_year = None
         current_town = None
         for row in data:
-            if row['Town'] != last_town_name:
-                if last_town_name:
+            next_row_dims = row
+            cur_year = next_row_dims.pop('Year', None)
+            cur_value = next_row_dims.pop('Value', None)
+            if cmp(last_row_dims, next_row_dims) != 0:
+                if last_row_dims:
                     while check_year < len(sorted_years):
                         result['data'][-1]['data'].append(None)
                         check_year += 1
@@ -132,20 +143,21 @@ class ChartView(View):
                     print 'place 1'
                     result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(sorted_years)})
                     check_town += 1
-                current_town = {'name': row['Town'], 'data': []}
-                last_town_name = row['Town']
+                current_town = {'dims': {k: str(v) for k, v in next_row_dims.items()},
+                                'data': []}
+                last_row_dims = next_row_dims
                 check_town += 1
                 check_year = 0
 
                 result['data'].append(current_town)
 
             # if some of the years was skipped, append None values for them for current town
-            while check_year < len(sorted_years) and int(row['Year']) != sorted_years[check_year]:
+            while check_year < len(sorted_years) and cur_year != sorted_years[check_year]:
                 check_year += 1
                 current_town['data'].append(None)
 
             try:
-                current_town['data'].append(float(row['Value']))
+                current_town['data'].append(float(cur_value))
             except ValueError:
                 current_town['data'].append(None)
 

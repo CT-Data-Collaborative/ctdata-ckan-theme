@@ -65,7 +65,7 @@ class QueryBuilder(object):
         """
         Columns used in the SELECT clause. Descendants may override those according to their needs.
         """
-        return ['Town', 'Year', 'Measure Type', 'Value']
+        return ['Town', 'Year', 'Measure Type', 'Variable', 'Value']
 
     def get_order_by(self, filters):
         """
@@ -103,17 +103,27 @@ class TableQueryBuilder(QueryBuilder):
 
     def get_order_by(self, filters):
         mult_field = self.determine_multifield(filters)
-        return ['Town', mult_field, 'Measure Type', 'Year']
+        return ['Town', mult_field, 'Measure Type', 'Variable', 'Year']
 
 
 class ChartQueryBuilder(QueryBuilder):
     def get_order_by(self, filters):
-        return ['Town', 'Year']
+        table_columns = map (lambda (x): x.name, self.dataset.dimensions)
+        table_columns.remove("Year")
+        table_columns.append("Year")
+        return table_columns
 
+    def get_columns(self, filters):
+      table_columns = map( lambda (x): x.name, self.dataset.dimensions)
+      table_columns.append('Value')
+      return table_columns
 
 class MapQueryBuilder(QueryBuilder):
     def get_columns(self, filters):
         return ['Town', 'Value']
+
+    def get_order_by(self, filters):
+        return ['Town']
 
 
 class QueryBuilderFactory(object):

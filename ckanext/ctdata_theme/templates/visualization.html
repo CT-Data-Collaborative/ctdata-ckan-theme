@@ -1,5 +1,6 @@
 {% extends "page.html" %}
 
+{% block title %}CTData Visualization - {{ dataset.title }} {% endblock %}
 {% block page_name %}{{ dataset.title }}{% endblock %}
 {% block page_description %}Profile info{% endblock %}
 
@@ -60,13 +61,15 @@
 <div class="display_options">
 <label>Display As</label>
 <ul>
-<li><a href="javascript:void(0)" onclick="set_display_type('table')"><img src="/common/images/displayopt1.png" alt="" /></a></li>
-<li><a href="javascript:void(0)" onclick="set_display_type('bar')"><img src="/common/images/displayopt2.png" alt="" /></a></li>
-<li><a href="javascript:void(0)" onclick="set_display_type('line')"><img src="/common/images/displayopt3.png" alt="" /></a></li>
-<li><a href="javascript:void(0)" onclick="set_display_type('map')"><img src="/common/images/displayopt4.png" alt="" /></a></li>
+<li><a href="javascript:void(0)" onclick="set_display_type('table')"><img id="table_icon" src="/common/images/displayopt1-inv.png" alt="" /></a></li>
+<li><a href="javascript:void(0)" onclick="set_display_type('column')"><img id="bar_icon" src="/common/images/displayopt2.png" alt="" /></a></li>
+<li><a href="javascript:void(0)" onclick="set_display_type('line')"><img id="line_icon" src="/common/images/displayopt3.png" alt="" /></a></li>
+<li><a href="javascript:void(0)" onclick="set_display_type('map')"><img id="map_icon" src="/common/images/displayopt4.png" alt="" /></a></li>
+<li style="padding-top: 3px;"><a href="/dataset/{{dataset.name}}">Raw Data</a>
 </ul>
 </div>
 
+<!--
 <div class="operations">
 <label>Operations</label>
 <ul>
@@ -75,6 +78,7 @@
 <li><a href="#"><img src="/common/images/operation3.png" alt="" /></a></li>
 </ul>
 </div>
+-->
 
 </div>
 

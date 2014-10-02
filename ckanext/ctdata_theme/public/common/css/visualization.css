@@ -1,7 +1,7 @@
 div.panel-collapse.collapse.in{
   max-height: 200px;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 input[type="checkbox"],input[type="radio"]{
   -webkit-appearance: checkbox;
@@ -12,6 +12,11 @@ label.checkLabel{
   padding-top: 4px;
   padding-left: 5px;
 }
+
+label.checkLabel:after {
+  content: "";
+}
+
 span.checkLabel {
   padding-top: 4px;
   padding-left: 5px;
@@ -43,4 +48,20 @@ span.checkLabel {
 
 .indicator-filters {
     margin-left: 240px;
+}
+
+#mapTitle{
+  font-size: 24px;
+  background-color: white;
+  border-radius: 2px;
+  padding: 10px;
+  text-align: center;
+  border: 1px lightgray;
+  border-style:solid;
+}
+#mapSubtitle{
+  font-size: 12px;
+}
+#legendDims{
+  text-align: right;
 }
