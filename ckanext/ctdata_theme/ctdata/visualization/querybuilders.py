@@ -65,7 +65,11 @@ class QueryBuilder(object):
         """
         Columns used in the SELECT clause. Descendants may override those according to their needs.
         """
-        return ['Town', 'Year', 'Measure Type', 'Variable', 'Value']
+        table_cols = ['Town', 'Year', 'Measure Type', 'Value']
+        if 'Variable' in map(lambda dim: dim.name, self.dataset.dimensions):
+          table_cols.append('Variable')
+
+        return table_cols
 
     def get_order_by(self, filters):
         """
@@ -87,7 +91,7 @@ class TableQueryBuilder(QueryBuilder):
          I'm afraid I can break something.
         """
         dimension_names = map(lambda dim: dim.name, self.dataset.dimensions)
-        can_be_multifield = list(set(dimension_names) - set(['Year', 'Town', 'Measure Type', 'Variable']))
+        can_be_multifield = list(set(dimension_names) - set(['Year', 'Town', 'Measure Type']))
         valid_filters = filter(lambda f: f['field'] in can_be_multifield, filters)
         # either field with several values or the first field if there's no such
         try:
@@ -103,7 +107,11 @@ class TableQueryBuilder(QueryBuilder):
 
     def get_order_by(self, filters):
         mult_field = self.determine_multifield(filters)
-        return ['Town', mult_field, 'Measure Type', 'Variable', 'Year']
+        table_cols = ['Town', mult_field, 'Measure Type', 'Year']
+        if 'Variable' in map(lambda dim: dim.name, self.dataset.dimensions):
+          table_cols.insert(3, 'Variable')
+
+        return table_cols
 
 
 class ChartQueryBuilder(QueryBuilder):

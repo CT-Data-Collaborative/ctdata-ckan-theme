@@ -66,6 +66,8 @@ class TableView(View):
             #Don't include row if it doesn't have a value for the multifield
             if row[multifield] == "NA":
               continue
+            if not 'Variable' in row:
+              row['Variable'] = None
             if row['Town'] != last_town:
                 current_mt = {'measure_type': row['Measure Type'], 'variable': row['Variable'], 'data': []}
                 last_mt = row['Measure Type']

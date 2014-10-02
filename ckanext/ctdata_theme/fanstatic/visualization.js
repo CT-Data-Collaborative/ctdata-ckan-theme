@@ -167,9 +167,12 @@ function draw_table(){
                  "<thead>"+
                    "<tr>"+
                      "<th class='col-1'>Location</th>"+
-                     "<th class='col-2'>"+multifield+"</th>"+
-                     "<th class='col-3'>Variable</th>"+
-                     "<th class='col-4'>Measure Type</th>";
+                     "<th class='col-2'>"+multifield+"</th>";
+      //If there is a variable field, include it in the table
+      if (data['data'][0]['multifield'][0]['data'][0]['variable']){
+                     html += "<th class='col-3'>Variable</th>";
+         }
+                     html += "<th class='col-4'>Measure Type</th>";
                  $.each(years, function(i){
                      html = html+"<th class='col-"+(i+5)+"'>"+years[i]+"</th>";
                  });
@@ -186,9 +189,10 @@ function draw_table(){
               html = html+
                  "<tr>"+
                    "<td class='col-1'>"+town['town']+"</td>"+
-                   "<td class='col-2'>"+mf['value']+"</td>"+
-                   "<td class='col-3'>"+mt['variable']+"</td>"+
-                   "<td class='col-4'>"+mt['measure_type']+"</td>";
+                   "<td class='col-2'>"+mf['value']+"</td>";
+             if (mt['variable'])
+                   html += "<td class='col-3'>"+mt['variable']+"</td>";
+             html += "<td class='col-4'>"+mt['measure_type']+"</td>";
               //For each year
               $.each(years, function(value_index){
                value = mt['data'][value_index];
@@ -233,8 +237,6 @@ function draw_chart(){
           suffix = cur_series_dims['Measure Type'];
           if (suffix == 'percent' || suffix == 'Percent')
             suffix = '%';
-          if (suffix == 'number' || suffix == 'Number')
-            suffix = ' People';
           delete cur_series_dims['Measure Type'];
           name = /*"<div id='legendTown'>"+*/cur_series_dims['Town'] + " -  <br> <div id='legendDims'>";
           delete cur_series_dims['Town'];
@@ -251,8 +253,7 @@ function draw_chart(){
 
         console.log(years);
         console.log(series);
-        yAxisLabel = $(".Variable:checked").first().val() + " (" +
-                     $(".MeasureType:checked").first().val() + ")";
+        yAxisLabel = $(".MeasureType:checked").first().val();
 
         $('#container').highcharts({
             chart: {
