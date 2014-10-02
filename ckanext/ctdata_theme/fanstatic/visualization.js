@@ -1,4 +1,4 @@
-var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "Percent"];//, "K through 12", "1", "Percent", "Students absent 20 or more days", "8"];
+var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "Percent", "Education", "Operating", "Rate per 1000", "Substantiated", "All allegation types"];
 
 var display_type = "table";
 var test_incompat = { 
@@ -237,6 +237,8 @@ function draw_chart(){
           suffix = cur_series_dims['Measure Type'];
           if (suffix == 'percent' || suffix == 'Percent')
             suffix = '%';
+          else
+            suffix = '';
           delete cur_series_dims['Measure Type'];
           name = /*"<div id='legendTown'>"+*/cur_series_dims['Town'] + " -  <br> <div id='legendDims'>";
           delete cur_series_dims['Town'];
@@ -308,7 +310,10 @@ $(function () {
       default_filters = ["2008", "2009", "2010", "Math", "Reading", "Ashford", "Ansonia", "New Haven", "Grade 3", "Advanced", "Percent"];
     }
     check_defaults()
-      $("#NumberCheck").prop('checked', false);
+    $("#NumberCheck").prop('checked', false);
+    if($(".MeasureType:checked").length == 0){
+        $(".MeasureType").first().prop('checked', true);
+    }
     $('div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         display_data();
