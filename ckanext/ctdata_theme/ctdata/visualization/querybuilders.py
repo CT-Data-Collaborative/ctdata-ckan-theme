@@ -122,6 +122,9 @@ class MapQueryBuilder(QueryBuilder):
     def get_columns(self, filters):
         return ['Town', 'Value']
 
+    def get_order_by(self, filters):
+        return ['Town']
+
 
 class QueryBuilderFactory(object):
     @staticmethod

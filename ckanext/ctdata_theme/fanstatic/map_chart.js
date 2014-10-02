@@ -12,23 +12,22 @@ $.each(filters, function(i){
 
 $.ajax({type: "POST",
         url: "/data/" + dataset_id,
-        data: JSON.stringify({view: 'chart',
+        data: JSON.stringify({view: 'map',
                               filters: filters
                              }),
         contentType: 'application/json; charset=utf-8'}).done(function(    data) {
-
+console.log(data);
 var max = -Infinity;
 var min = Infinity;
 $.each(data.data, function(i){
-  if (data.data[i]['name'] == "Connecticut"){
+  if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
     return "Skip data for all of connecticut"
   }
-  data.data[i]['value'] = data.data[i]['data'][0];
-  if(data.data[i]['data'][0] > max)
-    max = data.data[i]['data'][0];
-  if(data.data[i]['data'][0] < min)
-    min = data.data[i]['data'][0];
+  if(data.data[i]['value'] > max)
+    max = data.data[i]['value'];
+  if(data.data[i]['value'] < min)
+    min = data.data[i]['value'];
 });
 
 //Split data into classes for discrete map coloring
@@ -131,7 +130,7 @@ chart = new Highcharts.Chart({
     mapData: geojson,
     borderColor: '#666666',
     name: data['years'][0],
-    joinBy: ['NAME', 'name'],
+    joinBy: ['NAME', 'code'],
     states: {
       hover: {
         color: 'highlight',
