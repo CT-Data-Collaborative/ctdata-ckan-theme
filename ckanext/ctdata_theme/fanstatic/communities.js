@@ -69,5 +69,12 @@ $(function(){
                 $('#filters').html(build_filters(data['result']));
             }
         });
-    })
+    });
+
+    $('.table_data').hover(function() {
+        console.log('test');
+        $(this).find('.close_pic').animate({opacity: 1.0}, 300);
+    }, function () {
+        $(this).find('.close_pic').animate({opacity: 0.0}, 300);
+    });
 });

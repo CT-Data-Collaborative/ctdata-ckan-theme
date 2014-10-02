@@ -108,15 +108,16 @@ class TableQueryBuilder(QueryBuilder):
 
 class ChartQueryBuilder(QueryBuilder):
     def get_order_by(self, filters):
-        table_columns = map (lambda (x): x.name, self.dataset.dimensions)
+        table_columns = map(lambda (x): x.name, self.dataset.dimensions)
         table_columns.remove("Year")
         table_columns.append("Year")
         return table_columns
 
     def get_columns(self, filters):
-      table_columns = map( lambda (x): x.name, self.dataset.dimensions)
-      table_columns.append('Value')
-      return table_columns
+        table_columns = map(lambda (x): x.name, self.dataset.dimensions)
+        table_columns.append('Value')
+        return table_columns
+
 
 class MapQueryBuilder(QueryBuilder):
     def get_columns(self, filters):
@@ -124,6 +125,14 @@ class MapQueryBuilder(QueryBuilder):
 
     def get_order_by(self, filters):
         return ['Town']
+
+
+class ProfileQueryBuilder(QueryBuilder):
+    def get_order_by(self, filters):
+        return ['Town', 'Year']
+
+    def get_columns(self, filters):
+        return ['Town', 'Year', 'Measure Type', 'Value']
 
 
 class QueryBuilderFactory(object):
@@ -137,3 +146,5 @@ class QueryBuilderFactory(object):
             return MapQueryBuilder(dataset)        
         elif name == 'default':
             return QueryBuilder(dataset)
+        elif name == 'profile':
+            return ProfileQueryBuilder(dataset)

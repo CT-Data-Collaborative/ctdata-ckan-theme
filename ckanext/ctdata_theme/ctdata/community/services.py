@@ -1,8 +1,10 @@
 import json
 
+from sqlalchemy import and_, or_
+
 import ckan.plugins.toolkit as toolkit
 
-from models import CommunityProfile, ProfileIndicator, ProfileIndicatorValue, Town
+from models import CommunityProfile, ProfileIndicator, ProfileIndicatorValue, Town, table_users_indicators
 from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
 from ..visualization.services import DatasetService
@@ -34,13 +36,21 @@ class CommunityProfileService(object):
         all.remove(conn)
         return [conn] + all
 
-    def create_profile_indicator(self, filters, dataset_id, owner=None):
+    def create_profile_indicator(self, filters, dataset_id, owner):
         dataset = DatasetService.get_dataset(dataset_id)
+
+        if owner.is_admin:
+            existing_inds = self.session.query(ProfileIndicator)\
+                .filter(and_(ProfileIndicator.dataset_id == dataset.ckan_meta['id'],
+                             ProfileIndicator.is_global == True))
+        else:
+            users_indicators = map(lambda ind: ind.id, owner.indicators)
+            existing_inds = self.session.query(ProfileIndicator)\
+                .filter(and_(ProfileIndicator.dataset_id == dataset.ckan_meta['id'],
+                             ProfileIndicator.id.in_(users_indicators)))
 
         # check that there're currently no such indicators in the db
         # there's a JSON type for fields in postgre, so maybe there's a way to do it using SQL
-        existing_inds = self.session.query(ProfileIndicator)\
-            .filter(ProfileIndicator.dataset_id == dataset.ckan_meta['id'])
         for ex_ind in existing_inds:
             ex_fltrs = json.loads(ex_ind.filters)
             # python allows us to compare lists of dicts
@@ -63,37 +73,70 @@ class CommunityProfileService(object):
         except ValueError:
             raise toolkit.ObjectNotFound("'Year' filter value must be an integer")
 
-        # TODO: check owner's priviligies there, when adding support for global indicators
-        is_global = False if owner else True
+        is_global = True if owner.is_admin else False
         indicator = ProfileIndicator(json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
                                      variable)
         owner.indicators.append(indicator)
+        print "\nUSER'S INDICATORS:", owner.indicators
         self.session.add(indicator)
 
-        self.session.commit()
+    def remove_profile_indicator(self, user, indicator_id):
+        ind = self.session.query(ProfileIndicator).get(indicator_id)
+        if ind:
+            if user.is_admin and ind.is_global:
+                table_users_indicators.delete(table_users_indicators.indicator_id == indicator_id)
+                table_users_indicators.execute()
+                self.session.delete(ind)
 
-    def get_indicators(self, community_name, towns_names):
+            if not user.is_admin and ind.is_global:
+                pass
+
+            if not user.is_admin and not ind.is_global:
+                pass
+        else:
+            raise toolkit.ObjectNotFound("Indicator not found")
+
+    def get_indicators(self, community_name, towns_names, user=None):
         community = self.get_community_profile(community_name)
-        print community.town
 
         towns = set()
         if towns_names:
             towns.update(self.session.query(Town).filter(Town.name.in_(set(towns_names))).all())
         towns.update([community.town])
         towns_fipses = map(lambda x: x.fips, list(towns))
-        print towns
 
         existing_towns, existing_indicators = set(), set()
+        if user and not user.is_admin:
+            users_indicators = map(lambda x: x.id, user.indicators)
+            indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
+                                    filter(or_(ProfileIndicator.is_global == True,
+                                               ProfileIndicator.id.in_(users_indicators))).all())
+        else:
+            indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
+                                    filter(ProfileIndicator.is_global == True).all())
+
+        print "\nINDICATORS FILTERS:", indicators_filter
+
         existing_values = self.session.query(ProfileIndicatorValue).\
-            filter(ProfileIndicatorValue.town_id.in_(towns_fipses)).all()
+            filter(and_(ProfileIndicatorValue.town_id.in_(towns_fipses),
+                        ProfileIndicatorValue.indicator_id.in_(indicators_filter))).all()
         for val in existing_values:
             existing_towns.update([val.town])
             existing_indicators.update([val.indicator])
 
-        all_indicators = self.session.query(ProfileIndicator).all()
+        print "\nEXISTING INDICATORS:", existing_indicators
+
+        all_indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.id.in_(indicators_filter)).all()
+
+        print "\nALL INDICATORS:", all_indicators
 
         new_indicators = list(set(all_indicators) - existing_indicators)
         new_towns = list(towns - existing_towns)
+
+        if user and not user.is_admin:
+            # add new global indicators to the list of user's indicators
+            print "\nNEW INDICATORS:", new_indicators
+            user.indicators += filter(lambda ind: ind.is_global, new_indicators)
 
         # convert sets back to lists
         existing_towns, existing_indicators, towns = list(existing_towns), list(existing_indicators), list(towns)
@@ -113,8 +156,10 @@ class CommunityProfileService(object):
         # gather the indicators data for the frontend
         result, last_id, current_ind = [], None, None
         indicators_values = self.session.query(ProfileIndicatorValue).\
-            filter(ProfileIndicatorValue.town_id.in_(towns_fipses)).\
+            filter(and_(ProfileIndicatorValue.town_id.in_(towns_fipses),
+                        ProfileIndicatorValue.indicator_id.in_(indicators_filter))).\
             order_by(ProfileIndicatorValue.indicator_id, ProfileIndicatorValue.town_id).all()
+
         for val in indicators_values:
             if val.indicator.id != last_id:
                 filters = filter(lambda fl: fl['field'] not in ('Town', 'Year', 'Variable', 'Measure Type'),
@@ -139,8 +184,7 @@ class CommunityProfileService(object):
 
             dataset = DatasetService.get_dataset(indicator.dataset_id)
 
-            # Chart query builder suits Profile view just fine
-            qb = QueryBuilderFactory.get_query_builder('chart', dataset)
+            qb = QueryBuilderFactory.get_query_builder('profile', dataset)
             view = ViewFactory.get_view('profile', qb)
 
             filters.append({'field': 'Town', 'values': map(lambda t: t.name, towns)})
@@ -150,5 +194,3 @@ class CommunityProfileService(object):
                 print value, town
                 val = ProfileIndicatorValue(indicator, town, value['data'][0])
                 self.session.add(val)
-
-        self.session.commit()

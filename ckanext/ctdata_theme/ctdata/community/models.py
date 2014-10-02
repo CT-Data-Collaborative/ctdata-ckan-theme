@@ -88,7 +88,14 @@ class UserInfo(Base):
     __tablename__ = 'ctdata_user_info'
 
     ckan_user_id = Column(String, primary_key=True)
+    is_admin = Column(Boolean)
     indicators = relationship("ProfileIndicator", secondary=lambda: table_users_indicators)
 
-    def __init__(self, ckan_user_id):
+    def __init__(self, ckan_user_id, is_admin=False):
         self.ckan_user_id = ckan_user_id
+        self.is_admin = is_admin
+
+    def __repr__(self):
+        str_repr = "User: %s" % self.ckan_user_id
+        str_repr += " (admin)" if self.is_admin else ""
+        return str_repr
