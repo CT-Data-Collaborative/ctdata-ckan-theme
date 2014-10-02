@@ -40,7 +40,8 @@ for(i = 0; i < numClasses; i++){
                     to:   Math.floor(min+(step*(i+1)))
                     });
 }
-dataClasses[dataClasses.length-1]['to'] = max+1;
+if(dataClasses[dataClasses.length-1]['to'] < max+1)
+  dataClasses[dataClasses.length-1]['to'] = max+1;
 
 $.getJSON('/common/map.json', function (geojson) {
 
@@ -60,7 +61,7 @@ var cur_mt = $(".MeasureType:checked").first().val();
 var units = "";
 if (cur_mt == "percent" || cur_mt == "Percent")
   units = "%";
-if (cur_mt == "number" || cur_mt == "Number")
+if ((cur_mt == "number" || cur_mt == "Number") && ($("#dataset_id").val() == 'cmt-results' || $("#dataset_id").val() == 'chronic-absenteeism'))
   units = " Students";
 
 // Initiate the chart
@@ -94,6 +95,7 @@ chart = new Highcharts.Chart({
   },
 
   legend: {
+    labelFormat: "{name}" + units,
     useHTML: true,
     floating: true,
     backgroundColor: 'white',
