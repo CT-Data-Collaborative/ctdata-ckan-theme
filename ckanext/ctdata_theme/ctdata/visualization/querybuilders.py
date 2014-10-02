@@ -91,23 +91,30 @@ class TableQueryBuilder(QueryBuilder):
          I'm afraid I can break something.
         """
         dimension_names = map(lambda dim: dim.name, self.dataset.dimensions)
-        can_be_multifield = list(set(dimension_names) - set(['Year', 'Town', 'Measure Type']))
+        print "NAMES =" 
+        print dimension_names
+        can_be_multifield = list(set(dimension_names) - set(['Year', 'Town', 'Measure Type', 'Variable']))
         valid_filters = filter(lambda f: f['field'] in can_be_multifield, filters)
         # either field with several values or the first field if there's no such
+        print "INCS"
+        print self.dataset.incs_meta_url
         try:
             return (filter(lambda f: len(f['values']) > 1, valid_filters) or valid_filters)[0]['field']
         except IndexError:
-            return can_be_multifield[0]
+            return None
 
     def get_columns(self, filters):
         table_columns = super(TableQueryBuilder, self).get_columns(filters)
-        table_columns.insert(1, self.determine_multifield(filters))
+        if self.determine_multifield(filters):
+           table_columns.insert(1, self.determine_multifield(filters))
 
         return table_columns
 
     def get_order_by(self, filters):
         mult_field = self.determine_multifield(filters)
-        table_cols = ['Town', mult_field, 'Measure Type', 'Year']
+        table_cols = ['Town', 'Measure Type', 'Year']
+        if mult_field:
+          table_cols.insert(1, mult_field)
         if 'Variable' in map(lambda dim: dim.name, self.dataset.dimensions):
           table_cols.insert(3, 'Variable')
 

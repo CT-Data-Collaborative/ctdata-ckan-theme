@@ -53,6 +53,7 @@ class TableView(View):
         result['multifield'] = multifield
         result['data'] = []
 
+        cur_row_multifield = None
         last_town = None
         last_mf = None  # last multifield
         last_mt = None  # last measure type
@@ -64,7 +65,11 @@ class TableView(View):
         # groups data first by Town, then by multifield and then by Measure Type
         for row in data:
             #Don't include row if it doesn't have a value for the multifield
-            if row[multifield] == "NA":
+            if multifield:
+              cur_row_multifield = row[multifield]
+            else:
+              cur_row_multifield = None
+            if cur_row_multifield == "NA":
               continue
             if not 'Variable' in row:
               row['Variable'] = None
@@ -73,21 +78,21 @@ class TableView(View):
                 last_mt = row['Measure Type']
                 last_var = row['Variable']
 
-                current_mf = {'value': str(row[multifield]), 'data': [current_mt]}
-                last_mf = row[multifield]
+                current_mf = {'value': str(cur_row_multifield), 'data': [current_mt]}
+                last_mf = cur_row_multifield
 
                 current_town = {'town': row['Town'], 'multifield': [current_mf]}
                 last_town = row['Town']
 
                 result['data'].append(current_town)
 
-            if row[multifield] != last_mf:
+            if cur_row_multifield != last_mf:
                 current_mt = {'measure_type': row['Measure Type'], 'variable': row['Variable'], 'data': []}
                 last_mt = row['Measure Type']
                 last_var = row['Variable']
 
-                current_mf = {'value': str(row[multifield]), 'data': [current_mt]}
-                last_mf = row[multifield]
+                current_mf = {'value': str(cur_row_multifield), 'data': [current_mt]}
+                last_mf = cur_row_multifield
 
                 current_town['multifield'].append(current_mf)
 

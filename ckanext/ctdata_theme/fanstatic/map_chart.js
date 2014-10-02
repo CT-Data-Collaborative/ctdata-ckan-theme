@@ -98,12 +98,12 @@ chart = new Highcharts.Chart({
     floating: true,
     backgroundColor: 'white',
     valueDecimals: 0,
-    width: 520,
+    width: 600,
     align: "right",
     borderWidth:1,
     borderRadius:3,
-    itemWidth:130,
-    y: -10
+    itemWidth:300,
+    y: 10
   },
   xAxis:{
     labels: {enabled: false},

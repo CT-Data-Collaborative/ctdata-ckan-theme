@@ -155,55 +155,54 @@ function draw_table(){
       dataset_title = $("dataset_title").val();
   $.ajax({type: "POST",
           url: "/data/"+dataset_id,
-          data: JSON.stringify({view: 'table',
+          data: JSON.stringify({view: 'chart',
                                filters: get_filters()
                                }),
           contentType: 'application/json; charset=utf-8'}).done(function(data) {
 
       console.log(data);
-      var multifield = data['multifield'];
+      first_idx = 0;
+      while(!data['data'][first_idx]['dims']) first_idx++;
+      all_dims = data['data'][first_idx]['dims'];
+      selected_dims = {};
+      $.each(all_dims, function(dim_name){
+        if(all_dims[dim_name] != "NA" && dim_name != "Town"){
+          selected_dims[dim_name] = all_dims[dim_name];
+        }
+      });
       var years = data['years'];
+      var col_num = 2;
       var html = '<table id="table" class="results_table">'+
                  "<thead>"+
                    "<tr>"+
-                     "<th class='col-1'>Location</th>"+
-                     "<th class='col-2'>"+multifield+"</th>";
-      //If there is a variable field, include it in the table
-      if (data['data'][0]['multifield'][0]['data'][0]['variable']){
-                     html += "<th class='col-3'>Variable</th>";
-         }
-                     html += "<th class='col-4'>Measure Type</th>";
+                     "<th class='col-1'>Location</th>";
+                   $.each(selected_dims, function(dim_name){
+                     html += "<th class='col-"+col_num+"'>"+dim_name+"</th>";
+                     col_num++;
+                   });
                  $.each(years, function(i){
-                     html = html+"<th class='col-"+(i+5)+"'>"+years[i]+"</th>";
+                     html = html+"<th class='col-"+(col_num+i)+"'>"+years[i]+"</th>";
                  });
                  html+=  "</tr>"+
                  "</thead>"+
                  "<tbody>";
-      $.each(data['data'], function(town_index){
-        town = data['data'][town_index];
-        $.each(town['multifield'], function(mf_index){
-          mf = town['multifield'][mf_index];
-          if(mf['value']=='NA') return "skip to next mf";
-            $.each(mf['data'], function(mt_index){ 
-              mt = mf['data'][mt_index];
-              html = html+
-                 "<tr>"+
-                   "<td class='col-1'>"+town['town']+"</td>"+
-                   "<td class='col-2'>"+mf['value']+"</td>";
-             if (mt['variable'])
-                   html += "<td class='col-3'>"+mt['variable']+"</td>";
-             html += "<td class='col-4'>"+mt['measure_type']+"</td>";
-              //For each year
-              $.each(years, function(value_index){
-               value = mt['data'][value_index];
-               if(value == undefined) value="-";
-               html += "<td class='col-"+(value_index+5)+"'>"+value+"</td>";
-              });
-               html +=  "</tr>";
-            });
+        $.each(data['data'], function(row_index){
+          if (!data['data'][row_index]['dims']) return "No data for this row";
+          col_num = 2;
+          html += "<tr>"+
+                    "<td class='col-1'>"+data['data'][row_index]['dims']['Town']+"</td>";
+          $.each(selected_dims, function(dim_name){
+               html += "<td class='col-"+col_num+"'>"+data['data'][row_index]['dims'][dim_name]+"</td>";
+               col_num++;
+          });
+          $.each(years, function(year_index){
+               cur_value = data['data'][row_index]['data'][year_index];
+               if (!cur_value) cur_value = "-";
+               html += "<td class='col-"+col_num+"'>"+cur_value+"</td>";
+               col_num++;
+          });
         });
-      });
-      html = html+"</tbody></table>";
+     html = html+"</tbody></table>";
       $("#container").html(html);
       $("#table").DataTable()
 });
