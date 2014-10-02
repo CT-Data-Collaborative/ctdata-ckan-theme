@@ -21,7 +21,10 @@ class View(object):
         :param data: rows of data from the db with information about column names
         ([{'column name': 'column value', ...}, ...]
         """
-        result = {'years': dict_with_key_value('field', 'Year', filters)['values']}
+        result = {}
+        years = dict_with_key_value('field', 'Year', filters)
+        if years:
+            result = {'years': years['values']}
         return result
 
     def get_data(self, filters):
@@ -116,9 +119,10 @@ class ChartView(View):
         result['data'] = []
 
         towns_from_filters = dict_with_key_value('field', 'Town', filters)['values']
-        years_from_filters = dict_with_key_value('field', 'Year', filters)['values']
+        years_fltrs = dict_with_key_value('field', 'Year', filters)
+        years_from_filters = years_fltrs.get('values') if years_fltrs else None
         sorted_towns = sorted(towns_from_filters)
-        sorted_years = sorted(map(lambda y: int(y), years_from_filters))
+        sorted_years = sorted(map(lambda y: int(y), years_from_filters)) if years_from_filters else []
         if towns_from_filters[0].lower() == 'all':
             sorted_towns = []
             sorted_years = []

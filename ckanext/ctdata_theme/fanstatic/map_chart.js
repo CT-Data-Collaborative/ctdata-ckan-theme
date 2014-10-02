@@ -64,6 +64,10 @@ if (cur_mt == "percent" || cur_mt == "Percent")
 if ((cur_mt == "number" || cur_mt == "Number") && ($("#dataset_id").val() == 'cmt-results' || $("#dataset_id").val() == 'chronic-absenteeism'))
   units = " Students";
 
+var series_name = 'value';
+if (data['years'] !== undefined)
+  series_name = data['years'][0];
+
 // Initiate the chart
 chart = new Highcharts.Chart({
   chart: {
@@ -131,7 +135,7 @@ chart = new Highcharts.Chart({
     data : data.data,
     mapData: geojson,
     borderColor: '#666666',
-    name: data['years'][0],
+    name: series_name,
     joinBy: ['NAME', 'code'],
     states: {
       hover: {

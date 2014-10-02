@@ -181,9 +181,13 @@ function draw_table(){
                      html += "<th class='col-"+col_num+"'>"+dim_name+"</th>";
                      col_num++;
                    });
-                 $.each(years, function(i){
-                     html = html+"<th class='col-"+(col_num+i)+"'>"+years[i]+"</th>";
-                 });
+                 if (years !== undefined) {
+                   $.each(years, function (i) {
+                       html = html + "<th class='col-" + (col_num + i) + "'>" + years[i] + "</th>";
+                   });
+                 } else {
+                   html = html + "<th class='col-" + (col_num) + "'>Value</th>";
+                 }
                  html+=  "</tr>"+
                  "</thead>"+
                  "<tbody>";
@@ -196,12 +200,17 @@ function draw_table(){
                html += "<td class='col-"+col_num+"'>"+data['data'][row_index]['dims'][dim_name]+"</td>";
                col_num++;
           });
-          $.each(years, function(year_index){
-               cur_value = data['data'][row_index]['data'][year_index];
-               if (!cur_value) cur_value = "-";
-               html += "<td class='col-"+col_num+"'>"+cur_value+"</td>";
-               col_num++;
-          });
+          if (years !== undefined) {
+            $.each(years, function (year_index) {
+              cur_value = data['data'][row_index]['data'][year_index];
+              if (!cur_value) cur_value = "-";
+              html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
+              col_num++;
+            });
+          } else {
+            cur_value = data['data'][row_index]['data'][0];
+            html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
+          }
         });
      html = html+"</tbody></table>";
       $("#container").html(html);
