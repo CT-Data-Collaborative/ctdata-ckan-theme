@@ -1,7 +1,7 @@
 div.panel-collapse.collapse.in{
   max-height: 200px;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 input[type="checkbox"],input[type="radio"]{
   -webkit-appearance: checkbox;
