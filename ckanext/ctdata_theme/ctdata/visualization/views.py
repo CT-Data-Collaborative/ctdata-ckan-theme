@@ -143,7 +143,8 @@ class ChartView(View):
                     print 'place 1'
                     result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(sorted_years)})
                     check_town += 1
-                current_town = {'dims': next_row_dims, 'data': []}
+                current_town = {'dims': {k: str(v) for k, v in next_row_dims.items()},
+                                'data': []}
                 last_row_dims = next_row_dims
                 check_town += 1
                 check_year = 0
