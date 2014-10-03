@@ -1,6 +1,8 @@
 var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "Percent", "Education", "Operating", "Rate per 1000", "Substantiated", "All allegation types"];
 
+
 var display_type = "table";
+/*
 var test_incompat = { 
     "Grade":["Race\\\\\/ethnicity","Race\\\/ethnicity","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","StudentswithDisabilities"],
     "Race\\\/ethnicity":["Grade","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","StudentswithDisabilities"],
@@ -11,8 +13,16 @@ var test_incompat = {
     "Year":[],
     "MeasureType":[],
     "Variable":[]
-     };
+     };*/
 var incompat = {};
+
+function get_incompat(){
+
+  $.getJSON('/common/cmtResultsInc.json', function(data){
+    incompat = data;
+    console.log(incompat);
+  });
+}
 
 function set_display_type(new_type){
   set_icon(new_type);
@@ -55,7 +65,10 @@ function handle_incompatibilities(){
   cur_incompat = [];
   cur_checked = $("input:checked");
   $.each(cur_checked, function(i){
-    $.merge(cur_incompat, incompat[$(cur_checked[i]).attr('class')]);
+    $.each(incompat, function(j){
+      if(incompat[j]['dimVal']==cur_checked[i].value)
+        $.merge(cur_incompat, incompat[j]['incompatible']);
+    });
   });
   all_dims = $('a.dimension');
   $.each(all_dims, function(i){
@@ -318,7 +331,7 @@ $(function () {
     if ($("#dataset_id").val() == 'cmt-results'){
       default_filters = ["2008", "2009", "2010", "Math", "Reading", "Ashford", "Ansonia", "New Haven", "Grade 3", "Advanced", "Percent"];
     }
-    check_defaults()
+//    check_defaults()
     $("#NumberCheck").prop('checked', false);
     if($(".MeasureType:checked").length == 0){
         $(".MeasureType").first().prop('checked', true);
@@ -329,7 +342,7 @@ $(function () {
         handle_incompatibilities();  
     });
     
-    incompat = test_incompat;
-
+   // incompat = test_incompat;
+    get_incompat();
     display_data();
 });
