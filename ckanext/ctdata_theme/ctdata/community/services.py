@@ -183,9 +183,9 @@ class CommunityProfileService(object):
 
         # gather the indicators data for the frontend
         result, last_id, current_ind = [], None, None
-        if user.is_admin:
-            user_indicators = indicators_filter
-        else:
+
+        user_indicators = indicators_filter
+        if user and not user.is_admin:
             user_indicators = self.session.query(UserIndicatorLink.indicator_id).\
                 filter(and_(UserIndicatorLink.user_id == user.ckan_user_id,
                             UserIndicatorLink.deleted == False))
