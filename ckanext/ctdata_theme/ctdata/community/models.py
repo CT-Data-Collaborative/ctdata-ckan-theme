@@ -1,4 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Boolean, Table
 from sqlalchemy.orm import relationship, backref
 
@@ -66,8 +67,9 @@ class ProfileIndicatorValue(Base):
     town_id = Column(BigInteger, ForeignKey('ctdata_towns.fips'))
     value = Column(String)
 
-    indicator = relationship("ProfileIndicator", backref=backref('values', order_by=id))
-    town = relationship("Town", backref=backref('values', order_by=id))
+    indicator = relationship("ProfileIndicator", backref=backref('values', cascade="save-update, merge, "
+                                                                                   "delete, delete-orphan"))
+    town = relationship("Town", backref=backref('values'))
 
     def __init__(self, indicator, town, value):
         self.indicator = indicator
@@ -78,10 +80,22 @@ class ProfileIndicatorValue(Base):
         return "[Value: %s; %s; %s; %s]" % (self.town, self.community, self.indicator, self.value)
 
 
-table_users_indicators = Table('ctdata_users_indicators', Base.metadata,
-    Column('user_id', String, ForeignKey('ctdata_user_info.ckan_user_id')),
-    Column('indicator_id', Integer, ForeignKey('ctdata_profile_indicators.id'))
-)
+class UserIndicatorLink(Base):
+    __tablename__ = 'ctdata_users_indicators'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(String, ForeignKey('ctdata_user_info.ckan_user_id'))
+    indicator_id = Column(Integer, ForeignKey('ctdata_profile_indicators.id'))
+    deleted = Column(Boolean, default=False)
+
+    indicator = relationship("ProfileIndicator", backref=backref("users_links", cascade="save-update, merge, "
+                                                                                        "delete, delete-orphan"))
+    user = relationship("UserInfo", backref="indicators_links")
+
+    def __init__(self, indicator=None, user=None, deleted=False):
+        self.indicator = indicator
+        self.user = user
+        self.deleted = deleted
 
 
 class UserInfo(Base):
@@ -89,7 +103,8 @@ class UserInfo(Base):
 
     ckan_user_id = Column(String, primary_key=True)
     is_admin = Column(Boolean)
-    indicators = relationship("ProfileIndicator", secondary=lambda: table_users_indicators)
+
+    indicators = association_proxy("indicators_links", "indicator")
 
     def __init__(self, ckan_user_id, is_admin=False):
         self.ckan_user_id = ckan_user_id

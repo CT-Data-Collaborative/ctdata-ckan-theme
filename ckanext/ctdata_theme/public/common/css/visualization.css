@@ -65,3 +65,7 @@ span.checkLabel {
 #legendDims{
   text-align: right;
 }
+
+.error {
+    color: red;
+}

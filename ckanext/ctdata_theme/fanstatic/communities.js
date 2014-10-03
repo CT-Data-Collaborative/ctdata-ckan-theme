@@ -37,6 +37,7 @@ $(function(){
 
         $('#add_' + popup_name).click(function() {
             popup.modal('show');
+            $("#indicator_adding_error").css({opacity: 0});
         });
 
         $('#close_' + popup_name + '_popup').click(function() {
@@ -50,13 +51,20 @@ $(function(){
     });
 
     $('#save_indicator').click(function() {
+        $("#indicator_adding_error").animate({opacity: 0}, 300);
         $.ajax({type: "POST",
             url: "/community/add_indicator",
             data: JSON.stringify({dataset_id: current_dataset,
                                   filters: get_filters()}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                window.location.reload();
+                console.log(data);
+                if (data.success == true)
+                    window.location.reload();
+                else {
+                    $("#indicator_adding_error").html(data.error);
+                    $("#indicator_adding_error").animate({opacity: 1}, 300);
+                }
             }
         });
     });
@@ -66,7 +74,7 @@ $(function(){
         $.ajax({type: "GET",
             url: "/community/get_filters/" + current_dataset,
             success: function (data) {
-                $('#filters').html(build_filters(data['result']));
+                $('#filters_content').html(build_filters(data['result']));
             }
         });
     });

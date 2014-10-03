@@ -47,7 +47,7 @@
         {% endfor %}
             {% if c.userobj %}
             <li>
-                <a href="/community/remove_indicator/{{indicator['indicator'].id}}?anti_csrf={{anti_csrf_token}}">
+                <a href="/community/remove_indicator/{{indicator['indicator'].id}}?anti_csrf={{anti_csrf_token}}&came_from={{request.url}}">
                 <img class="close_pic" style="opacity: 0; margin-left: 10px" src="/common/images/close_pic.png">
                 </a>
             </li>
@@ -123,7 +123,11 @@
                     </ul>
                 </div>
                 <div id="filters" class="indicator-filters">
-                    Choose a dataset from the leftside menu.
+                    <div id="indicator_adding_error" class="error" style="opacity: 0">
+                    </div>
+                    <div id="filters_content">
+                        Choose a dataset from the leftside menu.
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">

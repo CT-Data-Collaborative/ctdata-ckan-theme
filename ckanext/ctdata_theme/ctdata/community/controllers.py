@@ -1,8 +1,8 @@
 import json
 import uuid
 
-from pylons.controllers.util import abort
-from pylons import session
+from pylons.controllers.util import abort, redirect
+from pylons import session, url
 
 import ckan.lib.base as base
 import ckan.model as model
@@ -13,7 +13,7 @@ from ..database import Database
 from ..users.services import UserService
 from ..visualization.services import DatasetService
 from ..topic.services import TopicSerivce
-from services import CommunityProfileService, ProfileAlreadyExists
+from services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
 
 
 class CommunityProfilesController(base.BaseController):
@@ -37,7 +37,7 @@ class CommunityProfilesController(base.BaseController):
                 abort(400)
 
             try:
-                self.community_profile_service.create_profile_indicator(filters, dataset_id, user)
+                self.community_profile_service.create_indicator(filters, dataset_id, user)
             except toolkit.ObjectNotFound:
                 abort(404)
             except ProfileAlreadyExists, e:
@@ -52,7 +52,10 @@ class CommunityProfilesController(base.BaseController):
     def remove_indicator(self, indicator_id):
         user_name = http_request.environ.get("REMOTE_USER")
 
-        user = self.user_service.get_or_create_user(user_name)
+        if user_name:
+            user = self.user_service.get_or_create_user(user_name)
+        else:
+            abort(401)
 
         if user:
             csrf_token_passed = http_request.GET.get('anti_csrf')
@@ -60,8 +63,26 @@ class CommunityProfilesController(base.BaseController):
             if csrf_token_passed and csrf_token_passed == csrf_token_session:
                 try:
                     self.community_profile_service.remove_indicator(user, indicator_id)
+                    self.session.commit()
                 except toolkit.ObjectNotFound:
                     abort(404)
+                except CantDeletePrivateIndicator, e:
+                    abort(400, str(e))
+                else:
+                    came_from = http_request.GET.get('came_from')
+                    if not came_from:
+                        came_from = http_request.headers.get('Referer')
+
+                    if came_from:
+                        redirect(came_from)
+                    else:
+                        # if user deleted came_from parameter from the url and disabled referers in his browser,
+                        # redirect him to the frontpage, after deleting the indicator
+                        redirect('/')
+            else:
+                abort(400, "anti-CSRF tokens don't match")
+        else:
+            abort(401)
 
     def community_profile(self, community_name):
         user_name = http_request.environ.get("REMOTE_USER")

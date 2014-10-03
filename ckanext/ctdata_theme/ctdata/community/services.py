@@ -1,10 +1,11 @@
 import json
 
 from sqlalchemy import and_, or_
+from sqlalchemy.exc import IntegrityError
 
 import ckan.plugins.toolkit as toolkit
 
-from models import CommunityProfile, ProfileIndicator, ProfileIndicatorValue, Town, table_users_indicators
+from models import CommunityProfile, ProfileIndicator, ProfileIndicatorValue, Town, UserIndicatorLink
 from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
 from ..visualization.services import DatasetService
@@ -12,6 +13,10 @@ from ..utils import dict_with_key_value, OrderedSet
 
 
 class ProfileAlreadyExists(Exception):
+    pass
+
+
+class CantDeletePrivateIndicator(Exception):
     pass
 
 
@@ -36,7 +41,9 @@ class CommunityProfileService(object):
         all.remove(conn)
         return [conn] + all
 
-    def create_profile_indicator(self, filters, dataset_id, owner):
+    def create_indicator(self, filters, dataset_id, owner):
+        assert owner is not None, "User must be passed in order for indicator creation to work"
+
         dataset = DatasetService.get_dataset(dataset_id)
 
         if owner.is_admin:
@@ -44,10 +51,12 @@ class CommunityProfileService(object):
                 .filter(and_(ProfileIndicator.dataset_id == dataset.ckan_meta['id'],
                              ProfileIndicator.is_global == True))
         else:
-            users_indicators = map(lambda ind: ind.id, owner.indicators)
+            user_indicators_id = self.session.query(UserIndicatorLink.indicator_id)\
+                .filter(and_(UserIndicatorLink.user_id == owner.ckan_user_id,
+                             UserIndicatorLink.deleted == False)).all()
             existing_inds = self.session.query(ProfileIndicator)\
                 .filter(and_(ProfileIndicator.dataset_id == dataset.ckan_meta['id'],
-                             ProfileIndicator.id.in_(users_indicators)))
+                             ProfileIndicator.id.in_(user_indicators_id)))
 
         # check that there're currently no such indicators in the db
         # there's a JSON type for fields in postgre, so maybe there's a way to do it using SQL
@@ -76,23 +85,37 @@ class CommunityProfileService(object):
         is_global = True if owner.is_admin else False
         indicator = ProfileIndicator(json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
                                      variable)
-        owner.indicators.append(indicator)
+        if not owner.is_admin:
+            owner.indicators.append(indicator)
         print "\nUSER'S INDICATORS:", owner.indicators
         self.session.add(indicator)
 
-    def remove_profile_indicator(self, user, indicator_id):
+    def remove_indicator(self, user, indicator_id):
+        # in case someone accidentally forgot to pass a valid user object
+        assert user is not None, "User must be passed in order for indicator removal to work"
         ind = self.session.query(ProfileIndicator).get(indicator_id)
         if ind:
-            if user.is_admin and ind.is_global:
-                table_users_indicators.delete(table_users_indicators.indicator_id == indicator_id)
-                table_users_indicators.execute()
-                self.session.delete(ind)
+            if ind.is_global:
+                if user.is_admin:
+                    # admins remove global indicators permanently and from all users
+                    self.session.delete(ind)
+                else:
+                    # regular users don't actually remove global indicators, but only mark them as removed so we're able
+                    # not to show those indicators to them
+                    print indicator_id, user.ckan_user_id
+                    link = self.session.query(UserIndicatorLink).\
+                        filter(and_(UserIndicatorLink.indicator_id == indicator_id,
+                                    UserIndicatorLink.user_id == user.ckan_user_id)).first()
+                    if link:
+                        link.deleted = True
+            else:
+                if not ind in user.indicators:
+                    # regular user tries to delete someone else's indicator
+                    raise CantDeletePrivateIndicator("The indicator you're trying to delete is not yours")
 
-            if not user.is_admin and ind.is_global:
-                pass
-
-            if not user.is_admin and not ind.is_global:
-                pass
+                if not user.is_admin:
+                    # regular users can permanently delete their own indicators
+                    self.session.delete(ind)
         else:
             raise toolkit.ObjectNotFound("Indicator not found")
 
@@ -107,10 +130,9 @@ class CommunityProfileService(object):
 
         existing_towns, existing_indicators = set(), set()
         if user and not user.is_admin:
-            users_indicators = map(lambda x: x.id, user.indicators)
+            users_indicators = map(lambda ind: ind.id, user.indicators)
             indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
-                                    filter(or_(ProfileIndicator.is_global == True,
-                                               ProfileIndicator.id.in_(users_indicators))).all())
+                                    filter(ProfileIndicator.id.in_(users_indicators)).all())
         else:
             indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
                                     filter(ProfileIndicator.is_global == True).all())
@@ -126,7 +148,8 @@ class CommunityProfileService(object):
 
         print "\nEXISTING INDICATORS:", existing_indicators
 
-        all_indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.id.in_(indicators_filter)).all()
+        all_indicators = self.session.query(ProfileIndicator).filter(or_(ProfileIndicator.id.in_(indicators_filter),
+                                                                         ProfileIndicator.is_global == True)).all()
 
         print "\nALL INDICATORS:", all_indicators
 
@@ -155,9 +178,15 @@ class CommunityProfileService(object):
 
         # gather the indicators data for the frontend
         result, last_id, current_ind = [], None, None
+        if user.is_admin:
+            user_indicators = indicators_filter
+        else:
+            user_indicators = self.session.query(UserIndicatorLink.indicator_id).\
+                filter(and_(UserIndicatorLink.user_id == user.ckan_user_id,
+                            UserIndicatorLink.deleted == False))
         indicators_values = self.session.query(ProfileIndicatorValue).\
             filter(and_(ProfileIndicatorValue.town_id.in_(towns_fipses),
-                        ProfileIndicatorValue.indicator_id.in_(indicators_filter))).\
+                        ProfileIndicatorValue.indicator_id.in_(user_indicators))).\
             order_by(ProfileIndicatorValue.indicator_id, ProfileIndicatorValue.town_id).all()
 
         for val in indicators_values:
@@ -190,7 +219,8 @@ class CommunityProfileService(object):
             filters.append({'field': 'Town', 'values': map(lambda t: t.name, towns)})
             data = view.get_data(filters)
 
+            town_ind_ids = map(lambda v: (v.town_id, v.indicator_id), indicator.values)
+
             for value, town in zip(data['data'], sorted(towns, key=lambda x: x.name)):
-                print value, town
-                val = ProfileIndicatorValue(indicator, town, value['data'][0])
-                self.session.add(val)
+                if not (town.fips, indicator.id) in town_ind_ids:
+                    self.session.add(ProfileIndicatorValue(indicator, town, value['data'][0]))
