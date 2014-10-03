@@ -38,8 +38,8 @@ class CommunityProfilesController(base.BaseController):
 
             try:
                 self.community_profile_service.create_indicator(filters, dataset_id, user)
-            except toolkit.ObjectNotFound:
-                abort(404)
+            except toolkit.ObjectNotFound, e:
+                abort(404, str(e))
             except ProfileAlreadyExists, e:
                 http_response.headers['Content-type'] = 'application/json'
                 return json.dumps({'success': False, 'error': str(e)})

@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
@@ -80,7 +81,11 @@ class CommunityProfileService(object):
         try:
             years = int(years)
         except ValueError:
-            raise toolkit.ObjectNotFound("'Year' filter value must be an integer")
+            try:
+                years = datetime.datetime.strptime("2008-09-03 00:00:00", "%Y-%m-%d %H:%M:%S").year
+            except ValueError:
+                raise toolkit.ObjectNotFound("'Year' filter value must be an integer "
+                                             "or have '%Y-%m-%d %H:%M:%S' format")
 
         is_global = True if owner.is_admin else False
         indicator = ProfileIndicator(json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),

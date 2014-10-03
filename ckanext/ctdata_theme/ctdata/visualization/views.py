@@ -1,3 +1,5 @@
+import datetime
+
 from ckanext.ctdata_theme.ctdata.utils import dict_with_key_value
 from ckanext.ctdata_theme.ctdata.database import Database
 
@@ -201,7 +203,14 @@ class ProfileView(View):
         towns_from_filters = dict_with_key_value('field', 'Town', filters)['values']
         years_from_filters = dict_with_key_value('field', 'Year', filters)['values']
         sorted_towns = sorted(towns_from_filters)
-        sorted_years = sorted(map(lambda y: int(y), years_from_filters))
+        try:
+            sorted_years = sorted(map(lambda y: int(y), years_from_filters))
+        except ValueError:
+            try:
+                sorted_years = sorted(map(lambda y: datetime.datetime
+                                          .strptime(y, "%Y-%m-%d %H:%M:%S").year, years_from_filters))
+            except ValueError:
+                sorted_years = []
         if towns_from_filters[0].lower() == 'all':
             sorted_towns = []
             sorted_years = []
