@@ -12,6 +12,7 @@
     <input type="hidden" id="dataset_title" value="{{ dataset.title }}">
     <input type="hidden" id="dataset_incs_meta_url" value="{{dataset.incs_meta_url}}">
     <input type="hidden" id="dataset_defaults_meta_url" value="{{defaults_url}}">
+    <input type="hidden" id="dataset_meta_url" value="{{meta_url}}">
 </form>
 
 <section class="visualisation">
@@ -27,10 +28,12 @@
   <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
   <ul>
   {% for value in dimension.possible_values %}
+    {% if value|length > 0 %}
     <li>
         <input type="checkbox" id="{{value}}Check" value="{{value}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}">
         <label for="{{value}}Check" class="checkLabel">{{value}}</label>
     </li>
+    {% endif %}
   {% endfor %}
   </ul>
   </div>

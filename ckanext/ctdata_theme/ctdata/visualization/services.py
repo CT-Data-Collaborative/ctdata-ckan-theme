@@ -11,6 +11,7 @@ class DatasetService(object):
         resource = None
         incs = None
         defaults = None
+        meta = None
         if dataset:
             for res in dataset['resources']:
                 if res['format'].lower() == 'csv':
@@ -19,6 +20,8 @@ class DatasetService(object):
                     incs = res
                 if res['format'].lower() == 'json' and res['name'].lower() == 'defaultinfo':
                     defaults = res
+                if res['format'].lower() == 'yml' and res['name'].lower() == 'metadata':
+                    meta = res
 
         if resource:
             table_name = resource['id']
@@ -26,7 +29,9 @@ class DatasetService(object):
                 incs = incs.get('url')
             if defaults:
                 defaults = defaults.get('url')
-            return Dataset(table_name, dataset, incs, defaults)
+            if meta:
+                meta = meta.get('url')
+            return Dataset(table_name, dataset, incs, defaults, meta)
         else:
             raise toolkit.ObjectNotFound("There's no resource for the given dataset")
 
