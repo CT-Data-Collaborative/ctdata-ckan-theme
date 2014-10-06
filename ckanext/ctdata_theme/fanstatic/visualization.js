@@ -1,28 +1,5 @@
 var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "Percent", "Education", "Operating", "Rate per 1000", "Substantiated", "All allegation types"];
-
-
 var display_type = "table";
-/*
-var test_incompat = { 
-    "Grade":["Race\\\\\/ethnicity","Race\\\/ethnicity","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","StudentswithDisabilities"],
-    "Race\\\/ethnicity":["Grade","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","StudentswithDisabilities"],
-    "EligibleforFreeandReducedPriceMeals":["Race\\\\\/ethnicity","Race\\\/ethnicity","Grade","EnglishLanguageLearner","StudentswithDisabilities"],
-    "EnglishLanguageLearner":["Race\\\\\/ethnicity","Race\\\/ethnicity","EligibleforFreeandReducedPriceMeals","Grade","StudentswithDisabilities"],
-    "StudentswithDisabilities":["Race\\\\\/ethnicity","Race\\\/ethnicity","EligibleforFreeandReducedPriceMeals","EnglishLanguageLearner","Grade"],
-    "Town":[],
-    "Year":[],
-    "MeasureType":[],
-    "Variable":[]
-     };*/
-var incompat = {};
-
-function get_incompat(){
-
-  $.getJSON('/common/cmtResultsInc.json', function(data){
-    incompat = data;
-    console.log(incompat);
-  });
-}
 
 function set_display_type(new_type){
   set_icon(new_type);
@@ -65,10 +42,9 @@ function handle_incompatibilities(){
   cur_incompat = [];
   cur_checked = $("input:checked");
   $.each(cur_checked, function(i){
-    $.each(incompat, function(j){
-      if(incompat[j]['dimVal']==cur_checked[i].value)
-        $.merge(cur_incompat, incompat[j]['incompatible']);
-    });
+      cur_filter = $(cur_checked[i]);
+      if (!$.isEmptyObject(incompat[cur_filter.attr('class')]))
+      $.merge(cur_incompat, incompat[cur_filter.attr('class')][cur_filter.val()]);
   });
   all_dims = $('a.dimension');
   $.each(all_dims, function(i){
@@ -342,7 +318,5 @@ $(function () {
         handle_incompatibilities();  
     });
     
-   // incompat = test_incompat;
-    get_incompat();
     display_data();
 });
