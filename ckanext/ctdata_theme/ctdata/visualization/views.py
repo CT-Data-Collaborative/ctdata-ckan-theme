@@ -31,9 +31,6 @@ class View(object):
     def get_data(self, filters):
         query, values = self.query_builder.get_query(filters)
 
-        print "\nQUERY:", query
-        print "QUERY PARAMS:", values
-
         conn = self.database.connect()
         if conn:
             curs = conn.cursor()
@@ -41,7 +38,6 @@ class View(object):
 
             cols = self.query_builder.get_columns(filters)
             rows = curs.fetchall()
-            print "\nRAW VALUES:", rows
             result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
 
             conn.commit()
@@ -111,8 +107,6 @@ class TableView(View):
                 current_mt['data'].append(float(row['Value']))
             except ValueError:
                 current_mt['data'].append(None)
-        print compatibles
-        print "COMPATIBLES"
         return result
 
 
@@ -157,7 +151,6 @@ class ChartView(View):
                         check_year += 1
                 # if some of the towns was skipped, append None values for them in the result
                 while check_town < len(sorted_towns) and row['Town'] != sorted_towns[check_town]:
-                    print 'place 1'
                     result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(sorted_years)})
                     check_town += 1
                 current_town = {'dims': {k: str(v) for k, v in next_row_dims.items()},
@@ -186,12 +179,8 @@ class ChartView(View):
                 check_year += 1
 
         while check_town < len(sorted_towns):
-            print 'place 2'
             result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(years_from_filters)})
             check_town += 1
-        print "\nPROCESSED VALUES:", result
-        print "COMPATIBLES"
-        print compatibles
         result['compatibles'] = list(compatibles)
         return result
 

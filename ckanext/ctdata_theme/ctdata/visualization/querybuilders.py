@@ -91,13 +91,9 @@ class TableQueryBuilder(QueryBuilder):
          I'm afraid I can break something.
         """
         dimension_names = map(lambda dim: dim.name, self.dataset.dimensions)
-        print "NAMES =" 
-        print dimension_names
         can_be_multifield = list(set(dimension_names) - set(['Year', 'Town', 'Measure Type', 'Variable']))
         valid_filters = filter(lambda f: f['field'] in can_be_multifield, filters)
         # either field with several values or the first field if there's no such
-        print "INCS"
-        print self.dataset.incs_meta_url
         try:
             return (filter(lambda f: len(f['values']) > 1, valid_filters) or valid_filters)[0]['field']
         except IndexError:

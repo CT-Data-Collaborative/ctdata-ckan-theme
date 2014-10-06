@@ -22,7 +22,6 @@ class DatasetService(object):
 
         if resource:
             table_name = resource['id']
-            print table_name
             if incs:
                 incs = incs.get('url')
             if defaults:
