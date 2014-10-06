@@ -11,6 +11,7 @@ function check_defaults(){
       cleaned_dim = cur_dim.replace(/ /g, '');
       $("."+cleaned_dim+"[value='"+cur_val+"']").prop('checked', true);
     });
+    display_data();
   });
 
 }
@@ -322,5 +323,4 @@ $(function () {
         display_data();
     });
     
-    display_data();
 });
