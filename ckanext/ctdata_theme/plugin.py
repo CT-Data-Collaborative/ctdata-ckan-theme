@@ -88,7 +88,8 @@ class CTDataController(base.BaseController):
             abort(404)
 
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
-                                                             'dimensions': dataset.dimensions})
+                                                             'dimensions': dataset.dimensions,
+                                                             'defaults_url': dataset.defaults_meta_url})
 
     def get_data(self, dataset_name):
         try:

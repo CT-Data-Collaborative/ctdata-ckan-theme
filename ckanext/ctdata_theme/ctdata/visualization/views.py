@@ -1,4 +1,5 @@
 from ckanext.ctdata_theme.ctdata.utils import dict_with_key_value
+from sets import Set
 from ckanext.ctdata_theme.ctdata.database import Database
 
 
@@ -61,12 +62,15 @@ class TableView(View):
         last_mf = None  # last multifield
         last_mt = None  # last measure type
         last_var = None # last variable
+        compatibles = Set()
 
         current_town = None
         current_mf = None  # current multifield
         current_mt = None  # current measure type
         # groups data first by Town, then by multifield and then by Measure Type
         for row in data:
+            for k in row:
+              compatibles.add({"dimension":k, "dimVal":row[k]});
             #Don't include row if it doesn't have a value for the multifield
             if multifield:
               cur_row_multifield = row[multifield]
@@ -110,6 +114,8 @@ class TableView(View):
                 current_mt['data'].append(float(row['Value']))
             except ValueError:
                 current_mt['data'].append(None)
+        print compatibles
+        print "COMPATIBLES"
         return result
 
 
@@ -140,10 +146,13 @@ class ChartView(View):
         next_row_dims = None
         cur_year = None
         current_town = None
+        compatibles = Set()
         for row in data:
             next_row_dims = row
             cur_year = next_row_dims.pop('Year', None)
             cur_value = next_row_dims.pop('Value', None)
+            for k in row:
+              compatibles.add(row[k])
             if cmp(last_row_dims, next_row_dims) != 0:
                 if last_row_dims:
                     while check_year < len(sorted_years):
@@ -184,6 +193,9 @@ class ChartView(View):
             result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(years_from_filters)})
             check_town += 1
         print "\nPROCESSED VALUES:", result
+        print "COMPATIBLES"
+        print compatibles
+        result['compatibles'] = list(compatibles)
         return result
 
 

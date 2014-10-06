@@ -10,19 +10,24 @@ class DatasetService(object):
 
         resource = None
         incs = None
+        defaults = None
         if dataset:
             for res in dataset['resources']:
                 if res['format'].lower() == 'csv':
                     resource = res
                 if res['format'].lower() == 'json' and res['name'].lower() == 'incsinfo':
                     incs = res
+                if res['format'].lower() == 'json' and res['name'].lower() == 'defaultinfo':
+                    defaults = res
 
         if resource:
             table_name = resource['id']
             print table_name
             if incs:
                 incs = incs.get('url')
-            return Dataset(table_name, dataset, incs)
+            if defaults:
+                defaults = defaults.get('url')
+            return Dataset(table_name, dataset, incs, defaults)
         else:
             raise toolkit.ObjectNotFound("There's no resource for the given dataset")
 

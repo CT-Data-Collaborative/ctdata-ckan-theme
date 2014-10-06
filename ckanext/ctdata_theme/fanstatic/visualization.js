@@ -1,5 +1,19 @@
-var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "Percent", "Education", "Operating", "Rate per 1000", "Substantiated", "All allegation types"];
+//var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "Percent", "Education", "Operating", "Rate per 1000", "Substantiated", "All allegation types"];
 var display_type = "table";
+
+function check_defaults(){
+
+  defaults_url = $("#dataset_defaults_meta_url").val();
+  $.getJSON(defaults_url, function(data){
+    $.each(data, function(i){
+      cur_dim = data[i]['dimension'];
+      cur_val = data[i]['dimVal'];
+      cleaned_dim = cur_dim.replace(/ /g, '');
+      $("."+cleaned_dim+"[value='"+cur_val+"']").prop('checked', true);
+    });
+  });
+
+}
 
 function set_display_type(new_type){
   set_icon(new_type);
@@ -38,25 +52,6 @@ function set_icon(type){
   }
 }
 
-function handle_incompatibilities(){
-  cur_incompat = [];
-  cur_checked = $("input:checked");
-  $.each(cur_checked, function(i){
-      cur_filter = $(cur_checked[i]);
-      if (!$.isEmptyObject(incompat[cur_filter.attr('class')]))
-      $.merge(cur_incompat, incompat[cur_filter.attr('class')][cur_filter.val()]);
-  });
-  all_dims = $('a.dimension');
-  $.each(all_dims, function(i){
-    $(all_dims[i]).css("pointer-events", "auto").css("color", "black");
-  });
-  $.each(cur_incompat, function(i){
-    $('a[href="#collapse'+cur_incompat[i]+'"]').css("pointer-events", "None");
-    $('a[href="#collapse'+cur_incompat[i]+'"]').css("color", "#D0D0D0");
-    $("div.collapse[id='collapse"+cur_incompat[i]+"']").collapse('hide');
-  });
-}
-
 function collapse_all(){
   $("div.collapse").collapse('hide');
 }
@@ -67,7 +62,6 @@ function set_chart_checkbox(){
     $(this).parent().parent().find("input[type='checkbox']").prop('checked', false);
     $(this).prop('checked', true);
     display_data();
-    handle_incompatibilities();
   });
   $("input.MeasureType").unbind("change");
   $("input.MeasureType:checked").slice(1).prop('checked', false);
@@ -80,7 +74,6 @@ function set_map_checkbox(){
     $(this).parent().parent().find("input[type='checkbox']").prop('checked', false);
     $(this).prop('checked', val);
     display_data();
-    handle_incompatibilities();
   });
   $("input[type='checkbox']:not(.Town)").unbind("change");
   //Uncheck all but the first checked for each filter
@@ -95,7 +88,6 @@ function reset_checkbox(){
   $("input[type='checkbox']:not(.Town)").unbind("click");
   $('input[type="checkbox"]:not(.Town)').change(function(){
       display_data();
-      handle_incompatibilities();  
   });
 } 
 
@@ -112,7 +104,7 @@ function display_data(){
       draw_chart();
   }
 }
-
+/*
 function check_defaults(){
   $.each(default_filters, function(i){
     $("li.filter").find("input[value='"+default_filters[i]+"']").prop('checked', true);
@@ -120,7 +112,7 @@ function check_defaults(){
   $(".MeasureType").first().prop('checked', true);
   $(".Variable").first().prop('checked', true);
 }
-
+*/
 function get_filters(){
   var filters = [];
   dimensions = $("li.filter");
@@ -140,6 +132,23 @@ function get_filters(){
   return filters;
 }
 
+function handle_incompatibilities(compatibles){
+
+  all_inputs = $("input[type='checkbox']:not(.Town):not(.Year)");
+  $.each(all_inputs, function(i){
+    if(!($(all_inputs[i]).parent().parent().find("input:checked").length == 0))
+      return "There is a filter on this set already"
+    if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
+      $(all_inputs[i]).removeAttr("disabled");
+      $(all_inputs[i]).parent().find("label").css("color", "gray");
+    }else{
+      $(all_inputs[i]).attr("disabled", true);
+      $(all_inputs[i]).parent().find("label").css("color", "lightgray");
+    }
+  });
+
+}
+
 function draw_table(){
   var dataset_id = $("#dataset_id").val(),
       dataset_title = $("dataset_title").val();
@@ -149,6 +158,9 @@ function draw_table(){
                                filters: get_filters()
                                }),
           contentType: 'application/json; charset=utf-8'}).done(function(data) {
+
+
+      handle_incompatibilities(data['compatibles']);
 
       console.log(data);
       first_idx = 0;
@@ -304,10 +316,7 @@ function display_filters(){
 }
 
 $(function () {
-    if ($("#dataset_id").val() == 'cmt-results'){
-      default_filters = ["2008", "2009", "2010", "Math", "Reading", "Ashford", "Ansonia", "New Haven", "Grade 3", "Advanced", "Percent"];
-    }
-//    check_defaults()
+    check_defaults()
     $("#NumberCheck").prop('checked', false);
     if($(".MeasureType:checked").length == 0){
         $(".MeasureType").first().prop('checked', true);
@@ -315,7 +324,6 @@ $(function () {
     $('div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         display_data();
-        handle_incompatibilities();  
     });
     
     display_data();
