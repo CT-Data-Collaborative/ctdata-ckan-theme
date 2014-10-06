@@ -316,11 +316,7 @@ function display_filters(){
 }
 
 $(function () {
-    check_defaults()
-    $("#NumberCheck").prop('checked', false);
-    if($(".MeasureType:checked").length == 0){
-        $(".MeasureType").first().prop('checked', true);
-    }
+    check_defaults();
     $('div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         display_data();
