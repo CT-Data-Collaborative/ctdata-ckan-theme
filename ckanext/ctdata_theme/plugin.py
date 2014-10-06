@@ -92,7 +92,8 @@ class CTDataController(base.BaseController):
             abort(404)
 
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
-                                                             'dimensions': dataset.dimensions})
+                                                             'dimensions': dataset.dimensions,
+                                                             'defaults_url': dataset.defaults_meta_url})
 
     def get_data(self, dataset_name):
         try:
@@ -120,3 +121,99 @@ class CTDataController(base.BaseController):
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps(data)
+    
+    def add_community_towns(self, community_name):
+        if http_request.method == 'POST':
+            session = Database().session_factory()
+            community_profile_service = CommunityProfileService(session)
+
+            try:
+                json_body = json.loads(http_request.body, encoding=http_request.charset)
+            except ValueError:
+                abort(400)
+            towns = json_body.get('towns')
+
+            if not towns:
+                abort(400, detail='No towns specified')
+
+            try:
+                community_profile_service.add_profile_town(community_name, towns)
+            except toolkit.ObjectNotFound:
+                abort(404)
+
+            session.commit()
+
+            http_response.headers['Content-type'] = 'application/json'
+            return json.dumps({'success': True})
+
+    def add_indicator(self):
+        if http_request.method == 'POST':
+            session = Database().session_factory()
+            community_profile_service = CommunityProfileService(session)
+
+            json_body = json.loads(http_request.body, encoding=http_request.charset)
+            filters, dataset_id = json_body.get('filters'), json_body.get('dataset_id')
+
+            if not filters or not dataset_id:
+                abort(400)
+
+            try:
+                community_profile_service.create_profile_indicator(filters, dataset_id)
+            except toolkit.ObjectNotFound:
+                abort(404)
+            except ProfileAlreadyExists, e:
+                http_response.headers['Content-type'] = 'application/json'
+                return json.dumps({'success': False, 'error': str(e)})
+
+            session.commit()
+
+            http_response.headers['Content-type'] = 'application/json'
+            return json.dumps({'success': True})
+
+    def get_filters(self, dataset_id):
+        http_response.headers['Content-type'] = 'application/json'
+
+        try:
+            dataset = DatasetService.get_dataset(dataset_id)
+        except toolkit.ObjectNotFound:
+            return json.dumps({'success': False, 'error': 'No datasets with this id'})
+
+        result = []
+        for dim in dataset.dimensions:
+            # use reasonably good hardcoded "required" dimensions for now (will be changed after metadata for optional
+            # dimensions added)
+            if dim.name in ('Year', 'Measure Type', 'Variable', 'Subject', 'Grade', 'Race'):
+                if dim.name == 'Race':
+                    dim.possible_values.append('all')
+                result.append({'name': dim.name, 'values': dim.possible_values})
+
+        return json.dumps({'success': True, 'result': result})
+
+    def remove_community_indicator(self, indicator_id):
+        pass
+    
+    def community_profile(self, community_name):
+        session = Database().session_factory()
+        community_profile_service = CommunityProfileService(session)
+
+        towns_raw, towns_names = http_request.GET.get('towns'), []
+        if towns_raw:
+            # parse town name
+            towns_names = map(lambda x: x.strip(), towns_raw.split(','))
+
+        try:
+            community, indicators, displayed_towns = community_profile_service.get_indicators(community_name,
+                                                                                              towns_names)
+            topics = TopicSerivce.get_topics()
+        except toolkit.ObjectNotFound as e:
+            abort(404, detail=str(e))
+
+        towns = community_profile_service.get_all_towns()
+        displayed_towns_names = map(lambda t: t.name, displayed_towns)
+
+        session.commit()
+        return base.render('community_profile.html', extra_vars={'community': community,
+                                                                 'indicators': indicators,
+                                                                 'topics': topics,
+                                                                 'displayed_towns': displayed_towns_names,
+                                                                 'towns': towns})

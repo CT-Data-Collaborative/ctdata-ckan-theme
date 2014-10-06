@@ -1,6 +1,7 @@
 import datetime
 
 from ckanext.ctdata_theme.ctdata.utils import dict_with_key_value
+from sets import Set
 from ckanext.ctdata_theme.ctdata.database import Database
 
 
@@ -32,9 +33,6 @@ class View(object):
     def get_data(self, filters):
         query, values = self.query_builder.get_query(filters)
 
-        print "\nQUERY:", query
-        print "QUERY PARAMS:", values
-
         conn = self.database.connect()
         if conn:
             curs = conn.cursor()
@@ -42,7 +40,6 @@ class View(object):
 
             cols = self.query_builder.get_columns(filters)
             rows = curs.fetchall()
-            print "\nRAW VALUES:", rows
             result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
 
             conn.commit()
@@ -138,10 +135,13 @@ class ChartView(View):
         next_row_dims = None
         cur_year = None
         current_town = None
+        compatibles = Set()
         for row in data:
             next_row_dims = row
             cur_year = next_row_dims.pop('Year', None)
             cur_value = next_row_dims.pop('Value', None)
+            for k in row:
+              compatibles.add(str(row[k]))
             if cmp(last_row_dims, next_row_dims) != 0:
                 if last_row_dims:
                     while check_year < len(sorted_years):
@@ -149,7 +149,6 @@ class ChartView(View):
                         check_year += 1
                 # if some of the towns was skipped, append None values for them in the result
                 while check_town < len(sorted_towns) and row['Town'] != sorted_towns[check_town]:
-                    print 'place 1'
                     result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(sorted_years)})
                     check_town += 1
                 current_town = {'dims': {k: str(v) for k, v in next_row_dims.items()},
@@ -178,10 +177,9 @@ class ChartView(View):
                 check_year += 1
 
         while check_town < len(sorted_towns):
-            print 'place 2'
             result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(years_from_filters)})
             check_town += 1
-        print "\nPROCESSED VALUES:", result
+        result['compatibles'] = list(compatibles)
         return result
 
 
@@ -270,9 +268,13 @@ class MapView(View):
         result = super(MapView, self).convert_data(data, filters)
         result['data'] = []
 
+        compatibles = Set()
         for row in data:
+            for k in row:
+              if k != 'Value':
+                compatibles.add(str(row[k]))
             result['data'].append({'code': row['Town'], 'value': float(row['Value'])})
-
+        result['compatibles'] = list(compatibles)
         return result
 
 

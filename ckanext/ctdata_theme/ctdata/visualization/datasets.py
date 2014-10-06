@@ -8,7 +8,7 @@ from models import DatasetCache
 
 
 class Dataset(object):
-    def __init__(self, table_name, ckan_meta, incs_meta_url=None):
+    def __init__(self, table_name, ckan_meta, incs_meta_url=None, defaults_meta_url=None):
         self.table_name = table_name
         # there're two kinds of metadata: CKAN's info about dataset (id, title, list of resources, extrafields, etc.)
         # and dataset's data metadata (list of dimensions, possible values for dimensions, list of incompatibilites)
@@ -16,6 +16,7 @@ class Dataset(object):
         self.ckan_meta = ckan_meta
         # dataset's data metadata stored in our own tables, and we load it from the db in form of Dimensions
         self.incs_meta_url = incs_meta_url
+        self.defaults_meta_url = defaults_meta_url
         self.dimensions = []
         self.default_indicator = []
         self._get_dimensions()

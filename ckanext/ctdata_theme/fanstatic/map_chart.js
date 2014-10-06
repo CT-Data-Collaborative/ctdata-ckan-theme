@@ -16,6 +16,7 @@ $.ajax({type: "POST",
                               filters: filters
                              }),
         contentType: 'application/json; charset=utf-8'}).done(function(    data) {
+handle_incompatibilities(data['compatibles']);
 console.log(data);
 var max = -Infinity;
 var min = Infinity;
