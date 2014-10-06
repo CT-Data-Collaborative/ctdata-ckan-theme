@@ -62,15 +62,12 @@ class TableView(View):
         last_mf = None  # last multifield
         last_mt = None  # last measure type
         last_var = None # last variable
-        compatibles = Set()
 
         current_town = None
         current_mf = None  # current multifield
         current_mt = None  # current measure type
         # groups data first by Town, then by multifield and then by Measure Type
         for row in data:
-            for k in row:
-              compatibles.add({"dimension":k, "dimVal":row[k]});
             #Don't include row if it doesn't have a value for the multifield
             if multifield:
               cur_row_multifield = row[multifield]
@@ -152,7 +149,7 @@ class ChartView(View):
             cur_year = next_row_dims.pop('Year', None)
             cur_value = next_row_dims.pop('Value', None)
             for k in row:
-              compatibles.add(row[k])
+              compatibles.add(str(row[k]))
             if cmp(last_row_dims, next_row_dims) != 0:
                 if last_row_dims:
                     while check_year < len(sorted_years):
@@ -214,9 +211,13 @@ class MapView(View):
         result = super(MapView, self).convert_data(data, filters)
         result['data'] = []
 
+        compatibles = Set()
         for row in data:
+            for k in row:
+              if k != 'Value':
+                compatibles.add(str(row[k]))
             result['data'].append({'code': row['Town'], 'value': float(row['Value'])})
-
+        result['compatibles'] = list(compatibles)
         return result
 
 

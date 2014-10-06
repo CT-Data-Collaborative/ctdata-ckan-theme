@@ -135,7 +135,9 @@ class ChartQueryBuilder(QueryBuilder):
 
 class MapQueryBuilder(QueryBuilder):
     def get_columns(self, filters):
-        return ['Town', 'Value']
+      table_columns = map( lambda (x): x.name, self.dataset.dimensions)
+      table_columns.append('Value')
+      return table_columns
 
     def get_order_by(self, filters):
         return ['Town']
