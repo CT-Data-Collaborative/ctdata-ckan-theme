@@ -48,18 +48,18 @@ function set_icon(type){
 }
 
 function print_chart(){
-  var chart = $("#container").highcharts();
-  chart.print();
+    var chart = $("#container").highcharts();
+    chart.print();
 }
 function save_chart_image(){
-  var chart = $("#container").highcharts();
-  var opts = {type:"image/png"};
-  chart.exportChart(opts);
+    var chart = $("#container").highcharts();
+    var opts = {type:"image/png"};
+    chart.exportChart(opts);
 }
 function save_chart_pdf(){
-  var chart = $("#container").highcharts();
-  var opts = {type: "application/pdf"};
-  chart.exportChart(opts);
+    var chart = $("#container").highcharts();
+    var opts = {type: "application/pdf"};
+    chart.exportChart(opts);
 }
 
 function collapse_all(){
@@ -238,7 +238,13 @@ function draw_table(){
         });
      html = html+"</tbody></table>";
       $("#container").html(html);
-      $("#table").DataTable()
+      $("#table").DataTable({
+        dom: 'T<"clear">lfrtip',
+        tableTools:{
+          "sSwfPath": "/common/swf/copy_csv_xls_pdf.swf",
+          "aButtons": ["print", "pdf", "csv"]
+        }
+      });
 });
 }
 
