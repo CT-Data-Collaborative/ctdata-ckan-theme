@@ -279,6 +279,8 @@ function draw_chart(){
 
         console.log(years);
         console.log(series);
+        if(series.length == 0)
+          return display_error("No results, please select different filters");
         yAxisLabel = $(".MeasureType:checked").first().val();
 
         $('#container').highcharts({
