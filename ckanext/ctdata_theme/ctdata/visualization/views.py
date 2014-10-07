@@ -160,7 +160,7 @@ class ChartView(View):
                 result['data'].append(current_town)
 
             # if some of the years was skipped, append None values for them for current town
-            while check_year < len(sorted_years) and cur_year != sorted_years[check_year]:
+            while check_year < len(sorted_years) and str(cur_year) != str(sorted_years[check_year]):
                 check_year += 1
                 current_town['data'].append(None)
 
@@ -259,7 +259,6 @@ class ProfileView(View):
         while check_town < len(sorted_towns):
             result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(years_from_filters)})
             check_town += 1
-        print "\nPROCESSED VALUES:", result
         return result
 
 
