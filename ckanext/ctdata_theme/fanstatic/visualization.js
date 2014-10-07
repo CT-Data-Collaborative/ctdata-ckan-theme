@@ -175,7 +175,10 @@ function draw_table(){
 
       console.log(data);
       first_idx = 0;
-      while(!data['data'][first_idx]['dims']) first_idx++;
+      while(data['data'][first_idx] && !data['data'][first_idx]['dims']) 
+        first_idx++;
+      if(!data['data'][first_idx])
+        return display_error("No results, please select different filters");
       all_dims = data['data'][first_idx]['dims'];
       selected_dims = {};
       $.each(all_dims, function(dim_name){
