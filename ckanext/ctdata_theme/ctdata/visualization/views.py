@@ -121,7 +121,7 @@ class ChartView(View):
         years_fltrs = dict_with_key_value('field', 'Year', filters)
         years_from_filters = years_fltrs.get('values') if years_fltrs else None
         sorted_towns = sorted(towns_from_filters)
-        sorted_years = sorted(map(lambda y: int(y), years_from_filters)) if years_from_filters else []
+        sorted_years = sorted(map(lambda y: str(y), years_from_filters)) if years_from_filters else []
         if towns_from_filters[0].lower() == 'all':
             sorted_towns = []
             sorted_years = []
@@ -202,7 +202,7 @@ class ProfileView(View):
         years_from_filters = dict_with_key_value('field', 'Year', filters)['values']
         sorted_towns = sorted(towns_from_filters)
         try:
-            sorted_years = sorted(map(lambda y: int(y), years_from_filters))
+            sorted_years = sorted(map(lambda y: str(y), years_from_filters))
         except ValueError:
             try:
                 sorted_years = sorted(map(lambda y: datetime.datetime
@@ -240,7 +240,7 @@ class ProfileView(View):
                 result['data'].append(current_town)
 
             # if some of the years was skipped, append None values for them for current town
-            while check_year < len(sorted_years) and int(row['Year']) != sorted_years[check_year]:
+            while check_year < len(sorted_years) and str(row['Year']) != sorted_years[check_year]:
                 check_year += 1
                 current_town['data'].append(None)
 
