@@ -451,3 +451,8 @@ label {font-weight: normal; cursor: auto}
   margin: 0 5px 10px 0;
   top: 4px;
 }
+
+.raw_tabs li.tab2, .raw_tabs li.tab3, .raw_tabs li.tab4{
+  visibility: hidden;
+}
+
