@@ -1,13 +1,7 @@
-//var default_filters = ["Ashford", "Ansonia", "New Haven", "2008", "2009", "2010", "2011", "2012", "2013", "Percent", "Education", "Operating", "Rate per 1000", "Substantiated", "All allegation types"];
 var display_type = "table";
 
 function check_defaults(){
-
     $.each(defaults, function(i){
-      //cur_dim = data[i]['dimension'];
-      //cur_val = data[i]['dimVal'];
-      //cleaned_dim = cur_dim.replace(/ /g, '');
-      //$("."+cleaned_dim+"[value='"+cur_val+"']").prop('checked', true);
       $.each(defaults[i], function(j){ 
         $("input."+i.replace(/ /g, '')+"[value='"+defaults[i][j]+"']").prop('checked', true);
       });
@@ -51,6 +45,21 @@ function set_icon(type){
   } else {
     $("#table_icon").attr("src", "/common/images/displayopt1.png");
   }
+}
+
+function print_chart(){
+  var chart = $("#container").highcharts();
+  chart.print();
+}
+function save_chart_image(){
+  var chart = $("#container").highcharts();
+  var opts = {type:"image/png"};
+  chart.exportChart(opts);
+}
+function save_chart_pdf(){
+  var chart = $("#container").highcharts();
+  var opts = {type: "application/pdf"};
+  chart.exportChart(opts);
 }
 
 function collapse_all(){
