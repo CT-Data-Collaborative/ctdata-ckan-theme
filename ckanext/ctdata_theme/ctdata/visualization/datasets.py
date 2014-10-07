@@ -1,5 +1,6 @@
 import urllib2
 import json
+import yaml
 
 import ckan.plugins.toolkit as toolkit
 
@@ -18,9 +19,18 @@ class Dataset(object):
         self.incs_meta_url = incs_meta_url
         self.defaults_meta_url = defaults_meta_url
         self.meta_url = meta_url
+        self.metadata = []
         self.dimensions = []
         self.default_indicator = []
         self._get_dimensions()
+        self._get_meta()
+
+    def _get_meta(self):
+      if self.meta_url:
+        response = urllib2.urlopen(self.meta_url)
+        raw_yaml = response.read()
+        meta = yaml.load(raw_yaml)
+        self.metadata = meta['Dataset']
 
     def _get_dimensions(self):
         db = Database()

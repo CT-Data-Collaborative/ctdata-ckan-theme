@@ -3,16 +3,14 @@ var display_type = "table";
 
 function check_defaults(){
 
-  defaults_url = $("#dataset_defaults_meta_url").val();
-  $.getJSON(defaults_url, function(data){
-    $.each(data, function(i){
-      cur_dim = data[i]['dimension'];
-      cur_val = data[i]['dimVal'];
-      cleaned_dim = cur_dim.replace(/ /g, '');
-      $("."+cleaned_dim+"[value='"+cur_val+"']").prop('checked', true);
+    $.each(defaults, function(i){
+      //cur_dim = data[i]['dimension'];
+      //cur_val = data[i]['dimVal'];
+      //cleaned_dim = cur_dim.replace(/ /g, '');
+      //$("."+cleaned_dim+"[value='"+cur_val+"']").prop('checked', true);
+      $("input[value='"+defaults[i]+"']").prop('checked', true);
     });
     display_data();
-  });
 
 }
 

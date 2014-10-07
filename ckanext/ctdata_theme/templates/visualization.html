@@ -12,7 +12,6 @@
     <input type="hidden" id="dataset_title" value="{{ dataset.title }}">
     <input type="hidden" id="dataset_incs_meta_url" value="{{dataset.incs_meta_url}}">
     <input type="hidden" id="dataset_defaults_meta_url" value="{{defaults_url}}">
-    <input type="hidden" id="dataset_meta_url" value="{{meta_url}}">
 </form>
 
 <section class="visualisation">
@@ -110,17 +109,8 @@
 {% resource 'ctdata_theme/map_chart.js' %}
 
 <script>
-  var incompat = {};
-  {% for dimension in dimensions %}
-    {% if dimension.possible_values %}
-        incompat['{{dimension.name}}'] = {};
-      {% for value in dimension.incompat %}
-        incompat['{{dimension.name}}']['{{value}}'] = [];
-        {% for i in dimension.incompat[value] %}
-        incompat['{{dimension.name}}']['{{value}}'].push('{{i}}');
-        {% endfor %}
-      {% endfor %}
-    {% endif %}
-  {% endfor %}
+var defaults = [];
+defaults = {{metadata.Default | safe}}
+
 </script>
 {% endblock %}
