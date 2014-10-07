@@ -77,3 +77,15 @@ div#metadata h2{
 div#metadata div.dataValue{
   font-size: 12px;
 }
+div#error_message{
+  font-size: 30px;
+  color: #444;
+  background-color: #eee;
+  border-radius: 5px;
+  width: 70%;
+  margin-left: 15%;
+  text-align: center;
+  height: auto;
+  line-height: 50px;
+
+}

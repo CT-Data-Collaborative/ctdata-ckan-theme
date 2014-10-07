@@ -92,8 +92,18 @@ function reset_checkbox(){
   });
 } 
 
+function display_error(message){
+  $("#container").html("<div id='error_message'>"+message+"</div>");
+}
+
 function display_data(){
   display_filters();
+  towns = $("input.Town:checked");
+  years = $("input.Year:checked");
+  if(towns.length == 0)
+    return display_error("Please select a town");
+  else if (years.length == 0)
+    return display_error("Please select a year");
   switch(display_type){
     case "map":
       draw_map();
