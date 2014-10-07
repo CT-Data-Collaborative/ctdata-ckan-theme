@@ -141,7 +141,7 @@ class ChartView(View):
             cur_year = next_row_dims.pop('Year', None)
             cur_value = next_row_dims.pop('Value', None)
             for k in row:
-              compatibles.add(str(k)+"|"+str(row[k]))
+              compatibles.add(str(row[k]))
             if cmp(last_row_dims, next_row_dims) != 0:
                 if last_row_dims:
                     while check_year < len(sorted_years):
@@ -272,7 +272,7 @@ class MapView(View):
         for row in data:
             for k in row:
               if k != 'Value':
-                compatibles.add(str(k)+"|"+str(row[k]))
+                compatibles.add(str(row[k]))
             result['data'].append({'code': row['Town'], 'value': float(row['Value'])})
         result['compatibles'] = list(compatibles)
         return result

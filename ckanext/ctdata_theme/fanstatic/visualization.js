@@ -8,7 +8,9 @@ function check_defaults(){
       //cur_val = data[i]['dimVal'];
       //cleaned_dim = cur_dim.replace(/ /g, '');
       //$("."+cleaned_dim+"[value='"+cur_val+"']").prop('checked', true);
-      $("input[value='"+defaults[i]+"']").prop('checked', true);
+      $.each(defaults[i], function(j){ 
+        $("input."+i.replace(/ /g, '')+"[value='"+defaults[i][j]+"']").prop('checked', true);
+      });
     });
     display_data();
 
@@ -134,16 +136,10 @@ function get_filters(){
 function handle_incompatibilities(compatibles){
 
   all_inputs = $("input[type='checkbox']:not(.Town):not(.Year)");
-  keys = $.map(compatibles, function(k){
-    return k.split('|')[0];
-  });
-  values = $.map(compatibles, function(v){
-    return v.split('|')[1];
-  });
   $.each(all_inputs, function(i){
     if(!($(all_inputs[i]).parent().parent().find("input:checked").length == 0))
       return "There is a filter on this set already"
-    if(($.inArray($(all_inputs[i]).val(), values) != -1)&&($.inArray($(all_inputs[i]).attr('class'), keys)!=-1)){
+    if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
       $(all_inputs[i]).removeAttr("disabled");
       $(all_inputs[i]).parent().find("label").css("color", "gray");
     }else{
