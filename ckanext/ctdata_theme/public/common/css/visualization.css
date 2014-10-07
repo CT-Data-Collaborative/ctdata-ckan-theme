@@ -69,3 +69,11 @@ span.checkLabel {
 .error {
     color: red;
 }
+
+div#metadata h2{
+  background: url(../images/tgl_down.png) no-repeat right center;
+  cursor: pointer;
+}
+div#metadata div.dataValue{
+  font-size: 12px;
+}

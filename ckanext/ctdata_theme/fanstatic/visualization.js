@@ -318,7 +318,7 @@ function display_filters(){
 
 $(function () {
     check_defaults();
-    $('div.collapse').collapse('hide');
+    $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         display_data();
     });
