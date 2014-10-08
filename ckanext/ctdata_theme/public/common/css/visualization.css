@@ -70,12 +70,32 @@ span.checkLabel {
     color: red;
 }
 
-div#metadata h2{
+div#metadata a.metadata_container{
   background: url(../images/tgl_down.png) no-repeat right center;
-  cursor: pointer;
+  width: 130px;
+  display: inline-block;
+  color: #444;
 }
 div#metadata div.dataValue{
   font-size: 12px;
+  margin-left: 40px;
+  color: #444;
+}
+div#metadata li a{
+  background: url(../images/tgl_down.png) no-repeat right center;
+  color: #444;
+  width: 150px;
+  margin-left: 30px;
+  margin-top: 20px;
+  border-bottom: 1px solid #888;
+  display: inline-block;
+}
+div#metadata{
+  background: #eee;
+  margin-top:15px;
+  padding-top:15px;
+  padding-bottom: 15px;
+  padding-left:15px;
 }
 div#error_message{
   font-size: 30px;

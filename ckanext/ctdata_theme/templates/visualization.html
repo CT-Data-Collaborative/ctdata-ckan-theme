@@ -50,31 +50,6 @@
 </li>
 -->
 </ul>
-
-    <div id="metadata" >
-      <h2 href="#collapseMetadata" data-toggle="collapse" class="togglebtn collapsed">Metadata</h2>
-      <div id="collapseMetadata" class="panel-collapse collapse">
-        <ul>
-        {% for property in metadata %}
-        {% if (metadata[property]) and (property not in ['Default', 'Dimensions', 'Measure Type', 'Headlines']) %}
-          <li>
-            <a href="#collapse{{property|replace(" ", "")}}" data-toggle="collapse" class="togglebtn">{{property}}</a>
-            <div id="collapse{{property|replace(" ", "")}}" class="panel-collapse collapse dataValue">
-              {% if metadata[property] is string %}
-                {{metadata[property]}}
-              {% else %}
-                {% for value in metadata[property] %}
-                  -{{value}}<br>
-                {% endfor %}
-              {% endif %}
-            </div>
-          </li>
-        {% endif %}
-        {% endfor %}
-        </ul>
-      </div>
-    </div>
-
 </div>
 
 <div class="visual_right">
@@ -112,6 +87,31 @@
 
 <div class="results_table">
     <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>
+
+    <div id="metadata" >
+      <a href="#collapseMetadata" data-toggle="collapse" class="togglebtn collapsed metadata_container">Metadata</a>
+      <div id="collapseMetadata" class="panel-collapse collapse">
+        <ul>
+        {% for property in metadata %}
+        {% if (metadata[property]) and (property not in ['Default', 'Dimensions', 'Measure Type', 'Headlines']) %}
+          <li>
+            <a href="#collapse{{property|replace(" ", "")}}" data-toggle="collapse" class="togglebtn">{{property}}</a>
+            <div id="collapse{{property|replace(" ", "")}}" class="panel-collapse collapse dataValue">
+              {% if metadata[property] is string %}
+                {{metadata[property]}}
+              {% else %}
+                {% for value in metadata[property] %}
+                  -{{value}}<br>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </li>
+        {% endif %}
+        {% endfor %}
+        </ul>
+      </div>
+    </div>
+
 
 </div>
 
