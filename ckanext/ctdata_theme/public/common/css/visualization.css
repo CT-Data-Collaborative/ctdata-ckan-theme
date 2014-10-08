@@ -73,7 +73,8 @@ span.checkLabel {
 div#metadata a.metadata_container{
   width: 130px;
   display: inline-block;
-  color: #444;
+  color: black;
+  font-size: 24px;
 }
 div#metadata div.dataValue{
   font-size: 12px;
