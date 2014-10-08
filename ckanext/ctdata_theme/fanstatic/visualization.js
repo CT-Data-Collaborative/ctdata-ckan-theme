@@ -13,14 +13,16 @@ function check_defaults(){
 function set_display_type(new_type){
   set_icon(new_type);
   display_type = new_type;
-  if (display_type == 'map')
+  if (display_type == 'map'){
       set_map_checkbox();
-  else if (display_type == 'column' || display_type == 'line'){
+    }else if (display_type == 'column' || display_type == 'line'){
       reset_checkbox();
       set_chart_checkbox();
   }
-  else
+  else{
+      //In table view
       reset_checkbox();
+  }
   display_data();
 }
 
@@ -115,12 +117,18 @@ function display_data(){
     return display_error("Please select a year");
   switch(display_type){
     case "map":
+     //Show the print and save icons
+      $(".operations").css("visibility","visible");
       draw_map();
       break;
     case "table":
+      //Don't show the print and save icons
+      $(".operations").css("visibility","hidden");
       draw_table();
       break;
     default:
+      //Show the print and save icons
+      $(".operations").css("visibility","visible");
       draw_chart();
   }
 }
