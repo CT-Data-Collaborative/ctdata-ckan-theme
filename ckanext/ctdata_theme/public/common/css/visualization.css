@@ -71,7 +71,6 @@ span.checkLabel {
 }
 
 div#metadata a.metadata_container{
-  background: url(../images/tgl_down.png) no-repeat right center;
   width: 130px;
   display: inline-block;
   color: #444;
@@ -82,7 +81,6 @@ div#metadata div.dataValue{
   color: #444;
 }
 div#metadata li a{
-  background: url(../images/tgl_down.png) no-repeat right center;
   color: #444;
   width: 150px;
   margin-left: 30px;
@@ -96,6 +94,7 @@ div#metadata{
   padding-top:15px;
   padding-bottom: 15px;
   padding-left:15px;
+  border-radius: 10px;
 }
 div#error_message{
   font-size: 30px;
@@ -109,6 +108,6 @@ div#error_message{
   line-height: 50px;
 
 }
-/*div.DTTT_container{
+.highcharts-button{
   visibility: hidden;
-}*/
+}
