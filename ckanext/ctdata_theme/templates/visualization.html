@@ -10,8 +10,6 @@
 <form>
     <input type="hidden" id="dataset_id" value="{{ dataset.name }}">
     <input type="hidden" id="dataset_title" value="{{ dataset.title }}">
-    <input type="hidden" id="dataset_incs_meta_url" value="{{dataset.incs_meta_url}}">
-    <input type="hidden" id="dataset_defaults_meta_url" value="{{defaults_url}}">
 </form>
 
 <section class="visualisation">
@@ -89,24 +87,16 @@
     <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>
 
     <div id="metadata" >
-      <a class="togglebtn metadata_container">Metadata</a>
+      <a class="togglebtn metadata_container">About this dataset</a>
       <div id="collapseMetadata">
         <ul>
         {% for property in metadata %}
-        {% if (metadata[property]) and (property not in ['Default', 'Dimensions', 'Measure Type', 'Headlines']) %}
           <li>
-            <a class="togglebtn">{{property}}</a>
+            <a class="togglebtn">{{property['key']}}</a>
             <div class="dataValue">
-              {% if metadata[property] is string %}
-                {{metadata[property]}}
-              {% else %}
-                {% for value in metadata[property] %}
-                  -{{value}}<br>
-                {% endfor %}
-              {% endif %}
+                {{property['value']}}
             </div>
           </li>
-        {% endif %}
         {% endfor %}
         </ul>
       </div>
@@ -135,8 +125,8 @@
 {% resource 'ctdata_theme/map_chart.js' %}
 <script>
 var defaults = [];
-{% if metadata %}
-defaults = {{metadata.Default | safe}}
+{% if default_filters %}
+defaults = {{default_filters | safe}}
 {% endif %}
 </script>
 {% endblock %}

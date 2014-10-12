@@ -86,15 +86,20 @@ class CTDataController(base.BaseController):
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def visualization(self, dataset_name):
+        metadata_fields = ['Description', 'Long Description']
         try:
             dataset = DatasetService.get_dataset(dataset_name)
+            dataset_meta = DatasetService.get_dataset_meta(dataset_name)
         except toolkit.ObjectNotFound:
             abort(404)
 
+        metadata = dataset_meta['extras']
+        metadata = filter(lambda x: x['key'] in metadata_fields, metadata) 
+        print dataset.metadata
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
-                                                             'defaults_url': dataset.defaults_meta_url,
-                                                             'metadata': dataset.metadata})
+                                                             'metadata': metadata,
+                                                             'default_filters': dataset.metadata['Default']})
 
     def get_data(self, dataset_name):
         try:
