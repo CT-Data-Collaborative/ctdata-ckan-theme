@@ -190,7 +190,6 @@ function draw_table(){
 
       handle_incompatibilities(data['compatibles']);
 
-      console.log(data);
       first_idx = 0;
       while(data['data'][first_idx] && !data['data'][first_idx]['dims']) 
         first_idx++;
@@ -217,7 +216,6 @@ function draw_table(){
           }
         });
       });
-      console.log(selected_dims);
       var years = data['years'];
       var col_num = 2;
       var html = '<table id="table" class="results_table">'+
@@ -283,8 +281,6 @@ function draw_chart(){
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         //var series = data['data'],
         //    years = data['years'];
-        console.log("HERE IS CHART DATA");
-        console.log(data);
         var suffix = '';
         var series = []
         var years = data['years'];
@@ -315,8 +311,6 @@ function draw_chart(){
           series.push(cur_series);
         });
 
-        console.log(years);
-        console.log(series);
         if(series.length == 0)
           return display_error("No results, please select different filters");
         yAxisLabel = $(".MeasureType:checked").first().val();
