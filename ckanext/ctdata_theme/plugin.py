@@ -95,11 +95,16 @@ class CTDataController(base.BaseController):
 
         metadata = dataset_meta['extras']
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata) 
-        print dataset.metadata
+
+        try:
+          defaults = dataset.metadata['Default']
+        except TypeError:
+          defaults = []
+         
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
-                                                             'default_filters': dataset.metadata['Default']})
+                                                             'default_filters': defaults})
 
     def get_data(self, dataset_name):
         try:

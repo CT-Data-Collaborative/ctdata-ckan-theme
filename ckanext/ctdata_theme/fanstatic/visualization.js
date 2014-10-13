@@ -198,11 +198,26 @@ function draw_table(){
         return display_error("No results, please select different filters");
       all_dims = data['data'][first_idx]['dims'];
       selected_dims = {};
-      $.each(all_dims, function(dim_name){
-        if(all_dims[dim_name] != "NA" && dim_name != "Town"){
-          selected_dims[dim_name] = all_dims[dim_name];
-        }
+
+      is_checked = [];
+      $.each(all_dims, function(i){
+        is_checked[i] = false;
       });
+      all_checked = $("input:checked");
+      $.each(all_checked, function(i){
+        is_checked[$(all_checked[i]).attr('class')] = true;
+      });
+        is_checked['Town'] = false;
+      $.each(data['data'], function(d){
+        $.each(all_dims, function(dim_name){
+          if(data['data'][d]['dims']){
+          if(is_checked[dim_name] || (data['data'][d]['dims'][dim_name] != "NA" && data['data'][d]['dims'][dim_name] != "All" && dim_name != "Town")){
+            selected_dims[dim_name] = all_dims[dim_name];
+          }
+          }
+        });
+      });
+      console.log(selected_dims);
       var years = data['years'];
       var col_num = 2;
       var html = '<table id="table" class="results_table">'+
