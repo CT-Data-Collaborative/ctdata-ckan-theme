@@ -17,23 +17,15 @@ class QueryBuilder(object):
         for fltr in filters:
             column_name, values = fltr['field'], fltr['values']
 
-            if "all" in map(lambda x: x.lower(), values):
-                # if some of the filters have "all" value, than we don't include them in the WHERE clause,
-                # and group by all the selected columns except Value.
-                if not groupby_fields:
-                    # exclude Value from the GROUP BY clause
-                    groupby_fields = list(OrderedSet(self.get_columns(filters)) - OrderedSet(['Value']))
-                continue
-            elif column_name in multivalue_dimensions or len(values) > 1:
+            if column_name in multivalue_dimensions or len(values) > 1:
                 filter_string = '"%s" in (%s)' % (column_name, ','.join(['%s'] * len(values)))
             else:
                 filter_string = '"%s" = %%s' % column_name
 
             processed_filters.append(filter_string)
         filters_string = ' and '.join(processed_filters)
-        filters_values = reduce(lambda acc, f: acc + f['values']
-                                if not 'all' in map(lambda x: x.lower(), f['values'])
-                                else acc, filters, [])
+        filters_values = reduce(lambda acc, f: acc + f['values'],
+                                 filters, [])
 
         if groupby_fields:
             columns_string = ','.join('"%s"' % col for col in groupby_fields)
