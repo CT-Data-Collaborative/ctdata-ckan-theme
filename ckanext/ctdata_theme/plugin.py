@@ -86,7 +86,7 @@ class CTDataController(base.BaseController):
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def visualization(self, dataset_name):
-        metadata_fields = ['Full Description', 'Source']
+        metadata_fields = ['Description', 'Full Description', 'Source']
         try:
             dataset = DatasetService.get_dataset(dataset_name)
             dataset_meta = DatasetService.get_dataset_meta(dataset_name)
