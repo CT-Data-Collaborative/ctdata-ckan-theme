@@ -37,10 +37,10 @@ class Dataset(object):
         sess = db.session_factory()
         # get the cached metadata from the db
         cached = sess.query(DatasetCache).filter(DatasetCache.table_name == self.table_name).first()
-
         # if the cached copy doesn't contain the info about incompatibilities and we were provided this info
         # we wouldn't use the cached copy but compute all the metadata once more, adding incompat. info
-        if cached and not (not cached.has_incs and self.incs_meta_url):
+        #if cached and not (not cached.has_incs and self.incs_meta_url):
+        if False:
             # it's ok, we have the cached copy and either it has the icompat. data or it doesn't but there was none
             # provided anyway
             parsed_json = json.loads(cached.meta)
@@ -108,20 +108,20 @@ class Dataset(object):
                         meta_data.append({'dimension': dim_name, 'values': dim_values, 'incompatible': joined_incs})
 
                     # add info about the fetched dimension and its possible values
-                    self.dimensions.append(Dimension(dim_name, dim_values, joined_incs))
+                        self.dimensions.append(Dimension(dim_name, dim_values, joined_incs))
 
                 # check whether we have info about incompatibles
                 has_inc = True if self.incs_meta_url else False
                 # caching the metadata so we don't have to compute it for every request
-                if cached:
-                    # if a cached copy alredy exists, we update it
-                    cached.has_incs = has_inc
-                    cached.meta = json.dumps(meta_data)
-                else:
-                    sess.add(DatasetCache(self.table_name, has_inc, json.dumps(meta_data)))
-                sess.commit()
-
-                conn.commit()
+#                if cached:
+#                    # if a cached copy alredy exists, we update it
+#                    cached.has_incs = has_inc
+#                    cached.meta = json.dumps(meta_data)
+#                else:
+#                    sess.add(DatasetCache(self.table_name, has_inc, json.dumps(meta_data)))
+#                sess.commit()
+#
+#                conn.commit()
 
 
 class Dimension(object):
