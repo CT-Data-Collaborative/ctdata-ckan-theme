@@ -51,8 +51,8 @@ class View(object):
 
       conn = self.database.connect()
       compatibles = []
-      towns_from_filters = dict_with_key_value('field', 'Town', filters)['values']
-      if towns_from_filters[0] == 'all':
+      towns_from_filters = dict_with_key_value('field', 'Town', filters)
+      if towns_from_filters and towns_from_filters['values'][0] == 'all':
         for f in filters:
           if f['field'] == 'Town':
             pass

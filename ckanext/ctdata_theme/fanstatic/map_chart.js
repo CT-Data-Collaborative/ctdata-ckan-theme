@@ -6,12 +6,12 @@ var dataset_id = $("#dataset_id").val(),
 
 filters = get_filters();
 //Remove town filter, since for a map we want all of them
-var town_index;
+var town_index = -1;
 $.each(filters, function(i){
   if(filters[i]['field'] == "Town")
     town_index = i 
 });
-if (town_index)
+if (town_index >= 0)
   filters.splice(town_index, 1)
 
 $.ajax({type: "POST",
