@@ -164,8 +164,6 @@ function handle_incompatibilities(compatibles){
 
   all_inputs = $("input[type='checkbox']:not(.Town):not(.Year)");
   $.each(all_inputs, function(i){
-    if(!($(all_inputs[i]).parent().parent().find("input:checked").length == 0))
-      return "There is a filter on this set already"
     if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
       $(all_inputs[i]).removeAttr("disabled");
       $(all_inputs[i]).parent().find("label").css("color", "gray");
