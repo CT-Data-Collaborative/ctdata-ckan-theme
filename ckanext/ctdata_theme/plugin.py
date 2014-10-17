@@ -96,12 +96,9 @@ class CTDataController(base.BaseController):
 
         metadata = dataset_meta['extras']
         default_metadata = filter(lambda x: x['key'] == 'Default', metadata)
-        print default_metadata[0]['value']
-        print default_metadata[0]['value'].encode('ascii', 'ignore')
         try:
           defaults = yaml.load(default_metadata[0]['value'])
-          print defaults
-        except TypeError:
+        except IndexError:
           defaults = []
         
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata) 
