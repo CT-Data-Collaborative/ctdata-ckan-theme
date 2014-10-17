@@ -4,9 +4,13 @@ var chart_filters = [];
 
 function check_defaults(){
     $.each(defaults, function(i){
+    if(defaults[i] instanceof Array){
       $.each(defaults[i], function(j){ 
         $("input."+i.replace(/ /g, '')+"[value='"+defaults[i][j]+"']").prop('checked', true);
       });
+    } else {
+        $("input."+i.replace(/ /g, '')+"[value='"+defaults[i]+"']").prop('checked', true);
+    }
     });
     display_data();
 

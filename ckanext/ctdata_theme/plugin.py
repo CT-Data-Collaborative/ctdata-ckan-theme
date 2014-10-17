@@ -1,4 +1,5 @@
 import json
+import yaml
 
 from pylons.controllers.util import abort
 
@@ -94,13 +95,17 @@ class CTDataController(base.BaseController):
             abort(404)
 
         metadata = dataset_meta['extras']
-        metadata = filter(lambda x: x['key'] in metadata_fields, metadata) 
-
+        default_metadata = filter(lambda x: x['key'] == 'Default', metadata)
+        print default_metadata[0]['value']
+        print default_metadata[0]['value'].encode('ascii', 'ignore')
         try:
-          defaults = dataset.metadata['Default']
+          defaults = yaml.load(default_metadata[0]['value'])
+          print defaults
         except TypeError:
           defaults = []
-         
+        
+        metadata = filter(lambda x: x['key'] in metadata_fields, metadata) 
+        
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
