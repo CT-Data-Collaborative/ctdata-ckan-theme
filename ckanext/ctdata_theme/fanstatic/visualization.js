@@ -1,4 +1,6 @@
 var display_type = "table";
+var map_filters = [];
+var chart_filters = [];
 
 function check_defaults(){
     $.each(defaults, function(i){
@@ -10,8 +12,35 @@ function check_defaults(){
 
 }
 
+function save_filters(display_type){
+  if(display_type == 'map')
+   map_filters = get_filters() 
+ else
+   chart_filters = get_filters()
+}
+
+function set_filters(display_type){
+  filters_to_update = []
+  if(display_type == 'map' && map_filters.length > 0){
+    filters_to_update = map_filters;
+  }
+  if(display_type != 'map' && chart_filters.length > 0){
+    filters_to_update = chart_filters;
+  }
+  if(filters_to_update.length > 0){
+    $.each(filters_to_update, function(i){
+      column = filters_to_update[i]
+      $.each(column['values'], function(value){
+        $("input."+column['field']+"[value='"+column['values'][value]+"']").prop('checked', true);
+      });
+    });
+  }
+}
+
 function set_display_type(new_type){
   set_icon(new_type);
+  save_filters(display_type);
+  set_filters(new_type);
   display_type = new_type;
   if (display_type == 'map'){
       set_map_checkbox();
