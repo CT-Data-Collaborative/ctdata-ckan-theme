@@ -89,7 +89,7 @@ class Dataset(object):
                         curs.execute(dim_values_query)
                         res = curs.fetchall()
 
-                        dim_values = [str(db[0]) for db in filter(lambda x: str(x[0]) != 'NA', res)]
+                        dim_values = [str(db[0]) for db in res]
 
                         # also determine incompatibilities for that dimension
                         dim_incs = filter(lambda x: x['dimension'] == dim_name, incompatibilities)
