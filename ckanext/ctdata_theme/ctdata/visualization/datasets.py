@@ -23,7 +23,7 @@ class Dataset(object):
         self.dimensions = []
         self.default_indicator = []
         self._get_dimensions()
-        self._get_meta()
+        #self._get_meta()
 
     def _get_meta(self):
       if self.meta_url:

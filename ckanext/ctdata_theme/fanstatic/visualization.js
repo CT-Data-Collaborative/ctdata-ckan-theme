@@ -195,7 +195,7 @@ function get_filters(){
 
 function handle_incompatibilities(compatibles){
 
-  all_inputs = $("input[type='checkbox']:not(.Town):not(.Year)");
+  all_inputs = $("input[type='checkbox']");
   $.each(all_inputs, function(i){
     if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
       $(all_inputs[i]).removeAttr("disabled");
