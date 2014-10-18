@@ -128,5 +128,9 @@ var defaults = [];
 {% if default_filters %}
 defaults = {{default_filters | safe}}
 {% endif %}
+var disabled = [];
+{% if disabled %}
+disabled = {{disabled | safe}}
+{% endif %}
 </script>
 {% endblock %}

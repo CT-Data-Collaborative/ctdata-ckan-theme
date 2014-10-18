@@ -100,12 +100,19 @@ class CTDataController(base.BaseController):
           defaults = yaml.load(default_metadata[0]['value'])
         except IndexError:
           defaults = []
+        disabled_metadata = filter(lambda x: x['key'] == "disabled_views", metadata)
+        print disabled_metadata
+        try:
+          disabled = yaml.load(disabled_metadata[0]['value'])
+        except IndexError:
+          disabled = []
+        metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
         
-        metadata = filter(lambda x: x['key'] in metadata_fields, metadata) 
         
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
+                                                             'disabled': disabled,
                                                              'default_filters': defaults})
 
     def get_data(self, dataset_name):

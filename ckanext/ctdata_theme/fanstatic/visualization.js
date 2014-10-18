@@ -142,6 +142,15 @@ function display_error(message){
 
 function display_data(){
   display_filters();
+  if(display_type == 'column'){
+    new_type = 'bar';
+  } else {
+    new_type = display_type
+  }
+    if(disabled.indexOf(new_type) != -1){
+      display_error("This visualization is disabled for this dataset")
+      return 0;
+    }
   towns = $("input.Town:checked");
   years = $("input.Year:checked");
   if(towns.length == 0)
