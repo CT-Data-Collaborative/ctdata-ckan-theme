@@ -24,6 +24,12 @@
   <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
   <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
   <ul>
+    <li>
+      {% if dimension.name == 'Town' %}
+        <input type="checkbox" id="select_all_town" value="Select All" class="select-all">
+        <label for="Select All Check" class="checkLabel select-all-label">Select All</label>
+      {% endif %}
+    </li>
   {% for value in dimension.possible_values %}
     {% if value|length > 0 %}
     <li>

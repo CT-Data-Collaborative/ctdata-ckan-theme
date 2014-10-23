@@ -33,7 +33,9 @@
     {% for indicator in indicators %}
         <ul class="table_data">
             <li class="col-1">
-                {{indicator['dataset']}}, {{indicator['indicator'].variable}}
+                <a href="/dataset/{{ indicator['dataset'].replace(' ', '-').lower() }}">
+                    {{indicator['dataset']}}, {{indicator['indicator'].variable}}
+                </a>
                 <span>
                     {% for filter in indicator['filters'] %}
                         {{ filter['field'] }}: {{filter['value']}}{% if not loop.last %},{% endif %}

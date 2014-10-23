@@ -94,13 +94,13 @@ class CTDataController(base.BaseController):
             abort(404)
 
         metadata = dataset_meta['extras']
-        metadata = filter(lambda x: x['key'] in metadata_fields, metadata) 
+        metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
         try:
           defaults = dataset.metadata['Default']
         except TypeError:
           defaults = []
-         
+
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
@@ -132,7 +132,7 @@ class CTDataController(base.BaseController):
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps(data)
-    
+
     def add_community_towns(self, community_name):
         if http_request.method == 'POST':
             session = Database().session_factory()
@@ -202,7 +202,7 @@ class CTDataController(base.BaseController):
 
     def remove_community_indicator(self, indicator_id):
         pass
-    
+
     def community_profile(self, community_name):
         session = Database().session_factory()
         community_profile_service = CommunityProfileService(session)
