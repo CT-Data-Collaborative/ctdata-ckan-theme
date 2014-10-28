@@ -40,6 +40,8 @@ span.checkLabel {
     width: 230px;
     border-right: 1px solid;
     float: left;
+    overflow: scroll !important;
+    height: 500px;
 }
 
 .indicator-filter-name {
@@ -47,7 +49,26 @@ span.checkLabel {
 }
 
 .indicator-filters {
-    margin-left: 240px;
+  margin-left: 240px;
+  overflow: scroll !important;
+  height: 500px;
+}
+
+.disable-scroll{
+  overflow-y:hidden;
+  overflow-x:hidden;
+}
+
+.active{
+  background-color: #EFEFEF;
+}
+
+.indicator-sub-topics{
+  padding-left: 8px;
+}
+
+.indicator-sub-topics li{
+  padding: 2px;
 }
 
 #mapTitle{

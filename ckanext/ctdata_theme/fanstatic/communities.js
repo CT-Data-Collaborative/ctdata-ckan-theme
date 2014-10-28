@@ -70,7 +70,9 @@ $(function(){
     });
 
     $('.dataset_chooser').click(function() {
+        $('li', $('ul.indicator-sub-topics')).removeClass('active')
         current_dataset = $(this).attr('id');
+        $(this).closest('li').addClass('active');
         $.ajax({type: "GET",
             url: "/community/get_filters/" + current_dataset,
             success: function (data) {

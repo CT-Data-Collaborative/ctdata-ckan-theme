@@ -13,7 +13,7 @@
 
 <section class="locationdata">
 <ul class="opt_btn">
-<li class="btn_blue"><a href="javascript:void(0)" id="add_towns">Add Towns</a></li>
+<li class="btn_blue"><a href="javascript:void(0)" id="add_towns">Edit Towns</a></li>
 {% if c.userobj %}
 <li class="btn_blue"><a href="javascript:void(0)" id="add_indicator">Add Indicator</a></li>
 {% endif %}
@@ -69,14 +69,14 @@
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                Add towns
+                Edit Towns
             </div>
             <div class="modal-body">
                 <div id="towns">
                     <ul style="">
                         {% for town in towns %}
                             <li>
-                                <input type="checkbox" value="{{town.name}}" {% if town.name in displayed_towns %}checked{% endif %}>
+                                <input type="checkbox" value="{{town.name}}" {% if town.name in displayed_towns %}checked{% endif %} {% if town.name == community.name %}disabled{% endif %}>
                                 <span class="checkLabel">{{town.name}}</span>
                             </li>
                         {% endfor %}
@@ -85,7 +85,7 @@
             </div>
             <div class="modal-footer">
                 <div style="float: right">
-                    <button id="save_towns" class="btn btn-primary">Add</button>
+                    <button id="save_towns" class="btn btn-primary">Save</button>
                     <button id="close_towns_popup" class="btn">Cancel</button>
                 </div>
             </div>
@@ -96,9 +96,9 @@
 <div id="indicator_popup" class="modal fade" style="display: none">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-body">
+            <div class="modal-body disable-scroll">
                 <div id="indicators" class="indicator-topics">
-                    <ul>
+                    <ul class="indicator-main-topics">
                     {% for topic in topics %}
                         <li>
                         <h3>{{ topic['title'] }}</h3>
@@ -107,7 +107,7 @@
                             <li>
                                 <div>
                                 <h3 style="color: #000000">{{ subtopic['title'] }}</h3>
-                                    <ul>
+                                    <ul class="indicator-sub-topics">
                                         {% for dataset in subtopic['datasets'] %}
                                         <li>
                                             <a href="javascript:void(0)" id="{{dataset['id']}}" class="dataset_chooser">
