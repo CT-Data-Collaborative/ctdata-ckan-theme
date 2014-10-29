@@ -46,6 +46,38 @@ class View(object):
 
         return result
 
+    def get_compatibles(self, filters):
+      cols = self.query_builder.get_columns(filters)
+
+      conn = self.database.connect()
+      compatibles = []
+      towns_from_filters = dict_with_key_value('field', 'Town', filters)
+      if towns_from_filters and towns_from_filters['values'][0] == 'all':
+        for f in filters:
+          if f['field'] == 'Town':
+            pass
+            filters.remove(f)
+      if conn:
+        curs = conn.cursor()
+        for cur_col in cols:
+          processed_filters = []
+          filters_values = []
+          for f in filters:
+            if f['field'] != cur_col:
+              column_name, values = f['field'], f['values']
+              filter_string = '"%s" in (%s)' % (column_name, ','.join(['%s'] * len(values)))
+              processed_filters.append(filter_string)
+              filters_values = filters_values + values
+          filters_string = ' and '.join(processed_filters)
+          if filters_string:
+            query = '''SELECT DISTINCT "%s" FROM public."%s" WHERE %s''' % (cur_col, self.query_builder.dataset.table_name, filters_string)
+          else:
+            query = '''SELECT DISTINCT "%s" FROM public."%s"''' % (cur_col, self.query_builder.dataset.table_name)
+          curs.execute(query, filters_values)
+          rows = curs.fetchall()
+          for row in rows:
+            compatibles.append(str(row[0]))
+      return compatibles
 
 class TableView(View):
     def convert_data(self, data, filters):
@@ -135,13 +167,10 @@ class ChartView(View):
         next_row_dims = None
         cur_year = None
         current_town = None
-        compatibles = Set()
         for row in data:
             next_row_dims = row
             cur_year = next_row_dims.pop('Year', None)
             cur_value = next_row_dims.pop('Value', None)
-            for k in row:
-              compatibles.add(str(row[k]))
             if cmp(last_row_dims, next_row_dims) != 0:
                 if last_row_dims:
                     while check_year < len(sorted_years):
@@ -179,7 +208,7 @@ class ChartView(View):
         while check_town < len(sorted_towns):
             result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(years_from_filters)})
             check_town += 1
-        result['compatibles'] = list(compatibles)
+        result['compatibles'] = self.get_compatibles(filters)
         return result
 
 
@@ -263,17 +292,50 @@ class ProfileView(View):
 
 
 class MapView(View):
+
+    def get_compatibles(self, filters):
+      cols = self.query_builder.get_columns(filters)
+
+      conn = self.database.connect()
+      compatibles = []
+      towns_from_filters = dict_with_key_value('field', 'Town', filters)
+      if towns_from_filters and towns_from_filters['values'][0] == 'all':
+        for f in filters:
+          if f['field'] == 'Town':
+            pass
+            filters.remove(f)
+      if conn:
+        curs = conn.cursor()
+        for cur_col in cols:
+          processed_filters = []
+          filters_values = []
+          for f in filters:
+            if f['field'] != cur_col:
+              column_name, values = f['field'], f['values']
+              filter_string = '"%s" in (%s)' % (column_name, ','.join(['%s'] * len(values)))
+              processed_filters.append(filter_string)
+              filters_values = filters_values + values
+          processed_filters.append('"Town" not in (%s)')
+          filters_values = filters_values + ['Connecticut']
+          filters_string = ' and '.join(processed_filters)
+          if filters_string:
+            query = '''SELECT DISTINCT "%s" FROM public."%s" WHERE %s''' % (cur_col, self.query_builder.dataset.table_name, filters_string)
+          else:
+            query = '''SELECT DISTINCT "%s" FROM public."%s"''' % (cur_col, self.query_builder.dataset.table_name)
+          curs.execute(query, filters_values)
+          rows = curs.fetchall()
+          for row in rows:
+            compatibles.append(str(row[0]))
+      return compatibles
+
+
     def convert_data(self, data, filters):
         result = super(MapView, self).convert_data(data, filters)
         result['data'] = []
 
-        compatibles = Set()
         for row in data:
-            for k in row:
-              if k != 'Value':
-                compatibles.add(str(row[k]))
             result['data'].append({'code': row['Town'], 'value': float(row['Value'])})
-        result['compatibles'] = list(compatibles)
+        result['compatibles'] = self.get_compatibles(filters)
         return result
 
 

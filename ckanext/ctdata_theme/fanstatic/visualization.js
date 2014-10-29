@@ -1,4 +1,6 @@
 var display_type = "table";
+var map_filters = [];
+var chart_filters = [];
 
 function select_all(){
   $('.select-all').on('click', function(){
@@ -22,16 +24,48 @@ function deselect_all(){
 
 function check_defaults(){
     $.each(defaults, function(i){
+
+    if(defaults[i] instanceof Array){
       $.each(defaults[i], function(j){
         $("input."+i.replace(/ /g, '')+"[value='"+defaults[i][j]+"']").prop('checked', true);
       });
+    } else {
+        $("input."+i.replace(/ /g, '')+"[value='"+defaults[i]+"']").prop('checked', true);
+    }
     });
     display_data();
 
 }
 
+function save_filters(display_type){
+  if(display_type == 'map')
+   map_filters = get_filters()
+ else
+   chart_filters = get_filters()
+}
+
+function set_filters(display_type){
+  filters_to_update = []
+  if(display_type == 'map' && map_filters.length > 0){
+    filters_to_update = map_filters;
+  }
+  if(display_type != 'map' && chart_filters.length > 0){
+    filters_to_update = chart_filters;
+  }
+  if(filters_to_update.length > 0){
+    $.each(filters_to_update, function(i){
+      column = filters_to_update[i]
+      $.each(column['values'], function(value){
+        $("input."+column['field']+"[value='"+column['values'][value]+"']").prop('checked', true);
+      });
+    });
+  }
+}
+
 function set_display_type(new_type){
   set_icon(new_type);
+  save_filters(display_type);
+  set_filters(new_type);
   display_type = new_type;
   if (display_type == 'map'){
       set_map_checkbox();
@@ -129,6 +163,15 @@ function display_error(message){
 
 function display_data(){
   display_filters();
+  if(display_type == 'column'){
+    new_type = 'bar';
+  } else {
+    new_type = display_type
+  }
+    if(disabled.indexOf(new_type) != -1){
+      display_error("This visualization is disabled for this dataset")
+      return 0;
+    }
   towns = $("input.Town:checked");
   years = $("input.Year:checked");
   if(towns.length == 0)
@@ -182,10 +225,8 @@ function get_filters(){
 
 function handle_incompatibilities(compatibles){
 
-  all_inputs = $("input[type='checkbox']:not(.Town):not(.Year)");
+  all_inputs = $("input[type='checkbox']");
   $.each(all_inputs, function(i){
-    if(!($(all_inputs[i]).parent().parent().find("input:checked").length == 0))
-      return "There is a filter on this set already"
     if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
       $(all_inputs[i]).removeAttr("disabled");
       $(all_inputs[i]).parent().find("label").css("color", "gray");
