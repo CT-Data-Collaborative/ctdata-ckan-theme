@@ -210,7 +210,7 @@ function get_filters(){
 
   $.each(dimensions, function(i){
     var cur_dim = $(dimensions[i]);
-    var cur_filter = {'field': cur_dim.find('a').text(), 'values': []};
+    var cur_filter = {'field': cur_dim.find('a').text().replace('Select AllDeselect All', ''), 'values': []};
     var checked = cur_dim.find("input:checked")
 
     $.each(checked, function(option){
