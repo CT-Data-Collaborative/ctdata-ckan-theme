@@ -128,7 +128,7 @@ class CommunityProfilesController(base.BaseController):
 
         result = []
         for dim in dataset.dimensions:
-            if dim.name != 'Town':
+            if dim.name not in ['Town', 'Year']:
                 if dim.name == 'Race':
                     dim.possible_values.append('all')
                 result.append({'name': dim.name, 'values': dim.possible_values})

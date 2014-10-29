@@ -41,7 +41,7 @@ span.checkLabel {
     border-right: 1px solid;
     float: left;
     overflow: scroll !important;
-    height: 500px;
+    height: 370px;
 }
 
 .indicator-filter-name {
@@ -51,12 +51,11 @@ span.checkLabel {
 .indicator-filters {
   margin-left: 240px;
   overflow: scroll !important;
-  height: 500px;
+  height: 370px;
 }
 
 .disable-scroll{
-  overflow-y:hidden;
-  overflow-x:hidden;
+  overflow: hidden;
 }
 
 .active{
