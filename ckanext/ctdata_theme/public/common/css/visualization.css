@@ -132,3 +132,10 @@ div#error_message{
 .highcharts-button{
   visibility: hidden;
 }
+
+.select-all, .deselect-all{
+  text-decoration: underline !important;
+  color: #3970ba !important;
+  font-size: 10pt;
+  margin-left: 10px;
+}

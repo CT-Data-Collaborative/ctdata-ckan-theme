@@ -1,23 +1,22 @@
 var display_type = "table";
 
 function select_all(){
-  $('.select-all').on('change', function(){
+  $('.select-all').on('click', function(){
     $this = $(this)
+    $ul   = $this.closest('ul')
 
-    $ul = $this.closest('ul')
-    $inputs =  $('input', $ul)
-    if ($this.prop('checked')){
-      $text = 'Deselect All'
-    }
-    else{
-      $text = 'Select All'
-    }
+    $('input', $ul).prop('checked', true);
+    display_data();
+  });
+}
 
-    $inputs.prop('checked', $this.prop('checked'));
+function deselect_all(){
+  $('.deselect-all').on('click', function(){
+    $this = $(this)
+    $ul   = $this.closest('ul')
 
-
-    $('.select-all-label').text($text);
-    $this.removeClass('select-all').addClass('deselect-all')
+    $('input', $ul).prop('checked', false);
+    display_data();
   });
 }
 
@@ -371,12 +370,13 @@ function display_filters(){
     if (filters[i]['field'] == "Town") return "Skip town";
     filter_text += filters[i]['field']+": "+filters[i]['values'] + " | ";
   });
-  filter_text = filter_text.substring(0, filter_text.length - 2);
+  filter_text = filter_text.replace('Select AllDeselect All', '').substring(0, filter_text.length - 2);
   $("#pageDescription").text(filter_text);
 }
 
 $(function () {
     select_all();
+    deselect_all();
     check_defaults();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){

@@ -26,8 +26,8 @@
   <ul>
     <li>
       {% if dimension.name == 'Town' %}
-        <input type="checkbox" id="select_all_town" value="Select All" class="select-all">
-        <label for="Select All Check" class="checkLabel select-all-label">Select All</label>
+        <a href="javascript:void(0);" class="select-all">Select All</a>
+        <a href="javascript:void(0);" class="deselect-all">Deselect All</a>
       {% endif %}
     </li>
   {% for value in dimension.possible_values %}
