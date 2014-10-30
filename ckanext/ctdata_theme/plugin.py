@@ -99,6 +99,8 @@ class CTDataController(base.BaseController):
 
         try:
           defaults = yaml.load(default_metadata[0]['value'])
+          if type(defaults) is list:
+            defaults = defaults[0]
         except IndexError:
           defaults = []
 
