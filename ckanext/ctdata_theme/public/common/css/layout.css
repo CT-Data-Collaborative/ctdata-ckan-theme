@@ -266,7 +266,7 @@ h1, h2, h3, h4 {
 	text-align:center;
 }
 #databylocation h2 { text-transform:uppercase; color:#4670a7; margin:0 0 25px 0; font-size:1.8em; }
-#databylocation .dropdown { width:280px; text-align:left; }
+#databylocation .dropdown { width:280px; text-align:left;}
 .dropdown .caretbox {
 	background:#ececec;
 	padding:1px 12px;
@@ -275,7 +275,15 @@ h1, h2, h3, h4 {
     border-radius:3px;
     margin:0px -5px 0 15px;
 }
+ul.dropdown-menu{
+    height: 200px; overflow: scroll;
+}
 
+ul.dropdown-menu li a:hover{
+  background-color: #ECECEC !important;
+  background-image: none !important;
+  color:  #555;
+}
 #newsmods {
 	clear:both;
 	background:#fff;
@@ -340,6 +348,47 @@ h1, h2, h3, h4 {
 	color:#fff;
 }
 
+
+.bbtn:hover, .bbtn:focus {
+color: #555;
+text-decoration: none;
+border: 3px solid #3c72b8;
+}
+
+.bbtn {
+display: inline-block;
+padding: 6px 12px;
+margin-bottom: 0;
+font-size: 18px;
+font-weight: 400;
+line-height: 1.42857143;
+text-align: center;
+white-space: nowrap;
+vertical-align: middle;
+cursor: pointer;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+background-image: none;
+border: 3px solid #ccc;
+border-radius: 4px;
+background: #fff;
+}
+
+
+.dropdown {
+  position: relative;
+}
+.dropdown-menu li a {
+display: block;
+padding: 3px 20px;
+clear: both;
+font-weight: 400;
+line-height: 1.42857143;
+color: #777;
+white-space: nowrap;
+}
 
 
 
