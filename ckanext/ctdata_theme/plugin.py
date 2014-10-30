@@ -82,7 +82,7 @@ class CTDataController(base.BaseController):
         return base.render('special_projects.html')
 
     def data_by_topic(self):
-        domains = TopicSerivce.get_topics()
+        domains = TopicSerivce.get_topics('data_by_topic')
 
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 

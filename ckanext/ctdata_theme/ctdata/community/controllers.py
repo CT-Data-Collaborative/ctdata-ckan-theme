@@ -86,7 +86,6 @@ class CommunityProfilesController(base.BaseController):
 
     def community_profile(self, community_name):
         user_name = http_request.environ.get("REMOTE_USER")
-        include_hidden = False
 
         towns_raw, towns_names = http_request.GET.get('towns'), []
         if towns_raw:
@@ -99,7 +98,7 @@ class CommunityProfilesController(base.BaseController):
             community, indicators, displayed_towns = self.community_profile_service.get_indicators(community_name,
                                                                                                    towns_names,
                                                                                                    user)
-            topics = TopicSerivce.get_topics(include_hidden)
+            topics = TopicSerivce.get_topics('community_profile')
         except toolkit.ObjectNotFound as e:
             abort(404, detail=str(e))
 
@@ -129,7 +128,7 @@ class CommunityProfilesController(base.BaseController):
 
         result = []
         for dim in dataset.dimensions:
-            if dim.name not in ['Town', 'Year']:
+            if dim.name not in ['Town']:
                 if dim.name == 'Race':
                     dim.possible_values.append('all')
                 result.append({'name': dim.name, 'values': dim.possible_values})
