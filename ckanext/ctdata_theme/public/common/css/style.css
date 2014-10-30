@@ -1,4 +1,10 @@
 @charset "utf-8";
+@import url("bootstrap.min.css");
+@import url("font-awesome.min.css");
+@import url("buttons.css");
+@import url("buttons.css");
+@import url("layout.css");
+
 * { margin:0px; box-sizing:border-box; }/* max-width:100%;  padding:0px; border:none; */
 input, textarea { outline:none; -webkit-appearance: none; border-radius: 0; resize:none;}
 img { border:none; outline:none; max-width:100%; height:auto;}
@@ -41,27 +47,6 @@ header nav ul li a:hover { color:#333;}
 line-height: normal; margin-top: 0px}
 .ctdata-banner .overlay_text p { background:url(../images/whitepng.png) repeat; display:table; font-size:22px; color:#3380bd; padding:12px 32px; margin-bottom: 0px}
 
-.about { background:url(../images/about_bg.jpg) no-repeat center top #def3fd; background-size:cover; text-align:center; padding:50px 0 45px; float:left; width:100%; margin-top:-2px;}
-.about h2 { font-size:36px; color:#3970ba; margin-bottom:18px;}
-.about p { font-size:18px; color:#888888;}
-.about a { color:#33bdf2; margin-left:10px;}
-.about a:hover { text-decoration:underline;}
-
-.topics { float:left; width:100%; background:#3970ba; padding:35px 0 45px; text-align:center;}
-.topics h2 { font-size:30px; color:#ffffff; margin-bottom:50px; text-transform:uppercase;}
-.topics ul li { display:inline-block; vertical-align:bottom; width:11%; color:#cceffc; font-size:21px; margin:0 1%;}
-.topics ul li a { display:block;}
-.topics ul li a:hover { color: #aaa; text-decoration: none;}
-.topics ul li img { display:block; margin:0px auto 15px; vertical-align:top;  transition:all linear 0.2s 0s;}
-.topics ul li:hover img { transform:scale(1.1);}
-
-.location { width:100%; float:left; background:url(../images/location_bg.jpg) no-repeat center center #cff0fc; background-size:cover; padding:35px 0 45px; text-align:center;}
-.location h2 { font-size:30px; color:#33bdf2; margin-bottom:32px;text-transform:uppercase;}
-.location .select-wrapper {line-height: 175%; position:relative; display:inline-block; border-radius:6px; border:4px solid #bad0d8;  background:url(../images/drop_btn.jpg) 100% top no-repeat #fff; width:450px; }
-.location select.custom-select {height: 60px; line-height: 100%; font-size:24px; color:#888888; font-family: 'PT Sans', sans-serif; padding:14px 20px 13px; background:none; width:443px;}
-option { padding:0 24px;}
-
-
 .news { width:100%; float:left; background:#fff; padding:35px 0 45px;}
 .news h2 { text-align:center; color:#3970ba; font-size:30px; margin-bottom:50px; text-transform:uppercase; text-decoration: underline;}
 .news h2:hover { text-decoration: none;}
@@ -75,24 +60,6 @@ option { padding:0 24px;}
 .news_con p { color:#444444; font-size:14px; font-family: 'Roboto', sans-serif; font-weight:300; line-height:23px;}
 .news_con p a { color:#33bdf2;}
 .news_con p a:hover { text-decoration:underline;}
-
-footer { width:100%; float:left; background:#eeeeee; padding:30px 0 50px; box-shadow:0 0 3px #ccc inset;}
-footer h3 { color:#3970ba; font-size:18px; margin-bottom:8px; display:inline-block;}
-footer .col_1 { float:left; width:300px; font-size:12px; color:#888888;}
-footer .col_1 .ftr_logo { margin-bottom:16px; display:block; clear:both;}
-footer .col_1 span { display:block; margin-bottom:8px;}
-footer .col_1 span a{ color:#444444;}
-footer .col_1 span a:hover { text-decoration:underline;}
-
-footer .col_2 { width:295px; float:left;}
-footer ul li { color:#444444; font-size:14px; margin-bottom:6px}
-footer ul li:hover a { color:#000;}
-
-footer .last_col { width:270px; float:right;}
-footer .last_col .feedback { background:#666666; color:#fff; font-size:14px; text-transform:uppercase; display:table; margin:15px 0 25px; vertical-align:middle; padding-right:19px;}
-footer .last_col .feedback img { vertical-align:middle;  padding-right:19px;}
-footer .last_col .feedback:hover { opacity:0.8;}
-footer .last_col a { margin-right:20px; display:inline-block;}
 
 /* custom select*/
 .select-wrapper .holder{display: block;margin: 0 35px 0 5px;white-space: nowrap; overflow: hidden;cursor: pointer;position: relative;z-index:1;font-size:24px; color:#888888; font-family: 'PT Sans', sans-serif; padding:14px 20px 13px; background:none; width:450px; text-align:left;}
@@ -371,7 +338,6 @@ label {font-weight: normal; cursor: auto}
 .topics_list {
     float: left;
     width: 100%;
-    display: none;
     margin-top: 50px;
     margin-bottom: 50px;
     background: #fff;
@@ -475,4 +441,3 @@ label {font-weight: normal; cursor: auto}
 .raw_tabs li.tab2, .raw_tabs li.tab3, .raw_tabs li.tab4{
   visibility: hidden;
 }
-
