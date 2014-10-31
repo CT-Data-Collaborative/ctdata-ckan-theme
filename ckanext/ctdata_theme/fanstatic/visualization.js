@@ -19,6 +19,7 @@ function deselect_all(){
 
     $('input', $ul).prop('checked', false);
     display_data();
+    hide_spinner();
   });
 }
 
@@ -163,6 +164,7 @@ function display_error(message){
 
 function display_data(){
   display_filters();
+  display_spinner();
   if(display_type == 'column'){
     new_type = 'bar';
   } else {
@@ -318,6 +320,7 @@ function draw_table(){
           "aButtons": ["print", "pdf", "csv"]
         }
       });
+  hide_spinner();
 });
 }
 
@@ -367,6 +370,7 @@ function draw_chart(){
           return display_error("No results, please select different filters");
         yAxisLabel = $(".MeasureType:checked").first().val();
 
+        hide_spinner();
         $('#container').highcharts({
             chart: {
               type: display_type
@@ -400,8 +404,17 @@ function draw_chart(){
             },
             series: series
         });
-    })
+    });
+}
 
+function display_spinner(){
+  $('.spinner').show();
+  $('.results_table').hide();
+}
+
+function hide_spinner(){
+  $('.spinner').hide();
+  $('.results_table').show();
 }
 
 function display_filters(){
