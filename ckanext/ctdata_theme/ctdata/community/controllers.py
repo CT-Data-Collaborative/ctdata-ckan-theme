@@ -98,7 +98,7 @@ class CommunityProfilesController(base.BaseController):
             community, indicators, displayed_towns = self.community_profile_service.get_indicators(community_name,
                                                                                                    towns_names,
                                                                                                    user)
-            topics = TopicSerivce.get_topics()
+            topics = TopicSerivce.get_topics('community_profile')
         except toolkit.ObjectNotFound as e:
             abort(404, detail=str(e))
 
@@ -128,9 +128,7 @@ class CommunityProfilesController(base.BaseController):
 
         result = []
         for dim in dataset.dimensions:
-            # use reasonably good hardcoded "required" dimensions for now (will be changed after metadata for optional
-            # dimensions added)
-            if dim.name in ('Year', 'Measure Type', 'Variable', 'Subject', 'Grade', 'Race'):
+            if dim.name not in ['Town']:
                 if dim.name == 'Race':
                     dim.possible_values.append('all')
                 result.append({'name': dim.name, 'values': dim.possible_values})

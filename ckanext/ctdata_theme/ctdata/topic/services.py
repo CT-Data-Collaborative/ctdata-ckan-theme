@@ -1,11 +1,13 @@
+import yaml
 import ckan.plugins.toolkit as toolkit
 
 from ..utils import dict_with_key_value
+from ..visualization.services import DatasetService
 
 
 class TopicSerivce(object):
     @staticmethod
-    def get_topics():
+    def get_topics(action):
         dataset_names = toolkit.get_action('package_list')(data_dict={})
 
         domains = [{'title': 'Civic Vitality', 'subdomains': [], 'id': 'civic_vitality'},
@@ -18,6 +20,14 @@ class TopicSerivce(object):
 
         for dataset_name in dataset_names:
             dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+            metadata = DatasetService.get_dataset_meta(dataset_name)['extras']
+            hidden_meta = filter(lambda x: x['key'] == 'hidden_in', metadata)
+
+            try:
+              hidden_list = []
+              hidden_list.append( yaml.load(hidden_meta[0]['value']))
+            except IndexError:
+              hidden_list = []
 
             if len(dataset['extras']) > 0:
                 domain, subdomain = None, None
@@ -27,7 +37,7 @@ class TopicSerivce(object):
                     if extra['key'].lower() == 'subdomain':
                         subdomain = extra['value']
 
-                if domain and subdomain:
+                if domain and subdomain and action not in hidden_list:
                     dataset_obj = {'name': dataset['name'], 'title': dataset['title'], 'id': dataset['id']}
                     dmn = dict_with_key_value('title', domain, domains)
                     if dmn:

@@ -1,6 +1,7 @@
 import urllib2
 import json
 import yaml
+import re
 
 import ckan.plugins.toolkit as toolkit
 
@@ -126,8 +127,11 @@ class Dataset(object):
 
 class Dimension(object):
     def __init__(self, name, possible_values, incompat):
+        convert = lambda text: int(text) if text.isdigit() else text
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+
         self.name = name
-        self.possible_values = possible_values
+        self.possible_values = sorted(possible_values, key = alphanum_key)
         self.incompat = incompat  # incompatibilities
 
     def __repr__(self):

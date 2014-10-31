@@ -82,7 +82,7 @@ class CTDataController(base.BaseController):
         return base.render('special_projects.html')
 
     def data_by_topic(self):
-        domains = TopicSerivce.get_topics()
+        domains = TopicSerivce.get_topics('data_by_topic')
 
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
@@ -96,10 +96,14 @@ class CTDataController(base.BaseController):
 
         metadata = dataset_meta['extras']
         default_metadata = filter(lambda x: x['key'] == 'Default', metadata)
+
         try:
           defaults = yaml.load(default_metadata[0]['value'])
+          if type(defaults) is list:
+            defaults = defaults[0]
         except IndexError:
           defaults = []
+
         disabled_metadata = filter(lambda x: x['key'] == "disabled_views", metadata)
         print disabled_metadata
         try:
@@ -107,8 +111,8 @@ class CTDataController(base.BaseController):
         except IndexError:
           disabled = []
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
-        
-        
+
+
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
@@ -141,7 +145,7 @@ class CTDataController(base.BaseController):
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps(data)
-    
+
     def add_community_towns(self, community_name):
         if http_request.method == 'POST':
             session = Database().session_factory()
@@ -211,7 +215,7 @@ class CTDataController(base.BaseController):
 
     def remove_community_indicator(self, indicator_id):
         pass
-    
+
     def community_profile(self, community_name):
         session = Database().session_factory()
         community_profile_service = CommunityProfileService(session)

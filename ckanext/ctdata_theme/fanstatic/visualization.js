@@ -2,10 +2,31 @@ var display_type = "table";
 var map_filters = [];
 var chart_filters = [];
 
+function select_all(){
+  $('.select-all').on('click', function(){
+    $this = $(this)
+    $ul   = $this.closest('ul')
+
+    $('input', $ul).prop('checked', true);
+    display_data();
+  });
+}
+
+function deselect_all(){
+  $('.deselect-all').on('click', function(){
+    $this = $(this)
+    $ul   = $this.closest('ul')
+
+    $('input', $ul).prop('checked', false);
+    display_data();
+  });
+}
+
 function check_defaults(){
     $.each(defaults, function(i){
+
     if(defaults[i] instanceof Array){
-      $.each(defaults[i], function(j){ 
+      $.each(defaults[i], function(j){
         $("input."+i.replace(/ /g, '')+"[value='"+defaults[i][j]+"']").prop('checked', true);
       });
     } else {
@@ -18,7 +39,7 @@ function check_defaults(){
 
 function save_filters(display_type){
   if(display_type == 'map')
-   map_filters = get_filters() 
+   map_filters = get_filters()
  else
    chart_filters = get_filters()
 }
@@ -134,7 +155,7 @@ function reset_checkbox(){
   $('input[type="checkbox"]:not(.Town)').change(function(){
       display_data();
   });
-} 
+}
 
 function display_error(message){
   $("#container").html("<div id='error_message'>"+message+"</div>");
@@ -186,16 +207,16 @@ function check_defaults(){
 function get_filters(){
   var filters = [];
   dimensions = $("li.filter");
- 
+
   $.each(dimensions, function(i){
     var cur_dim = $(dimensions[i]);
-    var cur_filter = {'field': cur_dim.find('a').text(), 'values': []};
+    var cur_filter = {'field': cur_dim.find('a').text().replace('Select AllDeselect All', ''), 'values': []};
     var checked = cur_dim.find("input:checked")
-  
+
     $.each(checked, function(option){
       cur_filter['values'].push(checked[option].value);
     });
-    
+
     if(checked.length != 0)
       filters.push(cur_filter);
   });
@@ -231,7 +252,7 @@ function draw_table(){
       handle_incompatibilities(data['compatibles']);
 
       first_idx = 0;
-      while(data['data'][first_idx] && !data['data'][first_idx]['dims']) 
+      while(data['data'][first_idx] && !data['data'][first_idx]['dims'])
         first_idx++;
       if(!data['data'][first_idx])
         return display_error("No results, please select different filters");
@@ -390,15 +411,17 @@ function display_filters(){
     if (filters[i]['field'] == "Town") return "Skip town";
     filter_text += filters[i]['field']+": "+filters[i]['values'] + " | ";
   });
-  filter_text = filter_text.substring(0, filter_text.length - 2);
+  filter_text = filter_text.replace('Select AllDeselect All', '').substring(0, filter_text.length - 2);
   $("#pageDescription").text(filter_text);
 }
 
 $(function () {
+    select_all();
+    deselect_all();
     check_defaults();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         display_data();
     });
-    
+
 });

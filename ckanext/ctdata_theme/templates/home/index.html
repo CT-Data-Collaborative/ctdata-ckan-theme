@@ -5,69 +5,61 @@
 {% block content %}
 {% block maintag %}{{ super() }}{% endblock %}
 
-<section  class="ctdata-banner">
-<ul class="slider">
-<li><img src="/common/images/banner-image.png" alt="" /></li>
-</ul>
-<ul class="bullet">
-<li class="active"><a href="#"></a></li>
-<li><a href="#"></a></li>
-<li><a href="#"></a></li>
-<li><a href="#"></a></li>
-<li><a href="#"></a></li>
-</ul>
-
-<div class="overlay_text">
-<div class="ctdata-wrapper">
-<h2>Welcome to the new CTData.org</h2>
+<div id="gallery">
+  <div class="spacing">
+    <div class="gallerytitle">
+      <h2>Changing the way Connecticut uses data</h2>
+      CTDC is a public-private partnership working to increase the quality and availability of data for effective planning and policy.
+      <a href="/pages/about" class="orange_link">Learn More...</a>
+    </div>
+    <img src="common/images/g-capital2.jpg" alt="CT Data Collaborative" border="0" />
+  </div>
 </div>
+
+<div align="center">
+<div id="master">
+
+<div id="databytopic">
+  <div class="spacing">
+    <h2>Explore Data by Topic</h2>
+    <ul>
+      <li><a href="/data_by_topic#civic_vitality"><i class="fa fa-institution fa-2x"></i>     <br/>Civic Vitality</a></li>
+      <li><a href="/data_by_topic#demographics">  <i class="fa fa-pie-chart fa-2x"></i>       <br/>Demographics</a></li>
+      <li><a href="/data_by_topic#economy">       <i class="fa fa-line-chart fa-2x"></i>      <br/>Economy</a></li>
+      <li><a href="/data_by_topic#health">        <i class="fa fa-medkit fa-2x"></i>          <br/>Health</a></li>
+      <li><a href="/data_by_topic#education">     <i class="fa fa-graduation-cap fa-2x"></i>  <br/>Education</a></li>
+      <li><a href="/data_by_topic#housing">       <i class="fa fa-home fa-2x"></i>            <br/>Housing</a></li>
+      <li><a href="/data_by_topic#safety">        <i class="fa fa-lock fa-2x"></i>            <br/>Safety</a></li>
+    </ul>
+    <br clear="all" />
+  </div>
 </div>
-</section> <!-- BANNER SECTION ENDS HERE -->
 
-<section class="about">
-<div class="ctdata-wrapper">
-<h2>Changing the way Connecticut uses data.</h2>
-<p> CTDC is a public-private partnership working to increase the quality and availability of data for effective planning and policy. <a href="#">Learn More...</a></p>
+  </div>
 </div>
-</section> <!-- about section ends here -->
 
-<section class="topics">
-<div class="ctdata-wrapper">
-<h2>Explore Data by Topic or See <a id="all_data_link" href="/data_by_topic#all_data" style="text-decoration: underline;">All Data</a></h2>
-<ul>
-<li><a href="/data_by_topic#topic_civic_vitality"><img src="/common/images/topic1.png" alt="" />Civic Vitality</a></li>
-<li><a href="/data_by_topic#topic_demographics"><img src="/common/images/topic2.png" alt="" />Demographics</a></li>
-<li><a href="/data_by_topic#topic_economy"><img src="/common/images/topic3.png" alt="" />Economy</a></li>
-<li><a href="/data_by_topic#topic_health"><img src="/common/images/topic4.png" alt="" />Health</a></li>
-<li><a href="/data_by_topic#topic_education"><img src="/common/images/topic5.png" alt="" />Education</a></li>
-<li><a href="/data_by_topic#topic_housing"><img src="/common/images/topic6.png" alt="" />Housing</a></li>
-<li><a href="/data_by_topic#topic_safety"><img src="/common/images/topic7.png" alt="" />Safety</a></li>
-</ul>
+<div id="databylocation" class="location">
+<div class="spacing">
+
+  <a name="data-by-location"><h2>Explore Data by Location</h2></a>
+  <div align="center" style="margin-left:auto;margin-right:auto;">
+  <div class="dropdown">
+      <button class="bbtn dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+        -- Select Location --
+        <div class="caretbox"><span class="caret"></span></div>
+      </button>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+          {% set community_profiles = h.communities_helper() %}
+          {% if community_profiles %}
+              {% for profile in community_profiles %}
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="/community/{{ profile.name }}">{{ profile.name }}</a></li>
+              {% endfor %}
+          {% endif %}
+      </ul>
+  </div>
+  </div>
+  <br clear="all" />
 </div>
-</section>
-
-<section class="location">
-<div class="ctdata-wrapper">
-<a name="data-by-location"><h2>Explore Data by Location</h2></a>
-<select class="custom-select">
-<option selected >-- Select Location --</option>
-    {% set community_profiles = h.communities_helper() %}
-    {% if community_profiles %}
-        {% for profile in community_profiles %}
-            <option value="{{ profile.name }}">{{ profile.name }}</option>
-        {% endfor %}
-    {% endif %}
-</select>
-
-
-</div>
-</section> <!-- explore location section ends here -->
-
-<section class="news">
-<div class="ctdata-wrapper">
-<a href="/pages/news"><h2>Latest News</h2></a>
-</div>
-</section> <!-- latest news section ends -->
 </div>
 {% endblock %}
 

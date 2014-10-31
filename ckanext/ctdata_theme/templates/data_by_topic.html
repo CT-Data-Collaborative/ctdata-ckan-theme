@@ -5,62 +5,40 @@
 
 {% block content %}
 {% block underheader %}{{ super() }}{% endblock %}
-<section class="topics" id="topics">
-<div class="triangle_wrapper">
-<div class="ctdata-wrapper">
-<h2>Explore Data by Topic or See <a id="all_data_link" href="#topics" style="text-decoration: underline;">All Data</a></h2>
-<ul>
-<li><a href="#topics" id="topic_civic_vitality_link"><img src="/common/images/topic1.png" alt=""/>Civic Vitality</a></li>
-<li><a href="#topics" id="topic_demographics_link"><img src="/common/images/topic2.png" alt=""/>Demographics</a></li>
-<li><a href="#topics" id="topic_economy_link"><img src="/common/images/topic3.png" alt=""/>Economy</a></li>
-<li><a href="#topics" id="topic_health_link"><img src="/common/images/topic4.png" alt=""/>Health</a></li>
-<li><a href="#topics" id="topic_education_link" ><img src="/common/images/topic5.png" alt=""/>Education</a></li>
-<li><a href="#topics" id="topic_housing_link"><img src="/common/images/topic6.png" alt=""/>Housing</a></li>
-<li><a href="#topics" id="topic_safety_link"><img src="/common/images/topic7.png" alt=""/>Safety</a></li>
-</ul>
+
+<div align="center">
+<div id="master">
+
+<div id="databytopic">
+  <div class="spacing">
+    <h2>Explore Data by Topic</h2>
+    <ul>
+      <li><a href="#civic_vitality"><i class="fa fa-institution fa-2x"></i>     <br/>Civic Vitality</a></li>
+      <li><a href="#demographics">  <i class="fa fa-pie-chart fa-2x"></i>       <br/>Demographics</a></li>
+      <li><a href="#economy">       <i class="fa fa-line-chart fa-2x"></i>      <br/>Economy</a></li>
+      <li><a href="#health">        <i class="fa fa-medkit fa-2x"></i>          <br/>Health</a></li>
+      <li><a href="#education">     <i class="fa fa-graduation-cap fa-2x"></i>  <br/>Education</a></li>
+      <li><a href="#housing">       <i class="fa fa-home fa-2x"></i>            <br/>Housing</a></li>
+      <li><a href="#safety">        <i class="fa fa-lock fa-2x"></i>            <br/>Safety</a></li>
+    </ul>
+    <br clear="all" />
+  </div>
 </div>
-<img id="triangle" src="/common/images/selection_triangle.png">
+
+  </div>
 </div>
-</section>
 
-<style>
-
-</style>
-
-{% for domain in domains %}
-<section id="topic_{{ domain['id'] }}" class="topics_list">
-    <div class="ctdata-wrapper">
-        <ul>
-        {% for subdomain in domain['subdomains'] %}
-        <li class="subtopic">
-            <div class="subtopic_col">
-            <h2>{{ subdomain['title'] }}</h2>
-                <ul>
-                    {% for dataset in subdomain['datasets'] %}
-                    <li><a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </li>
-        {% else %}
-            There's no data for this topic yet.
-        {% endfor %}
-        </ul>
-    </div>
-</section>
-{% endfor %}
-
-<section id="all_data" class="topics_list">
+<section id="all_data" >
     <div class="ctdata-wrapper">
         {% for domain in domains %}
             {% if domain['subdomains']|length > 0 %}
-                <div style="clear: both; margin-bottom: 10px">
+                <div style="clear: both; margin-bottom: 10px" id="{{ domain['id'] }}" class="topics_list">
                 <h2>{{ domain['title'] }}</h2>
                 <ul>
                     {% for subdomain in domain['subdomains'] %}
                     <li class="subtopic">
                         <div class="subtopic_col">
-                        <h2>{{ subdomain['title'] }}</h2>
+                        <h4>{{ subdomain['title'] }}</h4>
                             <ul>
                                 {% for dataset in subdomain['datasets'] %}
                                 <li><a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }}</a></li>
