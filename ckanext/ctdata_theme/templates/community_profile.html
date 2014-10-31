@@ -33,7 +33,7 @@
     {% for indicator in indicators %}
         <ul class="table_data">
             <li class="col-1">
-                <a href="/dataset/{{ indicator['dataset'].replace(' ', '-').lower() }}">
+                <a href="/visualization/{{ indicator['dataset'].replace(' ', '-').lower() }}">
                     {{indicator['dataset']}}, {{indicator['indicator'].variable}}
                 </a>
                 <span>
