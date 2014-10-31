@@ -9,7 +9,7 @@ filters = get_filters();
 var town_index = -1;
 $.each(filters, function(i){
   if(filters[i]['field'] == "Town")
-    town_index = i 
+    town_index = i
 });
 if (town_index >= 0)
   filters.splice(town_index, 1)
@@ -56,7 +56,7 @@ var legend_html = '<div id="mapTitle">'+$("#dataset_title").val()+"<br>"+
 var cur_filters = get_filters();
 $.each(cur_filters, function(i){
   if (cur_filters[i].field == 'Town') return "Skip this filter";
-  legend_html += cur_filters[i].field + 
+  legend_html += cur_filters[i].field +
          ": " + cur_filters[i].values + " | ";
 });
 legend_html = legend_html.substring(0, legend_html.length-2);
@@ -155,6 +155,7 @@ chart.xAxis[0].setExtremes(-74, -71.5, false);
 chart.yAxis[0].setExtremes(-42.2, -40.8, false);
 chart.redraw();
 
+hide_spinner();
 //add gray map background
 $(".highcharts-container").css({
       backgroundImage: "url('/common/images/graymap.png')",
