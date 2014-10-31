@@ -19,6 +19,7 @@ function deselect_all(){
 
     $('input', $ul).prop('checked', false);
     display_data();
+    hide_spinner();
   });
 }
 
