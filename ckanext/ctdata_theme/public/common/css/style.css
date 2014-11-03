@@ -165,7 +165,7 @@ _noFocusLine: expression(this.hideFocus=true); -ms-filter:"progid:DXImageTransfo
 .refine_wrap h2 { font-size:18px; color:#888; border-bottom:1px solid #eeeeee;  padding:15px 0; text-transform:uppercase;}
 .refine_wrap h2 img { position:absolute; right:-14px; top:7px;}
 .refine_wrap ul li { width:100%; clear:both;}
-.refine_wrap ul li a.togglebtn { font-size:18px; color:#444; padding:15px 0; border-bottom:1px solid #eee; display:inline-block; width:100%; background:url(../images/tgl_down.png) no-repeat right center;}
+.refine_wrap ul li a.togglebtn { font-size:16px; color:#444; padding:10px 0; border-bottom:1px solid #eee; display:inline-block; width:100%; background:url(../images/tgl_down.png) no-repeat right center;}
 .refine_wrap ul li a.togglebtn.toggleup{background:url(../images/tgl_up.png) no-repeat right center;}
 .refine_wrap ul li .refine_options { padding:15px 0;}
 .refine_wrap ul li .refine_options  .input_row { margin-bottom:3px;}
@@ -402,6 +402,10 @@ label {font-weight: normal; cursor: auto}
     color: #000;
 }
 
+.subtopic_col ul{
+  margin-left: 10px;
+}
+
 @media screen and (max-width: 1070px) {
     .subtopic {
         width: 33.6%;
@@ -448,3 +452,6 @@ label {font-weight: normal; cursor: auto}
   visibility: hidden;
 }
 
+.data_by_location:hover{
+  text-decoration: none;
+}
