@@ -55,7 +55,7 @@ $(function(){
         $.ajax({type: "POST",
             url: "/community/add_indicator",
             data: JSON.stringify({dataset_id: current_dataset,
-                                  filters: get_filters()}),
+                                  filters: get_filters(), community_name: community_name}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 console.log(data);

@@ -5,8 +5,8 @@
 <link href='/common/css/visualization.css' rel='stylesheet' type='text/css'>
 {% endblock %}
 
-{% block page_name %}Data by Location - {{community.name}}{% endblock %}
-{% block page_description %}Create a Profile for Your Community{% endblock %}
+{% block page_name %}Data by Location - {{location}} - {{community.id}} {% endblock %}
+{% block page_description %}Create a Profile for Your Community: {{community.indicator_ids}} {% endblock %}
 
 {% block main_content %}
 <div class="wrapper">
@@ -33,6 +33,7 @@
     {% for indicator in indicators %}
         <ul class="table_data">
             <li class="col-1">
+                id: {{indicator['indicator'].id}}
                 <a href="/visualization/{{ indicator['dataset'].replace(' ', '-').lower() }}">
                     {{indicator['dataset']}}, {{indicator['indicator'].variable}}
                 </a>
@@ -151,4 +152,8 @@
 {% block scripts %}
     {{ super() }}
     {% resource 'ctdata_theme/communities.js' %}
+    <script>
+    var community_name = '';
+    community_name = "{{community.name}}"
+    </script>
 {% endblock %}

@@ -3,23 +3,26 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Boolean, Table
 from sqlalchemy.orm import relationship, backref
 
+from IPython import embed
+
 Base = declarative_base()
 
 
 class CommunityProfile(Base):
     __tablename__ = 'ctdata_community_profiles'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    town_id = Column(BigInteger, ForeignKey('ctdata_towns.fips'))
+    id            = Column(Integer, primary_key=True)
+    name          = Column(String)
+    indicator_ids = Column(String)
+    # town_id = Column(BigInteger, ForeignKey('ctdata_towns.fips'))
+    # town    = relationship("Town", uselist=False, backref="community")
 
-    town = relationship("Town", uselist=False, backref="community")
-
-    def __init__(self, name):
+    def __init__(self, name, indicator_ids):
         self.name = name
+        self.indicator_ids = indicator_ids
 
     def __repr__(self):
-        return "Community %s" % (self.name,)
+        return "Community %s %s" % (self.name, self.indicator_ids)
 
 
 class Town(Base):
@@ -39,13 +42,13 @@ class Town(Base):
 class ProfileIndicator(Base):
     __tablename__ = 'ctdata_profile_indicators'
 
-    id = Column(Integer, primary_key=True)
+    id         = Column(Integer, primary_key=True)
     dataset_id = Column(String)
-    is_global = Column(Boolean)
-    data_type = Column(String)
-    year = Column(Integer)
-    variable = Column(String)
-    filters = Column(Text)
+    is_global  = Column(Boolean)
+    data_type  = Column(String)
+    year       = Column(Integer)
+    variable   = Column(String)
+    filters    = Column(Text)
 
     def __init__(self, filters, dataset_id, is_global, data_type, year, variable):
         self.filters = filters
@@ -62,10 +65,10 @@ class ProfileIndicator(Base):
 class ProfileIndicatorValue(Base):
     __tablename__ = 'ctdata_profile_indicator_values'
 
-    id = Column(Integer, primary_key=True)
+    id           = Column(Integer, primary_key=True)
     indicator_id = Column(Integer, ForeignKey('ctdata_profile_indicators.id'))
-    town_id = Column(BigInteger, ForeignKey('ctdata_towns.fips'))
-    value = Column(String)
+    town_id      = Column(BigInteger, ForeignKey('ctdata_towns.fips'))
+    value        = Column(String)
 
     indicator = relationship("ProfileIndicator", backref=backref('values', cascade="save-update, merge, "
                                                                                    "delete, delete-orphan"))
@@ -77,7 +80,7 @@ class ProfileIndicatorValue(Base):
         self.value = value
 
     def __repr__(self):
-        return "[Value: %s; %s; %s; %s]" % (self.town, self.community, self.indicator, self.value)
+        return "[Value: %s; %s; %s;]" % (self.town, self.indicator, self.value)
 
 
 class UserIndicatorLink(Base):

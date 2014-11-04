@@ -4,6 +4,7 @@ import psycopg2
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Boolean, Table
 
 from visualization.models import VisualizationOrmBase
 from .utils import Singleton
@@ -39,8 +40,28 @@ class Database(object):
         self.engine = create_engine(connection_string)
         Base.metadata.create_all(self.engine)
         VisualizationOrmBase.metadata.create_all(self.engine)
-        
+
+        # profile_id  = Column('profile_id', String)
+        # self.remove_column('ctdata_profile_indicators', profile_id, connection_string)
+
+        try:
+            indicator_ids  = Column('indicator_ids', String)
+            self.add_column('ctdata_community_profiles', indicator_ids, connection_string)
+        except sqlalchemy.exc.ProgrammingError:
+            pass
+
         self.session_factory = sessionmaker(bind=self.engine)
+
+    def add_column(self, table, column, connection_string):
+        self.engine = create_engine(connection_string)
+        column_name = column.compile(dialect=self.engine.dialect)
+        column_type = column.type.compile(self.engine.dialect)
+        self.engine.execute('ALTER TABLE %s ADD COLUMN %s %s' % (table, column_name, column_type))
+
+    def remove_column(self, table, column, connection_string):
+        self.engine = create_engine(connection_string)
+        column_name = column.compile(dialect=self.engine.dialect)
+        self.engine.execute('ALTER TABLE %s REMOVE COLUMN %s %s' % (table, column_name))
 
     def init_community_data(self, table_name):
         session = self.session_factory()

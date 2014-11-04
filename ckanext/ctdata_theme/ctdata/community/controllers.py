@@ -15,7 +15,6 @@ from ..visualization.services import DatasetService
 from ..topic.services import TopicSerivce
 from services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
 
-
 class CommunityProfilesController(base.BaseController):
     def __init__(self):
         self.session = Database().session_factory()
@@ -31,13 +30,13 @@ class CommunityProfilesController(base.BaseController):
             user = self.user_service.get_or_create_user(user_name) if user_name else None
 
             json_body = json.loads(http_request.body, encoding=http_request.charset)
-            filters, dataset_id = json_body.get('filters'), json_body.get('dataset_id')
+            community_name, filters, dataset_id = json_body.get('community_name'), json_body.get('filters'), json_body.get('dataset_id')
 
             if not filters or not dataset_id:
                 abort(400)
 
             try:
-                self.community_profile_service.create_indicator(filters, dataset_id, user)
+                self.community_profile_service.create_indicator(community_name, filters, dataset_id, user)
             except toolkit.ObjectNotFound, e:
                 abort(404, str(e))
             except ProfileAlreadyExists, e:
@@ -85,7 +84,12 @@ class CommunityProfilesController(base.BaseController):
             abort(401)
 
     def community_profile(self, community_name):
-        user_name = http_request.environ.get("REMOTE_USER")
+        user_name       = http_request.environ.get("REMOTE_USER")
+        profile_to_load = http_request.GET.get('p')
+        location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
+
+        if profile_to_load != None:
+            community_name =  self.community_profile_service.get_community_profile_by_id(profile_to_load).name
 
         towns_raw, towns_names = http_request.GET.get('towns'), []
         if towns_raw:
@@ -97,6 +101,7 @@ class CommunityProfilesController(base.BaseController):
         try:
             community, indicators, displayed_towns = self.community_profile_service.get_indicators(community_name,
                                                                                                    towns_names,
+                                                                                                   location,
                                                                                                    user)
             topics = TopicSerivce.get_topics('community_profile')
         except toolkit.ObjectNotFound as e:
@@ -111,7 +116,8 @@ class CommunityProfilesController(base.BaseController):
         session['anti_csrf'] = anti_csrf_token
         session.save()
 
-        return base.render('community_profile.html', extra_vars={'community': community,
+        return base.render('community_profile.html', extra_vars={'location': location,
+                                                                 'community': community,
                                                                  'indicators': indicators,
                                                                  'topics': topics,
                                                                  'displayed_towns': displayed_towns_names,
