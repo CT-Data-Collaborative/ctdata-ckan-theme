@@ -124,6 +124,24 @@ class CommunityProfilesController(base.BaseController):
                                                                  'towns': towns,
                                                                  'anti_csrf_token': anti_csrf_token})
 
+    def add_profile(self):
+        user_name = http_request.environ.get("REMOTE_USER")
+        json_body = json.loads(http_request.body, encoding=http_request.charset)
+        ids       = json_body.get('indicator_ids')
+        community_name  = json_body.get('community_name')
+
+        if not user_name:
+            abort(401)
+        if http_request.method == 'POST':
+            user = self.user_service.get_or_create_user(user_name) if user_name else None
+
+            if not user.is_admin:
+                profile = self.community_profile_service.create_community_profile(user_name + ' profile', ids)
+                if profile.id:
+                    return json.dumps({'success': True, 'redirect_link': '/community/' + community_name + '?p=' + str(profile.id) })
+        else:
+            return json.dumps({'success': False})
+
     def get_filters(self, dataset_id):
         http_response.headers['Content-type'] = 'application/json'
 

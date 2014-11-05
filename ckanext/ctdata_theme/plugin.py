@@ -60,6 +60,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 controller='ckanext.ctdata_theme.ctdata.community.controllers:CommunityProfilesController') as m:
             m.connect('community_get_filters', '/community/get_filters/{dataset_id}', action='get_filters')
             m.connect('community_add_indicator', '/community/add_indicator', action='add_indicator')
+            m.connect('community_add_profile', '/community/add_profile', action='add_profile')
             m.connect('community_remove_indicator',
                       '/community/remove_indicator/{indicator_id}',
                       action='remove_indicator')

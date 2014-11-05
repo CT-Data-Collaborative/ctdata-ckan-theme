@@ -70,6 +70,21 @@ $(function(){
         });
     });
 
+    $('#create_profile').click(function() {
+        ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
+        $.ajax({type: "POST",
+            url: "/community/add_profile",
+            data: JSON.stringify({indicator_ids: ids, community_name: community_name}),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                data = JSON.parse(data)
+                if (data.success == true){
+                    window.location = data.redirect_link
+                }
+            }
+        });
+    });
+
     $('.dataset_chooser').click(function() {
         $('li', $('ul.indicator-sub-topics')).removeClass('active')
         current_dataset = $(this).attr('id');

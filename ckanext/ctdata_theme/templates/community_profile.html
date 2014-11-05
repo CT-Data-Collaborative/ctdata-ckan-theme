@@ -33,6 +33,7 @@
     {% for indicator in indicators %}
         <ul class="table_data">
             <li class="col-1">
+                <span class="indicator_id hidden">{{indicator['indicator'].id}} </span>
                 id: {{indicator['indicator'].id}}
                 <a href="/visualization/{{ indicator['dataset'].replace(' ', '-').lower() }}">
                     {{indicator['dataset']}}, {{indicator['indicator'].variable}}
@@ -64,6 +65,8 @@
     <form style="display: none">
         <input type="hidden" id="community_name" value="{{community.name}}">
     </form>
+
+    <button id='create_profile'>Save</button>
 </div>
 
 <div id="towns_popup" class="modal fade" style="display: none">

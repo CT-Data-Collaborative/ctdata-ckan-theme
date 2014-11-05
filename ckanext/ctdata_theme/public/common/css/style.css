@@ -448,3 +448,6 @@ label {font-weight: normal; cursor: auto}
   visibility: hidden;
 }
 
+.hidden{
+  display: none !important;
+}
