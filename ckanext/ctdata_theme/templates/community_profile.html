@@ -5,8 +5,8 @@
 <link href='/common/css/visualization.css' rel='stylesheet' type='text/css'>
 {% endblock %}
 
-{% block page_name %}Data by Location - {{location}} - {{community.id}} {% endblock %}
-{% block page_description %}Create a Profile for Your Community: {{community.indicator_ids}} {% endblock %}
+{% block page_name %}Data by Location - {{location}} {% endblock %}
+{% block page_description %}Create a Profile for Your Community {% endblock %}
 
 {% block main_content %}
 <div class="wrapper">
@@ -34,7 +34,6 @@
         <ul class="table_data">
             <li class="col-1">
                 <span class="indicator_id hidden">{{indicator['indicator'].id}} </span>
-                id: {{indicator['indicator'].id}}
                 <a href="/visualization/{{ indicator['dataset'].replace(' ', '-').lower() }}">
                     {{indicator['dataset']}}, {{indicator['indicator'].variable}}
                 </a>
@@ -66,7 +65,10 @@
         <input type="hidden" id="community_name" value="{{community.name}}">
     </form>
 
-    <button id='create_profile'>Save</button>
+    <!-- <button id='create_profile'>Save</button> -->
+    <ul class= 'opt_btn'>
+    <li class="btn_blue"><a href="javascript:void(0)" id="create_profile">Save to new profile</a></li>
+    </ul>
 </div>
 
 <div id="towns_popup" class="modal fade" style="display: none">
