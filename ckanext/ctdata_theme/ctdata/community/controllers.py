@@ -30,13 +30,13 @@ class CommunityProfilesController(base.BaseController):
             user = self.user_service.get_or_create_user(user_name) if user_name else None
 
             json_body = json.loads(http_request.body, encoding=http_request.charset)
-            community_name, filters, dataset_id = json_body.get('community_name'), json_body.get('filters'), json_body.get('dataset_id')
+            filters, dataset_id = json_body.get('filters'), json_body.get('dataset_id')
 
             if not filters or not dataset_id:
                 abort(400)
 
             try:
-                self.community_profile_service.create_indicator(community_name, filters, dataset_id, user)
+                self.community_profile_service.create_indicator(filters, dataset_id, user)
             except toolkit.ObjectNotFound, e:
                 abort(404, str(e))
             except ProfileAlreadyExists, e:
@@ -122,7 +122,8 @@ class CommunityProfilesController(base.BaseController):
                                                                  'topics': topics,
                                                                  'displayed_towns': displayed_towns_names,
                                                                  'towns': towns,
-                                                                 'anti_csrf_token': anti_csrf_token})
+                                                                 'anti_csrf_token': anti_csrf_token,
+                                                                 'user': user})
 
     def add_profile(self):
         user_name = http_request.environ.get("REMOTE_USER")

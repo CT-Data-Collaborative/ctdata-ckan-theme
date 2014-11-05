@@ -41,9 +41,6 @@ class Database(object):
         Base.metadata.create_all(self.engine)
         VisualizationOrmBase.metadata.create_all(self.engine)
 
-        # profile_id  = Column('profile_id', String)
-        # self.remove_column('ctdata_profile_indicators', profile_id, connection_string)
-
         try:
             indicator_ids  = Column('indicator_ids', String)
             self.add_column('ctdata_community_profiles', indicator_ids, connection_string)

@@ -65,7 +65,7 @@
         <input type="hidden" id="community_name" value="{{community.name}}">
     </form>
 
-    {% if c.userobj %}
+    {% if user and not user.is_admin%}
     <ul class= 'opt_btn'>
     <li class="btn_blue"><a href="javascript:void(0)" id="create_profile">Save to new profile</a></li>
     </ul>

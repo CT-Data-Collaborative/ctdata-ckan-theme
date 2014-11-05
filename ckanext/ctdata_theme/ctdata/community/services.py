@@ -63,19 +63,10 @@ class CommunityProfileService(object):
         all.remove(conn)
         return [conn] + all
 
-    def add_indicator_id_to_profile(self, community_profile, indicator_id):
-        if community_profile.indicator_ids == None:
-            community_profile.indicator_ids = str(indicator_id)
-        else:
-            community_profile.indicator_ids += ',' + str(indicator_id)
-
-        self.session.commit()
-
-    def create_indicator(self, community_name, filters, dataset_id, owner):
+    def create_indicator(self, filters, dataset_id, owner):
         assert owner is not None, "User must be passed in order for indicator creation to work"
 
         dataset = DatasetService.get_dataset(dataset_id)
-        community_profile = self.get_community_profile(community_name)
 
         if owner.is_admin:
             existing_inds = self.session.query(ProfileIndicator)\
@@ -125,7 +116,6 @@ class CommunityProfileService(object):
             owner.indicators.append(indicator)
         print "\nUSER'S INDICATORS:", owner.indicators
         self.session.add(indicator)
-        self.session.commit()
 
     def remove_indicator_id_from_profiles(self, indicator_id):
         community_profiles = self.get_all_profiles()
