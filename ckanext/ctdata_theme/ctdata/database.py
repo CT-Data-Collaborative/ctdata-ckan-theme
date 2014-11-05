@@ -61,7 +61,7 @@ class Database(object):
     def remove_column(self, table, column, connection_string):
         self.engine = create_engine(connection_string)
         column_name = column.compile(dialect=self.engine.dialect)
-        self.engine.execute('ALTER TABLE %s REMOVE COLUMN %s %s' % (table, column_name))
+        self.engine.execute('ALTER TABLE %s DROP COLUMN %s %s' % (table, column_name))
 
     def init_community_data(self, table_name):
         session = self.session_factory()
@@ -75,9 +75,9 @@ class Database(object):
             towns = curr.fetchall()
 
             for town in towns:
-                comm_prof = CommunityProfile(town[0])
+                comm_prof = CommunityProfile(town[0], None)
                 new_town = Town(town[1], town[0])
-                comm_prof.town = new_town
+                # comm_prof.town = new_town
                 session.add_all([comm_prof, new_town])
 
         session.commit()

@@ -116,15 +116,15 @@ class CommunityProfileService(object):
                                              "or have '%Y-%m-%d %H:%M:%S' format")
 
         is_global = True if owner.is_admin else False
-        # add profile_id here
         indicator = ProfileIndicator(json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
                                      variable)
+
         if not owner.is_admin:
             owner.indicators.append(indicator)
         print "\nUSER'S INDICATORS:", owner.indicators
         self.session.add(indicator)
-        self.add_indicator_id_to_profile(community_profile, indicator_id)
         self.session.commit()
+        self.add_indicator_id_to_profile(community_profile, indicator.id)
 
     def remove_indicator_id_from_profiles(self, indicator_id):
         community_profiles = self.get_all_profiles()

@@ -14,8 +14,6 @@ class CommunityProfile(Base):
     id            = Column(Integer, primary_key=True)
     name          = Column(String)
     indicator_ids = Column(String)
-    # town_id = Column(BigInteger, ForeignKey('ctdata_towns.fips'))
-    # town    = relationship("Town", uselist=False, backref="community")
 
     def __init__(self, name, indicator_ids):
         self.name = name
@@ -59,7 +57,7 @@ class ProfileIndicator(Base):
         self.variable = variable
 
     def __repr__(self):
-        return "[Indicator: %s; %s; %s;]" % (self.dataset_id, self.data_type, self.year)
+        return "[Indicator: %s; %s; %s; %s;]" % (self.id, self.dataset_id, self.data_type, self.year)
 
 
 class ProfileIndicatorValue(Base):
