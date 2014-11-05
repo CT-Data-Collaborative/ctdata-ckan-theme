@@ -61,6 +61,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('community_get_filters', '/community/get_filters/{dataset_id}', action='get_filters')
             m.connect('community_add_indicator', '/community/add_indicator', action='add_indicator')
             m.connect('community_add_profile', '/community/add_profile', action='add_profile')
+            m.connect('community_save_as_default', '/community/save_as_default', action='save_as_default')
             m.connect('community_remove_indicator',
                       '/community/remove_indicator/{indicator_id}',
                       action='remove_indicator')
@@ -217,28 +218,4 @@ class CTDataController(base.BaseController):
     def remove_community_indicator(self, indicator_id):
         pass
 
-    def community_profile(self, community_name):
-        session = Database().session_factory()
-        community_profile_service = CommunityProfileService(session)
-
-        towns_raw, towns_names = http_request.GET.get('towns'), []
-        if towns_raw:
-            # parse town name
-            towns_names = map(lambda x: x.strip(), towns_raw.split(','))
-
-        try:
-            community, indicators, displayed_towns = community_profile_service.get_indicators(community_name,
-                                                                                              towns_names)
-            topics = TopicSerivce.get_topics()
-        except toolkit.ObjectNotFound as e:
-            abort(404, detail=str(e))
-
-        towns = community_profile_service.get_all_towns()
-        displayed_towns_names = map(lambda t: t.name, displayed_towns)
-
-        session.commit()
-        return base.render('community_profile.html', extra_vars={'community': community,
-                                                                 'indicators': indicators,
-                                                                 'topics': topics,
-                                                                 'displayed_towns': displayed_towns_names,
-                                                                 'towns': towns})
+    # TODO: check if other controller methods are still in use

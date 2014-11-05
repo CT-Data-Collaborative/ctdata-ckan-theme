@@ -451,3 +451,8 @@ label {font-weight: normal; cursor: auto}
 .hidden{
   display: none !important;
 }
+
+.blue_button{
+  background-color: #66cef5;
+  padding:6px 20px 6px 20px;
+}

@@ -65,11 +65,14 @@
         <input type="hidden" id="community_name" value="{{community.name}}">
     </form>
 
-    {% if user and not user.is_admin%}
+    {% if user %}
     <ul class= 'opt_btn'>
-    <li class="btn_blue"><a href="javascript:void(0)" id="create_profile">Save to new profile</a></li>
+    <li><a href="javascript:void(0)" id="create_profile" class='blue_button'>Save to new profile</a></li>
+    {% if user.is_admin and community.name != location %}
+        <li><a href="javascript:void(0)" id="save_profile_as_default" class='blue_button'>Save as defualt</a></li>
+    {% endif %}
     </ul>
-    {%endif%}
+    {% endif %}
 </div>
 
 <div id="towns_popup" class="modal fade" style="display: none">

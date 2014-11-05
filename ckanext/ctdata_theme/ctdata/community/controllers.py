@@ -125,6 +125,28 @@ class CommunityProfilesController(base.BaseController):
                                                                  'anti_csrf_token': anti_csrf_token,
                                                                  'user': user})
 
+    def save_as_default(self):
+        user_name = http_request.environ.get("REMOTE_USER")
+        json_body = json.loads(http_request.body, encoding=http_request.charset)
+        ids       = json_body.get('indicator_ids').split(',')
+
+        new_indicators = self.community_profile_service.get_indicators_by_ids(ids)
+        old_indicators = self.community_profile_service.get_default_indicators()
+
+        if not user_name:
+            abort(401)
+        if http_request.method == 'POST':
+            user = self.user_service.get_or_create_user(user_name) if user_name else None
+            if user.is_admin and sorted(new_indicators) != sorted(old_indicators):
+                for old_indicator in old_indicators:
+                    old_indicator.is_global = False
+                for new_indicator in new_indicators:
+                    new_indicator.is_global = True
+
+                self.session.commit()
+
+        return json.dumps({'success': True})
+
     def add_profile(self):
         user_name = http_request.environ.get("REMOTE_USER")
         json_body = json.loads(http_request.body, encoding=http_request.charset)
@@ -134,12 +156,9 @@ class CommunityProfilesController(base.BaseController):
         if not user_name:
             abort(401)
         if http_request.method == 'POST':
-            user = self.user_service.get_or_create_user(user_name) if user_name else None
-
-            if not user.is_admin:
-                profile = self.community_profile_service.create_community_profile(user_name + ' profile', ids)
-                if profile.id:
-                    return json.dumps({'success': True, 'redirect_link': '/community/' + community_name + '?p=' + str(profile.id) })
+            profile = self.community_profile_service.create_community_profile(user_name + ' profile', ids)
+            if profile.id:
+                return json.dumps({'success': True, 'redirect_link': '/community/' + community_name + '?p=' + str(profile.id) })
         else:
             return json.dumps({'success': False})
 

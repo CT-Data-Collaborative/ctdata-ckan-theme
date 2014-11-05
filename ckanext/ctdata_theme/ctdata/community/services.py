@@ -159,6 +159,14 @@ class CommunityProfileService(object):
         else:
             raise toolkit.ObjectNotFound("Indicator not found")
 
+    def get_indicators_by_ids(self, ids):
+        indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.id.in_(ids)).all()
+        return indicators
+
+    def get_default_indicators(self):
+        indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.is_global == True).all()
+        return indicators
+
     def get_indicators(self, community_name, towns_names, location, user=None):
         community = self.get_community_profile(community_name)
         location  = self.get_town(location)
@@ -171,8 +179,7 @@ class CommunityProfileService(object):
 
         existing_towns, existing_indicators = set(), set()
 
-        if user and not user.is_admin:
-
+        if user and community.name != location.name:
             if community.indicator_ids != None:
                 indicator_ids = community.indicator_ids.split(',')
                 if indicator_ids[-1] == '':
@@ -206,7 +213,7 @@ class CommunityProfileService(object):
         new_indicators = list(set(all_indicators) - existing_indicators)
         new_towns = list(towns - existing_towns)
 
-        if user and not user.is_admin:
+        if user and community.name != location.name:
             # add new global indicators to the list of user's indicators
             print "\nNEW INDICATORS:", new_indicators
             user.indicators += filter(lambda ind: ind.is_global, new_indicators)
