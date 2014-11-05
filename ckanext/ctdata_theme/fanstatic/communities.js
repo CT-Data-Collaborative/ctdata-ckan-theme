@@ -62,7 +62,6 @@ $(function(){
                 if (data.success == true)
                     window.location.reload();
                 else {
-                    if (data.error == "Added to community profile"){ window.location.reload();}
                     $("#indicator_adding_error").html(data.error);
                     $("#indicator_adding_error").animate({opacity: 1}, 300);
                 }

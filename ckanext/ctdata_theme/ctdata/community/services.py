@@ -95,12 +95,7 @@ class CommunityProfileService(object):
             ex_fltrs = json.loads(ex_ind.filters)
             # python allows us to compare lists of dicts
             if sorted(filters) == sorted(ex_fltrs):
-                if community_profile.indicator_ids != None and str(ex_ind.id) in community_profile.indicator_ids:
-                    raise ProfileAlreadyExists("Profile with such dataset and filters already exists")
-                else:
-                    # if owner.is_admin:
-                    #     self.add_indicator_id_to_profile(community_profile, ex_ind.id)
-                    raise ProfileAlreadyExists("Added to community profile")
+                raise ProfileAlreadyExists("Profile with such dataset and filters already exists")
 
         try:
             data_type = dict_with_key_value("field", "Measure Type", filters)['values'][0]
@@ -131,8 +126,6 @@ class CommunityProfileService(object):
         print "\nUSER'S INDICATORS:", owner.indicators
         self.session.add(indicator)
         self.session.commit()
-        # if owner.is_admin:
-        #     self.add_indicator_id_to_profile(community_profile, indicator.id)
 
     def remove_indicator_id_from_profiles(self, indicator_id):
         community_profiles = self.get_all_profiles()
@@ -165,7 +158,6 @@ class CommunityProfileService(object):
                                     UserIndicatorLink.user_id == user.ckan_user_id)).first()
                     if link:
                         link.deleted = True
-                        # self.remove_indicator_id_from_profiles(ind.id)
             else:
                 if not ind in user.indicators:
                     # regular user tries to delete someone else's indicator
