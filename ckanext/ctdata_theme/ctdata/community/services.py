@@ -111,7 +111,6 @@ class CommunityProfileService(object):
         is_global = True if owner.is_admin else False
         indicator = ProfileIndicator(json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
                                      variable)
-
         if not owner.is_admin:
             owner.indicators.append(indicator)
         print "\nUSER'S INDICATORS:", owner.indicators
