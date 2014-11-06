@@ -446,4 +446,11 @@ $(function () {
         display_data();
     });
     hide_spinner();
+
+    var width = $(window).width() - 450;
+    $("#container").width(width);
+    window.onresize = function() {
+      var width = $(window).width() - 450;
+      $("#container").width(width);
+    }
 });
