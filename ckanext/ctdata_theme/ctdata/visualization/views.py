@@ -30,34 +30,6 @@ class View(object):
             result = {'years': years['values']}
         return result
 
-    def hide_cols_with_one_value(self, cols, rows, filters, result):
-        hash = dict(zip(cols, zip(*rows)))
-        indexes, cols = list(), list(cols)
-        for i, col in enumerate(cols):
-          x = hash[col]
-          if x.count(x[0])==len(x):
-            indexes.append(i)
-
-        indexes = sorted(indexes, reverse = True)
-
-        for index in indexes:
-          cols.pop(index)
-
-          for row in rows:
-            row = list(row)
-            row.pop(index)
-
-        new_result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
-        for i, item in enumerate(result['data']):
-            try:
-                new_result['data'][i]['data'] = item['data']
-            except KeyError:
-                pass
-            except IndexError:
-                pass
-
-        return new_result
-
     def get_data(self, filters):
         query, values = self.query_builder.get_query(filters)
 
@@ -70,11 +42,10 @@ class View(object):
             rows = curs.fetchall()
 
             result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
-            updated_result = self.hide_cols_with_one_value(cols, rows, filters, result)
 
             conn.commit()
 
-        return  updated_result
+        return  result
 
     def get_compatibles(self, filters):
       cols = self.query_builder.get_columns(filters)
