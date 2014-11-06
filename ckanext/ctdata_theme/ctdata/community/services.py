@@ -12,6 +12,8 @@ from ..visualization.views import ViewFactory
 from ..visualization.services import DatasetService
 from ..utils import dict_with_key_value, OrderedSet
 
+from IPython import embed
+from termcolor import colored
 
 class ProfileAlreadyExists(Exception):
     pass
@@ -179,18 +181,26 @@ class CommunityProfileService(object):
 
         existing_towns, existing_indicators = set(), set()
 
-        if user and community.name != location.name:
+        if user and user.is_admin and community.name == location.name:
+            indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
+                                    filter(ProfileIndicator.is_global == True).all())
+        else:
+            print colored(community.indicator_ids, 'green')
             if community.indicator_ids != None:
                 indicator_ids = community.indicator_ids.split(',')
                 if indicator_ids[-1] == '':
                     indicator_ids.pop(-1)
-            else:
-               indicator_ids = map(lambda ind: ind.id, user.indicators)
 
-            indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
+                    indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
                                     filter(ProfileIndicator.id.in_(indicator_ids)).all())
-        else:
-            indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
+            else:
+                if user:
+                    indicator_ids = map(lambda ind: ind.id, user.indicators)
+
+                    indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
+                                    filter(ProfileIndicator.id.in_(indicator_ids)).all())
+                else:
+                    indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
                                     filter(ProfileIndicator.is_global == True).all())
 
 
