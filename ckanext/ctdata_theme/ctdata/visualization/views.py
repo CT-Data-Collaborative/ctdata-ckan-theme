@@ -4,7 +4,6 @@ from ckanext.ctdata_theme.ctdata.utils import dict_with_key_value
 from sets import Set
 from ckanext.ctdata_theme.ctdata.database import Database
 
-
 class View(object):
     """
     Gets a query from the QueryBuilder and uses it to retrieve the data from the DB.

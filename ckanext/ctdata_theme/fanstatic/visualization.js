@@ -5,7 +5,7 @@ var chart_filters = [];
 function select_all(){
   $('.select-all').on('click', function(){
     $this = $(this)
-    $ul   = $this.closest('ul')
+    $ul   = $( 'ul', $this.closest('li.filter'))
 
     $('input', $ul).prop('checked', true);
     display_data();
@@ -15,7 +15,7 @@ function select_all(){
 function deselect_all(){
   $('.deselect-all').on('click', function(){
     $this = $(this)
-    $ul   = $this.closest('ul')
+    $ul   = $('ul', $this.closest('li.filter'))
 
     $('input', $ul).prop('checked', false);
     display_data();
@@ -176,10 +176,14 @@ function display_data(){
     }
   towns = $("input.Town:checked");
   years = $("input.Year:checked");
-  if(towns.length == 0)
+  if(towns.length == 0){
+    hide_spinner();
     return display_error("Please select a town");
-  else if (years.length == 0)
+  }
+  else if (years.length == 0){
+    hide_spinner();
     return display_error("Please select a year");
+  }
   switch(display_type){
     case "map":
      //Show the print and save icons
@@ -441,5 +445,5 @@ $(function () {
     $('input[type="checkbox"]').change(function(){
         display_data();
     });
-
+    hide_spinner();
 });

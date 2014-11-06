@@ -153,10 +153,10 @@ class CTDataController(base.BaseController):
         return json.dumps(data)
 
     def _hide_dims_with_one_value(self, data):
-        keys         = data['data'][0]['dims'].keys()
-        initial_data = data['data'][0]['dims']
-        counters     = {}
         size         = len(data['data'])
+        keys         = data['data'][size-1]['dims'].keys()
+        initial_data = data['data'][size-1]['dims']
+        counters     = {}
 
         for key in keys:
             counters[key] = 0
@@ -168,6 +168,7 @@ class CTDataController(base.BaseController):
                     if dims[key] == initial_data[key]:
                         counters[key] += 1
             except KeyError:
+                size -= 1
                 pass
 
         h = dict((key,value) for key, value in counters.iteritems() if value == size)
