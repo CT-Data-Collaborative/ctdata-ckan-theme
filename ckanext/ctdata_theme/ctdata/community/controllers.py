@@ -1,5 +1,6 @@
 import json
 import uuid
+import time
 
 from pylons.controllers.util import abort, redirect
 from pylons import session, url
@@ -151,12 +152,14 @@ class CommunityProfilesController(base.BaseController):
         user_name = http_request.environ.get("REMOTE_USER")
         json_body = json.loads(http_request.body, encoding=http_request.charset)
         ids       = json_body.get('indicator_ids')
+
         community_name  = json_body.get('community_name')
 
         if not user_name:
             abort(401)
         if http_request.method == 'POST':
-            profile = self.community_profile_service.create_community_profile(user_name + ' profile', ids)
+            name = user_name + '_profile' + time.strftime("%H_%M_%S")
+            profile = self.community_profile_service.create_community_profile(name, ids)
             if profile.id:
                 return json.dumps({'success': True, 'redirect_link': '/community/' + community_name + '?p=' + str(profile.id) })
         else:

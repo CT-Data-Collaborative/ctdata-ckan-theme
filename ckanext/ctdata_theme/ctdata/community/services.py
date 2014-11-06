@@ -12,8 +12,6 @@ from ..visualization.views import ViewFactory
 from ..visualization.services import DatasetService
 from ..utils import dict_with_key_value, OrderedSet
 
-from IPython import embed
-from termcolor import colored
 
 class ProfileAlreadyExists(Exception):
     pass
@@ -182,27 +180,20 @@ class CommunityProfileService(object):
         existing_towns, existing_indicators = set(), set()
 
         if user and user.is_admin and community.name == location.name:
-            indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
-                                    filter(ProfileIndicator.is_global == True).all())
+            indicators_filter = map(lambda x: x.id, self.get_default_indicators())
         else:
-            print colored(community.indicator_ids, 'green')
             if community.indicator_ids != None:
                 indicator_ids = community.indicator_ids.split(',')
                 if indicator_ids[-1] == '':
                     indicator_ids.pop(-1)
 
-                    indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
-                                    filter(ProfileIndicator.id.in_(indicator_ids)).all())
+                indicators_filter = map(lambda x: x.id, self.get_indicators_by_ids(indicator_ids))
             else:
                 if user:
-                    indicator_ids = map(lambda ind: ind.id, user.indicators)
-
-                    indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
-                                    filter(ProfileIndicator.id.in_(indicator_ids)).all())
+                    indicator_ids     = map(lambda ind: ind.id, user.indicators)
+                    indicators_filter = map(lambda x: x.id, self.get_indicators_by_ids(indicator_ids))
                 else:
-                    indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
-                                    filter(ProfileIndicator.is_global == True).all())
-
+                    indicators_filter = map(lambda x: x.id, self.get_default_indicators())
 
         print "\nINDICATORS FILTERS:", indicators_filter
 
