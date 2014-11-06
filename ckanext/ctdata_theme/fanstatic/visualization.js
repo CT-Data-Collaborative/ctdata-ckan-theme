@@ -355,13 +355,14 @@ function draw_chart(){
           delete cur_series_dims['Measure Type'];
           name = "<div id='legendTown'>"+ cur_series_dims['Town'] + "<div id='legendDims'>";
           delete cur_series_dims['Town'];
-          // var first_flag = 0;
-          // town = cur_series_dims
-          // $.each(cur_series_dims, function(dim_index){
-          //   if (cur_series_dims[dim_index] == "NA")
-          //     return "No value for this dimension"
-          //   name += dim_index + ": "+cur_series_dims[dim_index]+"<br> ";
-          // });
+          var first_flag = 0;
+          town = cur_series_dims
+          $.each(cur_series_dims, function(dim_index){
+            if (cur_series_dims[dim_index] == "NA")
+              return "No value for this dimension"
+            // name += dim_index + ": "+cur_series_dims[dim_index]+"<br> ";
+            name += ',' + cur_series_dims[dim_index];
+          });
 
           name += "</div>";
           cur_series['name'] = name;
