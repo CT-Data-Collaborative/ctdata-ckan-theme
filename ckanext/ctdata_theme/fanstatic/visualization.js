@@ -427,6 +427,10 @@ function display_filters(){
   });
   filter_text = filter_text.replace('Select AllDeselect All', '').substring(0, filter_text.length - 2);
   $("#pageDescription").text(filter_text);
+
+  $li = $('li#Connecticut')
+  $li.prependTo($li.closest('ul')[0]);
+
 }
 
 $(function () {
