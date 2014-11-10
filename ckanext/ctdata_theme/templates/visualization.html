@@ -20,19 +20,20 @@
 <ul>
 {% for dimension in dimensions %}
 {% if dimension.possible_values %}
+
 <li class="filter">
   <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
   <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
-  <ul>
-    <li>
+  <span>
       {% if dimension.name == 'Town' %}
         <a href="javascript:void(0);" class="select-all">Select All</a>
         <a href="javascript:void(0);" class="deselect-all">Deselect All</a>
       {% endif %}
-    </li>
+  </span>
+  <ul>
   {% for value in dimension.possible_values %}
     {% if value|length > 0 %}
-    <li>
+    <li id = "{{value}}">
         <input type="checkbox" id="{{value}}Check" value="{{value}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}">
         <label for="{{value}}Check" class="checkLabel">{{value}}</label>
     </li>

@@ -5,7 +5,7 @@ var chart_filters = [];
 function select_all(){
   $('.select-all').on('click', function(){
     $this = $(this)
-    $ul   = $this.closest('ul')
+    $ul   = $( 'ul', $this.closest('li.filter'))
 
     $('input', $ul).prop('checked', true);
     display_data();
@@ -15,7 +15,7 @@ function select_all(){
 function deselect_all(){
   $('.deselect-all').on('click', function(){
     $this = $(this)
-    $ul   = $this.closest('ul')
+    $ul   = $('ul', $this.closest('li.filter'))
 
     $('input', $ul).prop('checked', false);
     display_data();
@@ -176,10 +176,14 @@ function display_data(){
     }
   towns = $("input.Town:checked");
   years = $("input.Year:checked");
-  if(towns.length == 0)
+  if(towns.length == 0){
+    hide_spinner();
     return display_error("Please select a town");
-  else if (years.length == 0)
+  }
+  else if (years.length == 0){
+    hide_spinner();
     return display_error("Please select a year");
+  }
   switch(display_type){
     case "map":
      //Show the print and save icons
@@ -353,14 +357,17 @@ function draw_chart(){
           else
             suffix = '';
           delete cur_series_dims['Measure Type'];
-          name = /*"<div id='legendTown'>"+*/cur_series_dims['Town'] + " -  <br> <div id='legendDims'>";
+          name = "<div id='legendTown'>"+ cur_series_dims['Town'] + "<div id='legendDims'>";
           delete cur_series_dims['Town'];
           var first_flag = 0;
+          town = cur_series_dims
           $.each(cur_series_dims, function(dim_index){
             if (cur_series_dims[dim_index] == "NA")
               return "No value for this dimension"
-            name += dim_index + ": "+cur_series_dims[dim_index]+"<br> ";
+            // name += dim_index + ": "+cur_series_dims[dim_index]+"<br> ";
+            name += ',' + cur_series_dims[dim_index];
           });
+
           name += "</div>";
           cur_series['name'] = name;
           series.push(cur_series);
@@ -391,12 +398,10 @@ function draw_chart(){
                 title: {text: yAxisLabel}
             },
             legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle',
+                layout: 'horizontal',
+                verticalAlign: 'bottom',
                 borderWidth: 0,
-                //useHTML: true,
-                itemMarginBottom: 10
+                maxHeight: 90
             },
             tooltip: {
                 useHTML: true,
@@ -426,6 +431,10 @@ function display_filters(){
   });
   filter_text = filter_text.replace('Select AllDeselect All', '').substring(0, filter_text.length - 2);
   $("#pageDescription").text(filter_text);
+
+  $li = $('li#Connecticut')
+  $li.prependTo($li.closest('ul')[0]);
+
 }
 
 $(function () {
@@ -436,5 +445,12 @@ $(function () {
     $('input[type="checkbox"]').change(function(){
         display_data();
     });
+    hide_spinner();
 
+    var width = $(window).width() - 450;
+    $("#container").width(width);
+    window.onresize = function() {
+      var width = $(window).width() - 450;
+      $("#container").width(width);
+    }
 });

@@ -145,3 +145,11 @@ div#error_message{
   font-size: 10pt;
   margin-left: 10px;
 }
+
+#container{
+  position: relative;
+  max-height: 1000px;
+  min-height: 600px !important;
+
+  min-width: 600px !important;
+}

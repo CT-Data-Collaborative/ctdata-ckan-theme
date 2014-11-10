@@ -17,7 +17,6 @@ from ctdata.visualization.views import ViewFactory
 from ctdata.community.services import CommunityProfileService
 from ctdata.topic.services import TopicSerivce
 
-
 def communities():
     db = Database()
     sess = db.session_factory()
@@ -75,6 +74,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
 
 class CTDataController(base.BaseController):
+    global size
+
     def news(self):
         return base.render('news.html')
 
@@ -127,6 +128,10 @@ class CTDataController(base.BaseController):
 
         request_view, request_filters = json_body.get('view'), json_body.get('filters')
 
+        for one_filter in request_filters:
+            if len( one_filter['values']) == 1:
+                request_filters.remove(one_filter)
+
         if not request_view or not request_filters:
             abort(400, detail='No view and/or filters specified')
 
@@ -142,9 +147,41 @@ class CTDataController(base.BaseController):
         view = ViewFactory.get_view(request_view, query_builder)
 
         data = view.get_data(request_filters)
+        data = self._hide_dims_with_one_value(data)
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps(data)
+
+    def _hide_dims_with_one_value(self, data):
+        size         = len(data['data'])
+        keys         = data['data'][size-1]['dims'].keys()
+        initial_data = data['data'][size-1]['dims']
+        counters     = {}
+
+        for key in keys:
+            counters[key] = 0
+
+        for item in data['data']:
+            try:
+                dims = item['dims']
+                for key in keys:
+                    if dims[key] == initial_data[key]:
+                        counters[key] += 1
+            except KeyError:
+                size -= 1
+                pass
+
+        h = dict((key,value) for key, value in counters.iteritems() if value == size)
+
+        if len(h.keys()) > 0:
+            for key in h.keys():
+                for item in data['data']:
+                    try:
+                       item['dims'].pop(key, None)
+                    except KeyError:
+                        pass
+
+        return data
 
     def add_community_towns(self, community_name):
         if http_request.method == 'POST':

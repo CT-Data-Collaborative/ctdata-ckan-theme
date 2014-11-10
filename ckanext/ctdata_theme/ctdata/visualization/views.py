@@ -4,7 +4,6 @@ from ckanext.ctdata_theme.ctdata.utils import dict_with_key_value
 from sets import Set
 from ckanext.ctdata_theme.ctdata.database import Database
 
-
 class View(object):
     """
     Gets a query from the QueryBuilder and uses it to retrieve the data from the DB.
@@ -40,11 +39,12 @@ class View(object):
 
             cols = self.query_builder.get_columns(filters)
             rows = curs.fetchall()
+
             result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
 
             conn.commit()
 
-        return result
+        return  result
 
     def get_compatibles(self, filters):
       cols = self.query_builder.get_columns(filters)
