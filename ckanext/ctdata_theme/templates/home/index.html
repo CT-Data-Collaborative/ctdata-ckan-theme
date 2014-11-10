@@ -1,0 +1,99 @@
+{% ckan_extends %}
+
+{% block title %}Connecticut Data Collaborative{% endblock %}
+
+{% block content %}
+{% block maintag %}{{ super() }}{% endblock %}
+
+<div id="gallery">
+  <div class="spacing">
+    <!-- <div class="gallerytitle">
+      <h2>Changing the way Connecticut uses data</h2>
+      CTDC is a public-private partnership working to increase the quality and availability of data for effective planning and policy.
+      <a href="/pages/about" class="orange_link">Learn More...</a>
+    </div> -->
+    <img src="common/images/ctdata.jpg" alt="CT Data Collaborative" border="0" />
+  </div>
+</div>
+
+<div align="center">
+<div id="master">
+
+<div id="databytopic">
+  <div class="spacing">
+    <h2>Explore Data by Topic</h2>
+    <ul>
+      <li><a href="/data_by_topic#civic_vitality"><i class="fa fa-institution fa-2x"></i>     <br/>Civic Vitality</a></li>
+      <li><a href="/data_by_topic#demographics">  <i class="fa fa-pie-chart fa-2x"></i>       <br/>Demographics</a></li>
+      <li><a href="/data_by_topic#economy">       <i class="fa fa-line-chart fa-2x"></i>      <br/>Economy</a></li>
+      <li><a href="/data_by_topic#health">        <i class="fa fa-medkit fa-2x"></i>          <br/>Health</a></li>
+      <li><a href="/data_by_topic#education">     <i class="fa fa-graduation-cap fa-2x"></i>  <br/>Education</a></li>
+      <li><a href="/data_by_topic#housing">       <i class="fa fa-home fa-2x"></i>            <br/>Housing</a></li>
+      <li><a href="/data_by_topic#safety">        <i class="fa fa-lock fa-2x"></i>            <br/>Safety</a></li>
+    </ul>
+    <br clear="all" />
+  </div>
+</div>
+
+  </div>
+</div>
+
+<div id="databylocation" class="location">
+<div class="spacing">
+
+  <a name="data-by-location" class="data_by_location"><h2>Explore Data by Location</h2></a>
+  <div align="center" style="margin-left:auto;margin-right:auto;">
+  <div class="dropdown">
+      <button class="bbtn dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+        -- Select Location --
+        <div class="caretbox"><span class="caret"></span></div>
+      </button>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+          {% set community_profiles = h.communities_helper() %}
+          {% if community_profiles %}
+              {% for profile in community_profiles %}
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="/community/{{ profile.name }}">{{ profile.name }}</a></li>
+              {% endfor %}
+          {% endif %}
+      </ul>
+  </div>
+  </div>
+  <br clear="all" />
+</div>
+</div>
+
+<div id="newsmods">
+<div class="spacing">
+
+<div class="newsbox">
+<img src="common/images/news-housing.jpg" alt="" border="0" />
+<a href="https://www.surveymonkey.com/s/CTDataFall2014Conference"><h2>Register Now</h2></a>
+The Ct Data Collaborative is hosting a free conference, Data Driven Connecticut 2014: Progress and Possibilities, Moving from Data to Action, on November 21st at Yale School of Management, Evans Hall.
+<br />
+<a href="http://68.169.49.221/pages/conference-agenda-fall-2014">Learn More <i class="fa fa-arrow-circle-right"></i></a>
+</div>
+<div class="newsbox">
+<img src="common/images/news-health.jpg" alt="" border="0" />
+<a href="#"><h2>Check out new ctdata.org </h2></a>
+Welcome to the redesigned ctdata.org. Over the next few months we will be continuously enhancing the site. We want to make this a great utility for folks in CT so please provide suggestions/feedback.
+<br />
+<a href="" data-uv-trigger data-uv-position="top" >Learn More <i class="fa fa-arrow-circle-right"></i></a>
+</div>
+<div class="newsbox">
+<img src="common/images/news-education.jpg" alt="" border="0" />
+<a href="#"><h2>Upcoming Special Projects</h2></a>
+Ability to visualize state grants to towns. A project in partnership with the General Assembly Office of Fiscal Analysis.
+<br />
+<a href="">Learn More <i class="fa fa-arrow-circle-right"></i></a>
+</div>
+
+</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+
+    {% resource 'ctdata_theme/scripts.js' %}
+{% endblock %}

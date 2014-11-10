@@ -1,0 +1,76 @@
+To request the data from the backend for any of the views, send a POST request with the following json body to the
+/data/{dataset_id} endpoint:
+{"view": "map"|"table"|"chart",
+ "filters": [{"field": "field value", "values": ["option 1", "option 2]},
+             ...]}
+Even if you have a single value for filter you should enclose it in a list syntax.
+It's possible to specify "all" as a filter value, the values would be properly aggreagted by the backend (the structure
+of replies wouldn't be changed, only the values would be affected)
+
+For the "table" view the reply would be (for example) (assuming there were selected several values for the 'town',
+'grade' and 'measure type' dimensions):
+{
+    'multifield': 'grade',
+    'years': ['2013'],
+	'data': [
+	    {'town': 'town1 name',
+        'multifield': [
+            {'value': 'Grade 3', 'data': [{'measure_type': 'number', 'data': [*list of values, one for every year*]},
+                                          {'measure_type': 'percent', 'data': [...]}]},
+            {'value': 'Grade 4', 'data': [{'measure_type': 'number', 'data': [...]},
+                                          {'measure_type': 'percent', 'data': [...]}]}
+        ]]},
+	    {'town': 'town2 name',
+        'multifield': [
+            {'value': 'Grade 3', 'data': [{'measure_type': 'number', 'data': [*list of values, one for every year*]},
+                                          {'measure_type': 'percent', 'data': [...]}]},
+            {'value': 'Grade 4', 'data': [{'measure_type': 'number', 'data': [...]},
+                                          {'measure_type': 'percent', 'data': [...]}]}
+        ]]}
+    ]
+}
+
+This can be easily translated into an html representation (pseudocode):
+<table>
+    <th>
+        <td>Location</td>
+        <td>global['multifield']</td>
+        <td>Data Type</td>
+        for year in data['years']
+            <td>year</td>
+    </th>
+for town in data['data']:
+    for mf in town['multifield']:
+        for mt in mf['data']:
+            <tr>
+                <td>town['town']</td>
+                <td>mf['value']</td>
+                <td>mt['measuretype']</td>
+                for value in mt['data']:
+                    <td>value</td>
+            </tr>
+<table>
+
+
+For the chart views (bar and line both), the reply would be:
+{
+    'years': ['2012', '2013'],
+	'data': [
+	    {'name': 'town1 name',
+         'data': [*list of values, one for every year*]},
+	    {'name': 'town2 name',
+         'data': [*list of values, one for every year*]},
+    ]
+}
+
+
+For the map view, the reply would be (the 'years' field isn't required, but I left it just to be consistent):
+{
+    'years': ['2013'],
+	'data': [
+	    {'code': 'town1 name',
+         'value': *value for that town*},
+	    {'code': 'town2 name',
+         'value': *value for that town*},
+    ]
+}

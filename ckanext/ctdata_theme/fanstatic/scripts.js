@@ -1,0 +1,15 @@
+$(document).ready(function(){
+    $(".custom-select").each(function(){
+        $(this).wrap("<span class='select-wrapper'></span>");
+        $(this).after("<span class='holder'></span>");
+    });
+
+    $(".custom-select").change(function(){
+        var selectedOption = $(this).find(":selected").text();
+        $(this).next(".holder").text(selectedOption);
+    }).trigger('change');
+
+    $(".custom-select").change(function(){
+        window.location = '/community/' + $(this).find(":selected").val();
+    });
+});

@@ -1,0 +1,33 @@
+{% ckan_extends %}
+
+{% block primary_content_inner %}
+    <div class="tab_content">
+        <div class="results_head">
+            {% block package_description %}
+            <h2>{{ pkg.title or pkg.name }}<span>{{ c.pkg_notes_formatted }}</span></h2>
+            {% endblock %}
+
+            {% if pkg.private %}
+              <span class="dataset-private label label-inverse pull-right">
+                <i class="icon-lock"></i>
+                {{ _('Private') }}
+              </span>
+            {% endif %}
+
+            {% block package_notes %}
+            {% endblock %}
+
+            {% block package_resources %}
+                {% snippet "package/snippets/resources_list.html", pkg=pkg, resources=pkg.resources %}
+            {% endblock %}
+
+            {% block package_tags %}
+                {% snippet "package/snippets/tags.html", tags=pkg.tags %}
+            {% endblock %}
+
+            {% block package_additional_info %}
+                {% snippet "package/snippets/additional_info.html", pkg_dict=pkg %}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends "page.html" %}
+
+{% block title %}CTData Visualization - {{ dataset.title }} {% endblock %}
+{% block page_name %}{{ dataset.title }}{% endblock %}
+{% block page_description %}Profile info{% endblock %}
+
+
+{% block main_content %}
+
+<form>
+    <input type="hidden" id="dataset_id" value="{{ dataset.name }}">
+    <input type="hidden" id="dataset_title" value="{{ dataset.title }}">
+</form>
+
+<section class="visualisation">
+<div class="ctdata-wrapper">
+
+<div class="refine_wrap">
+<h2>Refine This Indicator <img src="/common/images/arrowimg.png" alt="" /></h2>
+<ul>
+{% for dimension in dimensions %}
+{% if dimension.possible_values %}
+
+<li class="filter">
+  <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
+  <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
+  <span>
+      {% if dimension.name == 'Town' %}
+        <a href="javascript:void(0);" class="select-all">Select All</a>
+        <a href="javascript:void(0);" class="deselect-all">Deselect All</a>
+      {% endif %}
+  </span>
+  <ul>
+  {% for value in dimension.possible_values %}
+    {% if value|length > 0 %}
+    <li id = "{{value}}">
+        <input type="checkbox" id="{{value}}Check" value="{{value}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}">
+        <label for="{{value}}Check" class="checkLabel">{{value}}</label>
+    </li>
+    {% endif %}
+  {% endfor %}
+  </ul>
+  </div>
+</li>
+{% endif %}
+{% endfor %}
+<!--
+<li>
+<div class="refine_options">
+<div class="input_row"><input type="checkbox"> <label>Quartile 1</label></div>
+<div class="input_row"><input type="checkbox"> <label>Quartile 2</label></div>
+<div class="input_row"><input type="checkbox"> <label>Quartile 3</label></div>
+<div class="input_row"><input type="checkbox"> <label>Quartile 4</label></div>
+</div>
+</li>
+-->
+</ul>
+</div>
+
+<div class="visual_right">
+<div class="option_row">
+<div class="customselectinner">
+<select class="custom">
+<option selected>Kindergarten Inventory Quartiles</option>
+<option>Kindergarten Inventory Quartiles</option>
+<option>Kindergarten Inventory Quartiles</option>
+</select>
+</div>
+
+<div class="display_options">
+<label>Display As</label>
+<ul>
+<li><a href="javascript:void(0)" onclick="set_display_type('table')"><img id="table_icon" src="/common/images/displayopt1-inv.png" alt="" /></a></li>
+<li><a href="javascript:void(0)" onclick="set_display_type('column')"><img id="bar_icon" src="/common/images/displayopt2.png" alt="" /></a></li>
+<li><a href="javascript:void(0)" onclick="set_display_type('line')"><img id="line_icon" src="/common/images/displayopt3.png" alt="" /></a></li>
+<li><a href="javascript:void(0)" onclick="set_display_type('map')"><img id="map_icon" src="/common/images/displayopt4.png" alt="" /></a></li>
+<li style="padding-top: 3px;"><a href="/dataset/{{dataset.name}}">Raw Data</a>
+</ul>
+</div>
+
+
+<div class="operations">
+<label>Operations</label>
+<ul>
+<li><a href="javascript:void(0)" onclick="print_chart()"><img src="/common/images/operation1.png" alt="" /></a></li>
+<li><a href="javascript:void(0)" onclick="save_chart_image()"><img src="/common/images/operation2.png" alt="" /></a></li>
+<li><a href="javascript:void(0)" onclick="save_chart_pdf()"><img src="/common/images/operation3.png" alt="" /></a></li>
+</ul>
+</div>
+
+</div>
+<div class="spinner"> <img src="/common/images/loading.gif"/> </div>
+<div class="results_table">
+    <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>
+
+    <div id="metadata" >
+      <a class="togglebtn metadata_container">About this dataset</a>
+      <div id="collapseMetadata">
+        <ul>
+        {% for property in metadata %}
+          <li>
+            <a class="togglebtn">{{property['key']}}</a>
+            <div class="dataValue">
+                {{property['value']}}
+            </div>
+          </li>
+        {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+
+</div>
+
+</div>
+
+</div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="/common/css/visualization.css">
+<link rel="stylesheet" type="text/css" href="/common/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="/common/css/tableTools.css">
+{% resource 'ctdata_theme/highcharts.js' %}
+{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/map.js' %}
+{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/data.js' %}
+{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/exporting.js' %}
+{% resource 'ctdata_theme/visualization.js' %}
+{% resource 'ctdata_theme/jquery.dataTables.js' %}
+{% resource 'ctdata_theme/map_chart.js' %}
+<script>
+var defaults = [];
+{% if default_filters %}
+defaults = {{default_filters | safe}}
+{% endif %}
+var disabled = [];
+{% if disabled %}
+disabled = {{disabled | safe}}
+{% endif %}
+</script>
+{% endblock %}

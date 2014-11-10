@@ -1,0 +1,10 @@
+{% set current_url = h.full_current_url() %}
+
+<div class="raw_org social">
+<h2>Social</h2>
+<ul>
+<li><a href="https://plus.google.com/share?url={{ current_url }}"><img src="/common/images/gplus.png" alt="" />Google+</a></li>
+<li><a href="https://twitter.com/share?url={{ current_url }}"><img src="/common/images/tweet.png" alt="" />Twitter</a></li>
+<li><a href="https://www.facebook.com/sharer.php?u={{ current_url }}"><img src="/common/images/fb.png" alt="" />Facebook</a></li>
+</ul>
+</div>

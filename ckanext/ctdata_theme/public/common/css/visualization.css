@@ -1,0 +1,155 @@
+.spinner{
+  display: none;
+  position: absolute;
+  left: 45%;
+  top: 500px;
+}
+
+div.panel-collapse.collapse.in{
+  max-height: 200px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+input[type="checkbox"],input[type="radio"]{
+  -webkit-appearance: checkbox;
+  float: left;
+}
+label.checkLabel{
+  float:left;
+  padding-top: 4px;
+  padding-left: 5px;
+}
+
+label.checkLabel:after {
+  content: "";
+}
+
+span.checkLabel {
+  padding-top: 4px;
+  padding-left: 5px;
+  font-weight: normal;
+  font-size: 16px;
+  color: black;
+}
+
+.indicator-filter-value {
+    color: #464646;
+}
+
+.indicator-filter-radio {
+    /* !important because we need to overwrite CKAN's default styles */
+    top: 0 !important;
+    margin-top: 3px !important;
+    margin-right: 5px !important;
+}
+
+.indicator-topics {
+    width: 230px;
+    border-right: 1px solid;
+    float: left;
+    overflow: scroll !important;
+    height: 370px;
+}
+
+.indicator-filter-name {
+    color: #1F58B1;
+}
+
+.indicator-filters {
+  margin-left: 240px;
+  overflow: scroll !important;
+  height: 370px;
+}
+
+.disable-scroll{
+  overflow: hidden;
+}
+
+.active{
+  background-color: #EFEFEF;
+}
+
+.indicator-sub-topics{
+  padding-left: 8px;
+}
+
+.indicator-sub-topics li{
+  padding: 2px;
+}
+
+#mapTitle{
+  font-size: 24px;
+  background-color: white;
+  border-radius: 2px;
+  padding: 10px;
+  text-align: center;
+  border: 1px lightgray;
+  border-style:solid;
+}
+#mapSubtitle{
+  font-size: 12px;
+}
+#legendDims{
+  text-align: right;
+}
+
+.error {
+    color: red;
+}
+
+div#metadata a.metadata_container{
+  display: inline-block;
+  color: black;
+  font-size: 24px;
+}
+div#metadata div.dataValue{
+  font-size: 12px;
+  margin-left: 40px;
+  color: #444;
+}
+div#metadata li a{
+  color: #444;
+  width: 150px;
+  margin-left: 30px;
+  margin-top: 20px;
+  border-bottom: 1px solid #888;
+  display: inline-block;
+}
+div#metadata{
+  background: #eee;
+  margin-top:15px;
+  padding-top:15px;
+  padding-bottom: 15px;
+  padding-left:15px;
+  border-radius: 10px;
+}
+div#error_message{
+  font-size: 30px;
+  color: #444;
+  background-color: #eee;
+  border-radius: 5px;
+  width: 70%;
+  margin-left: 15%;
+  text-align: center;
+  height: auto;
+  line-height: 50px;
+
+}
+.highcharts-button{
+  visibility: hidden;
+}
+
+.select-all, .deselect-all{
+  text-decoration: underline !important;
+  color: #3970ba !important;
+  font-size: 10pt;
+  margin-left: 10px;
+}
+
+#container{
+  position: relative;
+  max-height: 1000px;
+  min-height: 600px !important;
+
+  min-width: 600px !important;
+}
