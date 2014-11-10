@@ -1,5 +1,6 @@
 import json
 import uuid
+import time
 
 from pylons.controllers.util import abort, redirect
 from pylons import session, url
@@ -14,7 +15,6 @@ from ..users.services import UserService
 from ..visualization.services import DatasetService
 from ..topic.services import TopicSerivce
 from services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
-
 
 class CommunityProfilesController(base.BaseController):
     def __init__(self):
@@ -85,7 +85,12 @@ class CommunityProfilesController(base.BaseController):
             abort(401)
 
     def community_profile(self, community_name):
-        user_name = http_request.environ.get("REMOTE_USER")
+        user_name       = http_request.environ.get("REMOTE_USER")
+        profile_to_load = http_request.GET.get('p')
+        location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
+
+        if profile_to_load != None:
+            community_name =  self.community_profile_service.get_community_profile_by_id(profile_to_load).name
 
         towns_raw, towns_names = http_request.GET.get('towns'), []
         if towns_raw:
@@ -97,6 +102,7 @@ class CommunityProfilesController(base.BaseController):
         try:
             community, indicators, displayed_towns = self.community_profile_service.get_indicators(community_name,
                                                                                                    towns_names,
+                                                                                                   location,
                                                                                                    user)
             topics = TopicSerivce.get_topics('community_profile')
         except toolkit.ObjectNotFound as e:
@@ -111,12 +117,53 @@ class CommunityProfilesController(base.BaseController):
         session['anti_csrf'] = anti_csrf_token
         session.save()
 
-        return base.render('community_profile.html', extra_vars={'community': community,
+        return base.render('community_profile.html', extra_vars={'location': location,
+                                                                 'community': community,
                                                                  'indicators': indicators,
                                                                  'topics': topics,
                                                                  'displayed_towns': displayed_towns_names,
                                                                  'towns': towns,
-                                                                 'anti_csrf_token': anti_csrf_token})
+                                                                 'anti_csrf_token': anti_csrf_token,
+                                                                 'user': user})
+
+    def save_as_default(self):
+        user_name = http_request.environ.get("REMOTE_USER")
+        json_body = json.loads(http_request.body, encoding=http_request.charset)
+        ids       = json_body.get('indicator_ids').split(',')
+
+        new_indicators = self.community_profile_service.get_indicators_by_ids(ids)
+        old_indicators = self.community_profile_service.get_default_indicators()
+
+        if not user_name:
+            abort(401)
+        if http_request.method == 'POST':
+            user = self.user_service.get_or_create_user(user_name) if user_name else None
+            if user.is_admin and sorted(new_indicators) != sorted(old_indicators):
+                for old_indicator in old_indicators:
+                    old_indicator.is_global = False
+                for new_indicator in new_indicators:
+                    new_indicator.is_global = True
+
+                self.session.commit()
+
+        return json.dumps({'success': True})
+
+    def add_profile(self):
+        user_name = http_request.environ.get("REMOTE_USER")
+        json_body = json.loads(http_request.body, encoding=http_request.charset)
+        ids       = json_body.get('indicator_ids')
+
+        community_name  = json_body.get('community_name')
+
+        if not user_name:
+            abort(401)
+        if http_request.method == 'POST':
+            name = user_name + '_profile' + time.strftime("%H_%M_%S")
+            profile = self.community_profile_service.create_community_profile(name, ids)
+            if profile.id:
+                return json.dumps({'success': True, 'redirect_link': '/community/' + community_name + '?p=' + str(profile.id) })
+        else:
+            return json.dumps({'success': False})
 
     def get_filters(self, dataset_id):
         http_response.headers['Content-type'] = 'application/json'

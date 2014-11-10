@@ -58,12 +58,40 @@ $(function(){
                                   filters: get_filters()}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                console.log(data);
                 if (data.success == true)
                     window.location.reload();
                 else {
                     $("#indicator_adding_error").html(data.error);
                     $("#indicator_adding_error").animate({opacity: 1}, 300);
+                }
+            }
+        });
+    });
+
+    $('#save_profile_as_default').click(function() {
+        ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
+        $.ajax({type: "POST",
+            url: "/community/save_as_default",
+            data: JSON.stringify({indicator_ids: ids}),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if (data.success == true){
+                    window.location.reload();
+                }
+            }
+        });
+    });
+
+    $('#create_profile').click(function() {
+        ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
+        $.ajax({type: "POST",
+            url: "/community/add_profile",
+            data: JSON.stringify({indicator_ids: ids, community_name: community_name}),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                data = JSON.parse(data)
+                if (data.success == true){
+                    window.location = data.redirect_link
                 }
             }
         });
