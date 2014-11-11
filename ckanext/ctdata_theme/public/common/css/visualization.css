@@ -153,3 +153,18 @@ div#error_message{
 
   min-width: 600px !important;
 }
+
+.full_metadata_link{
+  font-size: 10pt;
+  padding-bottom: 20px;
+}
+
+.full_metadata_link a{
+  float: right;
+  margin-bottom: 10px;
+  margin-right: 20px;
+  text-decoration: underline;
+}
+.full_metadata_link a:hover{
+  text-decoration: none;
+}
