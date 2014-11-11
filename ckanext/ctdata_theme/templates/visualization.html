@@ -99,8 +99,8 @@
         <ul>
         {% for property in metadata %}
           <li>
-            <a class="togglebtn">{{property['key']}}</a>
-            <div class="dataValue">
+            <a class="togglebtn", >{{property['key']}}</a>
+            <div class="dataValue" id={{property['key']}}>
                 {{property['value']}}
             </div>
           </li>

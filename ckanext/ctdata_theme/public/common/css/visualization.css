@@ -149,7 +149,7 @@ div#error_message{
 #container{
   position: relative;
   max-height: 1000px;
-  min-height: 600px !important;
+  /*min-height: 500px !important;*/
 
   min-width: 600px !important;
 }
