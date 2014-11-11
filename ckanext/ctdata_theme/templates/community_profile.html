@@ -34,7 +34,7 @@
         <ul class="table_data">
             <li class="col-1">
                 <span class="indicator_id hidden">{{indicator['indicator'].id}} </span>
-                <a href="/visualization/{{ indicator['dataset'].replace(' ', '-').lower() }}">
+                <a href="/visualization/{{ indicator['dataset'].replace(' ', '-').lower()}}?ind={{indicator['indicator'].id}}">
                     {{indicator['dataset']}}, {{indicator['indicator'].variable}}
                 </a>
                 <span>

@@ -1,5 +1,6 @@
 import json
 import yaml
+import ast
 
 from pylons.controllers.util import abort
 
@@ -90,6 +91,18 @@ class CTDataController(base.BaseController):
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def visualization(self, dataset_name):
+        db = Database()
+        sess = db.session_factory()
+        community_profile_service = CommunityProfileService(sess)
+
+        try:
+            indicator_id = http_request.GET.get('ind')
+            indicator    = community_profile_service.get_indicators_by_ids([indicator_id])[0]
+            filters      = map(lambda fl: {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}, json.loads(indicator.filters))
+            ind_filters  = ast.literal_eval(json.dumps(dict(i.items()[0] for i in filters)))
+        except IndexError:
+            ind_filters = None
+
         metadata_fields = ['Description', 'Full Description', 'Source']
         try:
             dataset = DatasetService.get_dataset(dataset_name)
@@ -115,12 +128,11 @@ class CTDataController(base.BaseController):
           disabled = []
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
-
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
                                                              'disabled': disabled,
-                                                             'default_filters': defaults})
+                                                             'default_filters': defaults if not ind_filters else ind_filters})
 
     def get_data(self, dataset_name):
         try:
