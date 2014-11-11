@@ -103,7 +103,6 @@ class CTDataController(base.BaseController):
         except IndexError:
             ind_filters = None
 
-        metadata_fields = ['Description', 'Full Description', 'Source']
         try:
             dataset = DatasetService.get_dataset(dataset_name)
             dataset_meta = DatasetService.get_dataset_meta(dataset_name)
@@ -126,13 +125,23 @@ class CTDataController(base.BaseController):
           disabled = yaml.load(disabled_metadata[0]['value'])
         except IndexError:
           disabled = []
-        metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
         if not ind_filters:
             default_filters = defaults
         else:
             ind_filters['Town'] = defaults['Town']
             default_filters = ind_filters
+
+        visible_metadata_fields = filter(lambda x: x['key'] == 'visible_metadata', metadata)
+
+        try:
+            metadata_fields = yaml.load(visible_metadata_fields[0]['value'])
+            metadata_fields.split(',')
+        except IndexError:
+            metadata_fields = ['Description', 'Full Description', 'Source']
+
+        metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
+
 
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
