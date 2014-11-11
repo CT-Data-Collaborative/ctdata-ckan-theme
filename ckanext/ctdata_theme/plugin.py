@@ -128,11 +128,17 @@ class CTDataController(base.BaseController):
           disabled = []
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
+        if not ind_filters:
+            default_filters = defaults
+        else:
+            ind_filters['Town'] = defaults['Town']
+            default_filters = ind_filters
+
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
                                                              'disabled': disabled,
-                                                             'default_filters': defaults if not ind_filters else ind_filters})
+                                                             'default_filters': default_filters})
 
     def get_data(self, dataset_name):
         try:
