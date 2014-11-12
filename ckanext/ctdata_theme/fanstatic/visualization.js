@@ -388,7 +388,9 @@ function draw_table(){
 
 function draw_chart(){
   var dataset_id = $("#dataset_id").val(),
-      dataset_title = $("dataset_title").val();
+      dataset_title = $("#dataset_title").val(),
+      description = $("#pageDescription").text(),
+      source = $('#Source').text();
 
   $.ajax({type: "POST",
             url: "/data/" + dataset_id,
@@ -399,7 +401,8 @@ function draw_chart(){
         //var series = data['data'],
         //    years = data['years'];
         var suffix = '';
-        var series = []
+        var series = [];
+        var legend_series = [];
         var years = data['years'];
         var series_data = data['data'];
         $.each(series_data, function(i){
@@ -408,7 +411,9 @@ function draw_chart(){
           cur_series_data = series_data[i]['data'];
           cur_series_dims = series_data[i]['dims'];
           cur_series = {};
+          cur_legend_series = {};
           cur_series['data'] = cur_series_data;
+          cur_legend_series['data'] = cur_series_data;
           suffix = cur_series_dims['Measure Type'];
           if (suffix == 'percent' || suffix == 'Percent')
             suffix = '%';
@@ -416,6 +421,7 @@ function draw_chart(){
             suffix = '';
           delete cur_series_dims['Measure Type'];
           name = "<div id='legendTown'>"+ cur_series_dims['Town'] + "<div id='legendDims'>";
+          town_name = name
           delete cur_series_dims['Town'];
           var first_flag = 0;
           town = cur_series_dims
@@ -428,7 +434,9 @@ function draw_chart(){
 
           name += "</div>";
           cur_series['name'] = name;
+          cur_legend_series['name'] = town_name;
           series.push(cur_series);
+          legend_series.push(cur_legend_series);
         });
 
         if(series.length == 0)
@@ -436,13 +444,13 @@ function draw_chart(){
         yAxisLabel = $(".MeasureType:checked").first().val();
 
         hide_spinner();
+        console.log(dataset_title)
         $('#container').highcharts({
             chart: {
               type: display_type
             },
             title: {
-                text: dataset_title,
-                x: -20 //center
+              text: ''
             },
             xAxis: {
                 categories: years
@@ -465,7 +473,22 @@ function draw_chart(){
                 useHTML: true,
                 valueSuffix: suffix
             },
-            series: series
+            credits: {
+              text: 'Source: ' + source + '. CTData.org'
+            },
+            series: series,
+            exporting: {
+              chartOptions:{
+                title: {
+                    text: dataset_title,
+                    x: -20 //center
+                },
+                subtitle: {
+                    text: description,
+                    x: -20 //center
+                }
+              }
+            }
         });
     });
 }

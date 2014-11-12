@@ -1,5 +1,6 @@
 import json
 import yaml
+import ast
 
 from pylons.controllers.util import abort
 
@@ -92,9 +93,16 @@ class CTDataController(base.BaseController):
     def visualization(self, dataset_name):
         db = Database()
         sess = db.session_factory()
-        srvc = CommunityProfileService(sess)
+        community_profile_service = CommunityProfileService(sess)
 
-        metadata_fields = ['Description', 'Full Description', 'Source']
+        try:
+            indicator_id = http_request.GET.get('ind')
+            indicator    = community_profile_service.get_indicators_by_ids([indicator_id])[0]
+            filters      = map(lambda fl: {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}, json.loads(indicator.filters))
+            ind_filters  = ast.literal_eval(json.dumps(dict(i.items()[0] for i in filters)))
+        except IndexError:
+            ind_filters = None
+
         try:
             dataset = DatasetService.get_dataset(dataset_name)
             dataset_meta = DatasetService.get_dataset_meta(dataset_name)
@@ -117,15 +125,31 @@ class CTDataController(base.BaseController):
           disabled = yaml.load(disabled_metadata[0]['value'])
         except IndexError:
           disabled = []
+
+        if not ind_filters:
+            default_filters = defaults
+        else:
+            ind_filters['Town'] = defaults['Town']
+            default_filters = ind_filters
+
+        visible_metadata_fields = filter(lambda x: x['key'] == 'visible_metadata', metadata)
+
+        try:
+            metadata_fields = yaml.load(visible_metadata_fields[0]['value'])
+            metadata_fields.split(',')
+        except IndexError:
+            metadata_fields = ['Description', 'Full Description', 'Source']
+
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
-        headline_indicators = srvc.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
+        headline_indicators = community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
                                                              'disabled': disabled,
-                                                             'default_filters': defaults,
+                                                             'default_filters': default_filters,
                                                              'headline_indicators': headline_indicators})
+
 
     def get_data(self, dataset_name):
         try:
