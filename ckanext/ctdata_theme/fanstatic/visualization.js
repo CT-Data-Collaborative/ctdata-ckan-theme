@@ -1,6 +1,64 @@
-var display_type = "table";
-var map_filters = [];
-var chart_filters = [];
+var display_type  = "table",
+    map_filters   = [],
+    chart_filters = [],
+    dataset_id    = $("#dataset_id").val(),
+    popup         = $("#create_indicator_popup");
+
+popup.modal({show: false});
+$('#close_popup').click(function() {
+  popup.modal('hide');
+});
+
+function show_headline_popup(){
+  $('#save_headline_indicator').on('click', function(){
+    filters_hash = collect_filters_hash();
+    html_text    = "<ul>"
+
+    Object.keys(filters_hash).forEach(function (key) {
+      html_text += "<li><h4>" + key + "</h4><small>" + filters_hash[key].join(', ') + "</small></li>"
+    });
+    html_text += "</ul>"
+    $('#selected_filters').html(
+      html_text
+    );
+    popup.modal('show');
+  });
+}
+
+function create_headline_indicator(){
+  $('#create_headline_indicator').on('click', function(){
+    filters = []
+    Object.keys(filters_hash).forEach(function (key) {
+      filters.push({field: key, values: filters_hash[key]})
+    });
+
+    $.ajax({type: "POST",
+      url: "/community/add_indicator",
+      data: JSON.stringify({ dataset_id: dataset_id, name: $('#indicator_name').val(),
+                             headline: true, filters: filters}),
+      contentType: 'application/json; charset=utf-8',
+      success: function (data) {
+        window.location.reload();
+      }
+    });
+
+  });
+}
+
+function collect_filters_hash(){
+  var hash       = {},
+      checkboxes = $( "input:checked" );
+  $( "input:checked" ).map(function(){
+    key   = $(this).attr('name');
+    value = $(this).attr('value');
+
+    if (hash[key] == undefined )
+      hash[key] = [value];
+    else
+      hash[key].push(value);
+  });
+  return hash;
+}
 
 function select_all(){
   $('.select-all').on('click', function(){
@@ -441,6 +499,7 @@ $(function () {
     select_all();
     deselect_all();
     check_defaults();
+    show_headline_popup();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         display_data();
@@ -453,4 +512,5 @@ $(function () {
       var width = $(window).width() - 450;
       $("#container").width(width);
     }
+    create_headline_indicator();
 });

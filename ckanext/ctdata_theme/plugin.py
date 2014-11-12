@@ -90,6 +90,10 @@ class CTDataController(base.BaseController):
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def visualization(self, dataset_name):
+        db = Database()
+        sess = db.session_factory()
+        srvc = CommunityProfileService(sess)
+
         metadata_fields = ['Description', 'Full Description', 'Source']
         try:
             dataset = DatasetService.get_dataset(dataset_name)
@@ -115,12 +119,13 @@ class CTDataController(base.BaseController):
           disabled = []
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
-
+        headline_indicators = srvc.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
                                                              'disabled': disabled,
-                                                             'default_filters': defaults})
+                                                             'default_filters': defaults,
+                                                             'headline_indicators': headline_indicators})
 
     def get_data(self, dataset_name):
         try:
