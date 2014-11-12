@@ -99,14 +99,18 @@
         <ul>
         {% for property in metadata %}
           <li>
-            <a class="togglebtn">{{property['key']}}</a>
-            <div class="dataValue">
+            <a class="togglebtn", >{{property['key']}}</a>
+            <div class="dataValue" id={{property['key']}}>
                 {{property['value']}}
             </div>
           </li>
         {% endfor %}
+
         </ul>
       </div>
+      <div class="full_metadata_link">
+        <a href="/dataset/{{dataset.name}}#additional_info" >View Full Metadata</a>
+      <div>
     </div>
 
 
