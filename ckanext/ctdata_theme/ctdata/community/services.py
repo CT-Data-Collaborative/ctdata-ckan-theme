@@ -128,12 +128,18 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
+    def update_indicator_name(self, indicator_id, name):
+        ind = self.session.query(ProfileIndicator).get(indicator_id)
+        ind.name = name
+
+        self.session.commit()
+
     def remove_indicator(self, user, indicator_id):
         # in case someone accidentally forgot to pass a valid user object
         assert user is not None, "User must be passed in order for indicator removal to work"
         ind = self.session.query(ProfileIndicator).get(indicator_id)
         if ind:
-            if ind.is_global:
+            if ind.is_global or ind.headline:
                 if user.is_admin:
                     # admins remove global indicators permanently and from all users
                     self.session.delete(ind)

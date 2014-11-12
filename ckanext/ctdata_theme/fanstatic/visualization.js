@@ -2,11 +2,15 @@ var display_type  = "table",
     map_filters   = [],
     chart_filters = [],
     dataset_id    = $("#dataset_id").val(),
-    popup         = $("#create_indicator_popup");
+    create_popup  = $("#create_indicator_popup"),
+    edit_popup    = $("#edit_indicators_popup"),
+    ids_to_remove = [];
 
-popup.modal({show: false});
-$('#close_popup').click(function() {
-  popup.modal('hide');
+create_popup.modal({show: false});
+edit_popup.modal({show: false});
+$('.close_popup').click(function() {
+  create_popup.modal('hide');
+  edit_popup.modal('hide');
 });
 
 function show_headline_popup(){
@@ -21,8 +25,43 @@ function show_headline_popup(){
     $('#selected_filters').html(
       html_text
     );
-    popup.modal('show');
+    create_popup.modal('show');
   });
+}
+
+function show_edit_indicators_popup(){
+  $('#edit_headline_indicators').on('click', function(){
+    edit_popup.modal('show');
+  });
+}
+
+function add_ind_id_to_removing_list(){
+  $('.remove_indicator').on('click', function(){
+    ids_to_remove.push( $(this).attr('id'));
+    $(this).closest('div.control-group').hide();
+  });
+}
+
+function update_headline_indicators(){
+  $('#update_headline_indicators').on('click', function(){
+    names_hash = {}
+
+    $('.edit_name').map(function(){
+        names_hash[$(this).attr('id')]= $(this).val();
+    });
+
+
+    $.ajax({type: "POST",
+      url: "/dataset/"+dataset_id+"/update_indicators",
+      data: JSON.stringify({ names_hash: names_hash,
+                             indicators_to_remove: ids_to_remove}),
+      contentType: 'application/json; charset=utf-8',
+      success: function (data) {
+        window.location.reload();
+      }
+    });
+
+  })
 }
 
 function create_headline_indicator(){
@@ -523,6 +562,9 @@ $(function () {
     deselect_all();
     check_defaults();
     show_headline_popup();
+    show_edit_indicators_popup();
+    add_ind_id_to_removing_list();
+    update_headline_indicators();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         display_data();
