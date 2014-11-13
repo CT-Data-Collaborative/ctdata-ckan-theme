@@ -33,6 +33,27 @@ class CommunityProfileService(object):
 
         return community
 
+    def get_community_profile_by_id(self, community_id):
+        community = self.session.query(CommunityProfile).filter(CommunityProfile.id == community_id).first()
+        if not community:
+            raise toolkit.ObjectNotFound("No community with this name was found")
+
+        return community
+
+    def create_community_profile(self, name, indicator_ids):
+        new_profile = CommunityProfile(name, str(indicator_ids))
+        self.session.add(new_profile)
+
+        self.session.commit()
+        return new_profile
+
+    def get_town(self, town_name):
+        town = self.session.query(Town).filter(Town.name == town_name).first()
+        if not town:
+            raise toolkit.ObjectNotFound("No town with this name was found")
+
+        return town
+
     def get_all_towns(self):
         return self.session.query(Town).order_by(Town.name).all()
 
@@ -42,7 +63,7 @@ class CommunityProfileService(object):
         all.remove(conn)
         return [conn] + all
 
-    def create_indicator(self, filters, dataset_id, owner):
+    def create_indicator(self, name, filters, dataset_id, owner, headline):
         assert owner is not None, "User must be passed in order for indicator creation to work"
 
         dataset = DatasetService.get_dataset(dataset_id)
@@ -66,7 +87,6 @@ class CommunityProfileService(object):
             # python allows us to compare lists of dicts
             if sorted(filters) == sorted(ex_fltrs):
                 raise ProfileAlreadyExists("Profile with such dataset and filters already exists")
-
         try:
             data_type = dict_with_key_value("field", "Measure Type", filters)['values'][0]
             years = dict_with_key_value("field", "Year", filters)['values'][0]
@@ -87,23 +107,43 @@ class CommunityProfileService(object):
                 raise toolkit.ObjectNotFound("'Year' filter value must be an integer "
                                              "or have '%Y-%m-%d %H:%M:%S' format")
 
-        is_global = True if owner.is_admin else False
-        indicator = ProfileIndicator(json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
-                                     variable)
+        is_global = True if owner.is_admin and not headline else False
+        indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
+                                     variable, headline)
+
         if not owner.is_admin:
             owner.indicators.append(indicator)
         print "\nUSER'S INDICATORS:", owner.indicators
         self.session.add(indicator)
+
+    def remove_indicator_id_from_profiles(self, indicator_id):
+        community_profiles = self.get_all_profiles()
+
+        for profile in community_profiles:
+            if profile.indicator_ids != None:
+                ids = profile.indicator_ids.split(',')
+                if str(indicator_id) in ids:
+                    ids.remove(str(indicator_id))
+                profile.indicator_ids =  ','.join(str(x) for x in ids)
+
+        self.session.commit()
+
+    def update_indicator_name(self, indicator_id, name):
+        ind = self.session.query(ProfileIndicator).get(indicator_id)
+        ind.name = name
+
+        self.session.commit()
 
     def remove_indicator(self, user, indicator_id):
         # in case someone accidentally forgot to pass a valid user object
         assert user is not None, "User must be passed in order for indicator removal to work"
         ind = self.session.query(ProfileIndicator).get(indicator_id)
         if ind:
-            if ind.is_global:
+            if ind.is_global or ind.headline:
                 if user.is_admin:
                     # admins remove global indicators permanently and from all users
                     self.session.delete(ind)
+                    self.remove_indicator_id_from_profiles(ind.id)
                 else:
                     # regular users don't actually remove global indicators, but only mark them as removed so we're able
                     # not to show those indicators to them
@@ -121,32 +161,56 @@ class CommunityProfileService(object):
                 if not user.is_admin:
                     # regular users can permanently delete their own indicators
                     self.session.delete(ind)
+                    self.remove_indicator_id_from_profiles(ind.id)
         else:
             raise toolkit.ObjectNotFound("Indicator not found")
 
-    def get_indicators(self, community_name, towns_names, user=None):
+    def get_headline_indicators_for_dataset(self, dataset_id):
+        indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.headline == True,
+                                                                      ProfileIndicator.dataset_id == dataset_id)).all()
+        return indicators
+
+    def get_indicators_by_ids(self, ids):
+        indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.id.in_(ids)).all()
+        return indicators
+
+    def get_default_indicators(self):
+        indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.is_global == True).all()
+        return indicators
+
+    def get_indicators(self, community_name, towns_names, location, user=None):
         community = self.get_community_profile(community_name)
+        location  = self.get_town(location)
 
         towns = set()
         if towns_names:
             towns.update(self.session.query(Town).filter(Town.name.in_(set(towns_names))).all())
-        towns.update([community.town])
+        towns.update([location])
         towns_fipses = map(lambda x: x.fips, list(towns))
 
         existing_towns, existing_indicators = set(), set()
-        if user and not user.is_admin:
-            users_indicators = map(lambda ind: ind.id, user.indicators)
-            indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
-                                    filter(ProfileIndicator.id.in_(users_indicators)).all())
+
+        if user and user.is_admin and community.name == location.name:
+            indicators_filter = map(lambda x: x.id, self.get_default_indicators())
         else:
-            indicators_filter = map(lambda x: x.id, self.session.query(ProfileIndicator).
-                                    filter(ProfileIndicator.is_global == True).all())
+            if community.indicator_ids != None:
+                indicator_ids = community.indicator_ids.split(',')
+                if indicator_ids[-1] == '':
+                    indicator_ids.pop(-1)
+
+                indicators_filter = map(lambda x: x.id, self.get_indicators_by_ids(indicator_ids))
+            else:
+                if user:
+                    indicator_ids     = map(lambda ind: ind.id, user.indicators)
+                    indicators_filter = map(lambda x: x.id, self.get_indicators_by_ids(indicator_ids))
+                else:
+                    indicators_filter = map(lambda x: x.id, self.get_default_indicators())
 
         print "\nINDICATORS FILTERS:", indicators_filter
 
         existing_values = self.session.query(ProfileIndicatorValue).\
             filter(and_(ProfileIndicatorValue.town_id.in_(towns_fipses),
-                        ProfileIndicatorValue.indicator_id.in_(indicators_filter))).all()
+                ProfileIndicatorValue.indicator_id.in_(indicators_filter))).all()
         for val in existing_values:
             existing_towns.update([val.town])
             existing_indicators.update([val.indicator])
@@ -161,7 +225,7 @@ class CommunityProfileService(object):
         new_indicators = list(set(all_indicators) - existing_indicators)
         new_towns = list(towns - existing_towns)
 
-        if user and not user.is_admin:
+        if user and community.name != location.name:
             # add new global indicators to the list of user's indicators
             print "\nNEW INDICATORS:", new_indicators
             user.indicators += filter(lambda ind: ind.is_global, new_indicators)
@@ -185,10 +249,12 @@ class CommunityProfileService(object):
         result, last_id, current_ind = [], None, None
 
         user_indicators = indicators_filter
-        if user and not user.is_admin:
+
+        if user and not user.is_admin and community.name == location.name:
             user_indicators = self.session.query(UserIndicatorLink.indicator_id).\
                 filter(and_(UserIndicatorLink.user_id == user.ckan_user_id,
                             UserIndicatorLink.deleted == False))
+
         indicators_values = self.session.query(ProfileIndicatorValue).\
             filter(and_(ProfileIndicatorValue.town_id.in_(towns_fipses),
                         ProfileIndicatorValue.indicator_id.in_(user_indicators))).\

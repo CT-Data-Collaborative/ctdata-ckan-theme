@@ -5,7 +5,7 @@
 <link href='/common/css/visualization.css' rel='stylesheet' type='text/css'>
 {% endblock %}
 
-{% block page_name %}Data by Location - {{community.name}}{% endblock %}
+{% block page_name %}Data by Location - {{location}}{% endblock %}
 {% block page_description %}Create a Profile for Your Community{% endblock %}
 
 {% block main_content %}
@@ -33,7 +33,8 @@
     {% for indicator in indicators %}
         <ul class="table_data">
             <li class="col-1">
-                <a href="/visualization/{{ indicator['dataset'].replace(' ', '-').lower() }}">
+                <span class="indicator_id hidden">{{indicator['indicator'].id}} </span>
+                <a href="/visualization/{{ indicator['dataset'].replace(' ', '-').lower()}}?ind={{indicator['indicator'].id}}">
                     {{indicator['dataset']}}, {{indicator['indicator'].variable}}
                 </a>
                 <span>
@@ -63,6 +64,15 @@
     <form style="display: none">
         <input type="hidden" id="community_name" value="{{community.name}}">
     </form>
+
+    {% if user %}
+    <ul class= 'opt_btn'>
+    <li><a href="javascript:void(0)" id="create_profile" class='blue_button'>Save to new profile</a></li>
+    {% if user.is_admin and community.name != location %}
+        <li><a href="javascript:void(0)" id="save_profile_as_default" class='blue_button'>Save as defualt</a></li>
+    {% endif %}
+    </ul>
+    {% endif %}
 </div>
 
 <div id="towns_popup" class="modal fade" style="display: none">
@@ -151,4 +161,8 @@
 {% block scripts %}
     {{ super() }}
     {% resource 'ctdata_theme/communities.js' %}
+    <script>
+    var community_name = '';
+    community_name = "{{community.name}}"
+    </script>
 {% endblock %}

@@ -452,6 +452,15 @@ label {font-weight: normal; cursor: auto}
   visibility: hidden;
 }
 
+.hidden{
+  display: none !important;
+}
+
+.blue_button{
+  background-color: #66cef5;
+  padding:6px 20px 6px 20px;
+}
+
 .data_by_location:hover{
   text-decoration: none;
 }

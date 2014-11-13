@@ -9,17 +9,16 @@ Base = declarative_base()
 class CommunityProfile(Base):
     __tablename__ = 'ctdata_community_profiles'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    town_id = Column(BigInteger, ForeignKey('ctdata_towns.fips'))
+    id            = Column(Integer, primary_key=True)
+    name          = Column(String)
+    indicator_ids = Column(String)
 
-    town = relationship("Town", uselist=False, backref="community")
-
-    def __init__(self, name):
+    def __init__(self, name, indicator_ids):
         self.name = name
+        self.indicator_ids = indicator_ids
 
     def __repr__(self):
-        return "Community %s" % (self.name,)
+        return "Community %s %s" % (self.name, self.indicator_ids)
 
 
 class Town(Base):
@@ -41,22 +40,26 @@ class ProfileIndicator(Base):
 
     id = Column(Integer, primary_key=True)
     dataset_id = Column(String)
-    is_global = Column(Boolean)
-    data_type = Column(String)
-    year = Column(Integer)
-    variable = Column(String)
-    filters = Column(Text)
+    is_global  = Column(Boolean)
+    data_type  = Column(String)
+    year       = Column(Integer)
+    variable   = Column(String)
+    filters    = Column(Text)
+    name       = Column(String)
+    headline   = Column(Boolean)
 
-    def __init__(self, filters, dataset_id, is_global, data_type, year, variable):
+    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, headline):
+        self.name = name
         self.filters = filters
         self.dataset_id = dataset_id
         self.is_global = is_global
         self.data_type = data_type
         self.year = year
         self.variable = variable
+        self.headline = headline
 
     def __repr__(self):
-        return "[Indicator: %s; %s; %s;]" % (self.dataset_id, self.data_type, self.year)
+        return "[Indicator: %s; %s; %s; %s; %s;]" % (self.name, self.id, self.dataset_id, self.data_type, self.year)
 
 
 class ProfileIndicatorValue(Base):
@@ -77,7 +80,7 @@ class ProfileIndicatorValue(Base):
         self.value = value
 
     def __repr__(self):
-        return "[Value: %s; %s; %s; %s]" % (self.town, self.community, self.indicator, self.value)
+        return "[Value: %s; %s; %s;]" % (self.town, self.indicator, self.value)
 
 
 class UserIndicatorLink(Base):

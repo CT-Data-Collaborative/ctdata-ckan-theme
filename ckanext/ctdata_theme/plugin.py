@@ -1,5 +1,6 @@
 import json
 import yaml
+import ast
 
 from pylons.controllers.util import abort
 
@@ -16,6 +17,8 @@ from ctdata.visualization.querybuilders import QueryBuilderFactory
 from ctdata.visualization.views import ViewFactory
 from ctdata.community.services import CommunityProfileService
 from ctdata.topic.services import TopicSerivce
+from ctdata.users.services import UserService
+
 
 def communities():
     db = Database()
@@ -53,12 +56,15 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_data', '/data/{dataset_name}', action='get_data')
+            m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
 
         with routes.mapper.SubMapper(
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.community.controllers:CommunityProfilesController') as m:
             m.connect('community_get_filters', '/community/get_filters/{dataset_id}', action='get_filters')
             m.connect('community_add_indicator', '/community/add_indicator', action='add_indicator')
+            m.connect('community_add_profile', '/community/add_profile', action='add_profile')
+            m.connect('community_save_as_default', '/community/save_as_default', action='save_as_default')
             m.connect('community_remove_indicator',
                       '/community/remove_indicator/{indicator_id}',
                       action='remove_indicator')
@@ -87,8 +93,45 @@ class CTDataController(base.BaseController):
 
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
+    def update_indicators(self, dataset_name):
+        db   = Database()
+        sess = db.session_factory()
+        community_profile_service = CommunityProfileService(sess)
+        user_service = UserService(sess)
+        user_name    = http_request.environ.get("REMOTE_USER")
+
+        if not user_name:
+            abort(401)
+        if http_request.method == 'POST':
+            user = user_service.get_or_create_user(user_name) if user_name else None
+
+            if user.is_admin:
+                json_body   = json.loads(http_request.body, encoding=http_request.charset)
+                names_hash  = json_body.get('names_hash')
+                indicators_to_remove  = json_body.get('indicators_to_remove')
+
+                for indicator_id, name in names_hash.iteritems():
+                    community_profile_service.update_indicator_name(indicator_id, name)
+
+                for indicator_id in indicators_to_remove:
+                    community_profile_service.remove_indicator(user, int(indicator_id))
+
+        http_response.headers['Content-type'] = 'application/json'
+        return json.dumps({'success': True})
+
     def visualization(self, dataset_name):
-        metadata_fields = ['Description', 'Full Description', 'Source']
+        db   = Database()
+        sess = db.session_factory()
+        community_profile_service = CommunityProfileService(sess)
+
+        try:
+            indicator_id = http_request.GET.get('ind')
+            indicator    = community_profile_service.get_indicators_by_ids([indicator_id])[0]
+            filters      = map(lambda fl: {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}, json.loads(indicator.filters))
+            ind_filters  = ast.literal_eval(json.dumps(dict(i.items()[0] for i in filters)))
+        except IndexError:
+            ind_filters = None
+
         try:
             dataset = DatasetService.get_dataset(dataset_name)
             dataset_meta = DatasetService.get_dataset_meta(dataset_name)
@@ -111,14 +154,31 @@ class CTDataController(base.BaseController):
           disabled = yaml.load(disabled_metadata[0]['value'])
         except IndexError:
           disabled = []
+
+        if not ind_filters:
+            default_filters = defaults
+        else:
+            ind_filters['Town'] = defaults['Town']
+            default_filters = ind_filters
+
+        visible_metadata_fields = filter(lambda x: x['key'] == 'visible_metadata', metadata)
+
+        try:
+            metadata_fields = yaml.load(visible_metadata_fields[0]['value'])
+            metadata_fields.split(',')
+        except IndexError:
+            metadata_fields = ['Description', 'Full Description', 'Source']
+
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
-
+        headline_indicators = community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
                                                              'disabled': disabled,
-                                                             'default_filters': defaults})
+                                                             'default_filters': default_filters,
+                                                             'headline_indicators': headline_indicators})
+
 
     def get_data(self, dataset_name):
         try:
@@ -154,32 +214,35 @@ class CTDataController(base.BaseController):
 
     def _hide_dims_with_one_value(self, data):
         size         = len(data['data'])
-        keys         = data['data'][size-1]['dims'].keys()
-        initial_data = data['data'][size-1]['dims']
-        counters     = {}
+        try:
+            keys         = data['data'][size-1]['dims'].keys()
+            initial_data = data['data'][size-1]['dims']
+            counters     = {}
 
-        for key in keys:
-            counters[key] = 0
+            for key in keys:
+                counters[key] = 0
 
-        for item in data['data']:
-            try:
-                dims = item['dims']
-                for key in keys:
-                    if dims[key] == initial_data[key]:
-                        counters[key] += 1
-            except KeyError:
-                size -= 1
-                pass
+            for item in data['data']:
+                try:
+                    # dims = item['dims']
+                    for key in keys:
+                        if item['dims'][key] == initial_data[key]:
+                            counters[key] += 1
+                except KeyError:
+                    size -= 1
+                    pass
 
-        h = dict((key,value) for key, value in counters.iteritems() if value == size)
+            h = dict((key,value) for key, value in counters.iteritems() if value == size)
 
-        if len(h.keys()) > 0:
-            for key in h.keys():
-                for item in data['data']:
-                    try:
-                       item['dims'].pop(key, None)
-                    except KeyError:
-                        pass
+            if len(h.keys()) > 0:
+                for key in h.keys():
+                    for item in data['data']:
+                        try:
+                           item['dims'].pop(key, None)
+                        except KeyError:
+                            pass
+        except KeyError:
+            pass
 
         return data
 
@@ -253,28 +316,4 @@ class CTDataController(base.BaseController):
     def remove_community_indicator(self, indicator_id):
         pass
 
-    def community_profile(self, community_name):
-        session = Database().session_factory()
-        community_profile_service = CommunityProfileService(session)
-
-        towns_raw, towns_names = http_request.GET.get('towns'), []
-        if towns_raw:
-            # parse town name
-            towns_names = map(lambda x: x.strip(), towns_raw.split(','))
-
-        try:
-            community, indicators, displayed_towns = community_profile_service.get_indicators(community_name,
-                                                                                              towns_names)
-            topics = TopicSerivce.get_topics()
-        except toolkit.ObjectNotFound as e:
-            abort(404, detail=str(e))
-
-        towns = community_profile_service.get_all_towns()
-        displayed_towns_names = map(lambda t: t.name, displayed_towns)
-
-        session.commit()
-        return base.render('community_profile.html', extra_vars={'community': community,
-                                                                 'indicators': indicators,
-                                                                 'topics': topics,
-                                                                 'displayed_towns': displayed_towns_names,
-                                                                 'towns': towns})
+    # TODO: check if other controller methods are still in use
