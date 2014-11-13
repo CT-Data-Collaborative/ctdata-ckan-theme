@@ -183,32 +183,35 @@ class CTDataController(base.BaseController):
 
     def _hide_dims_with_one_value(self, data):
         size         = len(data['data'])
-        keys         = data['data'][size-1]['dims'].keys()
-        initial_data = data['data'][size-1]['dims']
-        counters     = {}
+        try:
+            keys         = data['data'][size-1]['dims'].keys()
+            initial_data = data['data'][size-1]['dims']
+            counters     = {}
 
-        for key in keys:
-            counters[key] = 0
+            for key in keys:
+                counters[key] = 0
 
-        for item in data['data']:
-            try:
-                dims = item['dims']
-                for key in keys:
-                    if dims[key] == initial_data[key]:
-                        counters[key] += 1
-            except KeyError:
-                size -= 1
-                pass
+            for item in data['data']:
+                try:
+                    # dims = item['dims']
+                    for key in keys:
+                        if item['dims'][key] == initial_data[key]:
+                            counters[key] += 1
+                except KeyError:
+                    size -= 1
+                    pass
 
-        h = dict((key,value) for key, value in counters.iteritems() if value == size)
+            h = dict((key,value) for key, value in counters.iteritems() if value == size)
 
-        if len(h.keys()) > 0:
-            for key in h.keys():
-                for item in data['data']:
-                    try:
-                       item['dims'].pop(key, None)
-                    except KeyError:
-                        pass
+            if len(h.keys()) > 0:
+                for key in h.keys():
+                    for item in data['data']:
+                        try:
+                           item['dims'].pop(key, None)
+                        except KeyError:
+                            pass
+        except KeyError:
+            pass
 
         return data
 
