@@ -15,6 +15,24 @@
 <section class="visualisation">
 <div class="ctdata-wrapper">
 
+{% if headline_indicators %}
+<div class="dropdown">
+  <button class="bbtn-mini dropdown-toggle" type="button"  data-toggle="dropdown">
+    -- Select Headline Indicator --
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+      {% for indicator in headline_indicators %}
+        <li role="presentation"><a href="/visualization/{{dataset.name}}?ind={{indicator.id}}"> {{indicator.name}} </a></li>
+      {% endfor %}
+  </ul>
+  {% if c.userobj.sysadmin %}
+    <a href="javascript:void(0);" id="edit_headline_indicators" class="btn"> Edit </a>
+  {% endif %}
+</div>
+{% endif %}
+
+
 <div class="refine_wrap">
 <h2>Refine This Indicator <img src="/common/images/arrowimg.png" alt="" /></h2>
 <ul>
@@ -34,7 +52,7 @@
   {% for value in dimension.possible_values %}
     {% if value|length > 0 %}
     <li id = "{{value}}">
-        <input type="checkbox" id="{{value}}Check" value="{{value}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}">
+        <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}">
         <label for="{{value}}Check" class="checkLabel">{{value}}</label>
     </li>
     {% endif %}
@@ -55,7 +73,13 @@
 </li>
 -->
 </ul>
+
+</br>
+{% if c.userobj.sysadmin %}
+<a href="javascript:void(0);" id="save_headline_indicator" class="btn"> Save </a>
+{% endif %}
 </div>
+
 
 <div class="visual_right">
 <div class="option_row">
@@ -118,6 +142,69 @@
 
 </div>
 
+</div>
+
+<div id="create_indicator_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            Create Headline Indicator
+        </div>
+        <div class="modal-content">
+            <div class="modal-body disable-scroll">
+                <div>
+                  <form class="form-horizontal">
+                    <div class="control-group">
+                      <label class="control-label"> Indicator name </label>
+                      <div class="controls">
+                        <input type="text" name="indicator_name" id="indicator_name"> </input>
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label class="control-label"> Selected Fiters </label>
+                      <div class="controls"> <div id="selected_filters" ></div> </div>
+                    </div>
+                  </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button id="create_headline_indicator" class="btn btn-info">Save</button>
+                    <button class="btn close_popup">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="edit_indicators_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            Update Headline Indicators
+        </div>
+        <div class="modal-content">
+            <div class="modal-body disable-scroll">
+                <div>
+                  <form class="form-horizontal">
+                    {% for indicator in headline_indicators %}
+                      <div class="control-group">
+                        <label class="control-label"> Indicator {{indicator.id}} </label>
+                        <div class="controls">
+                          <input type="text" name="indicator_name" id="{{indicator.id}}" value="{{indicator.name}}" class="edit_name"></input>
+                          <a href="javascript:void(0);" class="remove_indicator" id="{{indicator.id}}"> <i class='fa fa-times text-error'></i> </a>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button id="update_headline_indicators" class="btn btn-info">Update</button>
+                    <button class="btn close_popup">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </section>
 {% endblock %}

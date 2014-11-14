@@ -30,14 +30,17 @@ class CommunityProfilesController(base.BaseController):
         if http_request.method == 'POST':
             user = self.user_service.get_or_create_user(user_name) if user_name else None
 
-            json_body = json.loads(http_request.body, encoding=http_request.charset)
-            filters, dataset_id = json_body.get('filters'), json_body.get('dataset_id')
+            json_body   = json.loads(http_request.body, encoding=http_request.charset)
+            filters     = json_body.get('filters')
+            dataset_id  = json_body.get('dataset_id')
+            name        = json_body.get('name')
+            headline    = json_body.get('headline')
 
             if not filters or not dataset_id:
                 abort(400)
 
             try:
-                self.community_profile_service.create_indicator(filters, dataset_id, user)
+                self.community_profile_service.create_indicator(name, filters, dataset_id, user, headline)
             except toolkit.ObjectNotFound, e:
                 abort(404, str(e))
             except ProfileAlreadyExists, e:

@@ -349,13 +349,13 @@ ul.dropdown-menu li a:hover{
 }
 
 
-.bbtn:hover, .bbtn:focus {
+.bbtn:hover, .bbtn:focus, .bbtn-mini:hover, .bbtn-mini:focus {
 color: #555;
 text-decoration: none;
 border: 3px solid #3c72b8;
 }
 
-.bbtn {
+.bbtn, .bbtn-mini {
 display: inline-block;
 padding: 6px 12px;
 margin-bottom: 0;
@@ -376,6 +376,12 @@ border-radius: 4px;
 background: #fff;
 }
 
+.bbtn-mini{
+	font-size: 12px;
+	padding: 6px 6px;
+	border-radius: 2px;
+	border: 1px solid #ccc;
+}
 
 .dropdown {
   position: relative;

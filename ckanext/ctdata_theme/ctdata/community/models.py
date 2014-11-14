@@ -42,22 +42,26 @@ class ProfileIndicator(Base):
 
     id = Column(Integer, primary_key=True)
     dataset_id = Column(String)
-    is_global = Column(Boolean)
-    data_type = Column(String)
-    year = Column(Integer)
-    variable = Column(String)
-    filters = Column(Text)
+    is_global  = Column(Boolean)
+    data_type  = Column(String)
+    year       = Column(Integer)
+    variable   = Column(String)
+    filters    = Column(Text)
+    name       = Column(String)
+    headline   = Column(Boolean)
 
-    def __init__(self, filters, dataset_id, is_global, data_type, year, variable):
+    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, headline):
+        self.name = name
         self.filters = filters
         self.dataset_id = dataset_id
         self.is_global = is_global
         self.data_type = data_type
         self.year = year
         self.variable = variable
+        self.headline = headline
 
     def __repr__(self):
-        return "[Indicator: %s; %s; %s; %s;]" % (self.id, self.dataset_id, self.data_type, self.year)
+        return "[Indicator: %s; %s; %s; %s; %s;]" % (self.name, self.id, self.dataset_id, self.data_type, self.year)
 
 
 class ProfileIndicatorValue(Base):

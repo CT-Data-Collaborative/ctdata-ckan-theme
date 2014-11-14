@@ -54,7 +54,7 @@ $(function(){
         $("#indicator_adding_error").animate({opacity: 0}, 300);
         $.ajax({type: "POST",
             url: "/community/add_indicator",
-            data: JSON.stringify({dataset_id: current_dataset,
+            data: JSON.stringify({dataset_id: current_dataset, name: "", headline: false,
                                   filters: get_filters()}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
@@ -110,7 +110,6 @@ $(function(){
     });
 
     $('.table_data').hover(function() {
-        console.log('test');
         $(this).find('.close_pic').animate({opacity: 1.0}, 300);
     }, function () {
         $(this).find('.close_pic').animate({opacity: 0.0}, 300);
