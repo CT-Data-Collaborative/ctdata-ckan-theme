@@ -13,6 +13,14 @@ $('.close_popup').click(function() {
   edit_popup.modal('hide');
 });
 
+
+function show_selected_indicator(){
+  ind_id = location.search.split('ind=')[1]
+  if (ind_id != undefined){
+    $('#'+ind_id + '.head_ind_link').prop('selected', true)
+  }
+}
+
 function show_headline_popup(){
   $('#save_headline_indicator').on('click', function(){
     filters_hash = collect_filters_hash();
@@ -565,6 +573,7 @@ $(function () {
     show_edit_indicators_popup();
     add_ind_id_to_removing_list();
     update_headline_indicators();
+    show_selected_indicator();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         display_data();

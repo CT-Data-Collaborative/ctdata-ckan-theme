@@ -172,3 +172,12 @@ div#error_message{
 #save_headline_indicator{
   margin-left: 55px;
 }
+.headline_indicators{
+  margin-top: 40px;
+  margin-left: 400px;
+}
+
+.custom.bbtn{
+  width: 300px;
+  height: 40px;
+}
