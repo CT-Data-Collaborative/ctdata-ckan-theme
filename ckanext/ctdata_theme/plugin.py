@@ -158,8 +158,11 @@ class CTDataController(base.BaseController):
         if not ind_filters:
             default_filters = defaults
         else:
-            ind_filters['Town'] = defaults['Town']
-            default_filters = ind_filters
+            try:
+                ind_filters['Town'] = defaults['Town']
+                default_filters = ind_filters
+            except TypeError:
+                default_filters = ind_filters
 
         visible_metadata_fields = filter(lambda x: x['key'] == 'visible_metadata', metadata)
 

@@ -168,3 +168,7 @@ div#error_message{
 .full_metadata_link a:hover{
   text-decoration: none;
 }
+
+#save_headline_indicator{
+  margin-left: 55px;
+}
