@@ -355,7 +355,8 @@ function draw_table(){
   $.ajax({type: "POST",
           url: "/data/"+dataset_id,
           data: JSON.stringify({view: 'chart',
-                               filters: get_filters()
+                               filters: get_filters(),
+                               omit_single_values: true
                                }),
           contentType: 'application/json; charset=utf-8'}).done(function(data) {
 
@@ -442,7 +443,8 @@ function draw_chart(){
   $.ajax({type: "POST",
             url: "/data/" + dataset_id,
             data: JSON.stringify({view: 'chart',
-                                  filters: get_filters()
+                                  filters: get_filters(),
+                                  omit_single_values: true
                                   }),
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         //var series = data['data'],
