@@ -160,7 +160,7 @@ class CommunityProfilesController(base.BaseController):
         if http_request.method == 'POST':
             name = user_name + '_profile' + time.strftime("%H_%M_%S")
             user = self.user_service.get_or_create_user(user_name) if user_name else None
-            user_id = user.ckan_user_id if user and not user.is_admin else None
+            user_id = user.ckan_user_id if user else None
             profile = self.community_profile_service.create_community_profile(name, ids, user_id)
             if profile.id:
                 return json.dumps({'success': True, 'redirect_link': '/community/' + community_name + '?p=' + str(profile.id) })

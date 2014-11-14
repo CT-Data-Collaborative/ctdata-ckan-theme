@@ -59,7 +59,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_data', '/data/{dataset_name}', action='get_data')
-            m.connect('user_community_profiles', '/user_community_profiles', action='user_community_profiles')
+            m.connect('my_community_profiles', '/my_community_profiles', action='my_community_profiles')
 
         with routes.mapper.SubMapper(
                 route_map,
@@ -90,7 +90,7 @@ class CTDataController(base.BaseController):
         self.community_profile_service = CommunityProfileService(self.session)
         self.user_service = UserService(self.session)
 
-    def user_community_profiles(self):
+    def my_community_profiles(self):
         user_name = http_request.environ.get("REMOTE_USER")
 
         if not user_name:
