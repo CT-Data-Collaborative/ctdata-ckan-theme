@@ -353,7 +353,7 @@ function draw_table(){
   var dataset_id = $("#dataset_id").val(),
       dataset_title = $("dataset_title").val();
   $.ajax({type: "POST",
-          url: "/data/"+dataset_id,
+          url: "/vizualization_data/"+dataset_id,
           data: JSON.stringify({view: 'chart',
                                filters: get_filters(),
                                omit_single_values: true
@@ -441,7 +441,7 @@ function draw_chart(){
       source = $('#Source').text();
 
   $.ajax({type: "POST",
-            url: "/data/" + dataset_id,
+            url: "/vizualization_data/" + dataset_id,
             data: JSON.stringify({view: 'chart',
                                   filters: get_filters(),
                                   omit_single_values: true

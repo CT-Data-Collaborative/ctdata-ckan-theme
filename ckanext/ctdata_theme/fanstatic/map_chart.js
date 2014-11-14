@@ -15,7 +15,7 @@ if (town_index >= 0)
   filters.splice(town_index, 1)
 
 $.ajax({type: "POST",
-        url: "/data/" + dataset_id,
+        url: "/vizualization_data/" + dataset_id,
         data: JSON.stringify({view: 'map',
                               filters: filters
                              }),

@@ -55,7 +55,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('special_projects', '/special_projects', action='special_projects')
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
-            m.connect('get_data', '/data/{dataset_name}', action='get_data')
+            m.connect('get_vizualization_data', '/vizualization_data/{dataset_name}', action='get_vizualization_data')
             m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
 
         with routes.mapper.SubMapper(
@@ -183,7 +183,7 @@ class CTDataController(base.BaseController):
                                                              'headline_indicators': headline_indicators})
 
 
-    def get_data(self, dataset_name):
+    def get_vizualization_data(self, dataset_name):
         try:
             json_body = json.loads(http_request.body, encoding=http_request.charset)
         except ValueError:
