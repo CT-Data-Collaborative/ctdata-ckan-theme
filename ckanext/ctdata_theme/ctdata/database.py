@@ -42,6 +42,14 @@ class Database(object):
         VisualizationOrmBase.metadata.create_all(self.engine)
 
         try:
+            name     = Column('name', String)
+            headline = Column('headline', Boolean)
+            self.add_column('ctdata_profile_indicators', name, connection_string)
+            self.add_column('ctdata_profile_indicators', headline, connection_string)
+        except sqlalchemy.exc.ProgrammingError:
+            pass
+
+        try:
             indicator_ids  = Column('indicator_ids', String)
             self.add_column('ctdata_community_profiles', indicator_ids, connection_string)
         except sqlalchemy.exc.ProgrammingError:

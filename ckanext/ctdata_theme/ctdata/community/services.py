@@ -63,7 +63,7 @@ class CommunityProfileService(object):
         all.remove(conn)
         return [conn] + all
 
-    def create_indicator(self, filters, dataset_id, owner):
+    def create_indicator(self, name, filters, dataset_id, owner, headline):
         assert owner is not None, "User must be passed in order for indicator creation to work"
 
         dataset = DatasetService.get_dataset(dataset_id)
@@ -87,7 +87,6 @@ class CommunityProfileService(object):
             # python allows us to compare lists of dicts
             if sorted(filters) == sorted(ex_fltrs):
                 raise ProfileAlreadyExists("Profile with such dataset and filters already exists")
-
         try:
             data_type = dict_with_key_value("field", "Measure Type", filters)['values'][0]
             years = dict_with_key_value("field", "Year", filters)['values'][0]
@@ -108,9 +107,10 @@ class CommunityProfileService(object):
                 raise toolkit.ObjectNotFound("'Year' filter value must be an integer "
                                              "or have '%Y-%m-%d %H:%M:%S' format")
 
-        is_global = True if owner.is_admin else False
-        indicator = ProfileIndicator(json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
-                                     variable)
+        is_global = True if owner.is_admin and not headline else False
+        indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
+                                     variable, headline)
+
         if not owner.is_admin:
             owner.indicators.append(indicator)
         print "\nUSER'S INDICATORS:", owner.indicators
@@ -128,12 +128,18 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
+    def update_indicator_name(self, indicator_id, name):
+        ind = self.session.query(ProfileIndicator).get(indicator_id)
+        ind.name = name
+
+        self.session.commit()
+
     def remove_indicator(self, user, indicator_id):
         # in case someone accidentally forgot to pass a valid user object
         assert user is not None, "User must be passed in order for indicator removal to work"
         ind = self.session.query(ProfileIndicator).get(indicator_id)
         if ind:
-            if ind.is_global:
+            if ind.is_global or ind.headline:
                 if user.is_admin:
                     # admins remove global indicators permanently and from all users
                     self.session.delete(ind)
@@ -158,6 +164,11 @@ class CommunityProfileService(object):
                     self.remove_indicator_id_from_profiles(ind.id)
         else:
             raise toolkit.ObjectNotFound("Indicator not found")
+
+    def get_headline_indicators_for_dataset(self, dataset_id):
+        indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.headline == True,
+                                                                      ProfileIndicator.dataset_id == dataset_id)).all()
+        return indicators
 
     def get_indicators_by_ids(self, ids):
         indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.id.in_(ids)).all()

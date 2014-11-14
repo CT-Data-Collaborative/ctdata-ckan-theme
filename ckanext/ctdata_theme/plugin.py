@@ -17,6 +17,8 @@ from ctdata.visualization.querybuilders import QueryBuilderFactory
 from ctdata.visualization.views import ViewFactory
 from ctdata.community.services import CommunityProfileService
 from ctdata.topic.services import TopicSerivce
+from ctdata.users.services import UserService
+
 
 def communities():
     db = Database()
@@ -54,6 +56,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_data', '/data/{dataset_name}', action='get_data')
+            m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
 
         with routes.mapper.SubMapper(
                 route_map,
@@ -90,8 +93,34 @@ class CTDataController(base.BaseController):
 
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
+    def update_indicators(self, dataset_name):
+        db   = Database()
+        sess = db.session_factory()
+        community_profile_service = CommunityProfileService(sess)
+        user_service = UserService(sess)
+        user_name    = http_request.environ.get("REMOTE_USER")
+
+        if not user_name:
+            abort(401)
+        if http_request.method == 'POST':
+            user = user_service.get_or_create_user(user_name) if user_name else None
+
+            if user.is_admin:
+                json_body   = json.loads(http_request.body, encoding=http_request.charset)
+                names_hash  = json_body.get('names_hash')
+                indicators_to_remove  = json_body.get('indicators_to_remove')
+
+                for indicator_id, name in names_hash.iteritems():
+                    community_profile_service.update_indicator_name(indicator_id, name)
+
+                for indicator_id in indicators_to_remove:
+                    community_profile_service.remove_indicator(user, int(indicator_id))
+
+        http_response.headers['Content-type'] = 'application/json'
+        return json.dumps({'success': True})
+
     def visualization(self, dataset_name):
-        db = Database()
+        db   = Database()
         sess = db.session_factory()
         community_profile_service = CommunityProfileService(sess)
 
@@ -142,12 +171,14 @@ class CTDataController(base.BaseController):
 
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
-
+        headline_indicators = community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
                                                              'disabled': disabled,
-                                                             'default_filters': default_filters})
+                                                             'default_filters': default_filters,
+                                                             'headline_indicators': headline_indicators})
+
 
     def get_data(self, dataset_name):
         try:
