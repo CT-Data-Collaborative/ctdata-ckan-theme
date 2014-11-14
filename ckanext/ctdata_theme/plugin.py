@@ -17,6 +17,11 @@ from ctdata.visualization.querybuilders import QueryBuilderFactory
 from ctdata.visualization.views import ViewFactory
 from ctdata.community.services import CommunityProfileService
 from ctdata.topic.services import TopicSerivce
+from ctdata.users.services import UserService
+
+from termcolor import colored
+from IPython import embed
+
 
 def communities():
     db = Database()
@@ -54,6 +59,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_data', '/data/{dataset_name}', action='get_data')
+            m.connect('user_community_profiles', '/user_community_profiles', action='user_community_profiles')
 
         with routes.mapper.SubMapper(
                 route_map,
@@ -79,6 +85,22 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 class CTDataController(base.BaseController):
     global size
 
+    def __init__(self):
+        self.session = Database().session_factory()
+        self.community_profile_service = CommunityProfileService(self.session)
+        self.user_service = UserService(self.session)
+
+    def user_community_profiles(self):
+        user_name = http_request.environ.get("REMOTE_USER")
+
+        if not user_name:
+            abort(404)
+
+        user = self.user_service.get_or_create_user(user_name) if user_name else None
+        community_profiles = self.community_profile_service.get_user_profiles(user.ckan_user_id)
+
+        return base.render('user_community_profiles.html', extra_vars={'community_profiles': community_profiles})
+
     def news(self):
         return base.render('news.html')
 
@@ -91,13 +113,9 @@ class CTDataController(base.BaseController):
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def visualization(self, dataset_name):
-        db = Database()
-        sess = db.session_factory()
-        community_profile_service = CommunityProfileService(sess)
-
         try:
             indicator_id = http_request.GET.get('ind')
-            indicator    = community_profile_service.get_indicators_by_ids([indicator_id])[0]
+            indicator    = self.community_profile_service.get_indicators_by_ids([indicator_id])[0]
             filters      = map(lambda fl: {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}, json.loads(indicator.filters))
             ind_filters  = ast.literal_eval(json.dumps(dict(i.items()[0] for i in filters)))
         except IndexError:
@@ -193,7 +211,6 @@ class CTDataController(base.BaseController):
 
             for item in data['data']:
                 try:
-                    # dims = item['dims']
                     for key in keys:
                         if item['dims'][key] == initial_data[key]:
                             counters[key] += 1
@@ -217,9 +234,6 @@ class CTDataController(base.BaseController):
 
     def add_community_towns(self, community_name):
         if http_request.method == 'POST':
-            session = Database().session_factory()
-            community_profile_service = CommunityProfileService(session)
-
             try:
                 json_body = json.loads(http_request.body, encoding=http_request.charset)
             except ValueError:
@@ -230,7 +244,7 @@ class CTDataController(base.BaseController):
                 abort(400, detail='No towns specified')
 
             try:
-                community_profile_service.add_profile_town(community_name, towns)
+                self.community_profile_service.add_profile_town(community_name, towns)
             except toolkit.ObjectNotFound:
                 abort(404)
 
@@ -241,8 +255,6 @@ class CTDataController(base.BaseController):
 
     def add_indicator(self):
         if http_request.method == 'POST':
-            session = Database().session_factory()
-            community_profile_service = CommunityProfileService(session)
 
             json_body = json.loads(http_request.body, encoding=http_request.charset)
             filters, dataset_id = json_body.get('filters'), json_body.get('dataset_id')
@@ -251,7 +263,7 @@ class CTDataController(base.BaseController):
                 abort(400)
 
             try:
-                community_profile_service.create_profile_indicator(filters, dataset_id)
+                self.community_profile_service.create_profile_indicator(filters, dataset_id)
             except toolkit.ObjectNotFound:
                 abort(404)
             except ProfileAlreadyExists, e:

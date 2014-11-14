@@ -40,8 +40,8 @@ class CommunityProfileService(object):
 
         return community
 
-    def create_community_profile(self, name, indicator_ids):
-        new_profile = CommunityProfile(name, str(indicator_ids))
+    def create_community_profile(self, name, indicator_ids, user_id):
+        new_profile = CommunityProfile(name, str(indicator_ids), user_id)
         self.session.add(new_profile)
 
         self.session.commit()
@@ -57,11 +57,16 @@ class CommunityProfileService(object):
     def get_all_towns(self):
         return self.session.query(Town).order_by(Town.name).all()
 
+
     def get_all_profiles(self):
         all = self.session.query(CommunityProfile).order_by(CommunityProfile.name).all()
         conn = self.session.query(CommunityProfile).filter(CommunityProfile.name == 'Connecticut').first()
         all.remove(conn)
         return [conn] + all
+
+    def get_user_profiles(self, user_id):
+        profiles = self.session.query(CommunityProfile).filter(CommunityProfile.user_id == user_id).all()
+        return profiles
 
     def create_indicator(self, filters, dataset_id, owner):
         assert owner is not None, "User must be passed in order for indicator creation to work"

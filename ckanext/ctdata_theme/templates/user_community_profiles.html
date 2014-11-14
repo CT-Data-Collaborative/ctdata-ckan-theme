@@ -1,0 +1,49 @@
+{% extends "page.html" %}
+
+{% block title %}CTData User Community Profiles {% endblock %}
+{% block page_name %} Community Profiles {% endblock %}
+{% block page_description %}Created by {{c.userobj.name}}{% endblock %}
+
+
+{% block main_content %}
+
+<div class="wrapper">
+<div class="ctdata-wrapper">
+
+<table role="table" class="table">
+  <thead>
+  <th> Id</th>
+  <th> Name</th>
+  <th></th>
+  </thead>
+  <tbody>
+    {% for profile in community_profiles%}
+      <tr>
+        <td>{{profile.id}}</td>
+        <td>
+          <input type="text" class="profile_name" id="{{profile.id}}" value="{{profile.name}}"></input>
+        </td>
+        <td><a href="javascript:void(0)" class="remove_profile" id="{{profile.id}}">remove</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+</div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="/common/css/visualization.css">
+<link rel="stylesheet" type="text/css" href="/common/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="/common/css/tableTools.css">
+{% resource 'ctdata_theme/highcharts.js' %}
+{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/map.js' %}
+{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/data.js' %}
+{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/exporting.js' %}
+{% resource 'ctdata_theme/visualization.js' %}
+{% resource 'ctdata_theme/jquery.dataTables.js' %}
+{% resource 'ctdata_theme/map_chart.js' %}
+
+{% endblock %}

@@ -47,6 +47,12 @@ class Database(object):
         except sqlalchemy.exc.ProgrammingError:
             pass
 
+        try:
+            user_id  = Column('user_id', String, ForeignKey('ctdata_user_info.ckan_user_id'))
+            self.add_column('ctdata_community_profiles', user_id, connection_string)
+        except sqlalchemy.exc.ProgrammingError:
+            pass
+
         self.session_factory = sessionmaker(bind=self.engine)
 
     def add_column(self, table, column, connection_string):
