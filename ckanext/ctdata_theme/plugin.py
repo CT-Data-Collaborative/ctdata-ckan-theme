@@ -158,7 +158,7 @@ class CTDataController(base.BaseController):
         request_view, request_filters = json_body.get('view'), json_body.get('filters')
 
         for one_filter in request_filters:
-            if len( one_filter['values']) == 1:
+            if len( one_filter['values']) == 1 and one_filter['field'] != 'Town':
                 request_filters.remove(one_filter)
 
         if not request_view or not request_filters:
@@ -195,7 +195,7 @@ class CTDataController(base.BaseController):
                 try:
                     # dims = item['dims']
                     for key in keys:
-                        if item['dims'][key] == initial_data[key]:
+                        if item['dims'][key] == initial_data[key] and key != 'Town':
                             counters[key] += 1
                 except KeyError:
                     size -= 1
