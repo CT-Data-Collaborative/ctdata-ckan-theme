@@ -114,9 +114,6 @@ class CTDataController(base.BaseController):
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def update_indicators(self, dataset_name):
-        db   = Database()
-        sess = db.session_factory()
-        community_profile_service = CommunityProfileService(sess)
         user_service = UserService(sess)
         user_name    = http_request.environ.get("REMOTE_USER")
 
@@ -131,10 +128,10 @@ class CTDataController(base.BaseController):
                 indicators_to_remove  = json_body.get('indicators_to_remove')
 
                 for indicator_id, name in names_hash.iteritems():
-                    community_profile_service.update_indicator_name(indicator_id, name)
+                    self.community_profile_service.update_indicator_name(indicator_id, name)
 
                 for indicator_id in indicators_to_remove:
-                    community_profile_service.remove_indicator(user, int(indicator_id))
+                    self.community_profile_service.remove_indicator(user, int(indicator_id))
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps({'success': True})
@@ -171,11 +168,11 @@ class CTDataController(base.BaseController):
         except IndexError:
           disabled = []
 
-        if not ind_filters:
-            default_filters = defaults
-        else:
-            ind_filters['Town'] = defaults['Town']
-            default_filters = ind_filters
+        # if not ind_filters:
+        #     default_filters = defaults
+        # else:
+        #     ind_filters['Town'] = defaults['Town']
+        #     default_filters = ind_filters
 
         visible_metadata_fields = filter(lambda x: x['key'] == 'visible_metadata', metadata)
 
@@ -187,7 +184,7 @@ class CTDataController(base.BaseController):
 
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
-        headline_indicators = community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
+        headline_indicators = self.community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,

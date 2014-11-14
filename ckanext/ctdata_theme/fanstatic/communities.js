@@ -1,3 +1,14 @@
+var create_popup  = $("#create_profile_popup");
+create_popup.modal({show: false});
+
+$('.close_popup').click(function() {
+  create_popup.modal('hide');
+});
+
+$('#create_profile_button').click(function() {
+  create_popup.modal('show');
+});
+
 function build_filters(filter_data) {
     var filters_html = '<ul>';
     $.each(filter_data, function(i, fltr) {
@@ -84,17 +95,20 @@ $(function(){
 
     $('#create_profile').click(function() {
         ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
-        $.ajax({type: "POST",
-            url: "/community/add_profile",
-            data: JSON.stringify({indicator_ids: ids, community_name: community_name}),
-            contentType: 'application/json; charset=utf-8',
-            success: function (data) {
-                data = JSON.parse(data)
-                if (data.success == true){
-                    window.location = data.redirect_link
+        name = $('input#profile_name').val()
+        if (name != ''){
+            $.ajax({type: "POST",
+                url: "/community/add_profile",
+                data: JSON.stringify({indicator_ids: ids, community_name: community_name, name: name}),
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    data = JSON.parse(data)
+                    if (data.success == true){
+                        window.location = data.redirect_link
+                    }
                 }
-            }
-        });
+            });
+        }
     });
 
     $('.dataset_chooser').click(function() {
