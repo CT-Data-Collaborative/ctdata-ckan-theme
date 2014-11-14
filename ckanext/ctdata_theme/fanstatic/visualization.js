@@ -580,10 +580,10 @@ $(function () {
     });
     hide_spinner();
 
-    var width = $(window).width() - 450;
+    var width = $(window).width() * 0.6;
     $("#container").width(width);
     window.onresize = function() {
-      var width = $(window).width() - 450;
+      var width = $(window).width() * 0.6;
       $("#container").width(width);
     }
     create_headline_indicator();

@@ -150,8 +150,9 @@ div#error_message{
   position: relative;
   max-height: 1000px;
   /*min-height: 500px !important;*/
-
-  min-width: 600px !important;
+  max-width: 1300px !important;
+  min-width: 310px !important;
+  margin-left: 5% !important;
 }
 
 .full_metadata_link{
