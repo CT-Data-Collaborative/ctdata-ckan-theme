@@ -19,12 +19,9 @@ from ctdata.community.services import CommunityProfileService
 from ctdata.topic.services import TopicSerivce
 from ctdata.users.services import UserService
 
-<<<<<<< HEAD
 from termcolor import colored
 from IPython import embed
 
-=======
->>>>>>> develop
 
 def communities():
     db = Database()
@@ -62,11 +59,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_data', '/data/{dataset_name}', action='get_data')
-<<<<<<< HEAD
             m.connect('my_community_profiles', '/my_community_profiles', action='my_community_profiles')
-=======
             m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
->>>>>>> develop
 
         with routes.mapper.SubMapper(
                 route_map,
