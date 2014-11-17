@@ -5,7 +5,7 @@
 <link href='/common/css/visualization.css' rel='stylesheet' type='text/css'>
 {% endblock %}
 
-{% block page_name %}Data by Location - {{location}}{% endblock %}
+{% block page_name %}Data by Location - <span id="location">{{location}}</span>{% endblock %}
 {% block page_description %}Create a Profile for Your Community{% endblock %}
 
 {% block main_content %}
@@ -188,8 +188,4 @@
 {% block scripts %}
     {{ super() }}
     {% resource 'ctdata_theme/communities.js' %}
-    <script>
-    var community_name = '';
-    community_name = "{{community.name}}"
-    </script>
 {% endblock %}

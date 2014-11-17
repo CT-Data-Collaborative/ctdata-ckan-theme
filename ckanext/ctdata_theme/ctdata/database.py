@@ -61,6 +61,12 @@ class Database(object):
         except sqlalchemy.exc.ProgrammingError:
             pass
 
+        try:
+            default_url = Column('default_url', String)
+            self.add_column('ctdata_community_profiles', default_url, connection_string)
+        except sqlalchemy.exc.ProgrammingError:
+            pass
+
         self.session_factory = sessionmaker(bind=self.engine)
 
     def add_column(self, table, column, connection_string):

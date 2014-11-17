@@ -13,14 +13,16 @@ class CommunityProfile(Base):
     name          = Column(String)
     indicator_ids = Column(String)
     user_id       = Column(String, ForeignKey('ctdata_user_info.ckan_user_id'))
+    default_url   = Column(String)
 
-    def __init__(self, name, indicator_ids, user_id):
+    def __init__(self, name, indicator_ids, user_id, default_url):
         self.name = name
         self.indicator_ids = indicator_ids
         self.user_id = user_id
+        self.default_url = default_url
 
     def __repr__(self):
-        return "Community %s %s %s" % (self.name, self.indicator_ids, self.user_id)
+        return "Community %s %s %s %s" % (self.name, self.indicator_ids, self.user_id, self.default_url)
 
 
 class Town(Base):

@@ -19,9 +19,6 @@ from ctdata.community.services import CommunityProfileService
 from ctdata.topic.services import TopicSerivce
 from ctdata.users.services import UserService
 
-from termcolor import colored
-from IPython import embed
-
 
 def communities():
     db = Database()
@@ -61,6 +58,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('my_community_profiles', '/my_community_profiles', action='my_community_profiles')
             m.connect('get_vizualization_data', '/vizualization_data/{dataset_name}', action='get_vizualization_data')
             m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
+            m.connect('update_community_profiles', '/update_community_profiles', action='update_community_profiles')
 
         with routes.mapper.SubMapper(
                 route_map,
@@ -102,6 +100,28 @@ class CTDataController(base.BaseController):
 
         return base.render('user_community_profiles.html', extra_vars={'community_profiles': community_profiles})
 
+    def update_community_profiles(self):
+        user_name    = http_request.environ.get("REMOTE_USER")
+
+        if not user_name:
+            abort(401)
+        if http_request.method == 'POST':
+            user = self.user_service.get_or_create_user(user_name) if user_name else None
+
+            json_body   = json.loads(http_request.body, encoding=http_request.charset)
+            names_hash  = json_body.get('names_hash')
+            profiles_to_remove  = json_body.get('profiles_to_remove')
+
+            for community_id, name in names_hash.iteritems():
+                self.community_profile_service.update_community_profile_name(int(community_id), name, user.ckan_user_id)
+
+            for community_id in profiles_to_remove:
+                self.community_profile_service.remove_community_profile(int(community_id), user.ckan_user_id)
+
+        http_response.headers['Content-type'] = 'application/json'
+        return json.dumps({'success': True})
+
+
     def news(self):
         return base.render('news.html')
 
@@ -114,13 +134,12 @@ class CTDataController(base.BaseController):
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def update_indicators(self, dataset_name):
-        user_service = UserService(sess)
         user_name    = http_request.environ.get("REMOTE_USER")
 
         if not user_name:
             abort(401)
         if http_request.method == 'POST':
-            user = user_service.get_or_create_user(user_name) if user_name else None
+            user = self.user_service.get_or_create_user(user_name) if user_name else None
 
             if user.is_admin:
                 json_body   = json.loads(http_request.body, encoding=http_request.charset)

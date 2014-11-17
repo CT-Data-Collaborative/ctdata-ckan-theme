@@ -99,7 +99,7 @@ $(function(){
         if (name != ''){
             $.ajax({type: "POST",
                 url: "/community/add_profile",
-                data: JSON.stringify({indicator_ids: ids, community_name: community_name, name: name}),
+                data: JSON.stringify({indicator_ids: ids, location: $('#location').text(), name: name}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     data = JSON.parse(data)

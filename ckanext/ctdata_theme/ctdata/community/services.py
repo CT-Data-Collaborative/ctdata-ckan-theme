@@ -34,18 +34,33 @@ class CommunityProfileService(object):
         return community
 
     def get_community_profile_by_id(self, community_id):
-        community = self.session.query(CommunityProfile).filter(CommunityProfile.id == community_id).first()
+        community = self.session.query(CommunityProfile).get(community_id)
         if not community:
-            raise toolkit.ObjectNotFound("No community with this name was found")
+            raise toolkit.ObjectNotFound("No community with this id was found")
 
         return community
 
-    def create_community_profile(self, name, indicator_ids, user_id):
-        new_profile = CommunityProfile(name, str(indicator_ids), user_id)
+    def create_community_profile(self, name, indicator_ids, user_id, default_url):
+        new_profile = CommunityProfile(name, str(indicator_ids), user_id, default_url)
         self.session.add(new_profile)
 
         self.session.commit()
+        new_profile.default_url += '?p=' + str(new_profile.id)
+        self.session.commit()
         return new_profile
+
+    def update_community_profile_name(self, community_id, name, user_id ):
+        community = self.session.query(CommunityProfile).get(community_id)
+        if community and community.user_id == user_id:
+            community.name = name
+            self.session.commit()
+
+    def remove_community_profile(self, community_id, user_id ):
+        community = self.session.query(CommunityProfile).get(community_id)
+        if community.user_id == user_id:
+            self.session.delete(community)
+            self.session.commit()
+
 
     def get_town(self, town_name):
         town = self.session.query(Town).filter(Town.name == town_name).first()

@@ -397,5 +397,24 @@ white-space: nowrap;
 }
 
 
+.table{}
+.table th:nth-child(even){
+	border-bottom: 5px solid #00adef;
+	color: #00adef;
+}
+.table th:nth-child(odd){
+	border-bottom: 5px solid #66cef5;
+	color: #66cef5;
+}
 
+.table td {
+	text-align: left;
+	padding: 10px;
+	font-family: 'roboto';
+	line-height: 1;
+	border-bottom: 1px solid #eee;
+}
 
+.table td:nth-child(even){
+	background: #f9f9f9;
+}

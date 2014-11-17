@@ -12,24 +12,25 @@
 
 <table role="table" class="table">
   <thead>
-  <th> Id</th>
+  <th> Default Url</th>
   <th> Name</th>
   <th></th>
   </thead>
   <tbody>
     {% for profile in community_profiles%}
       <tr>
-        <td>{{profile.id}}</td>
+        <td><a href="{{profile.default_url}}">{{profile.default_url}}</a></td>
         <td>
-          <input type="text" class="profile_name" id="{{profile.id}}" value="{{profile.name}}"></input>
+          <input type="text" class="edit_profile_name hidden" id="{{profile.id}}" value="{{profile.name}}"></input>
+          <a href="javascript:void(0)" class="edit_name"> {{profile.name}} </a>
         </td>
-        <td><a href="javascript:void(0)" class="remove_profile" id="{{profile.id}}">remove</a></td>
+        <td><a href="javascript:void(0)" class="remove_profile" id="{{profile.id}}"><i class='fa fa-times text-error'></i></a></td>
       </tr>
     {% endfor %}
   </tbody>
 </table>
 
-
+<a href="javascript:void(0)" id="update_user_communities" class="btn pull-right"> Update Community Profiles </a>
 </div>
 </div>
 {% endblock %}
@@ -38,12 +39,7 @@
 <link rel="stylesheet" type="text/css" href="/common/css/visualization.css">
 <link rel="stylesheet" type="text/css" href="/common/css/jquery.dataTables.css">
 <link rel="stylesheet" type="text/css" href="/common/css/tableTools.css">
-{% resource 'ctdata_theme/highcharts.js' %}
-{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/map.js' %}
-{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/data.js' %}
-{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/exporting.js' %}
-{% resource 'ctdata_theme/visualization.js' %}
-{% resource 'ctdata_theme/jquery.dataTables.js' %}
-{% resource 'ctdata_theme/map_chart.js' %}
+
+{% resource 'ctdata_theme/user_communities.js' %}
 
 {% endblock %}
