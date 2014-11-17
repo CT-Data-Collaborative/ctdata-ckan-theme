@@ -61,8 +61,8 @@ $(function(){
                 if (data.success == true)
                     window.location.reload();
                 else {
-                    $("#indicator_adding_error").html(data.error);
-                    $("#indicator_adding_error").animate({opacity: 1}, 300);
+                    $("#error").html(data.error);
+                    $("#error").animate({opacity: 1}, 300);
                 }
             }
         });

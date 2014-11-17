@@ -85,7 +85,12 @@ function create_headline_indicator(){
                              headline: true, filters: filters}),
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
-        window.location.reload();
+        if (data.success == true)
+          window.location.reload();
+        else {
+            $("#error").html(data.error);
+            $("#error").animate({opacity: 1}, 300);
+        }
       }
     });
 
