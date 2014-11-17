@@ -6,6 +6,24 @@
 
 
 {% block main_content %}
+<div class="ctdata-wrapper">
+<div class="headline_indicators">
+  {% if headline_indicators %}
+    <select class="custom bbtn" onchange="window.location.href=this.value">
+      <option selected="true" value="/visualization/{{dataset.name}}">
+        <span >-- Select Headline Indicator --</span>
+        <span class="caretbox"><span class="caret"></span></span>
+      </option>
+      {% for indicator in headline_indicators %}
+        <option value="/visualization/{{dataset.name}}?ind={{indicator.id}}" class="head_ind_link" id="{{indicator.id}}"> {{indicator.name}} </option>
+      {% endfor %}
+    </select>
+
+    {% if c.userobj.sysadmin %}
+      <a href="javascript:void(0);" id="edit_headline_indicators" class="btn"> Edit </a>
+    {% endif %}
+  {% endif %}
+</div>
 
 <form>
     <input type="hidden" id="dataset_id" value="{{ dataset.name }}">
@@ -13,25 +31,6 @@
 </form>
 
 <section class="visualisation">
-<div class="ctdata-wrapper">
-
-{% if headline_indicators %}
-<div class="dropdown">
-  <button class="bbtn-mini dropdown-toggle" type="button"  data-toggle="dropdown">
-    -- Select Headline Indicator --
-    <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-      {% for indicator in headline_indicators %}
-        <li role="presentation"><a href="/visualization/{{dataset.name}}?ind={{indicator.id}}"> {{indicator.name}} </a></li>
-      {% endfor %}
-  </ul>
-  {% if c.userobj.sysadmin %}
-    <a href="javascript:void(0);" id="edit_headline_indicators" class="btn"> Edit </a>
-  {% endif %}
-</div>
-{% endif %}
-
 
 <div class="refine_wrap">
 <h2>Refine This Indicator <img src="/common/images/arrowimg.png" alt="" /></h2>
@@ -76,7 +75,7 @@
 
 </br>
 {% if c.userobj.sysadmin %}
-<a href="javascript:void(0);" id="save_headline_indicator" class="btn"> Save </a>
+<a href="javascript:void(0);" id="save_headline_indicator" class="btn"> Save Filters </a>
 {% endif %}
 </div>
 
