@@ -15,7 +15,6 @@ from ..users.services import UserService
 from ..visualization.services import DatasetService
 from ..topic.services import TopicSerivce
 from services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
-from IPython import embed
 
 class CommunityProfilesController(base.BaseController):
     def __init__(self):
@@ -26,7 +25,6 @@ class CommunityProfilesController(base.BaseController):
     def add_indicator(self):
 
         user_name = http_request.environ.get("REMOTE_USER")
-        embed()
         if user_name == None:
             user_name = "guest_" + str(datetime.date.today())
 
