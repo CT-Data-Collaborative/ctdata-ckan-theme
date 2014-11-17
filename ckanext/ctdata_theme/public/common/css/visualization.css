@@ -150,8 +150,9 @@ div#error_message{
   position: relative;
   max-height: 1000px;
   /*min-height: 500px !important;*/
-
-  min-width: 600px !important;
+  max-width: 1300px !important;
+  min-width: 310px !important;
+  margin-left: 5% !important;
 }
 
 .full_metadata_link{
@@ -167,4 +168,17 @@ div#error_message{
 }
 .full_metadata_link a:hover{
   text-decoration: none;
+}
+
+#save_headline_indicator{
+  margin-left: 55px;
+}
+.headline_indicators{
+  margin-top: 40px;
+  margin-left: 400px;
+}
+
+.custom.bbtn{
+  width: 300px;
+  height: 40px;
 }

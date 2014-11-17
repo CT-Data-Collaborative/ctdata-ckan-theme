@@ -55,7 +55,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('special_projects', '/special_projects', action='special_projects')
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
-            m.connect('get_data', '/data/{dataset_name}', action='get_data')
+            m.connect('get_vizualization_data', '/vizualization_data/{dataset_name}', action='get_vizualization_data')
             m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
 
         with routes.mapper.SubMapper(
@@ -158,8 +158,11 @@ class CTDataController(base.BaseController):
         if not ind_filters:
             default_filters = defaults
         else:
-            ind_filters['Town'] = defaults['Town']
-            default_filters = ind_filters
+            try:
+                ind_filters['Town'] = defaults['Town']
+                default_filters = ind_filters
+            except TypeError:
+                default_filters = ind_filters
 
         visible_metadata_fields = filter(lambda x: x['key'] == 'visible_metadata', metadata)
 
@@ -180,17 +183,13 @@ class CTDataController(base.BaseController):
                                                              'headline_indicators': headline_indicators})
 
 
-    def get_data(self, dataset_name):
+    def get_vizualization_data(self, dataset_name):
         try:
             json_body = json.loads(http_request.body, encoding=http_request.charset)
         except ValueError:
             abort(400)
 
-        request_view, request_filters = json_body.get('view'), json_body.get('filters')
-
-        for one_filter in request_filters:
-            if len( one_filter['values']) == 1:
-                request_filters.remove(one_filter)
+        request_view, request_filters, omit_single_values = json_body.get('view'), json_body.get('filters'), json_body.get('omit_single_values')
 
         if not request_view or not request_filters:
             abort(400, detail='No view and/or filters specified')
@@ -207,7 +206,8 @@ class CTDataController(base.BaseController):
         view = ViewFactory.get_view(request_view, query_builder)
 
         data = view.get_data(request_filters)
-        data = self._hide_dims_with_one_value(data)
+        if omit_single_values:
+            data = self._hide_dims_with_one_value(data)
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps(data)
@@ -226,7 +226,7 @@ class CTDataController(base.BaseController):
                 try:
                     # dims = item['dims']
                     for key in keys:
-                        if item['dims'][key] == initial_data[key]:
+                        if item['dims'][key] == initial_data[key] and key != 'Town':
                             counters[key] += 1
                 except KeyError:
                     size -= 1
