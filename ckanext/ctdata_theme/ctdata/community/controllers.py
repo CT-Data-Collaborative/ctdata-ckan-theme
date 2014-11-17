@@ -1,6 +1,6 @@
 import json
 import uuid
-import time
+import datetime
 
 from pylons.controllers.util import abort, redirect
 from pylons import session, url
@@ -15,6 +15,7 @@ from ..users.services import UserService
 from ..visualization.services import DatasetService
 from ..topic.services import TopicSerivce
 from services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
+from IPython import embed
 
 class CommunityProfilesController(base.BaseController):
     def __init__(self):
@@ -23,9 +24,11 @@ class CommunityProfilesController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def add_indicator(self):
+
         user_name = http_request.environ.get("REMOTE_USER")
+        embed()
         if user_name == None:
-            user_name = "guest"
+            user_name = "guest_" + str(datetime.date.today())
 
         if http_request.method == 'POST':
             user = self.user_service.get_or_create_user(user_name) if user_name else None
@@ -95,7 +98,7 @@ class CommunityProfilesController(base.BaseController):
         location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
 
         if user_name == None:
-            user_name = "guest"
+            user_name = "guest_" + str(datetime.date.today())
 
         if profile_to_load != None:
             community_name =  self.community_profile_service.get_community_profile_by_id(profile_to_load).name
