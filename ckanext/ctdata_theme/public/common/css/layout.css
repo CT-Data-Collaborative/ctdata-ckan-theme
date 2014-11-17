@@ -398,6 +398,10 @@ white-space: nowrap;
 
 
 .table{}
+.table th small{
+	font-size: 6pt;
+	color: #717171;
+}
 .table th:nth-child(even){
 	border-bottom: 5px solid #00adef;
 	color: #00adef;
