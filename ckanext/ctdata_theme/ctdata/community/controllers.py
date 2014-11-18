@@ -9,6 +9,7 @@ import ckan.lib.base as base
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 from ckan.common import response as http_response, request as http_request
+import ckan.lib.helpers as h
 
 from ..database import Database
 from ..users.services import UserService
@@ -171,7 +172,10 @@ class CommunityProfilesController(base.BaseController):
             user        = self.user_service.get_or_create_user(user_name) if user_name else None
             user_id     = user.ckan_user_id if user else None
             profile = self.community_profile_service.create_community_profile(name, ids, user_id, '/community/' + location)
+
             if profile:
+                host = host = http_request.environ.get('HTTP_HOST')
+                h.flash_notice('Profile ' + profile.name + 'has been saved. Url: ' + host + profile.default_url)
                 return json.dumps({'success': True, 'redirect_link': profile.default_url })
         else:
             return json.dumps({'success': False})

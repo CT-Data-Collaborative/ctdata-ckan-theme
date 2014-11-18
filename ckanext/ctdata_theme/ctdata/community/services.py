@@ -227,7 +227,6 @@ class CommunityProfileService(object):
                 else:
                     indicators_filter = map(lambda x: x.id, self.get_default_indicators())
 
-        print "\nINDICATORS FILTERS:", indicators_filter
 
         existing_values = self.session.query(ProfileIndicatorValue).\
             filter(and_(ProfileIndicatorValue.town_id.in_(towns_fipses),
