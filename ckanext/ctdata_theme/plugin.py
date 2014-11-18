@@ -87,8 +87,6 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
 
 class CTDataController(base.BaseController):
-    global size
-
     def __init__(self):
         self.session = Database().session_factory()
         self.community_profile_service = CommunityProfileService(self.session)
@@ -249,6 +247,7 @@ class CTDataController(base.BaseController):
 
         return data
 
+    # TODO: move to Community Controller
     def add_community_towns(self, community_name):
         if http_request.method == 'POST':
             try:
@@ -270,48 +269,3 @@ class CTDataController(base.BaseController):
             http_response.headers['Content-type'] = 'application/json'
             return json.dumps({'success': True})
 
-    def add_indicator(self):
-        if http_request.method == 'POST':
-
-            json_body = json.loads(http_request.body, encoding=http_request.charset)
-            filters, dataset_id = json_body.get('filters'), json_body.get('dataset_id')
-
-            if not filters or not dataset_id:
-                abort(400)
-
-            try:
-                self.community_profile_service.create_profile_indicator(filters, dataset_id)
-            except toolkit.ObjectNotFound:
-                abort(404)
-            except ProfileAlreadyExists, e:
-                http_response.headers['Content-type'] = 'application/json'
-                return json.dumps({'success': False, 'error': str(e)})
-
-            session.commit()
-
-            http_response.headers['Content-type'] = 'application/json'
-            return json.dumps({'success': True})
-
-    def get_filters(self, dataset_id):
-        http_response.headers['Content-type'] = 'application/json'
-
-        try:
-            dataset = DatasetService.get_dataset(dataset_id)
-        except toolkit.ObjectNotFound:
-            return json.dumps({'success': False, 'error': 'No datasets with this id'})
-
-        result = []
-        for dim in dataset.dimensions:
-            # use reasonably good hardcoded "required" dimensions for now (will be changed after metadata for optional
-            # dimensions added)
-            if dim.name in ('Year', 'Measure Type', 'Variable', 'Subject', 'Grade', 'Race'):
-                if dim.name == 'Race':
-                    dim.possible_values.append('all')
-                result.append({'name': dim.name, 'values': dim.possible_values})
-
-        return json.dumps({'success': True, 'result': result})
-
-    def remove_community_indicator(self, indicator_id):
-        pass
-
-    # TODO: check if other controller methods are still in use

@@ -66,7 +66,7 @@
     {% if user %}
     <ul class= 'opt_btn'>
     <li><a href="javascript:void(0)" id="create_profile_button" class='blue_button'>Save to new profile</a></li>
-    {% if user.is_admin and community.name != location %}
+    {% if user.is_admin %}
         <li><a href="javascript:void(0)" id="save_profile_as_default" class='blue_button'>Save as defualt</a></li>
     {% endif %}
     </ul>

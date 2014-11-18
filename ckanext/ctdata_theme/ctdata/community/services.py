@@ -89,17 +89,12 @@ class CommunityProfileService(object):
 
         dataset = DatasetService.get_dataset(dataset_id)
 
-        if  owner.is_admin:
-            existing_inds = self.session.query(ProfileIndicator)\
-                .filter(and_(ProfileIndicator.dataset_id == dataset.ckan_meta['id'],
-                             ProfileIndicator.is_global == True))
-        else:
-            user_indicators_id = self.session.query(UserIndicatorLink.indicator_id)\
-                .filter(and_(UserIndicatorLink.user_id == owner.ckan_user_id,
-                             UserIndicatorLink.deleted == False)).all()
-            existing_inds = self.session.query(ProfileIndicator)\
-                .filter(and_(ProfileIndicator.dataset_id == dataset.ckan_meta['id'],
-                             ProfileIndicator.id.in_(user_indicators_id)))
+        user_indicators_id = self.session.query(UserIndicatorLink.indicator_id)\
+            .filter(and_(UserIndicatorLink.user_id == owner.ckan_user_id,
+                         UserIndicatorLink.deleted == False)).all()
+        existing_inds = self.session.query(ProfileIndicator)\
+            .filter(and_(ProfileIndicator.dataset_id == dataset.ckan_meta['id'],
+                         ProfileIndicator.id.in_(user_indicators_id)))
 
         # check that there're currently no such indicators in the db
         # there's a JSON type for fields in postgre, so maybe there's a way to do it using SQL
@@ -128,12 +123,10 @@ class CommunityProfileService(object):
                 raise toolkit.ObjectNotFound("'Year' filter value must be an integer "
                                              "or have '%Y-%m-%d %H:%M:%S' format")
 
-        is_global = True if owner.is_admin and not headline else False
+        is_global = False
         indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
                                      variable, headline)
-
-        if not owner.is_admin:
-            owner.indicators.append(indicator)
+        owner.indicators.append(indicator)
 
         self.session.add(indicator)
 
@@ -211,21 +204,18 @@ class CommunityProfileService(object):
 
         existing_towns, existing_indicators = set(), set()
 
-        if user and user.is_admin and community.name == location.name:
-            indicators_filter = map(lambda x: x.id, self.get_default_indicators())
-        else:
-            if community.indicator_ids != None and community.indicator_ids != '':
-                indicator_ids = community.indicator_ids.split(',')
-                if indicator_ids[-1] == '':
-                    indicator_ids.pop(-1)
+        if community.indicator_ids != None and community.indicator_ids != '':
+            indicator_ids = community.indicator_ids.split(',')
+            if indicator_ids[-1] == '':
+                indicator_ids.pop(-1)
 
+            indicators_filter = map(lambda x: x.id, self.get_indicators_by_ids(indicator_ids))
+        else:
+            if user:
+                indicator_ids     = map(lambda ind: ind.id, user.indicators)
                 indicators_filter = map(lambda x: x.id, self.get_indicators_by_ids(indicator_ids))
             else:
-                if user:
-                    indicator_ids     = map(lambda ind: ind.id, user.indicators)
-                    indicators_filter = map(lambda x: x.id, self.get_indicators_by_ids(indicator_ids))
-                else:
-                    indicators_filter = map(lambda x: x.id, self.get_default_indicators())
+                indicators_filter = map(lambda x: x.id, self.get_default_indicators())
 
 
         existing_values = self.session.query(ProfileIndicatorValue).\
@@ -259,15 +249,13 @@ class CommunityProfileService(object):
         if new_indicators:
             self._add_indicator_values(new_indicators, towns)
 
-        # TODO: following code should be extracted somewhere, service should only return the data and some other entity
-        # (controller?) should convert it for views to use.
-
         # gather the indicators data for the frontend
         result, last_id, current_ind = [], None, None
 
         user_indicators = indicators_filter
 
-        if user and not user.is_admin and community.name == location.name:
+        # if user and not user.is_admin and community.name == location.name:
+        if user and community.name == location.name:
             user_indicators = self.session.query(UserIndicatorLink.indicator_id).\
                 filter(and_(UserIndicatorLink.user_id == user.ckan_user_id,
                             UserIndicatorLink.deleted == False))
