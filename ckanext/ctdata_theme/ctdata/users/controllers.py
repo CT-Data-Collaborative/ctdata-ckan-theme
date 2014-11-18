@@ -23,7 +23,7 @@ class UserController(UserController):
         self.community_profile_service = CommunityProfileService(self.session)
         self.user_service = UserService(self.session)
 
-    def my_community_profiles(self):
+    def community_profiles(self):
         user_name = http_request.environ.get("REMOTE_USER")
 
         if not user_name:

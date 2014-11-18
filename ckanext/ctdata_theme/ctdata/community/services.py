@@ -135,7 +135,6 @@ class CommunityProfileService(object):
         if not owner.is_admin:
             owner.indicators.append(indicator)
 
-        print "\nUSER'S INDICATORS:", owner.indicators
         self.session.add(indicator)
 
     def remove_indicator_id_from_profiles(self, indicator_id):
@@ -215,7 +214,7 @@ class CommunityProfileService(object):
         if user and user.is_admin and community.name == location.name:
             indicators_filter = map(lambda x: x.id, self.get_default_indicators())
         else:
-            if community.indicator_ids != None:
+            if community.indicator_ids != None and community.indicator_ids != '':
                 indicator_ids = community.indicator_ids.split(',')
                 if indicator_ids[-1] == '':
                     indicator_ids.pop(-1)
@@ -237,19 +236,16 @@ class CommunityProfileService(object):
             existing_towns.update([val.town])
             existing_indicators.update([val.indicator])
 
-        print "\nEXISTING INDICATORS:", existing_indicators
 
         all_indicators = self.session.query(ProfileIndicator).filter(or_(ProfileIndicator.id.in_(indicators_filter),
                                                                          ProfileIndicator.is_global == True)).all()
 
-        print "\nALL INDICATORS:", all_indicators
 
         new_indicators = list(set(all_indicators) - existing_indicators)
         new_towns = list(towns - existing_towns)
 
         if user and community.name != location.name:
             # add new global indicators to the list of user's indicators
-            print "\nNEW INDICATORS:", new_indicators
             user.indicators += filter(lambda ind: ind.is_global, new_indicators)
 
         # convert sets back to lists
