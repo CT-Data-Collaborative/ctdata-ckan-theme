@@ -270,29 +270,6 @@ class CTDataController(base.BaseController):
             http_response.headers['Content-type'] = 'application/json'
             return json.dumps({'success': True})
 
-    def add_indicator(self):
-        if http_request.method == 'POST':
-            session = Database().session_factory()
-            community_profile_service = CommunityProfileService(session)
-
-            json_body = json.loads(http_request.body, encoding=http_request.charset)
-            filters, dataset_id = json_body.get('filters'), json_body.get('dataset_id')
-
-            if not filters or not dataset_id:
-                abort(400)
-
-            try:
-                community_profile_service.create_profile_indicator(filters, dataset_id)
-            except toolkit.ObjectNotFound:
-                abort(404)
-            except ProfileAlreadyExists, e:
-                http_response.headers['Content-type'] = 'application/json'
-                return json.dumps({'success': False, 'error': str(e)})
-
-            session.commit()
-
-            http_response.headers['Content-type'] = 'application/json'
-            return json.dumps({'success': True})
 
     def get_filters(self, dataset_id):
         http_response.headers['Content-type'] = 'application/json'
