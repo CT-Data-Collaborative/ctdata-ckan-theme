@@ -85,12 +85,11 @@ class CommunityProfileService(object):
         return profiles
 
     def create_indicator(self, name, filters, dataset_id, owner, headline):
-
-        assert owner is not None, "User must be passed in order for indicator creation to work"
+        # assert owner is not None, "User must be passed in order for indicator creation to work"
 
         dataset = DatasetService.get_dataset(dataset_id)
 
-        if owner.is_admin:
+        if  owner.is_admin:
             existing_inds = self.session.query(ProfileIndicator)\
                 .filter(and_(ProfileIndicator.dataset_id == dataset.ckan_meta['id'],
                              ProfileIndicator.is_global == True))
@@ -135,6 +134,7 @@ class CommunityProfileService(object):
 
         if not owner.is_admin:
             owner.indicators.append(indicator)
+
         print "\nUSER'S INDICATORS:", owner.indicators
         self.session.add(indicator)
 

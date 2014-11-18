@@ -1,6 +1,6 @@
 import json
 import uuid
-import time
+import datetime
 
 from pylons.controllers.util import abort, redirect
 from pylons import session, url
@@ -23,10 +23,11 @@ class CommunityProfilesController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def add_indicator(self):
-        user_name = http_request.environ.get("REMOTE_USER")
 
-        if not user_name:
-            abort(401)
+        user_name = http_request.environ.get("REMOTE_USER")
+        if user_name == None:
+            user_name = "guest_" + str(datetime.date.today())
+
         if http_request.method == 'POST':
             user = self.user_service.get_or_create_user(user_name) if user_name else None
 
@@ -93,6 +94,9 @@ class CommunityProfilesController(base.BaseController):
         user_name       = http_request.environ.get("REMOTE_USER")
         profile_to_load = http_request.GET.get('p')
         location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
+
+        if user_name == None:
+            user_name = "guest_" + str(datetime.date.today())
 
         if profile_to_load != None:
             community_name =  self.community_profile_service.get_community_profile_by_id(profile_to_load).name

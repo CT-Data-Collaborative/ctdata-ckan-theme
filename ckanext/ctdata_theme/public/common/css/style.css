@@ -160,7 +160,7 @@ _noFocusLine: expression(this.hideFocus=true); -ms-filter:"progid:DXImageTransfo
 
 
 /* visualisation  page starts here */
-.visualisation { width:100%; float:left; margin-top:65px;}
+.visualisation { width:100%; float:left; margin-top:65px; overflow-y: hidden;}
 .refine_wrap { width:270px; border-right:5px solid #eeeeee; padding-bottom:1000px; margin-bottom:-1000px; padding-right:22px; position:relative; float:left;}
 .refine_wrap h2 { font-size:18px; color:#888; border-bottom:1px solid #eeeeee;  padding:15px 0; text-transform:uppercase;}
 .refine_wrap h2 img { position:absolute; right:-14px; top:7px;}
