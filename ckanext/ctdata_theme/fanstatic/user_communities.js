@@ -19,7 +19,7 @@ $(function(){
 
   $('#update_user_communities').on('click', function(){
     $.ajax({type: "POST",
-      url: "/update_community_profiles",
+      url: "/user/update_community_profiles",
       data: JSON.stringify({ names_hash: names_hash,
                              profiles_to_remove: ids_to_remove}),
       contentType: 'application/json; charset=utf-8',
