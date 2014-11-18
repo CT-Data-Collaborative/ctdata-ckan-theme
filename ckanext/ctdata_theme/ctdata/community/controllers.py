@@ -1,6 +1,6 @@
 import json
 import uuid
-import time
+import datetime
 
 from pylons.controllers.util import abort, redirect
 from pylons import session, url
@@ -23,10 +23,11 @@ class CommunityProfilesController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def add_indicator(self):
-        user_name = http_request.environ.get("REMOTE_USER")
 
-        if not user_name:
-            abort(401)
+        user_name = http_request.environ.get("REMOTE_USER")
+        if user_name == None:
+            user_name = "guest_" + str(datetime.date.today())
+
         if http_request.method == 'POST':
             user = self.user_service.get_or_create_user(user_name) if user_name else None
 
@@ -94,6 +95,9 @@ class CommunityProfilesController(base.BaseController):
         profile_to_load = http_request.GET.get('p')
         location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
 
+        if user_name == None:
+            user_name = "guest_" + str(datetime.date.today())
+
         if profile_to_load != None:
             community_name =  self.community_profile_service.get_community_profile_by_id(profile_to_load).name
 
@@ -157,16 +161,17 @@ class CommunityProfilesController(base.BaseController):
         user_name = http_request.environ.get("REMOTE_USER")
         json_body = json.loads(http_request.body, encoding=http_request.charset)
         ids       = json_body.get('indicator_ids')
-
-        community_name  = json_body.get('community_name')
+        name      = json_body.get('name')
+        location  = json_body.get('location')
 
         if not user_name:
             abort(401)
         if http_request.method == 'POST':
-            name = user_name + '_profile' + time.strftime("%H_%M_%S")
-            profile = self.community_profile_service.create_community_profile(name, ids)
-            if profile.id:
-                return json.dumps({'success': True, 'redirect_link': '/community/' + community_name + '?p=' + str(profile.id) })
+            user        = self.user_service.get_or_create_user(user_name) if user_name else None
+            user_id     = user.ckan_user_id if user else None
+            profile = self.community_profile_service.create_community_profile(name, ids, user_id, '/community/' + location)
+            if profile:
+                return json.dumps({'success': True, 'redirect_link': profile.default_url })
         else:
             return json.dumps({'success': False})
 

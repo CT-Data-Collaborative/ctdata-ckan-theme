@@ -34,18 +34,33 @@ class CommunityProfileService(object):
         return community
 
     def get_community_profile_by_id(self, community_id):
-        community = self.session.query(CommunityProfile).filter(CommunityProfile.id == community_id).first()
+        community = self.session.query(CommunityProfile).get(community_id)
         if not community:
-            raise toolkit.ObjectNotFound("No community with this name was found")
+            raise toolkit.ObjectNotFound("No community with this id was found")
 
         return community
 
-    def create_community_profile(self, name, indicator_ids):
-        new_profile = CommunityProfile(name, str(indicator_ids))
+    def create_community_profile(self, name, indicator_ids, user_id, default_url):
+        new_profile = CommunityProfile(name, str(indicator_ids), user_id, default_url)
         self.session.add(new_profile)
 
         self.session.commit()
+        new_profile.default_url += '?p=' + str(new_profile.id)
+        self.session.commit()
         return new_profile
+
+    def update_community_profile_name(self, community_id, name, user_id ):
+        community = self.session.query(CommunityProfile).get(community_id)
+        if community and community.user_id == user_id:
+            community.name = name
+            self.session.commit()
+
+    def remove_community_profile(self, community_id, user_id ):
+        community = self.session.query(CommunityProfile).get(community_id)
+        if community.user_id == user_id:
+            self.session.delete(community)
+            self.session.commit()
+
 
     def get_town(self, town_name):
         town = self.session.query(Town).filter(Town.name == town_name).first()
@@ -57,18 +72,24 @@ class CommunityProfileService(object):
     def get_all_towns(self):
         return self.session.query(Town).order_by(Town.name).all()
 
+
     def get_all_profiles(self):
         all = self.session.query(CommunityProfile).order_by(CommunityProfile.name).all()
         conn = self.session.query(CommunityProfile).filter(CommunityProfile.name == 'Connecticut').first()
         all.remove(conn)
         return [conn] + all
 
+
+    def get_user_profiles(self, user_id):
+        profiles = self.session.query(CommunityProfile).filter(CommunityProfile.user_id == user_id).all()
+        return profiles
+
     def create_indicator(self, name, filters, dataset_id, owner, headline):
-        assert owner is not None, "User must be passed in order for indicator creation to work"
+        # assert owner is not None, "User must be passed in order for indicator creation to work"
 
         dataset = DatasetService.get_dataset(dataset_id)
 
-        if owner.is_admin:
+        if  owner.is_admin:
             existing_inds = self.session.query(ProfileIndicator)\
                 .filter(and_(ProfileIndicator.dataset_id == dataset.ckan_meta['id'],
                              ProfileIndicator.is_global == True))
@@ -113,6 +134,7 @@ class CommunityProfileService(object):
 
         if not owner.is_admin:
             owner.indicators.append(indicator)
+
         print "\nUSER'S INDICATORS:", owner.indicators
         self.session.add(indicator)
 
