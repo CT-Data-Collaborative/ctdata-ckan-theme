@@ -21,7 +21,6 @@ $.ajax({type: "POST",
                              }),
         contentType: 'application/json; charset=utf-8'}).done(function(    data) {
 handle_incompatibilities(data['compatibles']);
-console.log(data);
 var max = -Infinity;
 var min = Infinity;
 $.each(data.data, function(i){
