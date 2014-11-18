@@ -55,10 +55,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('special_projects', '/special_projects', action='special_projects')
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
-            m.connect('my_community_profiles', '/my_community_profiles', action='my_community_profiles')
             m.connect('get_vizualization_data', '/vizualization_data/{dataset_name}', action='get_vizualization_data')
             m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
-            m.connect('update_community_profiles', '/update_community_profiles', action='update_community_profiles')
 
         with routes.mapper.SubMapper(
                 route_map,
@@ -72,6 +70,13 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                       action='remove_indicator')
             m.connect('community_profiles', '/community/{community_name}', action='community_profile')
 
+        with routes.mapper.SubMapper(
+                route_map,
+                controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
+            m.connect('user_community_profiles', '/user/{user_id}/my_community_profiles', action='community_profiles')
+            m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
+
+
         return route_map
 
     def after_map(self, route_map):
@@ -82,45 +87,10 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
 
 class CTDataController(base.BaseController):
-    global size
-
     def __init__(self):
         self.session = Database().session_factory()
         self.community_profile_service = CommunityProfileService(self.session)
         self.user_service = UserService(self.session)
-
-    def my_community_profiles(self):
-        user_name = http_request.environ.get("REMOTE_USER")
-
-        if not user_name:
-            abort(404)
-
-        user = self.user_service.get_or_create_user(user_name) if user_name else None
-        community_profiles = self.community_profile_service.get_user_profiles(user.ckan_user_id)
-
-        return base.render('user_community_profiles.html', extra_vars={'community_profiles': community_profiles})
-
-    def update_community_profiles(self):
-        user_name    = http_request.environ.get("REMOTE_USER")
-
-        if not user_name:
-            abort(401)
-        if http_request.method == 'POST':
-            user = self.user_service.get_or_create_user(user_name) if user_name else None
-
-            json_body   = json.loads(http_request.body, encoding=http_request.charset)
-            names_hash  = json_body.get('names_hash')
-            profiles_to_remove  = json_body.get('profiles_to_remove')
-
-            for community_id, name in names_hash.iteritems():
-                self.community_profile_service.update_community_profile_name(int(community_id), name, user.ckan_user_id)
-
-            for community_id in profiles_to_remove:
-                self.community_profile_service.remove_community_profile(int(community_id), user.ckan_user_id)
-
-        http_response.headers['Content-type'] = 'application/json'
-        return json.dumps({'success': True})
-
 
     def news(self):
         return base.render('news.html')
@@ -277,6 +247,7 @@ class CTDataController(base.BaseController):
 
         return data
 
+    # TODO: move to Community Controller
     def add_community_towns(self, community_name):
         if http_request.method == 'POST':
             try:
@@ -298,48 +269,3 @@ class CTDataController(base.BaseController):
             http_response.headers['Content-type'] = 'application/json'
             return json.dumps({'success': True})
 
-    def add_indicator(self):
-        if http_request.method == 'POST':
-
-            json_body = json.loads(http_request.body, encoding=http_request.charset)
-            filters, dataset_id = json_body.get('filters'), json_body.get('dataset_id')
-
-            if not filters or not dataset_id:
-                abort(400)
-
-            try:
-                self.community_profile_service.create_profile_indicator(filters, dataset_id)
-            except toolkit.ObjectNotFound:
-                abort(404)
-            except ProfileAlreadyExists, e:
-                http_response.headers['Content-type'] = 'application/json'
-                return json.dumps({'success': False, 'error': str(e)})
-
-            session.commit()
-
-            http_response.headers['Content-type'] = 'application/json'
-            return json.dumps({'success': True})
-
-    def get_filters(self, dataset_id):
-        http_response.headers['Content-type'] = 'application/json'
-
-        try:
-            dataset = DatasetService.get_dataset(dataset_id)
-        except toolkit.ObjectNotFound:
-            return json.dumps({'success': False, 'error': 'No datasets with this id'})
-
-        result = []
-        for dim in dataset.dimensions:
-            # use reasonably good hardcoded "required" dimensions for now (will be changed after metadata for optional
-            # dimensions added)
-            if dim.name in ('Year', 'Measure Type', 'Variable', 'Subject', 'Grade', 'Race'):
-                if dim.name == 'Race':
-                    dim.possible_values.append('all')
-                result.append({'name': dim.name, 'values': dim.possible_values})
-
-        return json.dumps({'success': True, 'result': result})
-
-    def remove_community_indicator(self, indicator_id):
-        pass
-
-    # TODO: check if other controller methods are still in use

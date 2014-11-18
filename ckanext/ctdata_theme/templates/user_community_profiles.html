@@ -1,13 +1,22 @@
-{% extends "page.html" %}
+{% extends "user/read_base.html" %}
 
 {% block title %}CTData User Community Profiles {% endblock %}
 {% block page_name %} Community Profiles {% endblock %}
 {% block page_description %}Created by {{c.userobj.name}}{% endblock %}
 
 
+
 {% block main_content %}
 
+
+
 <div class="wrapper">
+<!-- {% block breadcrumb_content %}
+  <li><a href="{{ h.url_for(controller='user', action='index') }}">{{ _('Users') }}</a></li>
+  <li><a href="{{ h.url_for(controller='user', action='read', id=c.user_dict.name) }}">{{ c.user_dict.display_name }}</a></li>
+  <li class="active"><a href="#">{{ _('Manage') }}</a></li>
+{% endblock %} -->
+
 <div class="ctdata-wrapper">
 
 <table role="table" class="table">
