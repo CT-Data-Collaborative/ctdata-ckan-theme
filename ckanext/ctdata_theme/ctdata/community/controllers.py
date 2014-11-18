@@ -164,8 +164,9 @@ class CommunityProfilesController(base.BaseController):
         name      = json_body.get('name')
         location  = json_body.get('location')
 
-        if not user_name:
-            abort(401)
+        if user_name == None:
+            user_name = "guest_" + str(datetime.date.today())
+
         if http_request.method == 'POST':
             user        = self.user_service.get_or_create_user(user_name) if user_name else None
             user_id     = user.ckan_user_id if user else None
