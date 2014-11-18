@@ -5,7 +5,7 @@
 <link href='/common/css/visualization.css' rel='stylesheet' type='text/css'>
 {% endblock %}
 
-{% block page_name %}Data by Location - {{location}}{% endblock %}
+{% block page_name %}Data by Location - <span id="location">{{location}}</span>{% endblock %}
 {% block page_description %}Create a Profile for Your Community{% endblock %}
 
 {% block main_content %}
@@ -65,7 +65,7 @@
 
     {% if user %}
     <ul class= 'opt_btn'>
-    <li><a href="javascript:void(0)" id="create_profile" class='blue_button'>Save to new profile</a></li>
+    <li><a href="javascript:void(0)" id="create_profile_button" class='blue_button'>Save to new profile</a></li>
     {% if user.is_admin and community.name != location %}
         <li><a href="javascript:void(0)" id="save_profile_as_default" class='blue_button'>Save as defualt</a></li>
     {% endif %}
@@ -150,6 +150,33 @@
     </div>
 </div>
 
+<div id="create_profile_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            Create Community Profile
+        </div>
+        <div class="modal-content">
+            <div class="modal-body disable-scroll">
+                <div>
+                  <form class="form-horizontal">
+                    <div class="control-group">
+                      <label class="control-label"> Profile Name </label>
+                      <div class="controls">
+                        <input type="text" name="profile_name" id="profile_name"> </input>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button id="create_profile" class="btn btn-info">Save</button>
+                    <button class="btn close_popup">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 </section>
 
@@ -159,8 +186,4 @@
 {% block scripts %}
     {{ super() }}
     {% resource 'ctdata_theme/communities.js' %}
-    <script>
-    var community_name = '';
-    community_name = "{{community.name}}"
-    </script>
 {% endblock %}
