@@ -1,0 +1,71 @@
+{% extends "page.html" %}
+
+{% block page_name %}About{% endblock %}
+{% block page_description %}{% endblock %}
+
+{% block content %}
+    {% block underheader %}{{ super() }}{% endblock %}
+
+ <div class="container">
+        <div class="row">
+            <div class="span11 about-text">
+                <h2>About Us</h2>
+                <p>
+                    The Collaborative is a public-private partnership created to advance effective planning and decision-making in Connecticut at the state, regional and local levels through the use of open and accessible data. The Collaborative serves residents, nonprofits, policymakers, and funders in using data to drive policy, program and service improvements.
+                </p>
+                <h2>What we do</h2>
+                <dl>
+                    <dt>Advocacy</dt>
+                    <dd><p>Advocating for the public availability of all state data to inform public debate and to drive planning, policy, budgeting and decision making in state government.</p></dd>
+
+                    <dt>Standards</dt>
+                    <dd><p>Promoting and modeling the use of data standards for  privacy, interoperability, data definitions and quality.<p></dd>
+
+                    <dt>Access</dt>
+                    <dd><p>Meeting demands for public access to data through the Collaborative's data portal, CTData.org, and the associated Connecticut Nonprofit Strategy Platform.</p></dd>
+                    <dt>Building Capacity</dt>
+                    <dd><p>Creating opportunities for Collaborative and peer support in data development and use both online and in person.</p></dd>
+                </dl>
+                <h2>More About Us</h2>
+                <p>
+                    The Collaborative is developing CTData.org as a central portal where all Connecticut organizations and residents can access a wide range of data from federal, state, local and private sources relating to the health, well-being and economy of the residents of the State of Connecticut. The Collaborative is complementing the work being conducted by the state’s Open Data Policy by obtaining data sets requested by users and turning them into readily accessible indicators with web-based visualization tools that help users understand and analyze the data. CTData.org is the place where raw data is transformed into meaningful data stories.
+                </p>
+                <p>
+                    The Connecticut Data Collaborative is a project of the New Connecticut Foundation, a 501(c)3 nonprofit organization affiliated with the Connecticut Economic Resource Center. The Collaborative, established in 2009, has received major funding for its work from the Connecticut Health and Educational Facilities Authority and the State of Connecticut. Seed funding has been provided by the Connecticut Early Childhood Education Cabinet, the William Caspar Graustein Memorial Fund, United Way of Coastal Fairfield County, and the Grossman Family Foundation. Funding for the CTData.org customized data portals has also been provided by the Connecticut Department of Mental Health and Addiction Services, the Connecticut Office of Rural Health, the William Caspar Graustein Memorial Fund, the United Way of Coastal Fairfield County, the Bridgeport Department of Health, and the Connecticut Health Foundation.
+                </p>
+                <h4>Contact:</h4>
+                    <p><a href="mailto:mrn@ctdata.org">Michelle Riordan-Nold</a>, Executive Director, Connecticut Data Collaborative</p>
+            </div>
+            <div class="span4 about-news">
+                <h3 class="news-header">LATEST NEWS</h3>
+                <div class="inline-date">
+                    <span class="day">?</span>
+                    <span class="rest">Nov 2014</span>
+                </div>
+                <h3><a href="#">Conference Announcement</a></h3>
+                <p>
+                    Please join us for the next Ct Data Collaborative Conference. A full day of invigorating panels, speakers, and presentations. Stay tuned for more details…
+                </p>
+
+                <div class="inline-date">
+                    <span class="day">04</span>
+                    <span class="rest">Sept 2014</span>
+                </div>
+                <h3><a href="#">Read what others are saying about our work</a></h3>
+                <p>
+                    The US Open Data Institute blogs about the CT Data Collaborative. Read it <a href="https://usodi.org/2014/09/04/ctdata/">here.
+                </p>
+
+                <div class="inline-date">
+                    <span class="day">03</span>
+                    <span class="rest">Sept 2014</span>
+                </div>
+                <h3><a href="#">NEW DATA Available</a></h3>
+                <p>
+                    New data available on reading levels and summer learning loss (DRA2) and on child abuse and neglect rates by Town.
+                </p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
