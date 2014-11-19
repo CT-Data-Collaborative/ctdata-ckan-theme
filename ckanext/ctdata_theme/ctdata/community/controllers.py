@@ -127,7 +127,7 @@ class CommunityProfilesController(base.BaseController):
         session['anti_csrf'] = anti_csrf_token
         session.save()
 
-        return base.render('community_profile.html', extra_vars={'location': location,
+        return base.render('communities/community_profile.html', extra_vars={'location': location,
                                                                  'community': community,
                                                                  'indicators': indicators,
                                                                  'topics': topics,

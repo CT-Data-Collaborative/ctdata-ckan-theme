@@ -1,0 +1,69 @@
+{% extends "page.html" %}
+
+{% block styles %}
+{{ super() }}
+<link href='/common/css/visualization.css' rel='stylesheet' type='text/css'>
+{% endblock %}
+
+{% block page_name %}Data by Location - <span id="location">{{location}}</span>{% endblock %}
+{% block page_description %}Create a Profile for Your Community{% endblock %}
+
+{% block main_content %}
+<div class="wrapper">
+
+<section class="locationdata">
+<ul class="opt_btn">
+<li class="btn_blue"><a href="javascript:void(0)" id="add_towns">Edit Towns</a></li>
+<li class="btn_blue"><a href="javascript:void(0)" id="add_indicator">Add Indicator</a></li>
+<li class="download_btn"><a href="#">Download Profile</a></li>
+</ul>
+
+<div class="locaton_table">
+{% if indicators %}
+    <table class='table'>
+        <thead>
+            <th>Dataset</th>
+            <th>Data Type</th>
+            <th>Year</th>
+            {% for town_name in displayed_towns %}
+                <th>{{town_name}}</th>
+            {% endfor %}
+        </thead>
+        <tbody>
+            {% for indicator in indicators %}
+                {% snippet 'communities/snippets/indicators_table_tr.html', indicator=indicator, user=c.userobj %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    There're no indicators for this community yet.
+{% endif %}
+    <form style="display: none">
+        <input type="hidden" id="community_name" value="{{community.name}}">
+    </form>
+
+    {% if user %}
+    <ul class= 'opt_btn'>
+    <li><a href="javascript:void(0)" id="create_profile_button" class='blue_button'>Save to new profile</a></li>
+    {% if user.is_admin %}
+        <li><a href="javascript:void(0)" id="save_profile_as_default" class='blue_button'>Save as defualt</a></li>
+    {% endif %}
+    </ul>
+    {% endif %}
+</div>
+
+
+{% snippet 'communities/snippets/towns_popup.html', towns=towns, community=community %}
+{% snippet 'communities/snippets/indicator_popup.html', topics=topics %}
+{% snippet 'communities/snippets/create_profile_popup.html' %}
+
+
+</section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {% resource 'ctdata_theme/communities.js' %}
+{% endblock %}

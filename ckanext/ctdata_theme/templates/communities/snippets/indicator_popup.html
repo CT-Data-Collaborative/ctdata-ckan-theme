@@ -1,0 +1,48 @@
+<div id="indicator_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body disable-scroll">
+                <div id="indicators" class="indicator-topics">
+                    <ul class="indicator-main-topics">
+                    {% for topic in topics %}
+                        <li>
+                        <h3>{{ topic['title'] }}</h3>
+                        <ul>
+                            {% for subtopic in topic['subdomains'] %}
+                            <li>
+                                <div>
+                                <h3 style="color: #000000">{{ subtopic['title'] }}</h3>
+                                    <ul class="indicator-sub-topics">
+                                        {% for dataset in subtopic['datasets'] %}
+                                        <li>
+                                            <a href="javascript:void(0)" id="{{dataset['id']}}" class="dataset_chooser">
+                                                {{ dataset['title'] }}
+                                            </a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                <div id="filters" class="indicator-filters">
+                    <div id="indicator_adding_error" class="error" style="opacity: 0">
+                    </div>
+                    <div id="filters_content">
+                        Choose a dataset from the leftside menu.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button id="save_indicator" class="btn btn-primary">Add measure to profile</button>
+                    <button id="close_indicator_popup" class="btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

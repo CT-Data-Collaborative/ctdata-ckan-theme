@@ -397,7 +397,9 @@ white-space: nowrap;
 }
 
 
-.table{}
+.table{
+	width: auto;
+}
 .table th small{
 	font-size: 6pt;
 	color: #717171;
@@ -412,13 +414,26 @@ white-space: nowrap;
 }
 
 .table td {
+	word-wrap: break-word;
 	text-align: left;
 	padding: 10px;
 	font-family: 'roboto';
 	line-height: 1;
 	border-bottom: 1px solid #eee;
+	font-size: 14px;
 }
 
 .table td:nth-child(even){
 	background: #f9f9f9;
 }
+
+.table td.no-border{
+	border: none;
+}
+.col-1{ width:309px;}
+.col-2{ width:163px;}
+.col-3{ width:124px;}
+.col-4{ width:111px;}
+.col-5{ width:92px;}
+.col-6{ width:92px;}
+.col-7{ width:33px;}
