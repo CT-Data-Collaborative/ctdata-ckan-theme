@@ -1,0 +1,67 @@
+ {% extends "page.html" %}
+
+{% block page_name %}News{% endblock %}
+{% block page_description %}{% endblock %}
+
+{% block content %}
+    {% block underheader %}{{ super() }}{% endblock %}
+ <div class="container">
+        <div class="row">
+            <div class="span6">
+                <div class="news_entry">
+                    <div class='date'>
+                        <span class='day'>21</span>
+                        <span class='month'>Nov 2014</span>
+                    </div>
+                    <div class="news_con">
+                        <h3><a href="#">CTData.org Fall Conference</a></h3>
+                        <p>Please join us for the next Ct Data Collaborative Conference. A full day of invigorating panels, speakers, and presentations. Stay tuned for more details…</p>
+                    </div>
+                </div>
+                <div class="news_entry">
+                    <div class='date'>
+                        <span class='day'>04</span>
+                        <span class='month'>Sept 2014</span>
+                    </div>
+                    <div class="news_con">
+                        <h3><a href="#">What others are saying</a></h3>
+                        <p>The US Open Data Institute blogs about the CT Data Collaborative. Read it <a href="https://usodi.org/2014/09/04/ctdata/">here.</p>
+                    </div>
+                </div>
+                <div class="news_entry">
+                    <div class='date'>
+                        <span class='day'>31</span>
+                        <span class='month'>Mar 2014</span>
+                    </div>
+                    <div class="news_con">
+                        <h3><a href="#">Open Data Portal Launch</a></h3>
+                        <p>Connecticut Launches it's <a href="https://data.ct.gov">Open Data Portal</a>.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="span6">
+                <div class="news_entry">
+                    <div class='date'>
+                        <span class='day'>03</span>
+                        <span class='month'>Sept 2014</span>
+                    </div>
+                    <div class="news_con">
+                        <h3><a href="#">NEW DATA available</a></h3>
+                        <p>NEW DATA available on reading levels and summer learning loss (DRA2) and on Child Abuse and Neglect rates by Town.</p>
+                    </div>
+                </div>
+
+                <div class="news_entry">
+                    <div class='date'>
+                        <span class='day'>03</span>
+                        <span class='month'>Mar 2014</span>
+                    </div>
+                    <div class="news_con">
+                        <h3><a href="#">March 2014 Forum</a></h3>
+                        <p>View the Proceedings of CT Data Collaborative March 3 Forum on Open Data <a href="#">here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
