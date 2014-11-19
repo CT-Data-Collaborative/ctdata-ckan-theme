@@ -27,3 +27,6 @@ class PageController(base.BaseController):
 
     def news(self):
         return  base.render('pages/news.html', extra_vars={})
+
+    def special_projects(self):
+        return  base.render('pages/special_projects.html', extra_vars={})
