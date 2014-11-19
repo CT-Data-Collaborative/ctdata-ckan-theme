@@ -129,9 +129,7 @@ $(function(){
             data: JSON.stringify({indicator_ids: ids}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                if (data.success == true){
-                    window.location.reload();
-                }
+                window.location.reload();
             }
         });
     });

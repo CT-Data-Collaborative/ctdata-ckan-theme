@@ -186,6 +186,7 @@ class CommunityProfilesController(base.BaseController):
 
                 self.session.commit()
 
+        h.flash_notice('Default indicators successfully updated.')
         return json.dumps({'success': True})
 
     def add_profile(self):

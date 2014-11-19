@@ -227,11 +227,10 @@ class CommunityProfileService(object):
         all_indicators = self.session.query(ProfileIndicator).filter(or_(ProfileIndicator.id.in_(indicators_filter),
                                                                          ProfileIndicator.is_global == True)).all()
 
-
         new_indicators = list(set(all_indicators) - existing_indicators)
         new_towns = list(towns - existing_towns)
 
-        if user and community.name != location.name:
+        if user :
             # add new global indicators to the list of user's indicators
             user.indicators += filter(lambda ind: ind.is_global, new_indicators)
 
@@ -272,7 +271,7 @@ class CommunityProfileService(object):
                     del f['values']
                 dataset_name = DatasetService.get_dataset_meta(val.indicator.dataset_id)['title']
                 current_ind = {'indicator': val.indicator, 'filters': filters, 'values': [],
-                               'dataset': dataset_name}
+                               'dataset': dataset_name, 'is_global': val.indicator.is_global}
                 result.append(current_ind)
                 last_id = val.indicator.id
             current_ind['values'].append(val.value)
