@@ -9,7 +9,7 @@
 {% block page_description %}Create a Profile for Your Community{% endblock %}
 {% block main_content %}
 
-<div class="spinner"> <img src="/common/images/loading.gif"/> </div>
+<div class="spinner small"> <img src="/common/images/loading.gif"/> </div>
 
 <div class="wrapper">
 
@@ -47,6 +47,7 @@
 
     {% if c.userobj %}
     <ul class= 'opt_btn'>
+    <li><a href="javascript:void(0)" id="update_profile_indicators" class='blue_button pull-left'> Update profile indicators</a></li>
     <li><a href="javascript:void(0)" id="create_profile_button" class='blue_button'>Save to new profile</a></li>
     {% if c.userobj.sysadmin %}
         <li><a href="javascript:void(0)" id="save_profile_as_default" class='blue_button'>Save as defualt</a></li>

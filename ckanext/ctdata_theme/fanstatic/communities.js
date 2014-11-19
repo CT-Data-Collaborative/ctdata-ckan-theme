@@ -1,4 +1,5 @@
-var create_popup    = $("#create_profile_popup");
+var create_popup    = $("#create_profile_popup"),
+    ids_to_remove   = [];
 
 $('.close_popup').click(function() {
   $(this).closest('div.modal').modal('hide');
@@ -12,6 +13,11 @@ $('#add_towns').click(function() {
     $("#towns_popup").modal('show');
 })
 
+$('.remove_indicator').on('click', function(){
+    ids_to_remove.push( $(this).attr('id'));
+
+    $(this).closest('tr').hide();
+});
 
 function load_functions_for_indicators(){
     $('.close_popup').click(function() {
@@ -48,6 +54,18 @@ function load_functions_for_indicators(){
         });
     });
 
+
+    $('#update_profile_indicators').on('click', function(){
+        $.ajax({type: "POST",
+          url: "/community/update_profile_indicators",
+          data: JSON.stringify({ indicators_to_remove: ids_to_remove}),
+          contentType: 'application/json; charset=utf-8',
+          success: function (data) {
+            window.location.reload();
+          }
+        });
+
+    })
 }
 function load_topics(){
     if ($('#loaded_topics').html() == ""){

@@ -18,6 +18,7 @@ from ..topic.services import TopicSerivce
 from services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
 
 from IPython import embed
+from termcolor import colored
 
 class CommunityProfilesController(base.BaseController):
     def __init__(self):
@@ -55,40 +56,40 @@ class CommunityProfilesController(base.BaseController):
 
             return json.dumps({'success': True})
 
-    def remove_indicator(self, indicator_id):
-        user_name = http_request.environ.get("REMOTE_USER")
+    # def remove_indicator(self, indicator_id):
+    #     user_name = http_request.environ.get("REMOTE_USER")
 
-        if user_name:
-            user = self.user_service.get_or_create_user(user_name)
-        else:
-            abort(401)
+    #     if user_name:
+    #         user = self.user_service.get_or_create_user(user_name)
+    #     else:
+    #         abort(401)
 
-        if user:
-            csrf_token_passed = http_request.GET.get('anti_csrf')
-            csrf_token_session = session.get('anti_csrf')
-            if csrf_token_passed and csrf_token_passed == csrf_token_session:
-                try:
-                    self.community_profile_service.remove_indicator(user, indicator_id)
-                    self.session.commit()
-                except toolkit.ObjectNotFound:
-                    abort(404)
-                except CantDeletePrivateIndicator, e:
-                    abort(400, str(e))
-                else:
-                    came_from = http_request.GET.get('came_from')
-                    if not came_from:
-                        came_from = http_request.headers.get('Referer')
+    #     if user:
+    #         csrf_token_passed = http_request.GET.get('anti_csrf')
+    #         csrf_token_session = session.get('anti_csrf')
+    #         if csrf_token_passed and csrf_token_passed == csrf_token_session:
+    #             try:
+    #                 self.community_profile_service.remove_indicator(user, indicator_id)
+    #                 self.session.commit()
+    #             except toolkit.ObjectNotFound:
+    #                 abort(404)
+    #             except CantDeletePrivateIndicator, e:
+    #                 abort(400, str(e))
+    #             else:
+    #                 came_from = http_request.GET.get('came_from')
+    #                 if not came_from:
+    #                     came_from = http_request.headers.get('Referer')
 
-                    if came_from:
-                        redirect(came_from)
-                    else:
-                        # if user deleted came_from parameter from the url and disabled referers in his browser,
-                        # redirect him to the frontpage, after deleting the indicator
-                        redirect('/')
-            else:
-                abort(400, "anti-CSRF tokens don't match")
-        else:
-            abort(401)
+    #                 if came_from:
+    #                     redirect(came_from)
+    #                 else:
+    #                     # if user deleted came_from parameter from the url and disabled referers in his browser,
+    #                     # redirect him to the frontpage, after deleting the indicator
+    #                     redirect('/')
+    #         else:
+    #             abort(400, "anti-CSRF tokens don't match")
+    #     else:
+    #         abort(401)
 
     def community_profile(self, community_name):
         user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + str(datetime.date.today())
@@ -98,7 +99,6 @@ class CommunityProfilesController(base.BaseController):
         user            = self.user_service.get_or_create_user(user_name) if user_name else None
         towns_names     = map(lambda x: x.strip(), towns_raw.split(','))  if towns_raw else []
         towns           = self.community_profile_service.get_all_towns()
-        topics          = [] #TopicSerivce.get_topics('community_profile')
         indicators, displayed_towns, displayed_towns_names = [],[],[]
 
         if profile_to_load:
@@ -126,10 +126,37 @@ class CommunityProfilesController(base.BaseController):
         return base.render('communities/community_profile.html', extra_vars={'location': location,
                                                                  'community': community,
                                                                  'indicators': indicators,
-                                                                 'topics': topics,
                                                                  'displayed_towns': displayed_towns_names,
                                                                  'towns': towns,
                                                                  'anti_csrf_token': anti_csrf_token})
+
+    def update_profile_indicators(self):
+        http_response.headers['Content-type'] = 'application/json'
+
+        json_body   = json.loads(http_request.body, encoding=http_request.charset)
+        indicators_to_remove  = json_body.get('indicators_to_remove')
+        user_name = http_request.environ.get("REMOTE_USER")
+
+        if user_name:
+            user = self.user_service.get_or_create_user(user_name)
+        else:
+            abort(401)
+
+        print(indicators_to_remove)
+        if user:
+            for indicator_id in indicators_to_remove:
+                try:
+                    self.community_profile_service.remove_indicator(user, indicator_id)
+                    self.session.commit()
+                except toolkit.ObjectNotFound:
+                    print colored('Alarm', 'red')
+                    pass #abort(404)
+                except CantDeletePrivateIndicator, e:
+                    print colored('Alarm', 'red')
+                    pass #abort(400, str(e))
+
+        h.flash_notice('Indicators successfully updated.')
+        return json.dumps({'success': True})
 
     def get_topics(self):
         http_response.headers['Content-type'] = 'application/json'

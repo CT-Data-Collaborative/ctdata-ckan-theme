@@ -465,9 +465,12 @@ label {font-weight: normal; cursor: auto}
   text-decoration: none;
 }
 
-.spinner{
+.spinner.small{
   display: none;
   z-index: 999;
-/*  position: relative;
-  top: 500px;*/
+  /*position: absolute;*/
+  width: 200px;
+  height: 200px;
+  /*top: -100%;
+  left: -40%;*/
 }

@@ -172,10 +172,9 @@ class CommunityProfileService(object):
                     # regular user tries to delete someone else's indicator
                     raise CantDeletePrivateIndicator("The indicator you're trying to delete is not yours")
 
-                if not user.is_admin:
-                    # regular users can permanently delete their own indicators
-                    self.session.delete(ind)
-                    self.remove_indicator_id_from_profiles(ind.id)
+                # regular users can permanently delete their own indicators
+                self.session.delete(ind)
+                self.remove_indicator_id_from_profiles(ind.id)
         else:
             raise toolkit.ObjectNotFound("Indicator not found")
 
