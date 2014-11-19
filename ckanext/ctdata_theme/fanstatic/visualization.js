@@ -256,8 +256,18 @@ function set_map_checkbox(){
   //Uncheck all but the first checked for each filter
   filter_lists = $('.filter');
   $.each(filter_lists, function(i){
-    $(filter_lists[i]).find("input:checked:not(.Town)").slice(1).prop('checked', false);
+    $(filter_lists[i]).find("input:checked:not(.Town, .Year)").slice(1).prop('checked', false);
   });
+
+  //Check most recent year
+  values = []
+  $("input:checked.Year").map(function(){
+    values.push(parseInt($(this).val()))
+  });
+  max_year = Math.max.apply(null, values).toString()
+
+  $("input:checked.Year").prop('checked', false);
+  $("input:#"+ max_year +"Check.Year").prop('checked', true);
 }
 
 //When not showing map, allow multiple filters to be checked
@@ -498,7 +508,6 @@ function draw_chart(){
         yAxisLabel = $(".MeasureType:checked").first().val();
 
         hide_spinner();
-        console.log(dataset_title)
         $('#container').highcharts({
             chart: {
               type: display_type
