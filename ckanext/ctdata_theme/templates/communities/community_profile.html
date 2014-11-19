@@ -17,7 +17,7 @@
 <ul class="opt_btn">
 <li class="btn_blue"><a href="javascript:void(0)" id="add_towns">Edit Towns</a></li>
 <li class="btn_blue"><a href="javascript:void(0)" id="add_indicator">Add Indicator</a></li>
-<li class="download_btn"><a href="#">Download Profile</a></li>
+<li class="download_btn"><a href="#" onclick="$('.table').table2CSV({})"  id="download">Download Profile</a></li>
 </ul>
 
 
@@ -72,4 +72,5 @@
 {% block scripts %}
     {{ super() }}
     {% resource 'ctdata_theme/communities.js' %}
+    {% resource 'ctdata_theme/html2csv.js' %}
 {% endblock %}
