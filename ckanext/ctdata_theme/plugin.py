@@ -81,7 +81,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
             m.connect('page_about', '/pages/about', action='about')
             m.connect('page_news', '/pages/news', action='news')
-            # m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
+            m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
 
         return route_map
 
