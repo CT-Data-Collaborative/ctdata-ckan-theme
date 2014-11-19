@@ -464,3 +464,10 @@ label {font-weight: normal; cursor: auto}
 .data_by_location:hover{
   text-decoration: none;
 }
+
+.spinner{
+  display: none;
+  z-index: 999;
+/*  position: relative;
+  top: 500px;*/
+}

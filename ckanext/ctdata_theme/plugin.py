@@ -62,6 +62,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.community.controllers:CommunityProfilesController') as m:
             m.connect('community_get_filters', '/community/get_filters/{dataset_id}', action='get_filters')
+            m.connect('community_get_topics', '/community/get_topics', action='get_topics')
             m.connect('community_add_indicator', '/community/add_indicator', action='add_indicator')
             m.connect('community_add_profile', '/community/add_profile', action='add_profile')
             m.connect('community_save_as_default', '/community/save_as_default', action='save_as_default')

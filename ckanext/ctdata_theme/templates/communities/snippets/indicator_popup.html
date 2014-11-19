@@ -11,7 +11,7 @@
                             {% for subtopic in topic['subdomains'] %}
                             <li>
                                 <div>
-                                <h3 style="color: #000000">{{ subtopic['title'] }}</h3>
+                                    <h3 style="color: #000000">{{ subtopic['title'] }}</h3>
                                     <ul class="indicator-sub-topics">
                                         {% for dataset in subtopic['datasets'] %}
                                         <li>
@@ -40,7 +40,7 @@
             <div class="modal-footer">
                 <div style="float: right">
                     <button id="save_indicator" class="btn btn-primary">Add measure to profile</button>
-                    <button id="close_indicator_popup" class="btn">Cancel</button>
+                    <button class="btn close_popup">Cancel</button>
                 </div>
             </div>
         </div>

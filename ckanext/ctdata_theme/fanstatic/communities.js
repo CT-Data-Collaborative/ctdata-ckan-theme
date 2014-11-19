@@ -1,12 +1,70 @@
-var create_popup  = $("#create_profile_popup");
-create_popup.modal({show: false});
+var create_popup    = $("#create_profile_popup");
 
 $('.close_popup').click(function() {
-  create_popup.modal('hide');
+  $(this).closest('div.modal').modal('hide');
 });
 
 $('#create_profile_button').click(function() {
   create_popup.modal('show');
+});
+
+$('#add_towns').click(function() {
+    $("#towns_popup").modal('show');
+})
+
+
+function load_functions_for_indicators(){
+    $('.close_popup').click(function() {
+      $(this).closest('div.modal').modal('hide');
+    });
+
+    $('.dataset_chooser').on('click',function() {
+        $('li', $('ul.indicator-sub-topics')).removeClass('active')
+        current_dataset = $(this).attr('id');
+        $(this).closest('li').addClass('active');
+        $.ajax({type: "GET",
+            url: "/community/get_filters/" + current_dataset,
+            success: function (data) {
+                $('#filters_content').html(build_filters(data['result']));
+            }
+        });
+    });
+
+    $('#save_indicator').click(function() {
+        $("#indicator_adding_error").animate({opacity: 0}, 300);
+        $.ajax({type: "POST",
+            url: "/community/add_indicator",
+            data: JSON.stringify({dataset_id: current_dataset, name: "", headline: false,
+                                  filters: get_filters()}),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if (data.success == true)
+                    window.location.reload();
+                else {
+                    $("#error").html(data.error);
+                    $("#error").animate({opacity: 1}, 300);
+                }
+            }
+        });
+    });
+
+}
+function load_topics(){
+    if ($('#loaded_topics').html() == ""){
+        $(".spinner").show()
+        $.ajax({type: "GET",
+            url: "/community/get_topics/",
+            success: function (data) {
+                $('#loaded_topics').append($(data.html));
+                $(".spinner").hide()
+                load_functions_for_indicators();
+            }
+        });
+    }
+}
+
+$('#add_indicator').click(function() {
+    $("#indicator_popup").modal('show');
 });
 
 function build_filters(filter_data) {
@@ -41,42 +99,9 @@ function get_filters() {
 $(function(){
     var current_dataset;
 
-    $.each(['towns', 'indicator'], function(i, popup_name) {
-        var popup = $("#" + popup_name + "_popup");
-
-        popup.modal({show: false});
-
-        $('#add_' + popup_name).click(function() {
-            popup.modal('show');
-            $("#indicator_adding_error").css({opacity: 0});
-        });
-
-        $('#close_' + popup_name + '_popup').click(function() {
-            popup.modal('hide');
-        });
-    })
-
     $('#save_towns').click(function() {
         var towns = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         window.location.search = 'towns=' + towns.join();
-    });
-
-    $('#save_indicator').click(function() {
-        $("#indicator_adding_error").animate({opacity: 0}, 300);
-        $.ajax({type: "POST",
-            url: "/community/add_indicator",
-            data: JSON.stringify({dataset_id: current_dataset, name: "", headline: false,
-                                  filters: get_filters()}),
-            contentType: 'application/json; charset=utf-8',
-            success: function (data) {
-                if (data.success == true)
-                    window.location.reload();
-                else {
-                    $("#error").html(data.error);
-                    $("#error").animate({opacity: 1}, 300);
-                }
-            }
-        });
     });
 
     $('#save_profile_as_default').click(function() {
@@ -111,21 +136,11 @@ $(function(){
         }
     });
 
-    $('.dataset_chooser').click(function() {
-        $('li', $('ul.indicator-sub-topics')).removeClass('active')
-        current_dataset = $(this).attr('id');
-        $(this).closest('li').addClass('active');
-        $.ajax({type: "GET",
-            url: "/community/get_filters/" + current_dataset,
-            success: function (data) {
-                $('#filters_content').html(build_filters(data['result']));
-            }
-        });
-    });
-
     $('.table_data').hover(function() {
         $(this).find('.close_pic').animate({opacity: 1.0}, 300);
     }, function () {
         $(this).find('.close_pic').animate({opacity: 0.0}, 300);
     });
+
+    load_topics();
 });

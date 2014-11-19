@@ -192,8 +192,7 @@ class CommunityProfileService(object):
         indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.is_global == True).all()
         return indicators
 
-    def get_indicators(self, community_name, towns_names, location, user=None):
-        community = self.get_community_profile(community_name)
+    def get_indicators(self, community, towns_names, location, user=None):
         location  = self.get_town(location)
 
         towns = set()
@@ -281,7 +280,7 @@ class CommunityProfileService(object):
 
         towns.sort(key=lambda t: t.fips)
 
-        return community, result, towns
+        return result, towns
 
     def _add_indicator_values(self, indicators, towns):
         for indicator in indicators:

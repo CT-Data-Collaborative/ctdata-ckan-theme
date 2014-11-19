@@ -18,7 +18,7 @@
     {% if user %}
         <td class="no-border">
             <a href="/community/remove_indicator/{{indicator['indicator'].id}}?anti_csrf={{anti_csrf_token}}&came_from={{request.url}}">
-            <img class="close_pic" style="opacity: 0; margin-left: 10px" src="/common/images/close_pic.png">
+                <img class="close_pic" style="opacity: 0; margin-left: 10px" src="/common/images/close_pic.png">
             </a>
         </td>
     {% endif %}
