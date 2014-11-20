@@ -439,3 +439,7 @@ white-space: nowrap;
 .col-5{ width:92px;}
 .col-6{ width:92px;}
 .col-7{ width:33px;}
+
+.custom_profile_mess{
+	margin-left: 50px;
+}

@@ -16,11 +16,17 @@
 <section class="locationdata">
 <ul class="opt_btn">
 <li class="btn_blue"><a href="javascript:void(0)" id="add_towns">Edit Towns</a></li>
+{% if location == community.name %}
 <li class="btn_blue"><a href="javascript:void(0)" id="add_indicator">Add Indicator</a></li>
+{% endif %}
 <li class="download_btn"><a href="#" onclick="$('.table').table2CSV({})"  id="download">Download Profile</a></li>
 </ul>
 
 
+<div class="custom_profile_mess">
+    You are viewing a custom profile.  To create your own custom profile, click here" and have the
+    <a href="{{ default_url }}"> click here </a>.
+</div>
 <div class="locaton_table">
 {% if indicators %}
     <table class='table'>
@@ -47,11 +53,13 @@
 
 
     <ul class= 'opt_btn'>
+    {% if location == community.name %}
     {% if c.userobj %}
     <li><a href="javascript:void(0)" id="update_profile_indicators" class='blue_button pull-left'> Remove indicators</a></li>
     {% endif %}
     <li><a href="javascript:void(0)" id="remove_temp_indicators" class='gray_button'>Remove Temp Indicators</a></li>
     <li><a href="javascript:void(0)" id="create_profile_button"  class='blue_button'>Save to new profile</a></li>
+    {% endif %}
     {% if c.userobj.sysadmin %}
         <li><a href="javascript:void(0)" id="save_profile_as_default" class='blue_button'>Save as defualt</a></li>
     {% endif %}
