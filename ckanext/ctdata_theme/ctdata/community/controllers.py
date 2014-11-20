@@ -47,14 +47,19 @@ class CommunityProfilesController(base.BaseController):
 
             try:
                 self.community_profile_service.create_indicator(name, filters, dataset_id, user, headline)
+                self.session.commit()
+                h.flash_notice('Indicator successfully created.')
+                return json.dumps({'success': True})
             except toolkit.ObjectNotFound, e:
+                h.flash_error(str(e))
                 return json.dumps({'success': False, 'error': str(e)})
             except ProfileAlreadyExists, e:
+                h.flash_error(str(e))
                 return json.dumps({'success': False, 'error': str(e)})
 
-            self.session.commit()
+        h.flash_error('Indicator cannot be saved')
+        return json.dumps({'success': False})
 
-            return json.dumps({'success': True})
 
     # def remove_indicator(self, indicator_id):
     #     user_name = http_request.environ.get("REMOTE_USER")

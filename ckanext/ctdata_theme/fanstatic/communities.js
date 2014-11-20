@@ -17,6 +17,7 @@ $('.remove_indicator').on('click', function(){
     ids_to_remove.push( $(this).attr('id'));
 
     $(this).closest('tr').hide();
+    $('#update_profile_indicators').show();
 });
 
 function load_functions_for_indicators(){
@@ -159,4 +160,5 @@ $(function(){
     });
 
     load_topics();
+    $('#update_profile_indicators').hide();
 });
