@@ -11,7 +11,7 @@ from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
 from ..visualization.services import DatasetService
 from ..utils import dict_with_key_value, OrderedSet
-
+from IPython import embed
 
 class ProfileAlreadyExists(Exception):
     pass
@@ -294,12 +294,13 @@ class CommunityProfileService(object):
                 last_id = val.indicator.id
             current_ind['values'].append(val.value)
 
-            ######  show None if no value for some town/indicator colunm
-            if len(current_ind['values']) < len(existing_towns):
-                size = len(existing_towns) - len(current_ind['values'])
-                indicators_values + [None] * size
-
         towns.sort(key=lambda t: t.fips)
+
+        ######  show None if no value for some town/indicator colunm
+        for item in result:
+            if len(item['values']) < len(existing_towns):
+                size = len(existing_towns) - len(item['values'])
+                item['values'] += [None] * size
 
         return result, towns
 
