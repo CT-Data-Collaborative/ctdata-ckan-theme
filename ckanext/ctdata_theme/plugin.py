@@ -66,6 +66,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('community_add_indicator', '/community/add_indicator', action='add_indicator')
             m.connect('community_add_profile', '/community/add_profile', action='add_profile')
             m.connect('community_update_profile_indicators', '/community/update_profile_indicators', action='update_profile_indicators')
+            m.connect('community_remove_temp_indicators', '/community/remove_temp_indicators', action='remove_temp_indicators')
             m.connect('community_save_as_default', '/community/save_as_default', action='save_as_default')
             m.connect('community_remove_indicator',
                       '/community/remove_indicator/{indicator_id}',

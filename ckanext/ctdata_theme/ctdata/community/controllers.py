@@ -154,10 +154,10 @@ class CommunityProfilesController(base.BaseController):
                     self.community_profile_service.remove_indicator(user, indicator_id)
                     self.session.commit()
                 except toolkit.ObjectNotFound:
-                    print colored('Alarm', 'red')
+                    h.flash_error('Indicator not found.')
                     pass #abort(404)
                 except CantDeletePrivateIndicator, e:
-                    print colored('Alarm', 'red')
+                    h.flash_error(str(e))
                     pass #abort(400, str(e))
 
         h.flash_notice('Indicators successfully updated.')
@@ -216,6 +216,20 @@ class CommunityProfilesController(base.BaseController):
         else:
             h.flash_error('Profile cannot be saved.')
             return json.dumps({'success': False})
+
+    def remove_temp_indicators(self):
+        json_body = json.loads(http_request.body, encoding=http_request.charset)
+        ids       = json_body.get('indicator_ids')
+
+        if http_request.method == 'POST':
+            self.community_profile_service.remove_temp_user_indicators(ids)
+
+            # h.flash_notice('Indicators successfully removed.')
+            return json.dumps({'success': True})
+        else:
+            # h.flash_error('Indicators cannot be removed.')
+            return json.dumps({'success': False})
+
 
     def get_filters(self, dataset_id):
         http_response.headers['Content-type'] = 'application/json'

@@ -115,6 +115,21 @@ function get_filters() {
     }).get();
 }
 
+function remove_temp_indicators(){
+    if ($('.temp').size() != 0) {
+        ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
+        $.ajax({type: "POST",
+            url: "/community/remove_temp_indicators",
+            data: JSON.stringify({indicator_ids: ids}),
+            contentType: 'application/json; charset=utf-8'
+        });
+    }
+}
+
+$('#remove_temp_indicators').on( 'click', function(){
+    remove_temp_indicators();
+});
+
 $(function(){
     var current_dataset;
 
@@ -161,4 +176,9 @@ $(function(){
 
     load_topics();
     $('#update_profile_indicators').hide();
+    if ($('.temp').size() == 0) $('#remove_temp_indicators').hide()
+
+    $(window).bind('beforeunload', function(){
+        remove_temp_indicators()
+    });
 });

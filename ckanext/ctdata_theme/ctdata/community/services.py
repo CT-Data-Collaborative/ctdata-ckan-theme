@@ -40,9 +40,21 @@ class CommunityProfileService(object):
 
         return community
 
+    def remove_temp_user_indicators(self, indicator_ids):
+        temp_indicators = self.get_temp_user_indicators(map(int,indicator_ids.split(',')))
+        for indicator in temp_indicators:
+            self.session.delete(indicator)
+
+        self.session.commit()
+
     def create_community_profile(self, name, indicator_ids, user_id, default_url):
         new_profile = CommunityProfile(name, str(indicator_ids), user_id, default_url)
         self.session.add(new_profile)
+
+        ### update indicators temp color to True
+        temp_indicators = self.get_temp_user_indicators(map(int,indicator_ids.split(',')))
+        for indicator in temp_indicators:
+            indicator.temp = False
 
         self.session.commit()
         new_profile.default_url += '?p=' + str(new_profile.id)
@@ -124,8 +136,9 @@ class CommunityProfileService(object):
                                              "or have '%Y-%m-%d %H:%M:%S' format")
 
         is_global = False
+        temp      = False if headline else True
         indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
-                                     variable, headline)
+                                     variable, headline, temp)
         owner.indicators.append(indicator)
 
         self.session.add(indicator)
@@ -189,6 +202,11 @@ class CommunityProfileService(object):
 
     def get_default_indicators(self):
         indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.is_global == True).all()
+        return indicators
+
+    def get_temp_user_indicators(self, ids):
+        indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.temp == True,
+                                                                    ProfileIndicator.id.in_(ids))).all()
         return indicators
 
     def get_indicators(self, community, towns_names, location, user=None):
@@ -271,7 +289,7 @@ class CommunityProfileService(object):
                     del f['values']
                 dataset_name = DatasetService.get_dataset_meta(val.indicator.dataset_id)['title']
                 current_ind = {'indicator': val.indicator, 'filters': filters, 'values': [],
-                               'dataset': dataset_name, 'is_global': val.indicator.is_global}
+                               'dataset': dataset_name, 'is_global': val.indicator.is_global, 'temp': val.indicator.temp}
                 result.append(current_ind)
                 last_id = val.indicator.id
             current_ind['values'].append(val.value)
