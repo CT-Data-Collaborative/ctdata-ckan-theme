@@ -209,6 +209,7 @@ class CommunityProfilesController(base.BaseController):
                 h.flash_notice('Profile ' + profile.name + 'has been saved. Url: ' + host + profile.default_url)
                 return json.dumps({'success': True, 'redirect_link': profile.default_url })
         else:
+            h.flash_error('Profile cannot be saved.')
             return json.dumps({'success': False})
 
     def get_filters(self, dataset_id):
