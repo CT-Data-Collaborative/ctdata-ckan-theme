@@ -42,32 +42,6 @@ class Database(object):
         VisualizationOrmBase.metadata.create_all(self.engine)
 
         try:
-            name     = Column('name', String)
-            headline = Column('headline', Boolean)
-            self.add_column('ctdata_profile_indicators', name, connection_string)
-            self.add_column('ctdata_profile_indicators', headline, connection_string)
-        except sqlalchemy.exc.ProgrammingError:
-            pass
-
-        try:
-            indicator_ids  = Column('indicator_ids', String)
-            self.add_column('ctdata_community_profiles', indicator_ids, connection_string)
-        except sqlalchemy.exc.ProgrammingError:
-            pass
-
-        try:
-            user_id  = Column('user_id', String, ForeignKey('ctdata_user_info.ckan_user_id'))
-            self.add_column('ctdata_community_profiles', user_id, connection_string)
-        except sqlalchemy.exc.ProgrammingError:
-            pass
-
-        try:
-            default_url = Column('default_url', String)
-            self.add_column('ctdata_community_profiles', default_url, connection_string)
-        except sqlalchemy.exc.ProgrammingError:
-            pass
-
-        try:
             temp = Column('temp', Boolean)
             self.add_column('ctdata_profile_indicators', temp, connection_string)
         except sqlalchemy.exc.ProgrammingError:
