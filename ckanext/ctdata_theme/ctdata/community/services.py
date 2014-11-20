@@ -276,6 +276,11 @@ class CommunityProfileService(object):
                 last_id = val.indicator.id
             current_ind['values'].append(val.value)
 
+            ######  show None if no value for some town/indicator colunm
+            if len(current_ind['values']) < len(existing_towns):
+                size = len(existing_towns) - len(current_ind['values'])
+                indicators_values + [None] * size
+
         towns.sort(key=lambda t: t.fips)
 
         return result, towns
