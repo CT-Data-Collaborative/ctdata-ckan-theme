@@ -464,3 +464,14 @@ label {font-weight: normal; cursor: auto}
 .data_by_location:hover{
   text-decoration: none;
 }
+
+.spinner.small{
+  display: none;
+  z-index: 999;
+  /*position: absolute;*/
+  margin-top: -200px;
+  width: 200px;
+  height: 200px;
+  /*top: -100%;
+  left: -40%;*/
+}
