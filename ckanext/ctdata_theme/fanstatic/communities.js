@@ -69,12 +69,12 @@ function load_functions_for_indicators(){
 }
 function load_topics(){
     if ($('#loaded_topics').html() == ""){
-        $(".spinner").show()
+        // $(".spinner").show()
         $.ajax({type: "GET",
             url: "/community/get_topics/",
             success: function (data) {
                 $('#loaded_topics').append($(data.html));
-                $(".spinner").hide()
+                // $(".spinner").hide()
                 load_functions_for_indicators();
             }
         });
