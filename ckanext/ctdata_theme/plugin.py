@@ -66,6 +66,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('community_add_indicator', '/community/add_indicator', action='add_indicator')
             m.connect('community_add_profile', '/community/add_profile', action='add_profile')
             m.connect('community_update_profile_indicators', '/community/update_profile_indicators', action='update_profile_indicators')
+            m.connect('community_remove_temp_indicators', '/community/remove_temp_indicators', action='remove_temp_indicators')
             m.connect('community_save_as_default', '/community/save_as_default', action='save_as_default')
             m.connect('community_remove_indicator',
                       '/community/remove_indicator/{indicator_id}',
@@ -254,26 +255,3 @@ class CTDataController(base.BaseController):
             pass
 
         return data
-
-    # TODO: move to Community Controller
-    def add_community_towns(self, community_name):
-        if http_request.method == 'POST':
-            try:
-                json_body = json.loads(http_request.body, encoding=http_request.charset)
-            except ValueError:
-                abort(400)
-            towns = json_body.get('towns')
-
-            if not towns:
-                abort(400, detail='No towns specified')
-
-            try:
-                self.community_profile_service.add_profile_town(community_name, towns)
-            except toolkit.ObjectNotFound:
-                abort(404)
-
-            session.commit()
-
-            http_response.headers['Content-type'] = 'application/json'
-            return json.dumps({'success': True})
-

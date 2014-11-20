@@ -51,8 +51,9 @@ class ProfileIndicator(Base):
     filters    = Column(Text)
     name       = Column(String)
     headline   = Column(Boolean)
+    temp       = Column(Boolean)
 
-    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, headline):
+    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, headline, temp):
         self.name = name
         self.filters = filters
         self.dataset_id = dataset_id
@@ -61,6 +62,7 @@ class ProfileIndicator(Base):
         self.year = year
         self.variable = variable
         self.headline = headline
+        self.temp  = temp
 
     def __repr__(self):
         return "[Indicator: %s; %s; %s; %s; %s;]" % (self.name, self.id, self.dataset_id, self.data_type, self.year)

@@ -17,6 +17,7 @@ $('.remove_indicator').on('click', function(){
     ids_to_remove.push( $(this).attr('id'));
 
     $(this).closest('tr').hide();
+    $('#update_profile_indicators').show();
 });
 
 function load_functions_for_indicators(){
@@ -69,12 +70,12 @@ function load_functions_for_indicators(){
 }
 function load_topics(){
     if ($('#loaded_topics').html() == ""){
-        $(".spinner").show()
+        // $(".spinner").show()
         $.ajax({type: "GET",
             url: "/community/get_topics/",
             success: function (data) {
                 $('#loaded_topics').append($(data.html));
-                $(".spinner").hide()
+                // $(".spinner").hide()
                 load_functions_for_indicators();
             }
         });
@@ -113,6 +114,21 @@ function get_filters() {
         return {field: $(e).attr('name'), values: [$(e).val()]}
     }).get();
 }
+
+function remove_temp_indicators(){
+    if ($('.temp').size() != 0) {
+        ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
+        $.ajax({type: "POST",
+            url: "/community/remove_temp_indicators",
+            data: JSON.stringify({indicator_ids: ids}),
+            contentType: 'application/json; charset=utf-8'
+        });
+    }
+}
+
+$('#remove_temp_indicators').on( 'click', function(){
+    remove_temp_indicators();
+});
 
 $(function(){
     var current_dataset;
@@ -159,4 +175,10 @@ $(function(){
     });
 
     load_topics();
+    $('#update_profile_indicators').hide();
+    if ($('.temp').size() == 0) $('#remove_temp_indicators').hide()
+
+    $(window).bind('beforeunload', function(){
+        remove_temp_indicators()
+    });
 });

@@ -47,14 +47,19 @@ class CommunityProfilesController(base.BaseController):
 
             try:
                 self.community_profile_service.create_indicator(name, filters, dataset_id, user, headline)
+                self.session.commit()
+                h.flash_notice('Indicator successfully created.')
+                return json.dumps({'success': True})
             except toolkit.ObjectNotFound, e:
+                h.flash_error(str(e))
                 return json.dumps({'success': False, 'error': str(e)})
             except ProfileAlreadyExists, e:
+                h.flash_error(str(e))
                 return json.dumps({'success': False, 'error': str(e)})
 
-            self.session.commit()
+        h.flash_error('Indicator cannot be saved')
+        return json.dumps({'success': False})
 
-            return json.dumps({'success': True})
 
     # def remove_indicator(self, indicator_id):
     #     user_name = http_request.environ.get("REMOTE_USER")
@@ -149,10 +154,10 @@ class CommunityProfilesController(base.BaseController):
                     self.community_profile_service.remove_indicator(user, indicator_id)
                     self.session.commit()
                 except toolkit.ObjectNotFound:
-                    print colored('Alarm', 'red')
+                    h.flash_error('Indicator not found.')
                     pass #abort(404)
                 except CantDeletePrivateIndicator, e:
-                    print colored('Alarm', 'red')
+                    h.flash_error(str(e))
                     pass #abort(400, str(e))
 
         h.flash_notice('Indicators successfully updated.')
@@ -209,7 +214,22 @@ class CommunityProfilesController(base.BaseController):
                 h.flash_notice('Profile ' + profile.name + 'has been saved. Url: ' + host + profile.default_url)
                 return json.dumps({'success': True, 'redirect_link': profile.default_url })
         else:
+            h.flash_error('Profile cannot be saved.')
             return json.dumps({'success': False})
+
+    def remove_temp_indicators(self):
+        json_body = json.loads(http_request.body, encoding=http_request.charset)
+        ids       = json_body.get('indicator_ids')
+
+        if http_request.method == 'POST':
+            self.community_profile_service.remove_temp_user_indicators(ids)
+
+            # h.flash_notice('Indicators successfully removed.')
+            return json.dumps({'success': True})
+        else:
+            # h.flash_error('Indicators cannot be removed.')
+            return json.dumps({'success': False})
+
 
     def get_filters(self, dataset_id):
         http_response.headers['Content-type'] = 'application/json'

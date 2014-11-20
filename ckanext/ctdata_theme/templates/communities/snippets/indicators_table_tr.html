@@ -1,6 +1,9 @@
 <tr class="table_data">
     <td class="col-1">
         <span class="indicator_id hidden">{{indicator['indicator'].id}} </span>
+        {% if indicator['temp'] == True %}
+            <span class="text-warning temp">*</span>
+        {% endif %}
         <a href="/visualization/{{ indicator['dataset'].replace(' ', '-').lower()}}?ind={{indicator['indicator'].id}}">
             {{indicator['dataset']}}, {{indicator['indicator'].variable}}
         </a>

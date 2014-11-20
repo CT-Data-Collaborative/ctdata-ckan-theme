@@ -184,3 +184,11 @@ div#error_message{
   width: 300px;
   height: 40px;
 }
+
+a.change_dataset_link{
+  margin-left: 10px;
+}
+
+a.change_dataset_link:hover{
+  text-decoration: underline;
+}
