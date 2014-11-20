@@ -9,6 +9,14 @@
 {% block page_description %}Create a Profile for Your Community{% endblock %}
 {% block main_content %}
 
+{% if location != community.name %}
+<div class="flash-messages">
+
+    <div class="alert fade in alert-info text-center">
+      You are viewing a custom profile. We invite you to <a href="{{ default_url }}" class="underlined"> create your own custom profile </a>.
+    </div>
+</div>
+{% endif %}
 <div class="spinner small"> <img src="/common/images/loading.gif"/> </div>
 
 <div class="wrapper">
@@ -23,10 +31,6 @@
 </ul>
 
 
-<div class="custom_profile_mess">
-    You are viewing a custom profile.  To create your own custom profile, click here" and have the
-    <a href="{{ default_url }}"> click here </a>.
-</div>
 <div class="locaton_table">
 {% if indicators %}
     <table class='table'>
