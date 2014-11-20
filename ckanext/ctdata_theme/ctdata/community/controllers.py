@@ -128,12 +128,14 @@ class CommunityProfilesController(base.BaseController):
         session['anti_csrf'] = anti_csrf_token
         session.save()
 
+        default_url = http_request.environ.get('HTTP_HOST') + '/community/' + location
         return base.render('communities/community_profile.html', extra_vars={'location': location,
                                                                  'community': community,
                                                                  'indicators': indicators,
                                                                  'displayed_towns': displayed_towns_names,
                                                                  'towns': towns,
-                                                                 'anti_csrf_token': anti_csrf_token})
+                                                                 'anti_csrf_token': anti_csrf_token,
+                                                                 'default_url': default_url})
 
     def update_profile_indicators(self):
         http_response.headers['Content-type'] = 'application/json'
