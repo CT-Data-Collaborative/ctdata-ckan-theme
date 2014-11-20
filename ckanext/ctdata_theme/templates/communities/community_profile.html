@@ -45,15 +45,16 @@
         <input type="hidden" id="community_name" value="{{community.name}}">
     </form>
 
-    {% if c.userobj %}
+
     <ul class= 'opt_btn'>
+    {% if c.userobj %}
     <li><a href="javascript:void(0)" id="update_profile_indicators" class='blue_button pull-left'> Update profile indicators</a></li>
+    {% endif %}
     <li><a href="javascript:void(0)" id="create_profile_button" class='blue_button'>Save to new profile</a></li>
     {% if c.userobj.sysadmin %}
         <li><a href="javascript:void(0)" id="save_profile_as_default" class='blue_button'>Save as defualt</a></li>
     {% endif %}
     </ul>
-    {% endif %}
 </div>
 
 
