@@ -376,8 +376,10 @@ function draw_table(){
       first_idx = 0;
       while(data['data'][first_idx] && !data['data'][first_idx]['dims'])
         first_idx++;
-      if(!data['data'][first_idx])
+      if(!data['data'][first_idx]) {
+        hide_spinner();
         return display_error("No results, please select different filters");
+      }
       all_dims = data['data'][first_idx]['dims'];
       selected_dims = {};
 
