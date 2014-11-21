@@ -316,12 +316,6 @@ class CommunityProfileService(object):
 
         towns.sort(key=lambda t: t.fips)
 
-        ######  show None if no value for some town/indicator colunm
-        # for item in result:
-        #     if len(item['values']) < len(existing_towns):
-        #         size = len(existing_towns) - len(item['values'])
-        #         item['values'] += [None] * size
-
         return result, towns
 
 
