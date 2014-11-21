@@ -25,7 +25,7 @@ def communities():
     sess = db.session_factory()
 
     srvc = CommunityProfileService(sess)
-    communities = srvc.get_all_profiles()
+    communities = srvc.get_profiles_for_data_by_location()
 
     sess.commit()
     return communities

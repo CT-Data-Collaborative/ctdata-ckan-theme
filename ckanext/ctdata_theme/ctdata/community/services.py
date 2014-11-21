@@ -91,6 +91,14 @@ class CommunityProfileService(object):
         all.remove(conn)
         return [conn] + all
 
+    def get_profiles_for_data_by_location(self):
+        towns = self.get_all_towns()
+        towns_names = map(lambda val: val.name, towns)
+        all = self.session.query(CommunityProfile).filter(CommunityProfile.name.in_(towns_names)).order_by(CommunityProfile.name).all()
+        conn = self.session.query(CommunityProfile).filter(CommunityProfile.name == 'Connecticut').first()
+        all.remove(conn)
+        return [conn] + all
+
 
     def get_user_profiles(self, user_id):
         profiles = self.session.query(CommunityProfile).filter(CommunityProfile.user_id == user_id).all()
