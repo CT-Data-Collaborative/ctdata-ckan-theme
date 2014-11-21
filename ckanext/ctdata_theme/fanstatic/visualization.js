@@ -500,8 +500,10 @@ function draw_chart(){
           legend_series.push(cur_legend_series);
         });
 
-        if(series.length == 0)
+        if(series.length == 0) {
+          hide_spinner();
           return display_error("No results, please select different filters");
+        }
         yAxisLabel = $(".MeasureType:checked").first().val();
 
         hide_spinner();
