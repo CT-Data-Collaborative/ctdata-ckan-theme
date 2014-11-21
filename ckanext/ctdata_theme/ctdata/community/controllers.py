@@ -188,8 +188,10 @@ class CommunityProfilesController(base.BaseController):
             if user.is_admin and sorted(new_indicators) != sorted(old_indicators):
                 for old_indicator in old_indicators:
                     old_indicator.is_global = False
+                    old_indicator.temp = False
                 for new_indicator in new_indicators:
                     new_indicator.is_global = True
+                    new_indicator.temp = False
 
                 self.session.commit()
 
@@ -213,7 +215,7 @@ class CommunityProfilesController(base.BaseController):
 
             if profile:
                 host = host = http_request.environ.get('HTTP_HOST')
-                h.flash_notice('Profile ' + profile.name + 'has been saved. Url: ' + host + profile.default_url)
+                h.flash_notice('Profile ' + profile.name + ' has been saved. Url: ' + host + profile.default_url)
                 return json.dumps({'success': True, 'redirect_link': profile.default_url })
         else:
             h.flash_error('Profile cannot be saved.')

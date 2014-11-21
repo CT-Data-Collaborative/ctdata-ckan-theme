@@ -70,13 +70,21 @@ function load_functions_for_indicators(){
 }
 function load_topics(){
     if ($('#loaded_topics').html() == ""){
-        // $(".spinner").show()
+        $('#add_indicator').addClass('disabled')
+        $('#remove_temp_indicators').addClass('disabled')
+        $('#update_profile_indicators').addClass('disabled')
+        $('#create_profile_button').addClass('disabled')
+        $('#save_profile_as_default').addClass('disabled')
         $.ajax({type: "GET",
             url: "/community/get_topics/",
             success: function (data) {
                 $('#loaded_topics').append($(data.html));
-                // $(".spinner").hide()
                 load_functions_for_indicators();
+                $('#add_indicator').removeClass('disabled')
+                $('#remove_temp_indicators').removeClass('disabled')
+                $('#update_profile_indicators').removeClass('disabled')
+                $('#create_profile_button').removeClass('disabled')
+                $('#save_profile_as_default').removeClass('disabled')
             }
         });
     }

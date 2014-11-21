@@ -431,6 +431,7 @@ white-space: nowrap;
 
 .table td.no-border{
 	border: none;
+	background-color: white !important;
 }
 .col-1{ width:309px;}
 .col-2{ width:163px;}
@@ -440,6 +441,13 @@ white-space: nowrap;
 .col-6{ width:92px;}
 .col-7{ width:33px;}
 
+
 a.underlined{
 	text-decoration: underline !important;
+}
+
+a.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: default;
 }
