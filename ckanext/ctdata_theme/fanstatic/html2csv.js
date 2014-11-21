@@ -29,9 +29,10 @@ jQuery.fn.table2CSV = function(options) {
     // actual data
     $(el).find('tr').each(function() {
         var tmpRow = [];
-        $(this).filter(':visible').find('td').each(function() {
-            if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).html());
+        $(this).filter(':visible').find('td.for_csv').each(function() {
+            if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).find('.for_csv').text());
         });
+
         row2CSV(tmpRow);
     });
     if (options.delivery == 'popup') {
@@ -47,6 +48,7 @@ jQuery.fn.table2CSV = function(options) {
         // alert(tmp);
         if (tmpRow.length > 0 && tmp != '') {
             var mystr = tmpRow.join(options.separator);
+            mystr = mystr.replace(/\s\s/g, "");
             csvData[csvData.length] = mystr;
         }
     }

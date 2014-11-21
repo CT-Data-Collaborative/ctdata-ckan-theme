@@ -51,7 +51,7 @@ class CommunityProfileService(object):
         new_profile = CommunityProfile(name, str(indicator_ids), user_id, default_url)
         self.session.add(new_profile)
 
-        ### update indicators temp color to True
+        ### update indicators temp column to True
         temp_indicators = self.get_temp_user_indicators(map(int,indicator_ids.split(',')))
         for indicator in temp_indicators:
             indicator.temp = False
@@ -280,6 +280,25 @@ class CommunityProfileService(object):
                         ProfileIndicatorValue.indicator_id.in_(user_indicators))).\
             order_by(ProfileIndicatorValue.indicator_id, ProfileIndicatorValue.town_id).all()
 
+
+        ######### Add indicators if no value for some town
+        towns_inds_hash = map(lambda val: {val.town: val.indicator}, indicators_values)
+        inds = map(lambda val: val.indicator, indicators_values)
+        inds = set(inds)
+        inds = list(inds)
+
+        for town in existing_towns:
+            for ind in inds:
+                h = {}
+                h[town] = ind
+                try:
+                    towns_inds_hash.index(h)
+                except ValueError:
+                    new_item = ProfileIndicatorValue(ind,town, None)
+                    self.session.add(new_item)
+                    indicators_values.append(new_item)
+        ############
+
         for val in indicators_values:
             if val.indicator.id != last_id:
                 filters = filter(lambda fl: fl['field'] not in ('Town', 'Year', 'Variable', 'Measure Type'),
@@ -294,15 +313,11 @@ class CommunityProfileService(object):
                 last_id = val.indicator.id
             current_ind['values'].append(val.value)
 
+
         towns.sort(key=lambda t: t.fips)
 
-        ######  show None if no value for some town/indicator colunm
-        for item in result:
-            if len(item['values']) < len(existing_towns):
-                size = len(existing_towns) - len(item['values'])
-                item['values'] += [None] * size
-
         return result, towns
+
 
     def _add_indicator_values(self, indicators, towns):
         for indicator in indicators:
@@ -321,3 +336,4 @@ class CommunityProfileService(object):
             for value, town in zip(data['data'], sorted(towns, key=lambda x: x.name)):
                 if not (town.fips, indicator.id) in town_ind_ids:
                     self.session.add(ProfileIndicatorValue(indicator, town, value['data'][0]))
+        print('here')

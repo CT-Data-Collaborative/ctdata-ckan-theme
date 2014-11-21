@@ -1,9 +1,10 @@
 <tr class="table_data">
-    <td class="col-1">
+    <td class="col-1 for_csv">
         <span class="indicator_id hidden">{{indicator['indicator'].id}} </span>
         {% if indicator['temp'] == True %}
             <span class="text-warning temp">*</span>
         {% endif %}
+
         <a href="/visualization/{{ indicator['dataset'].replace(' ', '-').lower()}}?ind={{indicator['indicator'].id}}">
             {{indicator['dataset']}}, {{indicator['indicator'].variable}}
         </a>
@@ -12,11 +13,17 @@
                 {{ filter['field'] }}: {{filter['value']}}{% if not loop.last %},{% endif %}
             {% endfor %}
         </span>
+        <span class='for_csv hidden'>
+            {{indicator['dataset']}}, {{indicator['indicator'].variable}},
+            {% for filter in indicator['filters'] %}
+                {{ filter['field'] }}: {{filter['value']}}{% if not loop.last %},{% endif %}
+            {% endfor %}
+        </span>
     </td>
-    <td>{{indicator['indicator'].data_type}}</td>
-    <td>{{indicator['indicator'].year}}</td>
+    <td class='for_csv'> <span class='for_csv'> {{indicator['indicator'].data_type}}</span></td>
+    <td class='for_csv'><span class='for_csv'>{{indicator['indicator'].year}}</span></td>
     {% for value in indicator['values'] %}
-        <td>{{value}}</td>
+        <td class='for_csv'><span class='for_csv'>{{value}}</span></td>
     {% endfor %}
     {% if user %}
         <td class="no-border">
