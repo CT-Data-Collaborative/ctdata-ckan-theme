@@ -1,13 +1,15 @@
 {% extends "page.html" %}
 
-{% block title %}CTData Visualization - {{ dataset.title }} {% endblock %}
-{% block page_name %}{{ dataset.title }}{% endblock %}
-{% block page_description %}Profile info{% endblock %}
-
+{%- block underheader %}{% endblock -%}
 
 {% block main_content %}
 <div class="ctdata-wrapper">
-  <a href="/data_by_topic" class="change_dataset_link pull-left"> << change dataset </a>
+<div class='dataset_info'>
+  <h1>{{ dataset.title }}</h1>
+  <h3><span id="profile_info"></span></h3>
+</div>
+<a href="/data_by_topic" class="change_dataset_link pull-left"> << change dataset </a>
+
 <div class="headline_indicators">
   {% if headline_indicators %}
     <label> Select Headline Indicator </label>
