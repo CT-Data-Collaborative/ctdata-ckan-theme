@@ -1,5 +1,5 @@
 import json
-import uuid, OpenSSL
+import uuid
 import datetime
 
 from pylons.controllers.util import abort, redirect
@@ -27,7 +27,7 @@ class CommunityProfilesController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def add_indicator(self):
-        session_id = http_request.cookies.get('ckan') or uuid.UUID(bytes = OpenSSL.rand.bytes(16)).hex
+        session_id = http_request.cookies.get('ckan') or uuid.uuid4().hex
         user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
 
         if http_request.method == 'POST':
@@ -96,7 +96,7 @@ class CommunityProfilesController(base.BaseController):
     #         abort(401)
 
     def community_profile(self, community_name):
-        session_id = http_request.cookies.get('ckan') or uuid.UUID(bytes = OpenSSL.rand.bytes(16)).hex
+        session_id = http_request.cookies.get('ckan') or uuid.uuid4().hex
 
         print(session_id)
         user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + str(session_id)
@@ -201,7 +201,7 @@ class CommunityProfilesController(base.BaseController):
         return json.dumps({'success': True})
 
     def add_profile(self):
-        session_id = http_request.cookies.get('ckan') or uuid.UUID(bytes = OpenSSL.rand.bytes(16)).hex
+        session_id = http_request.cookies.get('ckan') or uuid.uuid4().hex
         user_name = http_request.environ.get("REMOTE_USER") or  "guest_" + session_id
         json_body = json.loads(http_request.body, encoding=http_request.charset)
         ids       = json_body.get('indicator_ids')
