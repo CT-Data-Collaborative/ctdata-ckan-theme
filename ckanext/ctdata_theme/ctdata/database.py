@@ -37,7 +37,7 @@ class Database(object):
         )
 
     def init_sa(self, connection_string):
-        self.engine = create_engine(connection_string)
+        self.engine = create_engine(connection_string, pool_size=100)
         Base.metadata.create_all(self.engine)
         VisualizationOrmBase.metadata.create_all(self.engine)
 
