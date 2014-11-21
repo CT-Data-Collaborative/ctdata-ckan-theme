@@ -1,0 +1,27 @@
+<div id="towns_popup" class="modal fade" style="display: none">
+  <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          Edit Towns
+        </div>
+        <div class="modal-body">
+          <div id="towns">
+            <ul style="">
+              {% for town in towns %}
+                <li>
+                  <input type="checkbox" value="{{town.name}}" {% if town.name in displayed_towns %}checked{% endif %} {% if town.name == community.name %}disabled{% endif %}>
+                  <span class="checkLabel">{{town.name}}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div style="float: right">
+            <button id="save_towns" class="btn btn-primary">Save</button>
+            <button class="btn close_popup">Cancel</button>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>

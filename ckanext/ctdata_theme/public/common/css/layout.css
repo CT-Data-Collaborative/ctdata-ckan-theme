@@ -9,13 +9,15 @@ www.dianastutz.com
 */
 
 * html, body {
+	/*font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 14px;*/
 	margin:0;
 	padding:0;
 	background:#fff;
-	font-family:'Roboto', Helvetica, Arial, Sans-Serif;
-	font-weight:400;
-	color:#555;
-	line-height:1.3em;
+	font-family:'Roboto', Helvetica, Arial, Sans-Serif !important;
+	font-weight:400 !important;
+	color:#555 !important;
+	line-height:1.3em !important;
 }
 
 a.orange_link, a.orange_link:link, a.orange_link:active, a.orange_link:visited {
@@ -141,7 +143,7 @@ h1, h2, h3, h4 {
 	background:none;
 	line-height:1.6em;
 }
-#gallery h2 { margin:0; padding:0 0 5px 0; font-weight:400; }
+#gallery h2 { margin:0; padding:0 0 5px 0; font-weight:400; color: white; font-size: 30px;}
 
 #content {
 	background:#fff;
@@ -303,7 +305,7 @@ ul.dropdown-menu li a:hover{
 	margin:0 30px;
 	vertical-align:top;
 }
-#newsmods h2 { margin:5px 0; font-size:1.8em; }
+#newsmods h2 { margin:5px 0; font-size:1.8em;  color: #e47b0a;}
 #newsmods a, #newsmods a:link, #newsmods a:active, #newsmods a:visited {
 	text-decoration:none;
 	color:#e47b0a;
@@ -397,7 +399,9 @@ white-space: nowrap;
 }
 
 
-.table{}
+.table{
+	width: auto;
+}
 .table th small{
 	font-size: 6pt;
 	color: #717171;
@@ -412,13 +416,38 @@ white-space: nowrap;
 }
 
 .table td {
+	word-wrap: break-word;
 	text-align: left;
 	padding: 10px;
 	font-family: 'roboto';
 	line-height: 1;
 	border-bottom: 1px solid #eee;
+	font-size: 14px;
 }
 
 .table td:nth-child(even){
 	background: #f9f9f9;
+}
+
+.table td.no-border{
+	border: none;
+	background-color: white !important;
+}
+.col-1{ width:309px;}
+.col-2{ width:163px;}
+.col-3{ width:124px;}
+.col-4{ width:111px;}
+.col-5{ width:92px;}
+.col-6{ width:92px;}
+.col-7{ width:33px;}
+
+
+a.underlined{
+	text-decoration: underline !important;
+}
+
+a.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: default;
 }

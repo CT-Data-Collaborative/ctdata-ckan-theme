@@ -1,0 +1,35 @@
+<tr class="table_data">
+    <td class="col-1 for_csv">
+        <span class="indicator_id hidden">{{indicator['indicator'].id}} </span>
+        {% if indicator['temp'] == True %}
+            <span class="text-warning temp">*</span>
+        {% endif %}
+
+        <a href="/visualization/{{ indicator['dataset'].replace(' ', '-').lower()}}?ind={{indicator['indicator'].id}}">
+            {{indicator['dataset']}}, {{indicator['indicator'].variable}}
+        </a>
+        <span>
+            {% for filter in indicator['filters'] %}
+                {{ filter['field'] }}: {{filter['value']}}{% if not loop.last %},{% endif %}
+            {% endfor %}
+        </span>
+        <span class='for_csv hidden'>
+            {{indicator['dataset']}}, {{indicator['indicator'].variable}},
+            {% for filter in indicator['filters'] %}
+                {{ filter['field'] }}: {{filter['value']}}{% if not loop.last %},{% endif %}
+            {% endfor %}
+        </span>
+    </td>
+    <td class='for_csv'> <span class='for_csv'> {{indicator['indicator'].data_type}}</span></td>
+    <td class='for_csv'><span class='for_csv'>{{indicator['indicator'].year}}</span></td>
+    {% for value in indicator['values'] %}
+        <td class='for_csv'><span class='for_csv'>{{value}}</span></td>
+    {% endfor %}
+    {% if user %}
+        <td class="no-border">
+            <a href="javascript:void(0)" id="{{indicator['indicator'].id}}" class="remove_indicator">
+                <img class="close_pic" style="opacity: 0; margin-left: 10px" src="/common/images/close_pic.png">
+            </a>
+        </td>
+    {% endif %}
+</tr>

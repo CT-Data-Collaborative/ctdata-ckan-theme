@@ -11,7 +11,7 @@ from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
 from ..visualization.services import DatasetService
 from ..utils import dict_with_key_value, OrderedSet
-
+from IPython import embed
 
 class ProfileAlreadyExists(Exception):
     pass
@@ -40,9 +40,21 @@ class CommunityProfileService(object):
 
         return community
 
+    def remove_temp_user_indicators(self, indicator_ids):
+        temp_indicators = self.get_temp_user_indicators(map(int,indicator_ids.split(',')))
+        for indicator in temp_indicators:
+            self.session.delete(indicator)
+
+        self.session.commit()
+
     def create_community_profile(self, name, indicator_ids, user_id, default_url):
         new_profile = CommunityProfile(name, str(indicator_ids), user_id, default_url)
         self.session.add(new_profile)
+
+        ### update indicators temp column to True
+        temp_indicators = self.get_temp_user_indicators(map(int,indicator_ids.split(',')))
+        for indicator in temp_indicators:
+            indicator.temp = False
 
         self.session.commit()
         new_profile.default_url += '?p=' + str(new_profile.id)
@@ -124,8 +136,9 @@ class CommunityProfileService(object):
                                              "or have '%Y-%m-%d %H:%M:%S' format")
 
         is_global = False
+        temp      = False if headline else True
         indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
-                                     variable, headline)
+                                     variable, headline, temp)
         owner.indicators.append(indicator)
 
         self.session.add(indicator)
@@ -172,10 +185,9 @@ class CommunityProfileService(object):
                     # regular user tries to delete someone else's indicator
                     raise CantDeletePrivateIndicator("The indicator you're trying to delete is not yours")
 
-                if not user.is_admin:
-                    # regular users can permanently delete their own indicators
-                    self.session.delete(ind)
-                    self.remove_indicator_id_from_profiles(ind.id)
+                # regular users can permanently delete their own indicators
+                self.session.delete(ind)
+                self.remove_indicator_id_from_profiles(ind.id)
         else:
             raise toolkit.ObjectNotFound("Indicator not found")
 
@@ -192,8 +204,12 @@ class CommunityProfileService(object):
         indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.is_global == True).all()
         return indicators
 
-    def get_indicators(self, community_name, towns_names, location, user=None):
-        community = self.get_community_profile(community_name)
+    def get_temp_user_indicators(self, ids):
+        indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.temp == True,
+                                                                    ProfileIndicator.id.in_(ids))).all()
+        return indicators
+
+    def get_indicators(self, community, towns_names, location, user=None):
         location  = self.get_town(location)
 
         towns = set()
@@ -229,11 +245,10 @@ class CommunityProfileService(object):
         all_indicators = self.session.query(ProfileIndicator).filter(or_(ProfileIndicator.id.in_(indicators_filter),
                                                                          ProfileIndicator.is_global == True)).all()
 
-
         new_indicators = list(set(all_indicators) - existing_indicators)
         new_towns = list(towns - existing_towns)
 
-        if user and community.name != location.name:
+        if user :
             # add new global indicators to the list of user's indicators
             user.indicators += filter(lambda ind: ind.is_global, new_indicators)
 
@@ -265,6 +280,25 @@ class CommunityProfileService(object):
                         ProfileIndicatorValue.indicator_id.in_(user_indicators))).\
             order_by(ProfileIndicatorValue.indicator_id, ProfileIndicatorValue.town_id).all()
 
+
+        ######### Add indicators if no value for some town
+        towns_inds_hash = map(lambda val: {val.town: val.indicator}, indicators_values)
+        inds = map(lambda val: val.indicator, indicators_values)
+        inds = set(inds)
+        inds = list(inds)
+
+        for town in existing_towns:
+            for ind in inds:
+                h = {}
+                h[town] = ind
+                try:
+                    towns_inds_hash.index(h)
+                except ValueError:
+                    new_item = ProfileIndicatorValue(ind,town, None)
+                    self.session.add(new_item)
+                    indicators_values.append(new_item)
+        ############
+
         for val in indicators_values:
             if val.indicator.id != last_id:
                 filters = filter(lambda fl: fl['field'] not in ('Town', 'Year', 'Variable', 'Measure Type'),
@@ -274,14 +308,16 @@ class CommunityProfileService(object):
                     del f['values']
                 dataset_name = DatasetService.get_dataset_meta(val.indicator.dataset_id)['title']
                 current_ind = {'indicator': val.indicator, 'filters': filters, 'values': [],
-                               'dataset': dataset_name}
+                               'dataset': dataset_name, 'is_global': val.indicator.is_global, 'temp': val.indicator.temp}
                 result.append(current_ind)
                 last_id = val.indicator.id
             current_ind['values'].append(val.value)
 
+
         towns.sort(key=lambda t: t.fips)
 
-        return community, result, towns
+        return result, towns
+
 
     def _add_indicator_values(self, indicators, towns):
         for indicator in indicators:
@@ -300,3 +336,4 @@ class CommunityProfileService(object):
             for value, town in zip(data['data'], sorted(towns, key=lambda x: x.name)):
                 if not (town.fips, indicator.id) in town_ind_ids:
                     self.session.add(ProfileIndicatorValue(indicator, town, value['data'][0]))
+        print('here')
