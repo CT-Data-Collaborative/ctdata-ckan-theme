@@ -136,6 +136,9 @@ function remove_temp_indicators(){
 
 $('#remove_temp_indicators').on( 'click', function(){
     remove_temp_indicators();
+
+    $(this).hide();
+    $('.temp').closest('tr').hide();
 });
 
 $(function(){
@@ -186,7 +189,7 @@ $(function(){
     $('#update_profile_indicators').hide();
     if ($('.temp').size() == 0) $('#remove_temp_indicators').hide()
 
-    $(window).bind('beforeunload', function(){
-        remove_temp_indicators()
-    });
+    // $(window).bind('beforeunload', function(){
+    //     remove_temp_indicators()
+    // });
 });

@@ -1,5 +1,5 @@
 import json
-import uuid
+import uuid, OpenSSL
 import datetime
 
 from pylons.controllers.util import abort, redirect
@@ -27,12 +27,11 @@ class CommunityProfilesController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def add_indicator(self):
-        user_name = http_request.environ.get("REMOTE_USER")
-        if user_name == None:
-            user_name = "guest_" + str(datetime.date.today())
+        session_id = http_request.cookies.get('ckan') or uuid.UUID(bytes = OpenSSL.rand.bytes(16)).hex
+        user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
 
         if http_request.method == 'POST':
-            user = self.user_service.get_or_create_user(user_name) if user_name else None
+            user = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
 
             json_body   = json.loads(http_request.body, encoding=http_request.charset)
             filters     = json_body.get('filters')
@@ -97,11 +96,14 @@ class CommunityProfilesController(base.BaseController):
     #         abort(401)
 
     def community_profile(self, community_name):
-        user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + str(datetime.date.today())
+        session_id = http_request.cookies.get('ckan') or uuid.UUID(bytes = OpenSSL.rand.bytes(16)).hex
+
+        print(session_id)
+        user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + str(session_id)
         location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
         profile_to_load = http_request.GET.get('p')
         towns_raw       = http_request.GET.get('towns')
-        user            = self.user_service.get_or_create_user(user_name) if user_name else None
+        user            = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
         towns_names     = map(lambda x: x.strip(), towns_raw.split(','))  if towns_raw else []
         towns           = self.community_profile_service.get_all_towns()
         indicators, displayed_towns, displayed_towns_names = [],[],[]
@@ -128,7 +130,7 @@ class CommunityProfilesController(base.BaseController):
         session['anti_csrf'] = anti_csrf_token
         session.save()
 
-        default_url = http_request.environ.get('HTTP_HOST') + '/community/' + location
+        default_url = '/community/' + location
         return base.render('communities/community_profile.html', extra_vars={'location': location,
                                                                  'community': community,
                                                                  'indicators': indicators,
@@ -199,17 +201,15 @@ class CommunityProfilesController(base.BaseController):
         return json.dumps({'success': True})
 
     def add_profile(self):
-        user_name = http_request.environ.get("REMOTE_USER")
+        session_id = http_request.cookies.get('ckan') or uuid.UUID(bytes = OpenSSL.rand.bytes(16)).hex
+        user_name = http_request.environ.get("REMOTE_USER") or  "guest_" + session_id
         json_body = json.loads(http_request.body, encoding=http_request.charset)
         ids       = json_body.get('indicator_ids')
         name      = json_body.get('name')
         location  = json_body.get('location')
 
-        if user_name == None:
-            user_name = "guest_" + str(datetime.date.today())
-
         if http_request.method == 'POST':
-            user        = self.user_service.get_or_create_user(user_name) if user_name else None
+            user        = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
             user_id     = user.ckan_user_id if user else None
             profile = self.community_profile_service.create_community_profile(name, ids, user_id, '/community/' + location)
 
