@@ -293,12 +293,10 @@ function display_data(){
   years = $("input.Year:checked");
   if(towns.length == 0){
     hide_spinner();
-    handle_incompatibilities();
     return display_error("Please select a town");
   }
   else if (years.length == 0){
     hide_spinner();
-    handle_incompatibilities();
     return display_error("Please select a year");
   }
   switch(display_type){
