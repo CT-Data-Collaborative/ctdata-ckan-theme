@@ -189,6 +189,11 @@ $(function(){
     $('#update_profile_indicators').hide();
     if ($('.temp').size() == 0) $('#remove_temp_indicators').hide()
 
+    $("#profile_name").keyup(function(event){
+        if(event.keyCode == 13){
+            $("#create_profile").click();
+        }
+    });
     // $(window).bind('beforeunload', function(){
     //     remove_temp_indicators()
     // });
