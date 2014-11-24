@@ -316,7 +316,7 @@
       //               // if there's no items, use size of container
       //               containerWidth;
 
-      this.columnWidth = 200;
+      this.columnWidth = 100;
       this.columnWidth += this.options.gutterWidth;
 
       this.cols = Math.floor( ( containerWidth + this.options.gutterWidth ) / this.columnWidth );
