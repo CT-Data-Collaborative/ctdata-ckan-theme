@@ -96,9 +96,7 @@ class CommunityProfilesController(base.BaseController):
     #         abort(401)
 
     def community_profile(self, community_name):
-        session_id = http_request.cookies.get('ckan') or uuid.uuid4().hex
-
-        print(session_id)
+        session_id      = http_request.cookies.get('ckan') or uuid.uuid4().hex
         user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + str(session_id)
         location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
         profile_to_load = http_request.GET.get('p')
@@ -142,12 +140,13 @@ class CommunityProfilesController(base.BaseController):
     def update_profile_indicators(self):
         http_response.headers['Content-type'] = 'application/json'
 
-        json_body   = json.loads(http_request.body, encoding=http_request.charset)
+        json_body             = json.loads(http_request.body, encoding=http_request.charset)
         indicators_to_remove  = json_body.get('indicators_to_remove')
-        user_name = http_request.environ.get("REMOTE_USER")
+        session_id      = http_request.cookies.get('ckan') or uuid.uuid4().hex
+        user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + str(session_id)
 
         if user_name:
-            user = self.user_service.get_or_create_user(user_name)
+            user = self.user_service.get_or_create_user_with_session_id(user_name,session_id)
         else:
             abort(401)
 
@@ -188,12 +187,16 @@ class CommunityProfilesController(base.BaseController):
         if http_request.method == 'POST':
             user = self.user_service.get_or_create_user(user_name) if user_name else None
             if user.is_admin and sorted(new_indicators) != sorted(old_indicators):
-                for old_indicator in old_indicators:
-                    old_indicator.is_global = False
-                    old_indicator.temp = False
                 for new_indicator in new_indicators:
                     new_indicator.is_global = True
                     new_indicator.temp = False
+
+                for old_indicator in old_indicators:
+                    # old_indicator.is_global = False
+                    # old_indicator.temp = False
+
+                    self.session.delete(old_indicator)
+                    self.remove_indicator_id_from_profiles(old_indicator.id)
 
                 self.session.commit()
 
