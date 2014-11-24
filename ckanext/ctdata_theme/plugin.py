@@ -85,6 +85,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('page_about', '/pages/about', action='about')
             m.connect('page_news', '/pages/news', action='news')
             m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
+            m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
 
         return route_map
 
