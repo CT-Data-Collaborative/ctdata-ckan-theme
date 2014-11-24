@@ -91,6 +91,7 @@ class CommunityProfileService(object):
         all.remove(conn)
         return [conn] + all
 
+    ##### Public community profiles that were made from towns names by system.
     def get_profiles_for_data_by_location(self):
         towns = self.get_all_towns()
         towns_names = map(lambda val: val.name, towns)
