@@ -33,7 +33,7 @@ $.each(data.data, function(i){
   if(data.data[i]['value'] < min)
     min = data.data[i]['value'];
 });
-
+var cur_mt = $(".MeasureType:checked").first().val();
 //Split data into classes for discrete map coloring
 var numClasses = 8;
 var range = max-min;
@@ -42,11 +42,12 @@ var dataClasses = []
 for(i = 0; i < numClasses; i++){
   to = Math.floor(min+(step*(i+1)))
   dataClasses.push({from: Math.floor(min+(step*i)),
-                    to:  to > 100 && 100 || to
+                    to:  to > 100 && (cur_mt == "percent" || cur_mt == "Percent") && 100 || to
                     });
 }
-if(dataClasses[dataClasses.length-1]['to'] < max+1 && max != 100)
-  dataClasses[dataClasses.length-1]['to'] = max+1;
+if(dataClasses[dataClasses.length-1]['to'] < max+1 )
+  if ((cur_mt != "percent" || cur_mt != "Percent") && max != 100)
+    dataClasses[dataClasses.length-1]['to'] = max+1;
 
 $.getJSON('/common/map.json', function (geojson) {
 
@@ -63,7 +64,6 @@ $.each(cur_filters, function(i){
 legend_html = legend_html.substring(0, legend_html.length-2);
 legend_html += "</div></div>"
 
-var cur_mt = $(".MeasureType:checked").first().val();
 var units = "";
 if (cur_mt == "percent" || cur_mt == "Percent")
   units = "%";
