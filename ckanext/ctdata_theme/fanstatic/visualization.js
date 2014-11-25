@@ -442,10 +442,18 @@ function draw_table(){
           "aButtons": ["print", "pdf", "csv"]
         }
       });
+  format_numbers();
   hide_spinner();
 });
 }
-
+function format_numbers(){
+  jQuery.map( $('td'), function( item ) {
+      text = $(item).html()
+      if (jQuery.isNumeric(text) == true){
+        $(item).html(parseInt(text).toLocaleString('en-US'))
+      }
+    });
+}
 function draw_chart(){
   var dataset_id = $("#dataset_id").val(),
       dataset_title = $("#dataset_title").val(),
