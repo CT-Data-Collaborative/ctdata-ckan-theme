@@ -602,4 +602,5 @@ $(function () {
       $("#container").width(width);
     }
     create_headline_indicator();
+    $('.tooltip_a').tooltip();
 });
