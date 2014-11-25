@@ -40,11 +40,12 @@ var range = max-min;
 var step = Math.ceil(range/numClasses);
 var dataClasses = []
 for(i = 0; i < numClasses; i++){
+  to = Math.floor(min+(step*(i+1)))
   dataClasses.push({from: Math.floor(min+(step*i)),
-                    to:   Math.floor(min+(step*(i+1)))
+                    to:  to > 100 && 100 || to
                     });
 }
-if(dataClasses[dataClasses.length-1]['to'] < max+1)
+if(dataClasses[dataClasses.length-1]['to'] < max+1 && max != 100)
   dataClasses[dataClasses.length-1]['to'] = max+1;
 
 $.getJSON('/common/map.json', function (geojson) {
@@ -58,6 +59,7 @@ $.each(cur_filters, function(i){
   legend_html += cur_filters[i].field +
          ": " + cur_filters[i].values + " | ";
 });
+
 legend_html = legend_html.substring(0, legend_html.length-2);
 legend_html += "</div></div>"
 
