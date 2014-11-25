@@ -133,7 +133,7 @@ function check_defaults(){
 
     if(defaults[i] instanceof Array){
       $.each(defaults[i], function(j){
-        $("input."+i.replace(/ /g, '')+"[value='"+defaults[i][j]+"']").prop('checked', true);
+        $("input[class*="+i.replace(/ /g, '')+"]"+"[value='"+defaults[i][j]+"']").prop('checked', true);
       });
     } else {
         $("input."+i.replace(/ /g, '')+"[value='"+defaults[i]+"']").prop('checked', true);
