@@ -22,7 +22,7 @@ $.ajax({type: "POST",
         contentType: 'application/json; charset=utf-8'}).done(function(    data) {
 handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
-var min = Infinity;
+var min = 0;
 $.each(data.data, function(i){
   if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
@@ -40,11 +40,12 @@ var range = max-min;
 var step = Math.ceil(range/numClasses);
 var dataClasses = []
 for(i = 0; i < numClasses; i++){
-  to = Math.floor(min+(step*(i+1)))
-  dataClasses.push({from: Math.floor(min+(step*i)),
+  var to = Math.floor(min+(step*(i+1)/100))*100;
+  dataClasses.push({from: Math.floor(min+(step*i)/100)*100,
                     to:  to > 100 && (cur_mt == "percent" || cur_mt == "Percent") && 100 || to
                     });
 }
+
 if(dataClasses[dataClasses.length-1]['to'] < max+1 )
   if ((cur_mt != "percent" || cur_mt != "Percent") && max != 100)
     dataClasses[dataClasses.length-1]['to'] = max+1;

@@ -537,7 +537,7 @@ function draw_chart(){
                 layout: 'horizontal',
                 verticalAlign: 'bottom',
                 borderWidth: 0,
-                maxHeight: 90
+                maxHeight: 200
             },
             tooltip: {
                 useHTML: true,
