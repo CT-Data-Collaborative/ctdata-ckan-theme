@@ -43,10 +43,16 @@
 <li class="filter">
   <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
   <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
-  <span>
+    <span>
       {% if dimension.name == 'Town' %}
         <a href="javascript:void(0);" class="select-all">Select All</a>
         <a href="javascript:void(0);" class="deselect-all">Deselect All</a>
+
+        <div class="ui-widget control-group">
+          <div class="controls">
+            <input type="text" id="tags" class="input-medium">
+          </div>
+        </div>
       {% endif %}
   </span>
   <ul>
@@ -216,6 +222,9 @@
 <link rel="stylesheet" type="text/css" href="/common/css/visualization.css">
 <link rel="stylesheet" type="text/css" href="/common/css/jquery.dataTables.css">
 <link rel="stylesheet" type="text/css" href="/common/css/tableTools.css">
+<link rel="stylesheet" type="text/css" href="/common/css/jquery_ui.css">
+
+{% resource 'ctdata_theme/jquery_ui.js' %}
 {% resource 'ctdata_theme/highcharts.js' %}
 {% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/map.js' %}
 {% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/data.js' %}
