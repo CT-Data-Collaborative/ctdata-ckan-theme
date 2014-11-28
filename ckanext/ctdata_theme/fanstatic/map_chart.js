@@ -46,24 +46,22 @@ for(i = 0; i < numClasses; i++){
                     });
 }
 
-if(dataClasses[dataClasses.length-1]['to'] < max+1 )
-  if ((cur_mt != "percent" || cur_mt != "Percent") && max != 100)
-    dataClasses[dataClasses.length-1]['to'] = max+1;
+// if(dataClasses[dataClasses.length-1]['to'] < max+1 )
+//   if ((cur_mt != "percent" || cur_mt != "Percent") && max != 100)
+//     dataClasses[dataClasses.length-1]['to'] = max+1;
 
 $.getJSON('/common/map.json', function (geojson) {
 
 //Create legend to display current filters
-var legend_html = '<div id="mapTitle">'+$("#dataset_title").val()+"<br>"+
-  '<div id="mapSubtitle">';
-var cur_filters = get_filters();
+var legend_html = "<div>" ,
+    cur_filters = get_filters();
 $.each(cur_filters, function(i){
   if (cur_filters[i].field == 'Town') return "Skip this filter";
-  legend_html += cur_filters[i].field +
-         ": " + cur_filters[i].values + " | ";
+  legend_html += cur_filters[i].field + ": " + cur_filters[i].values + " | ";
 });
 
 legend_html = legend_html.substring(0, legend_html.length-2);
-legend_html += "</div></div>"
+legend_html += "</div>"
 
 var units = "";
 if (cur_mt == "percent" || cur_mt == "Percent")
@@ -95,14 +93,24 @@ chart = new Highcharts.Chart({
     valueSuffix: units
   },
   title : {
-    text : legend_html,
-    style: {opacity: "70%", fontFamily: "Questrial, sans-serif", textWrap: "normal"},
+    text : $("#dataset_title").val(),
+    style: {opacity: "70%", fontFamily: "Questrial, sans-serif", textWrap: "normal", fontWeight: '900',zIndex: '999', fontSize: '24px'},
     floating: true,
     backgroundColor: 'white',
     borderWidth:1,
     borderRadius:3,
     useHTML: true,
     y: 30
+  },
+  subtitle: {
+    text: legend_html,
+    style: {opacity: "70%", fontFamily: "Questrial, sans-serif", backgroundColor: '#ffffff', padding: '5px', paddingTop: '40px', minWidth: '500px', textAlign: 'center', border: '1px solid lightgray'},
+    floating: true,
+    backgroundColor: 'white',
+    borderWidth:1,
+    borderRadius:3,
+    useHTML: true,
+    y: 10
   },
 
   legend: {
