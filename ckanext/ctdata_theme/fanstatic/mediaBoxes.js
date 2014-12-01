@@ -1,4 +1,4 @@
-/* ======================================================= 
+/* =======================================================
  * Multi Purpose Media Boxes
  * By David Blanco
  *
@@ -153,10 +153,10 @@
         .addClass('mediaBoxes-brick');
       return $bricks;
     },
-    
+
     // sets up widget
     _create : function( options ) {
-      
+
       this.options = $.extend( true, {}, $.MediaBoxes.settings, options );
       this.styleQueue = [];
 
@@ -182,7 +182,7 @@
         x: x ? parseInt( x, 10 ) : 0,
         y: y ? parseInt( y, 10 ) : 0
       };
-      
+
       this.isFluid = this.options.columnWidth && typeof this.options.columnWidth === 'function';
 
       // add mediaBoxes class first time around
@@ -190,10 +190,10 @@
       setTimeout( function() {
         instance.element.addClass('mediaBoxes');
       }, 0 );
-      
+
       // bind resize method
       if ( this.options.isResizable ) {
-        $(window).bind( 'smartresize.mediaBoxes', function() { 
+        $(window).bind( 'smartresize.mediaBoxes', function() {
           instance.resize();
         });
       }
@@ -203,7 +203,7 @@
       this.reloadItems();
 
     },
-  
+
     // _init fires when instance is first created
     // and when instance is triggered again -> $el.mediaBoxes();
     _init : function( callback ) {
@@ -216,9 +216,9 @@
       // signature: $('#foo').bar({ cool:false });
       if ( $.isPlainObject( key ) ){
         this.options = $.extend(true, this.options, key);
-      } 
+      }
     },
-    
+
     // ====================== General Layout ======================
 
     // used on collection of atoms (should be filtered, and sorted before )
@@ -229,7 +229,7 @@
       for (var i=0, len = $bricks.length; i < len; i++) {
         this._placeBrick( $bricks[i] );
       }
-      
+
       // set the size of the container
       var containerSize = {};
       containerSize.height = Math.max.apply( Math, this.colYs );
@@ -286,7 +286,7 @@
         var durationAnim = 500;
 
         //=End David Blanco
-        
+
         obj.$el[ styleFn ]( obj.style, animOpts );
 
       }
@@ -298,24 +298,25 @@
       if ( callback ) {
         callback.call( $bricks );
       }
-      
+
       this.isLaidOut = true;
     },
-    
+
     // calculates number of columns
     // i.e. this.columnWidth = 200
     _getColumns : function() {
       var container = this.options.isFitWidth ? this.element.parent() : this.element,
           containerWidth = container.width();
                          // use fluid columnWidth function if there
-      this.columnWidth = this.isFluid ? this.options.columnWidth( containerWidth ) :
-                    // if not, how about the explicitly set option?
-                    this.options.columnWidth ||
-                    // or use the size of the first item
-                    this.$bricks.outerWidth(true) ||
-                    // if there's no items, use size of container
-                    containerWidth;
+      // this.columnWidth = this.isFluid ? this.options.columnWidth( containerWidth ) :
+      //               // if not, how about the explicitly set option?
+      //               this.options.columnWidth ||
+      //               // or use the size of the first item
+      //               this.$bricks.outerWidth(true) ||
+      //               // if there's no items, use size of container
+      //               containerWidth;
 
+      this.columnWidth = 100;
       this.columnWidth += this.options.gutterWidth;
 
       this.cols = Math.floor( ( containerWidth + this.options.gutterWidth ) / this.columnWidth );
@@ -354,7 +355,7 @@
       // get the minimum Y value from the columns
       var minimumY = Math.min.apply( Math, groupY ),
           shortCol = 0;
-      
+
       // Find index of short column, the first from the left
       for (var i=0, len = groupY.length; i < len; i++) {
         if ( groupY[i] === minimumY ) {
@@ -379,8 +380,8 @@
       }
 
     },
-    
-    
+
+
     resize: function() {
       var prevColCount = this.cols;
       // get updated colCount
@@ -390,8 +391,8 @@
         this._reLayout();
       }
     },
-    
-    
+
+
     _reLayout : function( callback ) {
       // reset columns
       var i = this.cols;
@@ -402,24 +403,24 @@
       // apply layout logic to all bricks
       this.layout( this.$bricks, callback );
     },
-    
+
     // ====================== Convenience methods ======================
-    
+
     // goes through all children again and gets bricks in proper order
     reloadItems : function() {
       this.$bricks = this._getBricks( this.element.children() );
     },
-    
-    
+
+
     reload : function( callback ) {
       this.reloadItems();
       this._init( callback );
     },
-    
+
 
     // convienence method for working with Infinite Scroll
     appended : function( $content, isAnimatedFromBottom, callback ) {
-      
+
       //=David Blanco
 
       var containerWidth = this.element.width();
@@ -438,20 +439,20 @@
         this._appended( $content, callback );
       }
     },
-    
+
     _appended : function( $content, callback ) {
       var $newBricks = this._getBricks( $content );
       // add new bricks to brick pool
       this.$bricks = this.$bricks.add( $newBricks );
       this.layout( $newBricks, callback );
     },
-    
+
     // removes elements from Grid widget
     remove : function( $content ) {
       this.$bricks = this.$bricks.not( $content );
       $content.remove();
     },
-    
+
     // destroys widget, returns elements and container back (close) to original style
     destroy : function() {
 
@@ -462,7 +463,7 @@
           this.style.top = '';
           this.style.left = '';
         });
-      
+
       // re-apply saved container styles
       var elemStyle = this.element[0].style;
       for ( var prop in this.originalStyle ) {
@@ -473,11 +474,11 @@
         .unbind('.mediaBoxes')
         .removeClass('mediaBoxes')
         .removeData('mediaBoxes');
-      
+
       $(window).unbind('.mediaBoxes');
 
     }
-    
+
   };
 
   // helper function for logging errors
@@ -487,12 +488,12 @@
       window.console.error( message );
     }
   };
-  
+
   // =======================  Plugin bridge  ===============================
   // leverages data method to either create or return $.MediaBoxes constructor
   // A bit from jQuery UI
   //   https://github.com/jquery/jquery-ui/blob/master/ui/jquery.ui.widget.js
-  // A bit from jcarousel 
+  // A bit from jcarousel
   //   https://github.com/jsor/jcarousel/blob/master/lib/jquery.jcarousel.js
 
 
@@ -508,7 +509,7 @@
         }
 
         options.isFitWidth = ops.isFitWidth;
-        options.isAnimated = ops.isAnimated; 
+        options.isAnimated = ops.isAnimated;
         options.itemSelector = '.box';
         options.gutterWidth = ops.horizontalSpaceBetweenThumbnails;
         /* *************************************** ADJUST THE WIDTH OF THE COLUMNS *************************************** */
@@ -560,28 +561,28 @@
 
         $container.find('div.box').css('margin-bottom', ops.verticalSpaceBetweenThumbnails);
 
-        var supports = (function() {  
-            var   div = document.createElement('div'),  
-              vendors = 'Khtml ms O Moz Webkit'.split(' '),  
-                  len = vendors.length;  
+        var supports = (function() {
+            var   div = document.createElement('div'),
+              vendors = 'Khtml ms O Moz Webkit'.split(' '),
+                  len = vendors.length;
 
-            return function(prop) {  
-              if ( prop in div.style ) return true;  
+            return function(prop) {
+              if ( prop in div.style ) return true;
 
-              prop = prop.replace(/^[a-z]/, function(val) {  
-                 return val.toUpperCase();  
-              });  
+              prop = prop.replace(/^[a-z]/, function(val) {
+                 return val.toUpperCase();
+              });
 
-              while(len--) {  
-                 if ( vendors[len] + prop in div.style ) {  
-                    // browser supports box-shadow. Do what you need.  
-                    // Or use a bang (!) to test if the browser doesn't.  
-                    return true;  
-                 }   
-              }  
-              return false;  
-            };  
-        })(); 
+              while(len--) {
+                 if ( vendors[len] + prop in div.style ) {
+                    // browser supports box-shadow. Do what you need.
+                    // Or use a bang (!) to test if the browser doesn't.
+                    return true;
+                 }
+              }
+              return false;
+            };
+        })();
 
         if ( !supports('transform') ) { //IF IT DOES NOT SUPPORT SCALE PROPERTY FOR IE8 for example
              $container.addClass('noSupportTransform');
@@ -604,7 +605,7 @@
             this.category = category;
             this.index    = index;
         }
-        
+
         //FILL THE BOXES ARRAY OF OBJECTS
         boxes.each(function(i){
               $this = $(this);
@@ -645,7 +646,7 @@
             categories.push( $(this).data('category') );
         });
 
-        
+
         /* *************************************** NAVIGATION BAR FILTER *************************************** */
 
 
@@ -653,7 +654,7 @@
 
         var $op = $('<li />').data('category','all').appendTo($categoryNavBar).addClass('select');
         var $op = $('<a />').html(ops.allWord).appendTo($op);
-        
+
         for(var i=0; i<categories.length; i++){
             var $op = $('<li />').data('category', categories[i]).appendTo($categoryNavBar);
             var $op = $('<a />').html(categories[i]).appendTo($op);
@@ -674,9 +675,9 @@
                                   el.show();
                               }else{
                                   el.show();
-                                  
+
                                   if(el.data('moving') == false){
-                                      el.animate(ops.hiddenStyle,0);  
+                                      el.animate(ops.hiddenStyle,0);
                                       el.animate(ops.visibleStyle, options.animOpts, function(){ el.addClass('noTransform'); $.fn.mediaBoxes.settings.loadIframes(el); });
                                   }else{
                                       el.animate(ops.visibleStyle, 0); //If is hidden and it is going to move make sure it is visible
@@ -686,7 +687,7 @@
                           }else{
                             el.animate(ops.visibleStyle,options.animOpts, function(){ el.addClass('noTransform'); $.fn.mediaBoxes.settings.loadIframes(el); });
                           }
-                    } 
+                    }
 
                 });
             }
@@ -696,19 +697,19 @@
                 boxesHide[i].each(function(){
                     var el = $(this).removeClass('noTransform');
                     if( el.is(':hidden') == false ){
-                        
+
                         el.addClass('box');
                         if ( $container.hasClass('noSupportTransform') ) { //IF IT DOES NOT SUPPORT SCALE PROPERTY FOR IE8 for example
                              el.hide();
-                             el.removeClass('box'); 
+                             el.removeClass('box');
                         }else{
-                            el.animate(ops.visibleStyle,0);  
+                            el.animate(ops.visibleStyle,0);
                             el.animate(ops.hiddenStyle, options.animOpts, function(){
                                 el.hide();
                                 el.removeClass('box');
                             });
                         }
-                        
+
                     }else{
                       //do nothing
                     }
@@ -740,9 +741,9 @@
 
             if(filter == 'all'){
               var all = elem.children('div[data-show="yes"]').addClass('box mediaBoxes-brick').stop();
-              if ( $container.hasClass('noSupportTransform') ) { 
+              if ( $container.hasClass('noSupportTransform') ) {
                   all.css({'top': 200, 'left': 200});
-              }  
+              }
 
               boxesShow.push( all );
             }else{
@@ -751,13 +752,13 @@
                 var category = elem.children('div[data-category="'+filter+'"][data-show="yes"]').addClass('box mediaBoxes-brick');
 
                 if(others[0] != undefined){
-                    if ( $container.hasClass('noSupportTransform') ) { 
+                    if ( $container.hasClass('noSupportTransform') ) {
                         others.css({'top': 200, 'left': 200});
                     }
                     boxesShow.push( others.stop() );
                 }
                 if(category[0] != undefined){
-                    if ( $container.hasClass('noSupportTransform') ) { 
+                    if ( $container.hasClass('noSupportTransform') ) {
                         category.css({'top': 200, 'left': 200});
                     }
                     boxesShow.push( category.stop() );
@@ -774,12 +775,12 @@
             specialAnimation(boxesShow, boxesHide);
 
             //-------  END SPECIAL ANIMATION ------->
-                        
+
 
             fixLoadMoreButton( anyMoreImages(getCurrentCategory()) );
 
         });
-  
+
         if( typeof categories != "object" || categories.length == 0 || ops.showFilterBar == false ){
             // do not show navigation bar
         }else{
@@ -848,7 +849,7 @@
                             .removeClass("box mediaBoxes-brick")
                             .hide();
             }
-            
+
         }
         var boxesShow         = [];
         var firstTimeItLoads  = true;
@@ -856,16 +857,16 @@
 
         var loadImg = function(numerToLoad){
               var cat = getCurrentCategory();
-              
+
               if(firstTime){
                   $container.height(0);
-                  firstTime=false;  
+                  firstTime=false;
               }
               addLoading();
-              
+
               var cont = 0;
               var newObject = $.extend({}, boxesObj);
-              
+
               for(var box in newObject){
                   var obj = newObject[box];
 
@@ -952,7 +953,7 @@
                   }
 
                   verifyNavBar();
-                  
+
                   $container.addClass('mediaBoxes-with-loading-boxes');
                   $container.mediaBoxes('reload');
 
@@ -985,7 +986,7 @@
         /*if(ops.lazyLoad){
           $(window).scroll(function(){
             if(loadMore.closest('html').length){
-              if( ($(window).scrollTop() == ($(document).height() - $(window)[0].innerHeight)) ){        
+              if( ($(window).scrollTop() == ($(document).height() - $(window)[0].innerHeight)) ){
                 loadTrigger();
               }
             }
@@ -1007,10 +1008,10 @@
         if(ops.lazyLoad){
 
             $container.addClass('lazyLoad');
-            
+
             $container.waypoint(function(direction) {
               var $this = $(this);
-              if( $this.hasClass('completeAddingImages') ){                  
+              if( $this.hasClass('completeAddingImages') ){
                   if(loadMore.hasClass('mediaBoxes-loadMore')){
                       loadTrigger();
                       $this.removeClass('completeAddingImages');
@@ -1022,14 +1023,14 @@
               enabled: true,
               horizontal: false,
               offset: 'bottom-in-view',
-              triggerOnce: false,   
+              triggerOnce: false,
             });
 
         }
 
 
         /* *************************************** CAPTIONS *************************************** */
-        
+
         var setIconsAnimation = function($el){
                 var hoverText     = $el.find('.hover-text').hide();
                 var hoverLightbox = $el.find('.hover-lightbox').hide();
@@ -1049,8 +1050,8 @@
                       hoverLightbox.animate({ 'top' : 0 }, {queue: false,duration: ops.hoverImageIconsSpeedAnimation} );
 
                       hoverIframe.css({ 'top' : '-20px' });
-                      hoverIframe.animate({ 'top' : 0 }, {queue: false,duration: ops.hoverImageIconsSpeedAnimation} );                      
-                } 
+                      hoverIframe.animate({ 'top' : 0 }, {queue: false,duration: ops.hoverImageIconsSpeedAnimation} );
+                }
 
                 if(!hoverUrl.hasClass('noAnimation') && ops.hoverImageIconsAnimation){
                     hoverUrl.css({ 'top' : '20px' });
@@ -1077,7 +1078,7 @@
 
             if( evType === 'mouseenter' ) {
                 setIconsAnimation($el);
-                
+
 
                 if(ops.captionType == 'classic'){
                     $hoverElem.css( { "left" : 0, "top" : 0 } );
@@ -1087,11 +1088,11 @@
                 }
 
                 $hoverElem.css( { "left" : cssPos.from, "top" : cssPos.to } );
-              
+
                 $hoverElem.stop().show().fadeTo(0, 1, function() {
                                                     $(this).stop().animate( { "top" : 0, "left" : 0 } , 200, "linear", function(){ iconsAnimation($el); } );
                                                 } );
-                
+
             }else {
 
                 if(ops.captionType == 'classic'){
@@ -1099,7 +1100,7 @@
                     $hoverElem.fadeOut(100);
                     return;
                 }
-              
+
                 if(ops.captionType == 'grid-fade'){
                       $hoverElem.fadeOut(700);
                 }else{
@@ -1107,7 +1108,7 @@
                 }
 
             }
-                
+
         } );
 
         var _getDir = function( $el, coordinates ) {
@@ -1119,16 +1120,16 @@
                 /** gets the x value relative to the center of the DIV and "normalize" it **/
                 x = ( coordinates.x - $el.offset().left - ( w/2 )) * ( w > h ? ( h/w ) : 1 ),
                 y = ( coordinates.y - $el.offset().top  - ( h/2 )) * ( h > w ? ( w/h ) : 1 ),
-            
+
                 /** the angle and the direction from where the mouse came in/went out clockwise (TRBL=0123);**/
-                /** first calculate the angle of the point, 
+                /** first calculate the angle of the point,
                 add 180 deg to get rid of the negative values
                 divide by 90 to get the quadrant
                 add 3 and do a modulo by 4  to shift the quadrants to a proper clockwise TRBL (top/right/bottom/left) **/
                 direction = Math.round( ( ( ( Math.atan2(y, x) * (180 / Math.PI) ) + 180 ) / 90 ) + 3 )  % 4;
-            
+
             return direction;
-            
+
         };
 
         var _getPosition = function( direction, $el ) {
@@ -1136,27 +1137,27 @@
             switch( direction ) {
                 case 0:
                     // from top
-                    if ( !ops.reverse ) { 
-                            fromLeft = 0, fromTop = - $el.height() 
-                    }else {  
-                            fromLeft = 0, fromTop = - $el.height()  
+                    if ( !ops.reverse ) {
+                            fromLeft = 0, fromTop = - $el.height()
+                    }else {
+                            fromLeft = 0, fromTop = - $el.height()
                     }
                     break;
                 case 1:
                     // from right
-                    if ( !ops.reverse ) { 
+                    if ( !ops.reverse ) {
                             fromLeft = $el.width()  , fromTop = 0
-                    }else {  
-                            fromLeft = - $el.width() , fromTop = 0 
+                    }else {
+                            fromLeft = - $el.width() , fromTop = 0
                     }
                     break;
                 case 2:
                     // from bottom
-                    if ( !ops.reverse ) { 
-                            fromLeft = 0 , fromTop = $el.height() 
+                    if ( !ops.reverse ) {
+                            fromLeft = 0 , fromTop = $el.height()
                     }
-                    else {  
-                            fromLeft = 0, fromTop = - $el.height()  
+                    else {
+                            fromLeft = 0, fromTop = - $el.height()
                     }
                     break;
                 case 3:
@@ -1164,13 +1165,13 @@
                     if ( !ops.reverse ) {
                             fromLeft = -$el.width()  , fromTop = 0
                     }
-                    else {  
-                            fromLeft =  $el.width(), fromTop = 0 
+                    else {
+                            fromLeft =  $el.width(), fromTop = 0
                     }
                     break;
             };
             return { from : fromLeft, to: fromTop };
-        }; 
+        };
 
         /* *************************************** LIGHTBOX *************************************** */
         var $body           = $('body');
@@ -1181,7 +1182,7 @@
 
         var currentIndex    = 0;
         //Container with the black Background
-        var $lightbox       = $('<div class="mediaBoxes-lightbox" />').appendTo($body); 
+        var $lightbox       = $('<div class="mediaBoxes-lightbox" />').appendTo($body);
         //Navigation Bar
         var $lbnav          = $('<div class="mediaBoxes-nav" />').appendTo($lightbox);
 
@@ -1301,7 +1302,7 @@
             $lightboxTimer.css({'position': 'absolute', 'bottom':0}).animate( { width: '100%' }, ops.lightBoxPlayInterval, 'linear', function(){ stopTimer(); } );
         };
 
-        
+
 
         var playing = false;
         var closing = false;
@@ -1309,12 +1310,12 @@
         //Play slideshow
         var play = function(){
             vars.interval = setTimeout(function(){
-                next();   
+                next();
             }, ops.lightBoxPlayInterval);
 
             updateTimer();
         }
-        
+
         //WHEN THE LIGHTBOX FINISH TO LOAD AN IMAGE
         var finish = function(){
             if(playing && closing==false){
@@ -1335,7 +1336,7 @@
                         var a = source.attributes[i];
                         destination.attr(a.name, a.value);
                   }
-                  
+
                   $lightbox.append(destination.hide());
 
                   var jIframe = destination[0];
@@ -1384,7 +1385,7 @@
                 if(ops.lightBoxZoomAnim == false){
                   scale = 1;
                 }
-                
+
                 //GET THE SRC OF THE IMAGE THAT WILL BE SHOWN IN THE LIGHTBOX
                 var thumbnail = image;
                 var src = thumbnail.data('lightbox');
@@ -1431,7 +1432,7 @@
                     },  {duration : ops.lightBoxSpeedFx , complete: function(){ finish(); } });
 
                     fixImage();
-                    
+
                 };
 
 
@@ -1441,7 +1442,7 @@
 
         };
 
-        //OPEN THE LIGHTBOX 
+        //OPEN THE LIGHTBOX
         var lightboxOpen = false;
 
         var openLightbox = function($this, iframe){
@@ -1466,7 +1467,7 @@
             currentIndex = $container.find('.box').index($box[0]);
 
             var img = openTrigger.parents('.box').find('.box-image').children('img');
-            
+
 
             //ANIMATE THE NAVIGATION BAR OF THE LIGHTBOX
             var speed = ops.lightBoxSpeedFx;
@@ -1474,7 +1475,7 @@
             $lbnav.animate({
                                 'margin-top': 0
                             }, speed);
-            
+
             //SHOW THE LIGHTBOX
             $lightbox.fadeIn(speed);
 
@@ -1553,7 +1554,7 @@
                   //$body.css('overflow', 'auto');
               }
 
-            
+
         };
 
         //Next Post
@@ -1576,7 +1577,7 @@
                     }
 
                     if(boxes.eq(cont).is(":visible") && boxes.eq(cont).find('.box-image').children('img')[0] != undefined){
-                      currentIndex = cont;  
+                      currentIndex = cont;
                       break;
                     }
                 }
@@ -1609,7 +1610,7 @@
                     }
 
                     if(boxes.eq(cont).is(":visible") && boxes.eq(cont).find('.box-image').children('img')[0] != undefined){
-                     currentIndex = cont;  
+                     currentIndex = cont;
                       break;
                     }
                 }
@@ -1623,9 +1624,9 @@
 
 
         //TRIGGER EVENTS
-        $navNext.on('click', function(){  
+        $navNext.on('click', function(){
             stopTimer();
-            stopInterval();    
+            stopInterval();
             next();
         });
 
@@ -1661,7 +1662,7 @@
                 next();
             }
             //esc keyCode
-            if (event.keyCode == 27) { 
+            if (event.keyCode == 27) {
                 close();
             }
         });
@@ -1687,7 +1688,7 @@
                 play();
             }
 
-            
+
 
         });
 
@@ -1792,7 +1793,7 @@
       lightBoxText: true, //If you wish to show the text in the lightbox
       lightboxPlayBtn: true, //Show the play button?
       lightBoxAutoPlay: false, //The first time you open the lightbox it start playing the images
-      lightBoxPlayInterval: 4000, //The interval in the auto play mode 
+      lightBoxPlayInterval: 4000, //The interval in the auto play mode
       lightBoxShowTimer: true, //If you wish to show the timer in auto play mode
       lightBoxStopPlayOnClose: false, //Do you want pause the auto play mode when you close the lightbox?
       allWord: "All", //The "All" word so you can translate it to another lenguaje

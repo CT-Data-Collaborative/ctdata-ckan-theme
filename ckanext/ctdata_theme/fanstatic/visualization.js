@@ -600,6 +600,7 @@ $(function () {
     show_selected_indicator();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
+        $('#default.head_ind_link').prop('selected', true)
         display_data();
     });
     hide_spinner();

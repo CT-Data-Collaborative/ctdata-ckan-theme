@@ -1,0 +1,38 @@
+#topnav {
+  background: #849939;
+}
+
+#topnav li a {
+  color: #e7edd3;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.data_stories{
+  margin:0;
+  padding:0;
+}
+
+.data_stories h1{
+  font-size: 36px;
+  padding-top: 30px;
+  position: absolute;
+  left: 385px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  line-height: 1.1;
+  color:  black;
+}
+
+#leadmessage{
+  text-align: center;
+  background: #849939;
+  width: 100%;
+  color: #ececec;
+  font-family: 'Questrial', Arial, Sans-Serif;
+}
+
+#leadmessage h1{
+
+  color: #ececec;
+}
