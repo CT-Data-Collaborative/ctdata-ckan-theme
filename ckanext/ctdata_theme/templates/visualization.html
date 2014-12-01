@@ -43,10 +43,16 @@
 <li class="filter">
   <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
   <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
-  <span>
+    <span>
       {% if dimension.name == 'Town' %}
         <a href="javascript:void(0);" class="select-all">Select All</a>
         <a href="javascript:void(0);" class="deselect-all">Deselect All</a>
+
+        <div class="ui-widget control-group">
+          <div class="controls">
+            <input type="text" id="tags" class="input-medium">
+          </div>
+        </div>
       {% endif %}
   </span>
   <ul>
@@ -95,10 +101,10 @@
 <div class="display_options">
 <label>Display As</label>
 <ul>
-<li><a href="javascript:void(0)" onclick="set_display_type('table')"><img id="table_icon" src="/common/images/displayopt1-inv.png" alt="" /></a></li>
-<li><a href="javascript:void(0)" onclick="set_display_type('column')"><img id="bar_icon" src="/common/images/displayopt2.png" alt="" /></a></li>
-<li><a href="javascript:void(0)" onclick="set_display_type('line')"><img id="line_icon" src="/common/images/displayopt3.png" alt="" /></a></li>
-<li><a href="javascript:void(0)" onclick="set_display_type('map')"><img id="map_icon" src="/common/images/displayopt4.png" alt="" /></a></li>
+<li data-placement="bottom" data-toggle="tooltip" title="Table View" class='tooltip_a'><a href="javascript:void(0)" onclick="set_display_type('table')" ><img id="table_icon" src="/common/images/displayopt1-inv.png" alt="" /></a></li>
+<li data-placement="bottom" data-toggle="tooltip" title="Line View" class='tooltip_a'><a href="javascript:void(0)" onclick="set_display_type('column')"><img id="bar_icon" src="/common/images/displayopt2.png" alt="" /></a></li>
+<li data-toggle="tooltip" title="Chart View" class='tooltip_a' ><a href="javascript:void(0)" onclick="set_display_type('line')"><img id="line_icon" src="/common/images/displayopt3.png" alt="" /></a></li>
+<li data-toggle="tooltip" title="Map View" class='tooltip_a'><a href="javascript:void(0)" onclick="set_display_type('map')"><img id="map_icon" src="/common/images/displayopt4.png" alt="" /></a></li>
 <li style="padding-top: 3px;"><a href="/dataset/{{dataset.name}}">Raw Data</a>
 </ul>
 </div>
@@ -107,9 +113,9 @@
 <div class="operations">
 <label>Operations</label>
 <ul>
-<li><a href="javascript:void(0)" onclick="print_chart()"><img src="/common/images/operation1.png" alt="" /></a></li>
-<li><a href="javascript:void(0)" onclick="save_chart_image()"><img src="/common/images/operation2.png" alt="" /></a></li>
-<li><a href="javascript:void(0)" onclick="save_chart_pdf()"><img src="/common/images/operation3.png" alt="" /></a></li>
+<li data-toggle="tooltip" title="Print" class='tooltip_a'><a href="javascript:void(0)" onclick="print_chart()"><img src="/common/images/operation1.png" alt="" /></a></li>
+<li  data-toggle="tooltip" title="Save as PNG" class='tooltip_a'><a href="javascript:void(0)" onclick="save_chart_image()"><img src="/common/images/operation2.png" alt="" /></a></li>
+<li data-toggle="tooltip" title="Save as PDF" class='tooltip_a'><a href="javascript:void(0)" onclick="save_chart_pdf()" ><img src="/common/images/operation3.png" alt="" /></a></li>
 </ul>
 </div>
 
@@ -216,6 +222,9 @@
 <link rel="stylesheet" type="text/css" href="/common/css/visualization.css">
 <link rel="stylesheet" type="text/css" href="/common/css/jquery.dataTables.css">
 <link rel="stylesheet" type="text/css" href="/common/css/tableTools.css">
+<link rel="stylesheet" type="text/css" href="/common/css/jquery_ui.css">
+
+{% resource 'ctdata_theme/jquery_ui.js' %}
 {% resource 'ctdata_theme/highcharts.js' %}
 {% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/map.js' %}
 {% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/data.js' %}

@@ -133,7 +133,7 @@ function check_defaults(){
 
     if(defaults[i] instanceof Array){
       $.each(defaults[i], function(j){
-        $("input."+i.replace(/ /g, '')+"[value='"+defaults[i][j]+"']").prop('checked', true);
+        $("input[class*="+i.replace(/ /g, '')+"]"+"[value='"+defaults[i][j]+"']").prop('checked', true);
       });
     } else {
         $("input."+i.replace(/ /g, '')+"[value='"+defaults[i]+"']").prop('checked', true);
@@ -442,10 +442,18 @@ function draw_table(){
           "aButtons": ["print", "pdf", "csv"]
         }
       });
+  format_numbers();
   hide_spinner();
 });
 }
-
+function format_numbers(){
+  jQuery.map( $('td'), function( item ) {
+      text = $(item).html()
+      if (jQuery.isNumeric(text) == true){
+        $(item).html(parseInt(text).toLocaleString('en-US'))
+      }
+    });
+}
 function draw_chart(){
   var dataset_id = $("#dataset_id").val(),
       dataset_title = $("#dataset_title").val(),
@@ -529,7 +537,7 @@ function draw_chart(){
                 layout: 'horizontal',
                 verticalAlign: 'bottom',
                 borderWidth: 0,
-                maxHeight: 90
+                maxHeight: 200
             },
             tooltip: {
                 useHTML: true,
@@ -581,6 +589,7 @@ function display_filters(){
 }
 
 $(function () {
+
     select_all();
     deselect_all();
     check_defaults();
@@ -603,4 +612,22 @@ $(function () {
       $("#container").width(width);
     }
     create_headline_indicator();
+    $('.tooltip_a').tooltip();
+
+    var towns_names = []
+    $.map( $('li', $('#collapseTown')), function(item){
+      towns_names.push( $(item).attr('id'))
+    });
+
+    $( "#tags" ).autocomplete({
+      source: towns_names,
+      select: function (event, ui) {
+        var value = ui.item.value;
+
+        $('input#' + value + 'Check').prop('checked', true);
+        $('input#' + value + 'Check').closest('li').prependTo($li.closest('ul')[0]);
+        display_data();
+
+      }
+    });
 });

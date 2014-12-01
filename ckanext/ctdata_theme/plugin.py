@@ -201,7 +201,9 @@ class CTDataController(base.BaseController):
         except ValueError:
             abort(400)
 
-        request_view, request_filters, omit_single_values = json_body.get('view'), json_body.get('filters'), json_body.get('omit_single_values')
+        request_view       = json_body.get('view')
+        request_filters    = json_body.get('filters')
+        omit_single_values = json_body.get('omit_single_values')
 
         if not request_view or not request_filters:
             abort(400, detail='No view and/or filters specified')
