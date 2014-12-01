@@ -30,3 +30,6 @@ class PageController(base.BaseController):
 
     def special_projects(self):
         return  base.render('pages/special_projects.html', extra_vars={})
+
+    def data_gallery(self):
+        return  base.render('pages/data_gallery.html', extra_vars={'show_green_logo': True})
