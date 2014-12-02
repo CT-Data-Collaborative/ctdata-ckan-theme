@@ -33,30 +33,27 @@ $.each(data.data, function(i){
   if(data.data[i]['value'] < min)
     min = data.data[i]['value'];
 });
-var cur_mt = $(".MeasureType:checked").first().val();
 //Split data into classes for discrete map coloring
-var numClasses = 8;
-var range = max-min;
-var step = Math.ceil(range/numClasses);
-var dataClasses = []
-for(i = 0; i < numClasses; i++){
+var cur_mt = $(".MeasureType:checked").first().val(),
+    cur_mt_is_number  = (cur_mt == "number" && cur_mt == "Number"),
+    cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent"),
+    numClasses        = 8,
+    range             = max-min,
+    step              = Math.ceil(range/numClasses),
+    dataClasses       = [];
 
-  if (cur_mt == "percent" || cur_mt == "Percent"){
-    to   = Math.floor(min+(step*(i+1)))
-    from = Math.floor(min+(step*i))
-  }
-  else{
-    to   = Math.floor(min+(step*(i+1))/100)*100
-    from = Math.floor(min+(step*i)/100)*100
-  }
-  dataClasses.push({from: from,
-                    to:  to > 100 && (cur_mt == "percent" || cur_mt == "Percent") && 100 || to
-                    });
+for(i = 0; i < numClasses; i++){
+  to   = Math.floor(min+(step*(i+1)))
+  from = Math.floor(min+(step*i))
+
+  if (to.toString().length > 3)   to   = Math.floor(to/100)*100;
+  if (from.toString().length > 3) from = Math.floor(from/100)*100;
+
+  dataClasses.push({from: from, to:  to > 100 && cur_mt_is_percent && 100 || to });
 }
 
-if(dataClasses[dataClasses.length-1]['to'] < max+1 )
-  if ((cur_mt == "number" && cur_mt == "Number"))
-    dataClasses[dataClasses.length-1]['to'] = max+1;
+if(dataClasses[dataClasses.length-1]['to'] < max+1 && cur_mt_is_number)
+  dataClasses[dataClasses.length-1]['to'] = max+1;
 
 $.getJSON('/common/map.json', function (geojson) {
 
@@ -72,9 +69,8 @@ legend_html = legend_html.substring(0, legend_html.length-2);
 legend_html += "</div>"
 
 var units = "";
-if (cur_mt == "percent" || cur_mt == "Percent")
-  units = "%";
-if ((cur_mt == "number" || cur_mt == "Number") && ($("#dataset_id").val() == 'cmt-results' || $("#dataset_id").val() == 'chronic-absenteeism'))
+if (cur_mt_is_percent) units = "%";
+if (cur_mt_is_number && ($("#dataset_id").val() == 'cmt-results' || $("#dataset_id").val() == 'chronic-absenteeism'))
   units = " Students";
 
 var series_name = 'value';
