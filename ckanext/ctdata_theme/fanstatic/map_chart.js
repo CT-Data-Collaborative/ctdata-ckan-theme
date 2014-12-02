@@ -40,15 +40,23 @@ var range = max-min;
 var step = Math.ceil(range/numClasses);
 var dataClasses = []
 for(i = 0; i < numClasses; i++){
-  var to = Math.floor(min+(step*(i+1)/100))*100;
-  dataClasses.push({from: Math.floor(min+(step*i)/100)*100,
+
+  if (cur_mt == "percent" || cur_mt == "Percent"){
+    to   = Math.floor(min+(step*(i+1)))
+    from = Math.floor(min+(step*i))
+  }
+  else{
+    to   = Math.floor(min+(step*(i+1))/100)*100
+    from = Math.floor(min+(step*i)/100)*100
+  }
+  dataClasses.push({from: from,
                     to:  to > 100 && (cur_mt == "percent" || cur_mt == "Percent") && 100 || to
                     });
 }
 
-// if(dataClasses[dataClasses.length-1]['to'] < max+1 )
-//   if ((cur_mt != "percent" || cur_mt != "Percent") && max != 100)
-//     dataClasses[dataClasses.length-1]['to'] = max+1;
+if(dataClasses[dataClasses.length-1]['to'] < max+1 )
+  if ((cur_mt == "number" && cur_mt == "Number"))
+    dataClasses[dataClasses.length-1]['to'] = max+1;
 
 $.getJSON('/common/map.json', function (geojson) {
 
