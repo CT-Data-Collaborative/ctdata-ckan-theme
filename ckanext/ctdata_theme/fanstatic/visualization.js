@@ -624,8 +624,10 @@ $(function () {
       select: function (event, ui) {
         var value = ui.item.value;
 
-        $('input#' + value + 'Check').prop('checked', true);
-        $('input#' + value + 'Check').closest('li').prependTo($li.closest('ul')[0]);
+        $input = $('input[id="' + value + 'Check"]');
+
+        $input.prop('checked', true);
+        $input.closest('li').prependTo($li.closest('ul')[0]);
         display_data();
 
       }

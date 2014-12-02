@@ -239,7 +239,7 @@ margin-top:10px; width:35%;}
 .results_table td.col-18{ border-bottom:1px solid #eee;  width:93px;}
 
 .customselectinner { float:left;}
-.customselectinner select {   background: none; color: #888888; ; left: -999999px; padding: 14px 20px 13px; position: absolute;  width: 450px;}
+.customselectinner select {   background: none; color: #888888; left: -999999px; padding: 14px 20px 13px; position: absolute;  width: 450px;}
 .customselectinner .customSelect .selectedValue { width:350px; border:2px solid #ccc; height:38px; font-family:'roboto'; font-size:14px; color:#444; padding:7px 10px; float:left; border-radius:0; background:url(../images/drop2btn.jpg) no-repeat right top;}
 .customselectinner .customSelect dd {font-family:'roboto'; font-size:14px; color:#444; padding:7px 5px; }
 .customSelect .selected { color:#fff !important;}

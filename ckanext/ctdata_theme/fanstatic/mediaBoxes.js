@@ -307,16 +307,15 @@
     _getColumns : function() {
       var container = this.options.isFitWidth ? this.element.parent() : this.element,
           containerWidth = container.width();
-                         // use fluid columnWidth function if there
-      // this.columnWidth = this.isFluid ? this.options.columnWidth( containerWidth ) :
-      //               // if not, how about the explicitly set option?
-      //               this.options.columnWidth ||
-      //               // or use the size of the first item
-      //               this.$bricks.outerWidth(true) ||
-      //               // if there's no items, use size of container
-      //               containerWidth;
+                        // use fluid columnWidth function if there
+      this.columnWidth = this.isFluid ? this.options.columnWidth( containerWidth ) :
+                    // if not, how about the explicitly set option?
+                    this.options.columnWidth ||
+                    // or use the size of the first item
+                    this.$bricks.outerWidth(true) ||
+                    // if there's no items, use size of container
+                    containerWidth;
 
-      this.columnWidth = 100;
       this.columnWidth += this.options.gutterWidth;
 
       this.cols = Math.floor( ( containerWidth + this.options.gutterWidth ) / this.columnWidth );
