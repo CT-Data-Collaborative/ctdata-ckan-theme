@@ -231,7 +231,10 @@ class CommunityProfileService(object):
             existing_indicators.update([val.indicator])
 
         #######  load all indicators:  user or community indicators + default
-        all_indicators = self.session.query(ProfileIndicator).filter(or_(ProfileIndicator.id.in_(indicators_filter),
+        if user and user.is_admin:
+            all_indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.id.in_(indicators_filter)).all()
+        else:
+            all_indicators = self.session.query(ProfileIndicator).filter(or_(ProfileIndicator.id.in_(indicators_filter),
                                                                          ProfileIndicator.is_global == True)).all()
         new_indicators = list(set(all_indicators) - existing_indicators)
         new_towns      = list(towns - existing_towns)
@@ -254,7 +257,7 @@ class CommunityProfileService(object):
         user_indicators              = indicators_filter
 
         ######## hide indicators that was marked as deleted if user on default community profile
-        if community.name == location.name:
+        if community.name == location.name and not user.is_admin:
             user_indicators = self.session.query(UserIndicatorLink.indicator_id).\
                 filter(and_(UserIndicatorLink.user_id == user.ckan_user_id,
                             UserIndicatorLink.deleted == False))
@@ -300,6 +303,13 @@ class CommunityProfileService(object):
             ######## load user indicators or default
             if user:
                 indicator_ids     = map(lambda ind: ind.id, user.indicators)
+                deleted = self.session.query(UserIndicatorLink.indicator_id).\
+                    filter(and_(UserIndicatorLink.user_id == user.ckan_user_id,
+                            UserIndicatorLink.deleted == True)).all()
+
+                deleted = map(lambda x: x[0], deleted)
+                if deleted !=[]:
+                    indicator_ids = list(set(indicator_ids) - set(deleted))
                 indicators_filter = map(lambda x: x.id, self.get_indicators_by_ids(indicator_ids))
             else:
                 indicators_filter = map(lambda x: x.id, self.get_default_indicators())

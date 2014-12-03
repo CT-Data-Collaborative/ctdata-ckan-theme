@@ -186,6 +186,9 @@ class CommunityProfilesController(base.BaseController):
         if http_request.method == 'POST':
             user = self.user_service.get_or_create_user(user_name) if user_name else None
             if user.is_admin and sorted(new_indicators) != sorted(old_indicators):
+                for old_indicator in old_indicators:
+                    old_indicator.is_global = False
+
                 for new_indicator in new_indicators:
                     new_indicator.is_global = True
                     new_indicator.temp = False
@@ -193,9 +196,9 @@ class CommunityProfilesController(base.BaseController):
                 for old_indicator in old_indicators:
                     # old_indicator.is_global = False
                     # old_indicator.temp = False
-
-                    self.session.delete(old_indicator)
-                    self.remove_indicator_id_from_profiles(old_indicator.id)
+                    if not old_indicator.is_global:
+                        self.session.delete(old_indicator)
+                        self.community_profile_service.remove_indicator_id_from_profiles(old_indicator.id)
 
                 self.session.commit()
 
