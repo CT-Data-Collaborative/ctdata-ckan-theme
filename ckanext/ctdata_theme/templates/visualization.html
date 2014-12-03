@@ -48,14 +48,14 @@
         <a href="javascript:void(0);" class="select-all">Select All</a>
         <a href="javascript:void(0);" class="deselect-all">Deselect All</a>
 
-        <div class="ui-widget control-group">
+        <div class="ui-widget control-group search_town">
           <div class="controls">
             <input type="text" id="tags" class="input-medium">
           </div>
         </div>
       {% endif %}
   </span>
-  <ul>
+  <ul class="scrollable">
   {% for value in dimension.possible_values %}
     {% if value|length > 0 %}
     <li id = "{{value}}">
@@ -69,16 +69,6 @@
 </li>
 {% endif %}
 {% endfor %}
-<!--
-<li>
-<div class="refine_options">
-<div class="input_row"><input type="checkbox"> <label>Quartile 1</label></div>
-<div class="input_row"><input type="checkbox"> <label>Quartile 2</label></div>
-<div class="input_row"><input type="checkbox"> <label>Quartile 3</label></div>
-<div class="input_row"><input type="checkbox"> <label>Quartile 4</label></div>
-</div>
-</li>
--->
 </ul>
 
 </br>
