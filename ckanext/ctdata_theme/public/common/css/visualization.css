@@ -14,8 +14,14 @@ color: #000000;
 div.panel-collapse.collapse.in{
   max-height: 200px;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: none;
 }
+
+ul.scrollable{
+  overflow-y: scroll !important;
+  max-height: 200px;
+}
+
 input[type="checkbox"],input[type="radio"]{
   -webkit-appearance: checkbox;
   float: left;
@@ -198,4 +204,8 @@ a.change_dataset_link{
 
 a.change_dataset_link:hover{
   text-decoration: underline;
+}
+
+.search_town{
+
 }
