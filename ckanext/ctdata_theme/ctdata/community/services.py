@@ -89,6 +89,32 @@ class CommunityProfileService(object):
             self.session.delete(community)
             self.session.commit()
 
+    def get_town(self, town_name):
+        town = self.session.query(Town).filter(Town.name == town_name).first()
+        if not town:
+            raise toolkit.ObjectNotFound("No town with this name was found")
+
+        return town
+
+    def get_all_towns(self):
+        return self.session.query(Town).order_by(Town.name).all()
+
+
+    def get_all_profiles(self):
+        all = self.session.query(CommunityProfile).order_by(CommunityProfile.name).all()
+        conn = self.session.query(CommunityProfile).filter(CommunityProfile.name == 'Connecticut').first()
+        all.remove(conn)
+        return [conn] + all
+
+    ##### Public community profiles that were made from towns names by system.
+    def get_profiles_for_data_by_location(self):
+        towns = self.get_all_towns()
+        towns_names = map(lambda val: val.name, towns)
+        all = self.session.query(CommunityProfile).filter(CommunityProfile.name.in_(towns_names)).order_by(CommunityProfile.name).all()
+        conn = self.session.query(CommunityProfile).filter(CommunityProfile.name == 'Connecticut').first()
+        all.remove(conn)
+        return [conn] + all
+
     def get_user_profiles(self, user_id):
         profiles = self.session.query(CommunityProfile).filter(CommunityProfile.user_id == user_id).all()
         return profiles
