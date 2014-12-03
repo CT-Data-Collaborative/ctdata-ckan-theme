@@ -59,42 +59,6 @@ class CommunityProfilesController(base.BaseController):
         h.flash_error('Indicator cannot be saved')
         return json.dumps({'success': False})
 
-
-    # def remove_indicator(self, indicator_id):
-    #     user_name = http_request.environ.get("REMOTE_USER")
-
-    #     if user_name:
-    #         user = self.user_service.get_or_create_user(user_name)
-    #     else:
-    #         abort(401)
-
-    #     if user:
-    #         csrf_token_passed = http_request.GET.get('anti_csrf')
-    #         csrf_token_session = session.get('anti_csrf')
-    #         if csrf_token_passed and csrf_token_passed == csrf_token_session:
-    #             try:
-    #                 self.community_profile_service.remove_indicator(user, indicator_id)
-    #                 self.session.commit()
-    #             except toolkit.ObjectNotFound:
-    #                 abort(404)
-    #             except CantDeletePrivateIndicator, e:
-    #                 abort(400, str(e))
-    #             else:
-    #                 came_from = http_request.GET.get('came_from')
-    #                 if not came_from:
-    #                     came_from = http_request.headers.get('Referer')
-
-    #                 if came_from:
-    #                     redirect(came_from)
-    #                 else:
-    #                     # if user deleted came_from parameter from the url and disabled referers in his browser,
-    #                     # redirect him to the frontpage, after deleting the indicator
-    #                     redirect('/')
-    #         else:
-    #             abort(400, "anti-CSRF tokens don't match")
-    #     else:
-    #         abort(401)
-
     def community_profile(self, community_name):
         session_id      = session.id
         user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
