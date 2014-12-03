@@ -3,8 +3,8 @@ var display_type  = "table",
     chart_filters = [],
     dataset_id    = $("#dataset_id").val(),
     create_popup  = $("#create_indicator_popup"),
-    edit_popup    = $("#edit_indicators_popup"),
-    ids_to_remove = [];
+    edit_popup    = $("#edit_indicators_popup");
+window.ids_to_remove = [];
 
 create_popup.modal({show: false});
 edit_popup.modal({show: false});
@@ -12,7 +12,6 @@ $('.close_popup').click(function() {
   create_popup.modal('hide');
   edit_popup.modal('hide');
 });
-
 
 function show_selected_indicator(){
   ind_id = location.search.split('ind=')[1]
@@ -45,7 +44,7 @@ function show_edit_indicators_popup(){
 
 function add_ind_id_to_removing_list(){
   $('.remove_indicator').on('click', function(){
-    ids_to_remove.push( $(this).attr('id'));
+    window.ids_to_remove.push( $(this).attr('id'));
     $(this).closest('div.control-group').hide();
   });
 }
@@ -62,7 +61,7 @@ function update_headline_indicators(){
     $.ajax({type: "POST",
       url: "/dataset/"+dataset_id+"/update_indicators",
       data: JSON.stringify({ names_hash: names_hash,
-                             indicators_to_remove: ids_to_remove}),
+                             indicators_to_remove: window.ids_to_remove}),
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
         window.location.reload();
