@@ -133,14 +133,15 @@ function check_defaults(){
 
     if(defaults[i] instanceof Array){
       $.each(defaults[i], function(j){
-        $("input[class*="+i.replace(/ /g, '')+"]"+"[value='"+defaults[i][j]+"']").prop('checked', true);
+        $input = $("input[class*="+i.replace(/ /g, '')+"]"+"[value='"+defaults[i][j]+"']");
+        $input.prop('checked', true);
       });
     } else {
-        $("input."+i.replace(/ /g, '')+"[value='"+defaults[i]+"']").prop('checked', true);
+        $input = $("input."+i.replace(/ /g, '')+"[value='"+defaults[i]+"']");
+        $input.prop('checked', true);
     }
     });
     display_data();
-
 }
 
 function save_filters(display_type){
@@ -601,6 +602,8 @@ $(function () {
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         $('#default.head_ind_link').prop('selected', true)
+        $li = $(this).closest('li')
+        $li.prependTo($li.closest('ul'));
         display_data();
     });
     hide_spinner();
@@ -631,5 +634,12 @@ $(function () {
         display_data();
 
       }
+    });
+
+    // move checked checkboxes to the top of their lists
+    $.each( $("input:checked"), function(i, item){
+      console.log(item)
+      $li = $(item).closest('li');
+      $li.prependTo($li.closest('ul'));
     });
 });
