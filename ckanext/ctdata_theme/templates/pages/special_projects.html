@@ -1,83 +1,158 @@
- {% extends "page.html" %}
-
-{% block page_name %}Special Projects{% endblock %}
-{% block page_description %}{% endblock %}
-
+{% extends "page.html" %}
 {% block content %}
-    {% block underheader %}{{ super() }}{% endblock %}
+    <div id="content">
+        <div class="spacing">
+            <div class= "contentbody">
+                <h1>Special Projects</h1>
+               <!--  <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.</p> -->
 
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-<!--     <div class="wrapper">
-    <div class="ctdata-wrapper"> -->
-    <div class="container">
-        <div class="row">
-            <div class="span4">
-                <div class="sp_project_entry">
-                    <img src="/common/images/racial-profiling.jpg">
-                    <h3>Racial Profiling Prohibition Project</h3>
-                    <p>Access traffic stop data for each police district in the state collected by Central CT State University Institute for Municipal and Regional Planning. Coming later in fall 2014…interactive tables, maps and visualizations. New data will be posted as it is released.</p>
-                    <a href="#">&raquo; Go to this project</a>
+                <div id="grid">
+                    <div class="box" data-category="Community">
+                        <div class="box-image">
+                            <div data-thumbnail="/common/images/ctdata-capital.jpg" ></div>
+
+                            <div class="thumbnail-caption">
+                                <a href="http://ctrp3.ctdata.org"><div class="hover-url"></div></a>
+                            </div>
+
+                            <div class="lightbox-text">
+                            Racial Profiling Prohibition Project <span>Community</span>
+                            </div>
+                        </div>
+
+                        <div class="box-caption">
+                            <div class="box-title">Racial Profiling Prohibition Project</div>
+                            <div class="box-text">
+                                View traffic stop data for each police district in the state collected by Central CT State University Institute for Municipal and Regional Planning. Coming in winter 2015…interactive tables, maps and visualizations. New data will be posted as it is released.
+                            </div>
+                            <div class="box-more"> <a href="http://ctrp3.ctdata.org">Read More</a> </div>
+                        </div>
+                    </div>
+
+                    <div class="box" data-category="Community">
+                        <div class="box-image">
+                            <div data-thumbnail="/common/images/ctdata-earlyeducation.jpg" ></div>
+
+                            <div class="thumbnail-caption">
+                                <a href="http://ctdata.org/community/Connecticut?p=201"><div class="hover-url"></div></a>
+                            </div>
+
+                            <div class="lightbox-text">
+                            Early Childhood Portal <span>Community</span>
+                            </div>
+                        </div>
+
+                        <div class="box-caption">
+                            <div class="box-title">Early Childhood Portal</div>
+                            <div class="box-text">
+                                With support from the <a href="http://wcgmf.org/">William Caspar Graustein Memorial Fund</a>(GMF), see the latest and most commonly used community-level data on the status of families and young children birth though age 8, as well as the performance of early childhood systems and programs.
+                            </div>
+                            <div class="box-more"> <a href="http://ctdata.org/community/Connecticut?p=201">Read More</a> </div>
+                        </div>
+                    </div>
+
+                    <div class="box" data-category="Education">
+                        <div class="box-image">
+                            <div data-thumbnail="/common/images/ctdata-students.jpg" ></div>
+
+                            <div class="thumbnail-caption">
+                                <a href="http://ctdata.org/community/Connecticut?p=198"><div class="hover-url"></div></a>
+                            </div>
+
+                            <div class="lightbox-text">
+                            Kids Report Card <span>Education</span>
+                            </div>
+                        </div>
+
+                        <div class="box-caption">
+                            <div class="box-title">Kids Report Card</div>
+                            <div class="box-text">
+                                The Committee on Children of the Connecticut Legislature is building a report card on the wellbeing of all Connecticut children from birth through age 17. Find the metrics here.
+                            </div>
+                            <div class="box-more"> <a href="http://ctdata.org/community/Connecticut?p=198">Read More</a> </div>
+                        </div>
+                    </div>
+
+                    <div class="box" data-category="Education">
+                        <div class="box-image">
+                            <div data-thumbnail="/common/images/ctdata-lob.jpg" ></div>
+
+                            <div class="thumbnail-caption">
+                                <a href="http://ofa.herokuapp.com/"><div class="hover-url"></div></a>
+                            </div>
+
+                            <div class="lightbox-text">
+                            State Grants to Towns <span>Education</span>
+                            </div>
+                        </div>
+
+                        <div class="box-caption">
+                            <div class="box-title">State Grants to Towns</div>
+                            <div class="box-text">
+                                Explore interactive visualizations of state grant data provided to municipalities and provided here in partnership with the Legislative Office of Fiscal Analysis.
+                            </div>
+                            <div class="box-more"> <a href="http://ofa.herokuapp.com/">Read More</a> </div>
+                        </div>
+                    </div>
+
+
+                    <div class="box" data-category="Economy">
+                        <div class="box-image">
+                            <div data-thumbnail="/common/images/map_page.jpg" ></div>
+
+                            <div class="thumbnail-caption">
+                                <a href="http://eitc.ctdata.org"><div class="hover-url"></div></a>
+                            </div>
+
+                            <div class="lightbox-text">
+                            Earned Income Tax Credit <span>Economy</span>
+                            </div>
+                        </div>
+
+                        <div class="box-caption">
+                            <div class="box-title">Earned Income Tax Credit</div>
+                            <div class="box-text">
+                                The Earned Income Tax Credit (EITC) provides a credit to people that have earned income through work. Learn more about how the credit was distributed in Connecticut.
+                            </div>
+                            <div class="box-more"> <a href="http://eitc.ctdata.org">Read More</a> </div>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="sp_project_entry">
-                    <img src="/common/images/early-childhood2.jpg">
-                    <h3>Kids Report Card Metrics</h3>
-                    <p> The Committee on Children of the Connecticut legislature is building a report card on the wellbeing of all Connecticut children from birth through age 17. </p>
-                    <a href="#">&raquo; Go to this project</a>
-                </div>
             </div>
-            <div class="span4">
-                <div class="sp_project_entry">
-                    <img src="/common/images/early-childhood.jpg">
-                    <h3>Early Development Instrument</h3>
-                    <p>The Hartford Foundation in partnership with Hartford and West Hartford school leadership, community partners, and local policymakers is working to support collective action that promotes children’s school readiness and life success.  The data from the first Early Development Instrument pilot is available here.</p>
-                    <a href="#">&raquo; Go to this project</a>
-                </div>
-                <div class="sp_project_entry">
-                    <img src="/common/images/behavorial-health.jpg">
-                    <h3>SEOW Behavioral Health Indicators Portal</h3>
-                    <p>Coming soon...</p>
-                    <a href="#">&raquo; Go to this project</a>
-                </div>
+
+            <div class="contentrightnav">
+                <h3><i class="fa fa-bar-chart"></i> Kindergarten Readiness</h3>
+                <a href="#">Kindergarten Inventory Skills</a>
+                <br /><br />
+
+                <h3><i class="fa fa-pie-chart"></i> Student Behavior</h3>
+                <a href="#">Absenteeism</a><br />
+                <a href="#">Chronic Absenteeism</a>
+                <br /><br />
+
+                <h3><i class="fa fa-line-chart"></i> Student Demographics</h3>
+                <a href="#">English Language Learners</a><br />
+                <a href="#">Student Enrollment</a>
+                <br /><br />
+
+                <h3><i class="fa fa-area-chart"></i> Testing & Evaluation</h3>
+                <a href="#">CMT Number Tested</a><br />
+                <a href="#">CMT Results</a>
+                <br /><br />
             </div>
-            <div class="span4">
-                <div class="sp_project_entry">
-                    <img src="/common/images/early-childhood2.jpg">
-                    <h3>Early Childhood Portal</h3>
-                    <p>With support from the <a href="http://wcgmf.org/">William Caspar Graustein Memorial Fund</a>(GMF),  see the latest and most commonly used community-level data on the status of families and young children birth though age 8, as well as the performance of early childhood systems and programs.</p>
-                    <a href="#">&raquo; Go to this project</a>
-                </div>
-                <div class="sp_project_entry">
-                    <img src="/common/images/state_grants.png">
-                    <h3>State grants to towns</h3>
-                    <p>Explore interactive visualizations of state grant data provided to municipalities and provided here in partnership with the Office of Fiscal Analysis. Future phases of the project will include additional data on funds that are provided to towns by the state.</p>
-                    <a href="#">&raquo; Go to this project</a>
-                </div>
-            </div>
-            <div class="span4">
-                <div class="sp_project_entry">
-                    <img src="/common/images/early-childhood.jpg">
-                    <h3>Coastal Fairfield County Portal</h3>
-                    <p>Coming soon...</p>
-                    <a href="#">&raquo; Go to this project</a>
-                </div>
-            </div>
+
         </div>
     </div>
-    <!-- </div>
-    </div> -->
 
 {% block scripts %}
-{{ super() }}
+    {{ super() }}
     <link rel="stylesheet" type="text/css" href="/common/css/mediaBoxes.css">
-    <script  src="/common/js/mediaBoxes.js"> </script>
-    <script  src="/common/js/mediaBoxes.js"> </script>
+    {% resource "ctdata_theme/mediaBoxes.js" %}
+    {% resource "ctdata_theme/rotate-patch.js" %}
+    {% resource "ctdata_theme/waypoints.js" %}
+    {% resource "ctdata_theme/special_projects.js" %}
+
 {% endblock %}
 {% endblock %}
