@@ -1,3 +1,9 @@
+.tooltip-inner {
+
+background-color: #ffffff;
+color: #000000;
+}
+
 .spinner{
   display: none;
   position: absolute;
@@ -8,8 +14,14 @@
 div.panel-collapse.collapse.in{
   max-height: 200px;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: none;
 }
+
+ul.scrollable{
+  overflow-y: scroll !important;
+  max-height: 200px;
+}
+
 input[type="checkbox"],input[type="radio"]{
   -webkit-appearance: checkbox;
   float: left;
@@ -150,7 +162,8 @@ div#error_message{
 
 #container{
   position: relative;
-  max-height: 1000px;
+  min-height: 500px;
+  max-height: 2000px;
   /*min-height: 500px !important;*/
   max-width: 1300px !important;
   min-width: 310px !important;
@@ -191,4 +204,8 @@ a.change_dataset_link{
 
 a.change_dataset_link:hover{
   text-decoration: underline;
+}
+
+.search_town{
+
 }

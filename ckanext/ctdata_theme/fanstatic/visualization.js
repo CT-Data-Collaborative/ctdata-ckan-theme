@@ -3,8 +3,8 @@ var display_type  = "table",
     chart_filters = [],
     dataset_id    = $("#dataset_id").val(),
     create_popup  = $("#create_indicator_popup"),
-    edit_popup    = $("#edit_indicators_popup"),
-    ids_to_remove = [];
+    edit_popup    = $("#edit_indicators_popup");
+window.ids_to_remove = [];
 
 create_popup.modal({show: false});
 edit_popup.modal({show: false});
@@ -12,7 +12,6 @@ $('.close_popup').click(function() {
   create_popup.modal('hide');
   edit_popup.modal('hide');
 });
-
 
 function show_selected_indicator(){
   ind_id = location.search.split('ind=')[1]
@@ -45,7 +44,7 @@ function show_edit_indicators_popup(){
 
 function add_ind_id_to_removing_list(){
   $('.remove_indicator').on('click', function(){
-    ids_to_remove.push( $(this).attr('id'));
+    window.ids_to_remove.push( $(this).attr('id'));
     $(this).closest('div.control-group').hide();
   });
 }
@@ -62,7 +61,7 @@ function update_headline_indicators(){
     $.ajax({type: "POST",
       url: "/dataset/"+dataset_id+"/update_indicators",
       data: JSON.stringify({ names_hash: names_hash,
-                             indicators_to_remove: ids_to_remove}),
+                             indicators_to_remove: window.ids_to_remove}),
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
         window.location.reload();
@@ -133,14 +132,15 @@ function check_defaults(){
 
     if(defaults[i] instanceof Array){
       $.each(defaults[i], function(j){
-        $("input."+i.replace(/ /g, '')+"[value='"+defaults[i][j]+"']").prop('checked', true);
+        $input = $("input[class*="+i.replace(/ /g, '')+"]"+"[value='"+defaults[i][j]+"']");
+        $input.prop('checked', true);
       });
     } else {
-        $("input."+i.replace(/ /g, '')+"[value='"+defaults[i]+"']").prop('checked', true);
+        $input = $("input."+i.replace(/ /g, '')+"[value='"+defaults[i]+"']");
+        $input.prop('checked', true);
     }
     });
     display_data();
-
 }
 
 function save_filters(display_type){
@@ -442,10 +442,18 @@ function draw_table(){
           "aButtons": ["print", "pdf", "csv"]
         }
       });
+  format_numbers();
   hide_spinner();
 });
 }
-
+function format_numbers(){
+  jQuery.map( $('td'), function( item ) {
+      text = $(item).html()
+      if (jQuery.isNumeric(text) == true){
+        $(item).html(parseInt(text).toLocaleString('en-US'))
+      }
+    });
+}
 function draw_chart(){
   var dataset_id = $("#dataset_id").val(),
       dataset_title = $("#dataset_title").val(),
@@ -529,7 +537,7 @@ function draw_chart(){
                 layout: 'horizontal',
                 verticalAlign: 'bottom',
                 borderWidth: 0,
-                maxHeight: 90
+                maxHeight: 200
             },
             tooltip: {
                 useHTML: true,
@@ -581,6 +589,7 @@ function display_filters(){
 }
 
 $(function () {
+
     select_all();
     deselect_all();
     check_defaults();
@@ -591,6 +600,9 @@ $(function () {
     show_selected_indicator();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
+        $('#default.head_ind_link').prop('selected', true)
+        $li = $(this).closest('li')
+        $li.prependTo($li.closest('ul'));
         display_data();
     });
     hide_spinner();
@@ -602,4 +614,31 @@ $(function () {
       $("#container").width(width);
     }
     create_headline_indicator();
+    $('.tooltip_a').tooltip();
+
+    var towns_names = []
+    $.map( $('li', $('#collapseTown')), function(item){
+      towns_names.push( $(item).attr('id'))
+    });
+
+    $( "#tags" ).autocomplete({
+      source: towns_names,
+      select: function (event, ui) {
+        var value = ui.item.value;
+
+        $input = $('input[id="' + value + 'Check"]');
+
+        $input.prop('checked', true);
+        $input.closest('li').prependTo($li.closest('ul')[0]);
+        display_data();
+
+      }
+    });
+
+    // move checked checkboxes to the top of their lists
+    $.each( $("input:checked"), function(i, item){
+      console.log(item)
+      $li = $(item).closest('li');
+      $li.prependTo($li.closest('ul'));
+    });
 });

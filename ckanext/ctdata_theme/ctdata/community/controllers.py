@@ -27,8 +27,8 @@ class CommunityProfilesController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def add_indicator(self):
-        session_id = http_request.cookies.get('ckan') or uuid.uuid4().hex
-        user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
+        session_id = session.id
+        user_name  = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
 
         if http_request.method == 'POST':
             user = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
@@ -59,51 +59,13 @@ class CommunityProfilesController(base.BaseController):
         h.flash_error('Indicator cannot be saved')
         return json.dumps({'success': False})
 
-
-    # def remove_indicator(self, indicator_id):
-    #     user_name = http_request.environ.get("REMOTE_USER")
-
-    #     if user_name:
-    #         user = self.user_service.get_or_create_user(user_name)
-    #     else:
-    #         abort(401)
-
-    #     if user:
-    #         csrf_token_passed = http_request.GET.get('anti_csrf')
-    #         csrf_token_session = session.get('anti_csrf')
-    #         if csrf_token_passed and csrf_token_passed == csrf_token_session:
-    #             try:
-    #                 self.community_profile_service.remove_indicator(user, indicator_id)
-    #                 self.session.commit()
-    #             except toolkit.ObjectNotFound:
-    #                 abort(404)
-    #             except CantDeletePrivateIndicator, e:
-    #                 abort(400, str(e))
-    #             else:
-    #                 came_from = http_request.GET.get('came_from')
-    #                 if not came_from:
-    #                     came_from = http_request.headers.get('Referer')
-
-    #                 if came_from:
-    #                     redirect(came_from)
-    #                 else:
-    #                     # if user deleted came_from parameter from the url and disabled referers in his browser,
-    #                     # redirect him to the frontpage, after deleting the indicator
-    #                     redirect('/')
-    #         else:
-    #             abort(400, "anti-CSRF tokens don't match")
-    #     else:
-    #         abort(401)
-
     def community_profile(self, community_name):
-        session_id = http_request.cookies.get('ckan') or uuid.uuid4().hex
-
-        print(session_id)
-        user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + str(session_id)
+        session_id      = session.id
+        user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
         location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
         profile_to_load = http_request.GET.get('p')
         towns_raw       = http_request.GET.get('towns')
-        user            = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
+        user            = self.user_service.get_or_create_user_with_session_id(user_name, session_id)
         towns_names     = map(lambda x: x.strip(), towns_raw.split(','))  if towns_raw else []
         towns           = self.community_profile_service.get_all_towns()
         indicators, displayed_towns, displayed_towns_names = [],[],[]
@@ -142,16 +104,16 @@ class CommunityProfilesController(base.BaseController):
     def update_profile_indicators(self):
         http_response.headers['Content-type'] = 'application/json'
 
-        json_body   = json.loads(http_request.body, encoding=http_request.charset)
+        json_body             = json.loads(http_request.body, encoding=http_request.charset)
         indicators_to_remove  = json_body.get('indicators_to_remove')
-        user_name = http_request.environ.get("REMOTE_USER")
+        session_id      = session.id
+        user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
 
         if user_name:
-            user = self.user_service.get_or_create_user(user_name)
+            user = self.user_service.get_or_create_user_with_session_id(user_name,session_id)
         else:
             abort(401)
 
-        print(indicators_to_remove)
         if user:
             for indicator_id in indicators_to_remove:
                 try:
@@ -159,10 +121,10 @@ class CommunityProfilesController(base.BaseController):
                     self.session.commit()
                 except toolkit.ObjectNotFound:
                     h.flash_error('Indicator not found.')
-                    pass #abort(404)
+                    return json.dumps({'success': True})
                 except CantDeletePrivateIndicator, e:
                     h.flash_error(str(e))
-                    pass #abort(400, str(e))
+                    return json.dumps({'success': True})
 
         h.flash_notice('Indicators successfully updated.')
         return json.dumps({'success': True})
@@ -190,10 +152,17 @@ class CommunityProfilesController(base.BaseController):
             if user.is_admin and sorted(new_indicators) != sorted(old_indicators):
                 for old_indicator in old_indicators:
                     old_indicator.is_global = False
-                    old_indicator.temp = False
+
                 for new_indicator in new_indicators:
                     new_indicator.is_global = True
                     new_indicator.temp = False
+
+                for old_indicator in old_indicators:
+                    # old_indicator.is_global = False
+                    # old_indicator.temp = False
+                    if not old_indicator.is_global:
+                        self.session.delete(old_indicator)
+                        self.community_profile_service.remove_indicator_id_from_profiles(old_indicator.id)
 
                 self.session.commit()
 
@@ -201,7 +170,7 @@ class CommunityProfilesController(base.BaseController):
         return json.dumps({'success': True})
 
     def add_profile(self):
-        session_id = http_request.cookies.get('ckan') or uuid.uuid4().hex
+        session_id = session.id
         user_name = http_request.environ.get("REMOTE_USER") or  "guest_" + session_id
         json_body = json.loads(http_request.body, encoding=http_request.charset)
         ids       = json_body.get('indicator_ids')

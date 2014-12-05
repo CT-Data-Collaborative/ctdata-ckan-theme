@@ -14,7 +14,7 @@ img {
 /* ==== THEME 1 ==== */
 
     ul.theme1{
-        text-align: left; 
+        text-align: left;
     }
     ul.theme1 li.select a{  /* This is how you target the selected option of the category navigation bar */
         background: #28ac86 !important;
@@ -28,8 +28,8 @@ img {
     }
 
 /* ==== THEME 2 ==== */
-  
-    ul.theme2 li.select a{ 
+
+    ul.theme2 li.select a{
         background: #09b0dd !important;
     }
     .theme2 .thumbnail-caption{
@@ -41,9 +41,9 @@ img {
     }
 
 /* ==== THEME 3 ==== */
-  
+
     ul.theme3{
-        text-align: left; 
+        text-align: left;
     }
     .theme3 .thumbnail-caption>div>div{
         text-align: left;
@@ -58,9 +58,9 @@ img {
     }
 
 /* ==== THEME 4 ==== */
-  
+
     ul.theme4{
-        text-align: right; 
+        text-align: right;
     }
     .theme4 .thumbnail-caption>div>div{
         text-align: left;
@@ -70,7 +70,7 @@ img {
         background: transparent;
         padding: 0 20px;
     }
-    ul.theme4 li.select a{ 
+    ul.theme4 li.select a{
         background: #28ac86; !important;
     }
     .theme4 .thumbnail-caption{
@@ -81,9 +81,9 @@ img {
     }
 
 /* ==== THEME 5 ==== */
-  
+
     ul.theme5{
-        text-align: right; 
+        text-align: right;
     }
     .theme5 .thumbnail-caption>div>div{
         text-align: left;
@@ -93,7 +93,7 @@ img {
         background: transparent;
         padding: 0 20px;
     }
-    ul.theme5 li.select a{ 
+    ul.theme5 li.select a{
         background: #09b0dd; !important;
     }
     .theme5 .thumbnail-caption{
@@ -153,7 +153,7 @@ img {
 .thumbnail-caption{
   background: #4670a7; /* fallback for IE8 */
   background-color: rgba(70,112,167, .9);
-  
+
   color: #fff;
   text-align: center;
 }
@@ -170,7 +170,7 @@ img {
 
 /* --- BACKGROUND COLOR OF THE LIGHTBOX --> */
 .mediaBoxes-lightbox{
-  background: #313131; 
+  background: #313131;
   background: rgba(0,0,0,.85);
 }
 
@@ -182,7 +182,7 @@ img {
   -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
   opacity:inherit;
-  
+
   filter:inherit;
   -webkit-border-radius: 1px !important;
      -moz-border-radius: 1px !important;
@@ -243,7 +243,7 @@ img {
 }
 
 .category-navbar li.select a{
-  background: #4670a7; 
+  background: #4670a7;
   color: #fff;
 }
 
@@ -358,15 +358,15 @@ iframe.box-iframe{
 }
 
 .hover-lightbox, .hover-url, .hover-iframe{
-  
+
   cursor: pointer;
   display: inline-block;
   margin-top: 1px;
   line-height: 14px;
-  
+
   width: 27px;
   height: 27px;
-  background: url(../img/caption-icons.png);
+  background: url(../images/caption-icons.png);
   background-position: -1px -1px;
 
   margin: 0 6px;
@@ -378,7 +378,7 @@ iframe.box-iframe{
 }
 
 .hover-iframe{
-  background-position: -98px -2px; 
+  background-position: -98px -2px;
 }
 
 .hover-lightbox:hover, .hover-url:hover, .hover-iframe:hover{
@@ -426,7 +426,7 @@ iframe.box-iframe{
 
 .mediaBoxes-loader{
   width: 43px;
-  background: url(../img/loader.gif) no-repeat;
+  background: url(../images/loader.gif) no-repeat;
   background-position:center;
 }
 
@@ -482,7 +482,7 @@ iframe.box-iframe{
   width: 43px;
   height: 11px;
   background: url(../img/lightbox-loader.gif);
-  
+
   margin: 20px auto;
 }
 
@@ -522,7 +522,7 @@ iframe.box-iframe{
 }
 
 .mediaBoxes-play:hover, .mediaBoxes-close:hover, .mediaBoxes-next:hover, .mediaBoxes-prev:hover, .mediaBoxes-font:hover{
-  background: #1B1B1B; 
+  background: #1B1B1B;
 
 }
 
@@ -576,7 +576,7 @@ iframe.box-iframe{
 
   height: 25px;
   display: block;
-} 
+}
 
 .iconClose{
   width: 25px;
@@ -625,8 +625,8 @@ iframe.box-iframe{
 
 /* *************************************** GRID STYLE *************************************** */
 
-.centered { 
-    margin: auto; 
+.centered {
+    margin: auto;
 }
 
 .box {
@@ -644,7 +644,7 @@ iframe.box-iframe{
 
 .rtl .box {
   float: right;
-  text-align: right; 
+  text-align: right;
   direction: rtl;
 }
 
