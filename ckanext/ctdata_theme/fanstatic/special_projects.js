@@ -9,7 +9,7 @@ $('document').ready(function(){
         horizontalSpaceBetweenThumbnails: 15, //The space between images horizontally
         verticalSpaceBetweenThumbnails: 15, //The space between images vertically
         columnWidth: 'auto', //The width of each columns, if you set it to 'auto' it will use the columns instead
-        columns: 5, //The number of columns when you set columnWidth to 'auto'
+        columns: 2, //The number of columns when you set columnWidth to 'auto'
         columnMinWidth: 220, //The minimum width of each columns when you set columnWidth to 'auto'
         isAnimated: true, //If you wish the gallery to have animated effects when resizing the grid
         caption: true, //Show the caption in mouse over
