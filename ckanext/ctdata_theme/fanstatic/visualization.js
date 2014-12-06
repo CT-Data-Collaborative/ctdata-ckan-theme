@@ -136,7 +136,7 @@ function check_defaults(){
         $input.prop('checked', true);
       });
     } else {
-        $input = $("input."+i.replace(/ /g, '')+"[value='"+defaults[i]+"']");
+        $input = $("input[class*="+i.replace(/ /g, '')+"]"+"[value='"+defaults[i]+"']");
         $input.prop('checked', true);
     }
     });
@@ -162,7 +162,7 @@ function set_filters(display_type){
     $.each(filters_to_update, function(i){
       column = filters_to_update[i]
       $.each(column['values'], function(value){
-        $("input."+column['field']+"[value='"+column['values'][value]+"']").prop('checked', true);
+        $("input[class*="+column['field']+"]"+"[value='"+column['values'][value]+"']").prop('checked', true);
       });
     });
   }
