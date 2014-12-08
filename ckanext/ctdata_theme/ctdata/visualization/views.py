@@ -43,7 +43,6 @@ class View(object):
             result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
 
             conn.commit()
-
         return  result
 
     def get_compatibles(self, filters):

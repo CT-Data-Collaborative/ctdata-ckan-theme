@@ -22,7 +22,7 @@ $.ajax({type: "POST",
         contentType: 'application/json; charset=utf-8'}).done(function(    data) {
 handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
-var min = Infinity;
+var min = 0;
 $.each(data.data, function(i){
   if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
@@ -33,39 +33,44 @@ $.each(data.data, function(i){
   if(data.data[i]['value'] < min)
     min = data.data[i]['value'];
 });
-
 //Split data into classes for discrete map coloring
-var numClasses = 8;
-var range = max-min;
-var step = Math.ceil(range/numClasses);
-var dataClasses = []
+var cur_mt = $(".MeasureType:checked").first().val(),
+    cur_mt_is_number  = (cur_mt == "number" && cur_mt == "Number"),
+    cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent"),
+    numClasses        = 8,
+    range             = max-min,
+    step              = Math.ceil(range/numClasses),
+    dataClasses       = [];
+
 for(i = 0; i < numClasses; i++){
-  dataClasses.push({from: Math.floor(min+(step*i)),
-                    to:   Math.floor(min+(step*(i+1)))
-                    });
+  to   = Math.floor(min+(step*(i+1)))
+  from = Math.floor(min+(step*i))
+
+  if (to.toString().length > 3)   to   = Math.floor(to/100)*100;
+  if (from.toString().length > 3) from = Math.floor(from/100)*100;
+
+  dataClasses.push({from: from, to:  to > 100 && cur_mt_is_percent && 100 || to });
 }
-if(dataClasses[dataClasses.length-1]['to'] < max+1)
+
+if(dataClasses[dataClasses.length-1]['to'] < max+1 && cur_mt_is_number)
   dataClasses[dataClasses.length-1]['to'] = max+1;
 
 $.getJSON('/common/map.json', function (geojson) {
 
 //Create legend to display current filters
-var legend_html = '<div id="mapTitle">'+$("#dataset_title").val()+"<br>"+
-  '<div id="mapSubtitle">';
-var cur_filters = get_filters();
+var legend_html = "<div>" ,
+    cur_filters = get_filters();
 $.each(cur_filters, function(i){
   if (cur_filters[i].field == 'Town') return "Skip this filter";
-  legend_html += cur_filters[i].field +
-         ": " + cur_filters[i].values + " | ";
+  legend_html += cur_filters[i].field + ": " + cur_filters[i].values + " | ";
 });
-legend_html = legend_html.substring(0, legend_html.length-2);
-legend_html += "</div></div>"
 
-var cur_mt = $(".MeasureType:checked").first().val();
+legend_html = legend_html.substring(0, legend_html.length-2);
+legend_html += "</div>"
+
 var units = "";
-if (cur_mt == "percent" || cur_mt == "Percent")
-  units = "%";
-if ((cur_mt == "number" || cur_mt == "Number") && ($("#dataset_id").val() == 'cmt-results' || $("#dataset_id").val() == 'chronic-absenteeism'))
+if (cur_mt_is_percent) units = "%";
+if (cur_mt_is_number && ($("#dataset_id").val() == 'cmt-results' || $("#dataset_id").val() == 'chronic-absenteeism'))
   units = " Students";
 
 var series_name = 'value';
@@ -92,14 +97,24 @@ chart = new Highcharts.Chart({
     valueSuffix: units
   },
   title : {
-    text : legend_html,
-    style: {opacity: "70%", fontFamily: "Questrial, sans-serif", textWrap: "normal"},
+    text : $("#dataset_title").val(),
+    style: {opacity: "70%", fontFamily: "Questrial, sans-serif", textWrap: "normal", fontWeight: '900',zIndex: '999', fontSize: '24px'},
     floating: true,
     backgroundColor: 'white',
     borderWidth:1,
     borderRadius:3,
     useHTML: true,
     y: 30
+  },
+  subtitle: {
+    text: legend_html,
+    style: {opacity: "70%", fontFamily: "Questrial, sans-serif", backgroundColor: '#ffffff', padding: '5px', paddingTop: '40px', minWidth: '500px', textAlign: 'center', border: '1px solid lightgray'},
+    floating: true,
+    backgroundColor: 'white',
+    borderWidth:1,
+    borderRadius:3,
+    useHTML: true,
+    y: 10
   },
 
   legend: {

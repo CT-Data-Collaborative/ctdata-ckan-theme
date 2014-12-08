@@ -25,7 +25,7 @@ def communities():
     sess = db.session_factory()
 
     srvc = CommunityProfileService(sess)
-    communities = srvc.get_all_profiles()
+    communities = srvc.get_profiles_for_data_by_location()
 
     sess.commit()
     return communities
@@ -85,6 +85,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('page_about', '/pages/about', action='about')
             m.connect('page_news', '/pages/news', action='news')
             m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
+            m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
 
         return route_map
 
@@ -200,7 +201,9 @@ class CTDataController(base.BaseController):
         except ValueError:
             abort(400)
 
-        request_view, request_filters, omit_single_values = json_body.get('view'), json_body.get('filters'), json_body.get('omit_single_values')
+        request_view       = json_body.get('view')
+        request_filters    = json_body.get('filters')
+        omit_single_values = json_body.get('omit_single_values')
 
         if not request_view or not request_filters:
             abort(400, detail='No view and/or filters specified')

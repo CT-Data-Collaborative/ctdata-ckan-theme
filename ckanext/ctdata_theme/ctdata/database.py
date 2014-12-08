@@ -41,12 +41,6 @@ class Database(object):
         Base.metadata.create_all(self.engine)
         VisualizationOrmBase.metadata.create_all(self.engine)
 
-        try:
-            temp = Column('temp', Boolean)
-            self.add_column('ctdata_profile_indicators', temp, connection_string)
-        except sqlalchemy.exc.ProgrammingError:
-            pass
-
         self.session_factory = sessionmaker(bind=self.engine)
 
     def add_column(self, table, column, connection_string):
