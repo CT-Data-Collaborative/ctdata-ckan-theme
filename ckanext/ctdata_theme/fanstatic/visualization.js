@@ -136,7 +136,7 @@ function check_defaults(){
         $input.prop('checked', true);
       });
     } else {
-        $input = $("input."+i.replace(/ /g, '')+"[value='"+defaults[i]+"']");
+        $input = $("input[class*="+i.replace(/ /g, '')+"]"+"[value='"+defaults[i]+"']");
         $input.prop('checked', true);
     }
     });
@@ -162,7 +162,7 @@ function set_filters(display_type){
     $.each(filters_to_update, function(i){
       column = filters_to_update[i]
       $.each(column['values'], function(value){
-        $("input."+column['field']+"[value='"+column['values'][value]+"']").prop('checked', true);
+        $("input[class*="+column['field']+"]"+"[value='"+column['values'][value]+"']").prop('checked', true);
       });
     });
   }
@@ -425,11 +425,25 @@ function draw_table(){
             $.each(years, function (year_index) {
               cur_value = data['data'][row_index]['data'][year_index];
               if (!cur_value) cur_value = "-";
+
+              text = cur_value.toString()
+              array = text.split('.')
+              console.log(array)
+              console.log(array.length)
+              if (jQuery.isNumeric(text) == true && array.length == 1){
+                cur_value = parseInt(text).toLocaleString('en-US')
+              }
+
+
               html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
               col_num++;
             });
           } else {
             cur_value = data['data'][row_index]['data'][0];
+            text = cur_value
+            if (jQuery.isNumeric(text) == true){
+              if (Number(text)===text && text%1 !==0 ) cur_value = parseInt(text).toLocaleString('en-US')
+            }
             html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
           }
         });
@@ -442,7 +456,7 @@ function draw_table(){
           "aButtons": ["print", "pdf", "csv"]
         }
       });
-  format_numbers();
+  //format_numbers();
   hide_spinner();
 });
 }
@@ -601,8 +615,10 @@ $(function () {
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         $('#default.head_ind_link').prop('selected', true)
-        $li = $(this).closest('li')
-        $li.prependTo($li.closest('ul'));
+        if ($(this).attr('name') == 'Town'){
+          $li = $(this).closest('li')
+          $li.prependTo($li.closest('ul'));
+        }
         display_data();
     });
     hide_spinner();
@@ -636,7 +652,7 @@ $(function () {
     });
 
     // move checked checkboxes to the top of their lists
-    $.each( $("input:checked"), function(i, item){
+    $.each( $("input:checked", $('div#collapseTown')), function(i, item){
       console.log(item)
       $li = $(item).closest('li');
       $li.prependTo($li.closest('ul'));
