@@ -176,6 +176,7 @@ class CTDataController(base.BaseController):
             except TypeError:
                 default_filters = ind_filters
 
+        # metadata fileds for visualization page
         visible_metadata_fields = filter(lambda x: x['key'] == 'visible_metadata', metadata)
 
         try:
@@ -184,12 +185,22 @@ class CTDataController(base.BaseController):
         except IndexError:
             metadata_fields = ['Description', 'Full Description', 'Source']
 
+        # suppression metadata fileds for visualization page, which should be marked with red color
+        suppression_metadata_fields = filter(lambda x: x['key'] == 'Suppression', metadata)
+
+        try:
+            suppression_metadata_fields = yaml.load(suppression_metadata_fields[0]['value'])
+            suppression_metadata_fields = suppression_metadata_fields.split(',')
+        except IndexError:
+            suppression_metadata_fields = []
+
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
         headline_indicators = self.community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
+                                                             'suppression_fields': suppression_metadata_fields,
                                                              'disabled': disabled,
                                                              'default_filters': default_filters,
                                                              'headline_indicators': headline_indicators})

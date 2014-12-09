@@ -122,7 +122,11 @@
           <li>
             <a class="togglebtn", >{{property['key']}}</a>
             <div class="dataValue" id={{property['key']}}>
-                {{property['value']}}
+                {% if property['key'] in suppression_fields %}
+                  <span class="red">{{property['value']}}</span>
+                {% else %}
+                  {{property['value']}}
+                {% endif %}
             </div>
           </li>
         {% endfor %}

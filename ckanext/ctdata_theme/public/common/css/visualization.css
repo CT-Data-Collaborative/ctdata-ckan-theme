@@ -206,6 +206,8 @@ a.change_dataset_link:hover{
   text-decoration: underline;
 }
 
-.search_town{
+.search_town{}
 
+.red{
+  color: red;
 }
