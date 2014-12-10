@@ -200,12 +200,26 @@ div#error_message{
 
 a.change_dataset_link{
   margin-left: 10px;
+  margin-top: 20px;
+  margin-bottom: 0px;
 }
 
 a.change_dataset_link:hover{
   text-decoration: underline;
 }
 
-.search_town{
+.dataset_info{
+  margin-top: 20px;
+  margin-left: 10px;
+  /*width: 700px;*/
+}
+.dataset_info h1{
+  font-weight: 600;
+}
 
+.dataset_info h3{
+  color: #63CEBE;
+  font-weight: 400;
+}
+.search_town{
 }
