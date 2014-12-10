@@ -23,16 +23,22 @@ $.ajax({type: "POST",
 handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
+
 $.each(data.data, function(i){
   if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
     return "Skip data for all of connecticut"
+  }
+  if (data.data[i]['value'] == '*'){
+
+    return "Skip supressed data"
   }
   if(data.data[i]['value'] > max)
     max = data.data[i]['value'];
   if(data.data[i]['value'] < min)
     min = data.data[i]['value'];
 });
+
 //Split data into classes for discrete map coloring
 var cur_mt = $(".MeasureType:checked").first().val(),
     cur_mt_is_number  = (cur_mt == "number" && cur_mt == "Number"),
@@ -42,12 +48,15 @@ var cur_mt = $(".MeasureType:checked").first().val(),
     step              = Math.ceil(range/numClasses),
     dataClasses       = [];
 
+// Data Class for Supressed data
+dataClasses.push({name: 'Supressed', color: 'rgba(222, 134, 9, 1)', to: '*'})
+
 for(i = 0; i < numClasses; i++){
   to   = Math.floor(min+(step*(i+1)))
   from = Math.floor(min+(step*i))
 
   if (to.toString().length > 3)   to   = Math.floor(to/100)*100;
-  if (from.toString().length > 3) from = Math.floor(from/100)*100;
+  if (from.toString().length > 3 && from != max) from = Math.floor(from/100)*100;
 
   dataClasses.push({from: from, to:  to > 100 && cur_mt_is_percent && 100 || to });
 }
@@ -87,7 +96,7 @@ chart = new Highcharts.Chart({
     backgroundColor:null,
     animation: false
   },
-   mapNavigation: {
+  mapNavigation: {
     enabled: false,
   },
   colorAxis: {
@@ -148,6 +157,18 @@ chart = new Highcharts.Chart({
     minRange: 1,
     lineColor: 'transparent',
     tickColor: 'transparent'
+  },
+  tooltip: {
+    formatter: function () {
+      value = this.point.value
+      if (this.point.value == '*'){
+        value = 'Suppressed'
+      }
+
+      return '<b>' + this.series.name + '</b><br>' +
+             this.point.name + '<br>' +
+             'Value: <b>' + value + '</b>';
+    }
   },
   exporting: {enabled: false},
    series : [{
