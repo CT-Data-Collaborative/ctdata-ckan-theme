@@ -3,8 +3,8 @@ var display_type  = "table",
     chart_filters = [],
     dataset_id    = $("#dataset_id").val(),
     create_popup  = $("#create_indicator_popup"),
-    edit_popup    = $("#edit_indicators_popup"),
-    TABLE_VALUE_LIMIT = 20;
+    edit_popup    = $("#edit_indicators_popup");
+
 window.ids_to_remove = [];
 
 create_popup.modal({show: false});
@@ -433,7 +433,6 @@ function draw_table(){
               if (jQuery.isNumeric(text) == true && array.length == 1){
                 cur_value = parseInt(text).toLocaleString('en-US')
               }
-              if (cur_value < TABLE_VALUE_LIMIT) { cur_value = '*'}
               html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
               col_num++;
             });
@@ -545,6 +544,11 @@ function draw_chart(){
                     color: '#808080'
                 }],
                 title: {text: yAxisLabel}
+            },
+            plotOptions: {
+                column: {
+                    minPointLength: 3
+                    }
             },
             legend: {
                 layout: 'horizontal',
