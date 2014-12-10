@@ -50,7 +50,7 @@ var cur_mt = $(".MeasureType:checked").first().val(),
     dataClasses       = [];
 
 // Data Class for Supressed data
-if (asterisks_counter > 0) dataClasses.push({name: 'Supressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
+if (asterisks_counter > 0) dataClasses.push({name: 'Suppressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
 
 for(i = 0; i < numClasses; i++){
   to   = Math.floor(min+(step*(i+1)))
