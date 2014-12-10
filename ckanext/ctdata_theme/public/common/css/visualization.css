@@ -208,6 +208,10 @@ a.change_dataset_link:hover{
   text-decoration: underline;
 }
 
+.search_town{}
+
+.red{color: red;}
+
 .dataset_info{
   margin-top: 20px;
   margin-left: 10px;
@@ -220,6 +224,4 @@ a.change_dataset_link:hover{
 .dataset_info h3{
   color: #63CEBE;
   font-weight: 400;
-}
-.search_town{
 }

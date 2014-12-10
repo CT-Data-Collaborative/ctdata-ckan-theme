@@ -653,8 +653,10 @@ $(function () {
 
     // move checked checkboxes to the top of their lists
     $.each( $("input:checked", $('div#collapseTown')), function(i, item){
-      console.log(item)
       $li = $(item).closest('li');
       $li.prependTo($li.closest('ul'));
     });
+
+    //move suppression between full description and source
+    $('#Suppression').appendTo( $("li[id='Full Description']") )
 });

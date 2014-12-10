@@ -176,13 +176,14 @@ class CTDataController(base.BaseController):
             except TypeError:
                 default_filters = ind_filters
 
+        # metadata fileds for visualization page
         visible_metadata_fields = filter(lambda x: x['key'] == 'visible_metadata', metadata)
 
         try:
             metadata_fields = yaml.load(visible_metadata_fields[0]['value'])
             metadata_fields.split(',')
         except IndexError:
-            metadata_fields = ['Description', 'Full Description', 'Source']
+            metadata_fields = ['Description', 'Full Description', 'Suppression' ,'Source']
 
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 

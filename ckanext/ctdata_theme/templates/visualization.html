@@ -121,10 +121,14 @@
       <div id="collapseMetadata">
         <ul>
         {% for property in metadata %}
-          <li>
-            <a class="togglebtn", >{{property['key']}}</a>
-            <div class="dataValue" id={{property['key']}}>
-                {{property['value']}}
+          <li id="{{property['key']}}">
+            <a class="togglebtn" >{{property['key']}}</a>
+            <div class="dataValue">
+                {% if property['key'] == "Suppression" %}
+                  <span class="red">{{property['value']}}</span>
+                {% else %}
+                  {{property['value']}}
+                {% endif %}
             </div>
           </li>
         {% endfor %}
