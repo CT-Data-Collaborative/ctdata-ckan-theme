@@ -132,7 +132,7 @@ function check_defaults(){
 
     if(defaults[i] instanceof Array){
       $.each(defaults[i], function(j){
-        $input = $("input[class*="+i.replace(/ /g, '')+"]"+"[value='"+defaults[i][j]+"']");
+        $input = $("input[class*="+i.replace(/ /g, '')+"]"+'[value="'+defaults[i][j]+'"]');
         $input.prop('checked', true);
       });
     } else {
@@ -471,7 +471,7 @@ function format_numbers(){
 function draw_chart(){
   var dataset_id = $("#dataset_id").val(),
       dataset_title = $("#dataset_title").val(),
-      description = $("#pageDescription").text(),
+      description = $("#profile_info").text(),
       source = $('#Source').text();
 
   $.ajax({type: "POST",
@@ -595,7 +595,7 @@ function display_filters(){
     filter_text += filters[i]['field']+": "+filters[i]['values'] + " | ";
   });
   filter_text = filter_text.replace('Select AllDeselect All', '').substring(0, filter_text.length - 2);
-  $("#pageDescription").text(filter_text);
+  $("#profile_info").text(filter_text);
 
   $li = $('li#Connecticut')
   $li.prependTo($li.closest('ul')[0]);
