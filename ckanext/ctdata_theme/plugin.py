@@ -183,16 +183,7 @@ class CTDataController(base.BaseController):
             metadata_fields = yaml.load(visible_metadata_fields[0]['value'])
             metadata_fields.split(',')
         except IndexError:
-            metadata_fields = ['Description', 'Full Description', 'Source']
-
-        # suppression metadata fileds for visualization page, which should be marked with red color
-        suppression_metadata_fields = filter(lambda x: x['key'] == 'Suppression', metadata)
-
-        try:
-            suppression_metadata_fields = yaml.load(suppression_metadata_fields[0]['value'])
-            suppression_metadata_fields = suppression_metadata_fields.split(',')
-        except IndexError:
-            suppression_metadata_fields = []
+            metadata_fields = ['Description', 'Full Description', 'Suppression' ,'Source']
 
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
@@ -200,7 +191,6 @@ class CTDataController(base.BaseController):
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'metadata': metadata,
-                                                             'suppression_fields': suppression_metadata_fields,
                                                              'disabled': disabled,
                                                              'default_filters': default_filters,
                                                              'headline_indicators': headline_indicators})
