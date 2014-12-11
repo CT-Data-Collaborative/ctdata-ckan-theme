@@ -1,5 +1,10 @@
 var chart;
 
+function swap(array,i,j){
+  temp = array[i]
+  array[i] = array[j]
+  array[j] = temp
+}
 function draw_map() {
 var dataset_id = $("#dataset_id").val(),
     dataset_title = $("dataset_title").val();
@@ -50,7 +55,7 @@ var cur_mt = $(".MeasureType:checked").first().val(),
     dataClasses       = [];
 
 // Data Class for Supressed data
-if (asterisks_counter > 0) dataClasses.push({name: 'Suppressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
+if (asterisks_counter > 0) sortedDataClasses.push({name: 'Suppressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
 
 for(i = 0; i < numClasses; i++){
   to   = Math.floor(min+(step*(i+1)))
@@ -87,6 +92,22 @@ var series_name = 'value';
 if (data['years'] !== undefined)
   series_name = data['years'][0];
 
+sortedDataClasses = dataClasses
+
+// sort DataClasses to show in normal order
+  swap(sortedDataClasses,1,2)
+  swap(sortedDataClasses,1,4)
+  swap(sortedDataClasses,3,6)
+if (sortedDataClasses.length == 8){
+  swap(sortedDataClasses,5,3)
+} else{
+  swap(sortedDataClasses,1,8)
+  swap(sortedDataClasses,5,1)
+  swap(sortedDataClasses,5,7)
+}
+
+data_classess = []
+
 // Initiate the chart
 chart = new Highcharts.Chart({
   chart: {
@@ -101,7 +122,7 @@ chart = new Highcharts.Chart({
     enabled: false,
   },
   colorAxis: {
-    dataClasses: dataClasses
+    dataClasses: sortedDataClasses
   },
   tooltip:{
     valueSuffix: units
