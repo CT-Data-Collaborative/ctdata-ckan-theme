@@ -426,6 +426,7 @@ function draw_table(){
             $.each(years, function (year_index) {
               cur_value = data['data'][row_index]['data'][year_index];
               if (!cur_value) cur_value = "-";
+              if (cur_value == -9999) cur_value = '*'
 
               text = cur_value.toString()
               array = text.split('.')
@@ -490,6 +491,9 @@ function draw_chart(){
           if (!series_data[i]['dims'])
             return "This series doesn't exist"
           cur_series_data = series_data[i]['data'];
+          $.each(cur_series_data, function(i){
+            if (cur_series_data[i] == -9999) cur_series_data[i] = '*';
+          });
           cur_series_dims = series_data[i]['dims'];
           cur_series = {};
           cur_legend_series = {};
