@@ -86,7 +86,6 @@ if (cur_mt_is_number && ($("#dataset_id").val() == 'cmt-results' || $("#dataset_
 var series_name = 'value';
 if (data['years'] !== undefined)
   series_name = data['years'][0];
-
 // Initiate the chart
 chart = new Highcharts.Chart({
   chart: {
@@ -168,7 +167,7 @@ chart = new Highcharts.Chart({
 
       return '<b>' + this.series.name + '</b><br>' +
              this.point.name + '<br>' +
-             'Value: <b>' + value + '</b>';
+             'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
     }
   },
   exporting: {enabled: false},

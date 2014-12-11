@@ -19,6 +19,8 @@ from ctdata.community.services import CommunityProfileService
 from ctdata.topic.services import TopicSerivce
 from ctdata.users.services import UserService
 
+from IPython import embed
+
 
 def communities():
     db = Database()
@@ -185,11 +187,20 @@ class CTDataController(base.BaseController):
         except IndexError:
             metadata_fields = ['Description', 'Full Description', 'Suppression' ,'Source']
 
+        # load units
+        visible_metadata_fields = filter(lambda x: x['key'] == 'Units', metadata)
+
+        try:
+            metadata_units = yaml.load(visible_metadata_fields[0]['value'])
+        except IndexError:
+            metadata_units = {"Number": " ", "Percent": " "}
+
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
         headline_indicators = self.community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
         return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
+                                                             'units':    metadata_units,
                                                              'metadata': metadata,
                                                              'disabled': disabled,
                                                              'default_filters': default_filters,
