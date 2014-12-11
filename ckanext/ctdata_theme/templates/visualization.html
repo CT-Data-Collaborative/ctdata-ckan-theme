@@ -230,10 +230,18 @@
 {% resource 'ctdata_theme/map_chart.js' %}
 <script>
 var defaults = [];
+var disabled = [];
+var units = {};
+{% if units %}
+units = {{units | safe}}
+{% endif %}
+
+
 {% if default_filters %}
 defaults = {{default_filters | safe}}
 {% endif %}
-var disabled = [];
+
+
 {% if disabled %}
 disabled = {{disabled | safe}}
 {% endif %}

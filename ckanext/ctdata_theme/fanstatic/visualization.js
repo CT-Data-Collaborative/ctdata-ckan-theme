@@ -416,8 +416,7 @@ function draw_table(){
         $.each(data['data'], function(row_index){
           if (!data['data'][row_index]['dims']) return "No data for this row";
           col_num = 2;
-          html += "<tr>"+
-                    "<td class='col-1'>"+data['data'][row_index]['dims']['Town']+"</td>";
+          html += "<tr>"+ "<td class='col-1'>"+data['data'][row_index]['dims']['Town']+"</td>";
           $.each(selected_dims, function(dim_name){
                html += "<td class='col-"+col_num+"'>"+data['data'][row_index]['dims'][dim_name]+"</td>";
                col_num++;
@@ -433,6 +432,16 @@ function draw_table(){
               if (jQuery.isNumeric(text) == true && array.length == 1){
                 cur_value = parseInt(text).toLocaleString('en-US')
               }
+
+              type = data['data'][row_index]['dims']['Measure Type']
+              if (type != undefined)
+                cur_value = unit_for_value(cur_value, type)
+              else{
+                checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
+                cur_value = unit_for_value(cur_value, checked_measure);
+              }
+
+
               html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
               col_num++;
             });
@@ -442,6 +451,16 @@ function draw_table(){
             if (jQuery.isNumeric(text) == true){
               if (Number(text)===text && text%1 !==0 ) cur_value = parseInt(text).toLocaleString('en-US')
             }
+
+
+            type = data['data'][row_index]['dims']['Measure Type']
+            if (type != undefined)
+              cur_value = unit_for_value(cur_value, type)
+            else{
+              checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
+              cur_value = unit_for_value(cur_value, checked_measure);
+            }
+
             html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
           }
         });
@@ -458,6 +477,16 @@ function draw_table(){
   hide_spinner();
 });
 }
+
+function unit_for_value(value, type){
+  if ( units[type] != undefined){
+    if (units[type] == '$')
+      return '$' + value.toString()
+    else
+      return value.toString() + units[type]
+  }
+}
+
 function format_numbers(){
   jQuery.map( $('td'), function( item ) {
       text = $(item).html()
@@ -479,9 +508,7 @@ function draw_chart(){
                                   omit_single_values: true
                                   }),
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
-        //var series = data['data'],
-        //    years = data['years'];
-        var suffix = '';
+        var type = checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
         var series = [];
         var legend_series = [];
         var years = data['years'];
@@ -495,11 +522,7 @@ function draw_chart(){
           cur_legend_series = {};
           cur_series['data'] = cur_series_data;
           cur_legend_series['data'] = cur_series_data;
-          suffix = cur_series_dims['Measure Type'];
-          if (suffix == 'percent' || suffix == 'Percent')
-            suffix = '%';
-          else
-            suffix = '';
+
           delete cur_series_dims['Measure Type'];
           name = "<div id='legendTown'>"+ cur_series_dims['Town'] + "<div id='legendDims'>";
           town_name = name
@@ -557,8 +580,11 @@ function draw_chart(){
                 maxHeight: 200
             },
             tooltip: {
-                useHTML: true,
-                valueSuffix: suffix
+              formatter: function () {
+                return '<b>' + this.key + '</b><br>' +
+                       this.series.name + '<br>' +
+                       'Value: <b>' + unit_for_value(this.y, type) + '</b>';
+              }
             },
             credits: {
               text: 'Source: ' + source + '. CTData.org'

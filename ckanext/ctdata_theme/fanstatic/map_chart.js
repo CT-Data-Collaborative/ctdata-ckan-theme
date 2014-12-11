@@ -92,6 +92,7 @@ var series_name = 'value';
 if (data['years'] !== undefined)
   series_name = data['years'][0];
 
+
 sortedDataClasses = dataClasses
 
 // sort DataClasses to show in normal order
@@ -105,8 +106,6 @@ if (sortedDataClasses.length == 8){
   swap(sortedDataClasses,5,1)
   swap(sortedDataClasses,5,7)
 }
-
-data_classess = []
 
 // Initiate the chart
 chart = new Highcharts.Chart({
@@ -189,7 +188,7 @@ chart = new Highcharts.Chart({
 
       return '<b>' + this.series.name + '</b><br>' +
              this.point.name + '<br>' +
-             'Value: <b>' + value + '</b>';
+             'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
     }
   },
   exporting: {enabled: false},
