@@ -30,7 +30,7 @@ $.each(data.data, function(i){
     delete data.data[i];
     return "Skip data for all of connecticut"
   }
-  if (data.data[i]['value'] == -9999){
+  if (data.data[i]['value'] == SUPPRESSED_VALUE){
     data.data[i]['value'] = '*'
     asterisks_counter++;
     return "Skip supressed data"
