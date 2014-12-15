@@ -62,10 +62,15 @@ for(i = 0; i < numClasses; i++){
   to   = Math.floor(min+(step*(i+1)))
   from = Math.floor(min+(step*i))
 
-  if (to.toString().length > 3)   to   = Math.floor(to/100)*100;
-  if (from.toString().length > 3 && from != max) from = Math.floor(from/100)*100;
+  if (cur_mt_is_number){
+    if (to.toString().length > 3 && i != 7)   to = Math.floor(to/100)*100;
+    if (from.toString().length > 3) from = Math.floor(from/100)*100;
+  }
 
-  dataClasses.push({from: from, to:  to > 100 && cur_mt_is_percent && 100 || to });
+  if (to > 100 && cur_mt_is_percent)
+    to = 100
+  dataClasses.push({name: unit_for_value(from, cur_mt) + ' - ' + unit_for_value(to, cur_mt),
+                    from: from, to:  to });
 }
 
 if(dataClasses[dataClasses.length-1]['to'] < max+1 && cur_mt_is_number)
@@ -85,7 +90,6 @@ legend_html = legend_html.substring(0, legend_html.length-2);
 legend_html += "</div>"
 
 var units = "";
-if (cur_mt_is_percent) units = "%";
 if (cur_mt_is_number && ($("#dataset_id").val() == 'cmt-results' || $("#dataset_id").val() == 'chronic-absenteeism'))
   units = " Students";
 
