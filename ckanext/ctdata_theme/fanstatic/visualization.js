@@ -558,6 +558,8 @@ function draw_chart(){
           return display_error("No results, please select different filters");
         }
         yAxisLabel = $(".MeasureType:checked").first().val();
+        if (units[type] != undefined)
+          yAxisLabel += ' (' + units[type] + ')'
 
         hide_spinner();
         $('#container').highcharts({
