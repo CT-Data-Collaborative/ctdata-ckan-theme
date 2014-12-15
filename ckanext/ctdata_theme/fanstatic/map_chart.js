@@ -67,8 +67,10 @@ for(i = 0; i < numClasses; i++){
     if (from.toString().length > 3) from = Math.floor(from/100)*100;
   }
 
+  if (to > 100 && cur_mt_is_percent)
+    to = 100
   dataClasses.push({name: unit_for_value(from, cur_mt) + ' - ' + unit_for_value(to, cur_mt),
-                    from: from, to:  to > 100 && cur_mt_is_percent && 100 || to });
+                    from: from, to:  to });
 }
 
 if(dataClasses[dataClasses.length-1]['to'] < max+1 && cur_mt_is_number)
