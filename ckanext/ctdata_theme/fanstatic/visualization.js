@@ -520,7 +520,7 @@ function draw_chart(){
             return "This series doesn't exist"
           cur_series_data = series_data[i]['data'];
           $.each(cur_series_data, function(i){
-            if (cur_series_data[i] == SUPPRESSED_VALUE) cur_series_data[i] = '*';
+            if (cur_series_data[i] == SUPPRESSED_VALUE) cur_series_data[i] = null;
           });
           cur_series_dims = series_data[i]['dims'];
           cur_series = {};
