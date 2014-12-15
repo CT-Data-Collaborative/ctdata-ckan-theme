@@ -29,7 +29,7 @@ handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
 var asterisks_counter = 0;
-
+// debugger
 $.each(data.data, function(i){
   if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
@@ -56,7 +56,7 @@ var cur_mt = $(".MeasureType:checked").first().val(),
     dataClasses       = [];
 
 // Data Class for Supressed data
-if (asterisks_counter > 0) sortedDataClasses.push({name: 'Suppressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
+if (asterisks_counter > 0) dataClasses.push({name: 'Suppressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
 
 for(i = 0; i < numClasses; i++){
   to   = Math.floor(min+(step*(i+1)))
