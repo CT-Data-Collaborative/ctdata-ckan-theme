@@ -481,11 +481,16 @@ function draw_table(){
 }
 
 function unit_for_value(value, type){
+  isSuppressed = (value == '*' || value == -9999 || value == '-' || value == 'Suppressed')
+  if (isSuppressed)
+    return value
+
   if ( units[type] != undefined){
     if (units[type] == '$')
       return '$' + value.toString()
     else
       return value.toString() + units[type]
+
   }
 }
 
