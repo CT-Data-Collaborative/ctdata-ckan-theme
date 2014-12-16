@@ -444,7 +444,7 @@ function draw_table(){
               }
 
 
-              html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
+              html += "<td class='right_align col-" + col_num + "'>" + cur_value + "</td>";
               col_num++;
             });
           } else {
