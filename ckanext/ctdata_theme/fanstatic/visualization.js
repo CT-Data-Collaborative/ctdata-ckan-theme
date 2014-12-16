@@ -4,6 +4,8 @@ var display_type  = "table",
     dataset_id    = $("#dataset_id").val(),
     create_popup  = $("#create_indicator_popup"),
     edit_popup    = $("#edit_indicators_popup");
+    SUPPRESSED_VALUE = -9999;
+
 window.ids_to_remove = [];
 
 create_popup.modal({show: false});
@@ -132,7 +134,7 @@ function check_defaults(){
 
     if(defaults[i] instanceof Array){
       $.each(defaults[i], function(j){
-        $input = $("input[class*="+i.replace(/ /g, '')+"]"+"[value='"+defaults[i][j]+"']");
+        $input = $("input[class*="+i.replace(/ /g, '')+"]"+'[value="'+defaults[i][j]+'"]');
         $input.prop('checked', true);
       });
     } else {
@@ -415,8 +417,7 @@ function draw_table(){
         $.each(data['data'], function(row_index){
           if (!data['data'][row_index]['dims']) return "No data for this row";
           col_num = 2;
-          html += "<tr>"+
-                    "<td class='col-1'>"+data['data'][row_index]['dims']['Town']+"</td>";
+          html += "<tr>"+ "<td class='col-1'>"+data['data'][row_index]['dims']['Town']+"</td>";
           $.each(selected_dims, function(dim_name){
                html += "<td class='col-"+col_num+"'>"+data['data'][row_index]['dims'][dim_name]+"</td>";
                col_num++;
@@ -425,13 +426,21 @@ function draw_table(){
             $.each(years, function (year_index) {
               cur_value = data['data'][row_index]['data'][year_index];
               if (!cur_value) cur_value = "-";
+              if (cur_value == SUPPRESSED_VALUE) cur_value = '*'
 
               text = cur_value.toString()
               array = text.split('.')
-              console.log(array)
-              console.log(array.length)
+
               if (jQuery.isNumeric(text) == true && array.length == 1){
                 cur_value = parseInt(text).toLocaleString('en-US')
+              }
+
+              type = data['data'][row_index]['dims']['Measure Type']
+              if (type != undefined)
+                cur_value = unit_for_value(cur_value, type)
+              else{
+                checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
+                cur_value = unit_for_value(cur_value, checked_measure);
               }
 
 
@@ -444,6 +453,16 @@ function draw_table(){
             if (jQuery.isNumeric(text) == true){
               if (Number(text)===text && text%1 !==0 ) cur_value = parseInt(text).toLocaleString('en-US')
             }
+
+
+            type = data['data'][row_index]['dims']['Measure Type']
+            if (type != undefined)
+              cur_value = unit_for_value(cur_value, type)
+            else{
+              checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
+              cur_value = unit_for_value(cur_value, checked_measure);
+            }
+
             html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
           }
         });
@@ -460,6 +479,21 @@ function draw_table(){
   hide_spinner();
 });
 }
+
+function unit_for_value(value, type){
+  isSuppressed = (value == '*' || value == -9999 || value == '-' || value == 'Suppressed')
+  if (isSuppressed)
+    return value
+
+  if ( units[type] != undefined){
+    if (units[type] == '$')
+      return '$' + value.toString()
+    else
+      return value.toString() + units[type]
+
+  }
+}
+
 function format_numbers(){
   jQuery.map( $('td'), function( item ) {
       text = $(item).html()
@@ -471,7 +505,7 @@ function format_numbers(){
 function draw_chart(){
   var dataset_id = $("#dataset_id").val(),
       dataset_title = $("#dataset_title").val(),
-      description = $("#pageDescription").text(),
+      description = $("#profile_info").text(),
       source = $('#Source').text();
 
   $.ajax({type: "POST",
@@ -481,9 +515,7 @@ function draw_chart(){
                                   omit_single_values: true
                                   }),
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
-        //var series = data['data'],
-        //    years = data['years'];
-        var suffix = '';
+        var type = checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
         var series = [];
         var legend_series = [];
         var years = data['years'];
@@ -492,16 +524,15 @@ function draw_chart(){
           if (!series_data[i]['dims'])
             return "This series doesn't exist"
           cur_series_data = series_data[i]['data'];
+          $.each(cur_series_data, function(i){
+            if (cur_series_data[i] == SUPPRESSED_VALUE) cur_series_data[i] = null;
+          });
           cur_series_dims = series_data[i]['dims'];
           cur_series = {};
           cur_legend_series = {};
           cur_series['data'] = cur_series_data;
           cur_legend_series['data'] = cur_series_data;
-          suffix = cur_series_dims['Measure Type'];
-          if (suffix == 'percent' || suffix == 'Percent')
-            suffix = '%';
-          else
-            suffix = '';
+
           delete cur_series_dims['Measure Type'];
           name = "<div id='legendTown'>"+ cur_series_dims['Town'] + "<div id='legendDims'>";
           town_name = name
@@ -527,6 +558,8 @@ function draw_chart(){
           return display_error("No results, please select different filters");
         }
         yAxisLabel = $(".MeasureType:checked").first().val();
+        if (units[type] != undefined && units[type] != ' ' && units[type] != '')
+          yAxisLabel += ' (' + units[type] + ')'
 
         hide_spinner();
         $('#container').highcharts({
@@ -547,6 +580,11 @@ function draw_chart(){
                 }],
                 title: {text: yAxisLabel}
             },
+            plotOptions: {
+                column: {
+                    minPointLength: 3
+                    }
+            },
             legend: {
                 layout: 'horizontal',
                 verticalAlign: 'bottom',
@@ -554,8 +592,11 @@ function draw_chart(){
                 maxHeight: 200
             },
             tooltip: {
-                useHTML: true,
-                valueSuffix: suffix
+              formatter: function () {
+                return '<b>' + this.key + '</b><br>' +
+                       this.series.name + '<br>' +
+                       'Value: <b>' + unit_for_value(this.y, type) + '</b>';
+              }
             },
             credits: {
               text: 'Source: ' + source + '. CTData.org'
@@ -595,7 +636,7 @@ function display_filters(){
     filter_text += filters[i]['field']+": "+filters[i]['values'] + " | ";
   });
   filter_text = filter_text.replace('Select AllDeselect All', '').substring(0, filter_text.length - 2);
-  $("#pageDescription").text(filter_text);
+  $("#profile_info").text(filter_text);
 
   $li = $('li#Connecticut')
   $li.prependTo($li.closest('ul')[0]);
@@ -653,8 +694,10 @@ $(function () {
 
     // move checked checkboxes to the top of their lists
     $.each( $("input:checked", $('div#collapseTown')), function(i, item){
-      console.log(item)
       $li = $(item).closest('li');
       $li.prependTo($li.closest('ul'));
     });
+
+    //move suppression between full description and source
+    $('#Suppression').appendTo( $("li[id='Full Description']") )
 });

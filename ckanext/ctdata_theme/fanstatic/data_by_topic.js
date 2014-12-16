@@ -32,4 +32,71 @@ $(document).ready(function(){
     if (current_hash && current_hash.length > 0) {
         $(current_hash + "_link").trigger('click');
     }
+
+
+
+    //topics search
+
+    $("#filter").keyup(function(){
+
+        // Retrieve the input field text and reset the count to zero
+        var filter = $(this).val();
+
+        // Loop through the comment list
+        $("#subtopic_list li").each(function(){
+
+            // If the list item does not contain the text phrase fade it out
+            if ($(this).text().search(new RegExp(filter, "i")) < 0) {
+                $(this).fadeOut();
+                $(this).addClass('hide');
+            // Show the list item if the phrase matches and increase the count by 1
+            } else {
+                $(this).show();
+                $(this).removeClass('hide');
+            }
+
+        });
+
+        $("li.subtopic").each( function(){
+            thiss = $(this)
+            console.log(thiss.find('li').length)
+            if (thiss.find('li').length == thiss.find('li.hide').length){
+                $(thiss).fadeOut();
+                $(thiss).addClass('hide');
+                $(thiss).fadeOut();
+
+                $(thiss).find('li.subtopic').addClass('hide');
+                $(thiss).find('li.subtopic').fadeOut();
+            } else {
+                $(thiss).show();
+                $(thiss).removeClass('hide');
+
+                $(thiss).find('li.subtopic').show();
+                $(thiss).find('li.subtopic').removeClass('hide');
+            }
+        });
+
+        $("li.topics_list").each( function(){
+            thiss = $(this)
+            console.log(thiss.find('li').length)
+            if (thiss.find('li').length == thiss.find('li.hide').length){
+                $(thiss).fadeOut();
+                $(thiss).addClass('hide');
+                $(thiss).fadeOut();
+
+                $(thiss).find('li.topics_list').addClass('hide');
+                $(thiss).find('li.topics_list').fadeOut();
+            } else {
+                $(thiss).show();
+                $(thiss).removeClass('hide');
+
+                $(thiss).find('li.topics_list').show();
+                $(thiss).find('li.topics_list').removeClass('hide');
+            }
+        });
+
+    });
+
+
+
 });

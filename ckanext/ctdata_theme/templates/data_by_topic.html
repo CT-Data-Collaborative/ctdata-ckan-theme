@@ -30,16 +30,26 @@
 
 <section id="all_data" >
     <div class="ctdata-wrapper">
+      <ul>
+        <br>
+        <div class="text-center">
+          <form id="live-search" action="" class="styled" method="post">
+            <fieldset>
+                <input type="text" class="text-input" id="filter" value="" placeholder="Search.." />
+            </fieldset>
+          </form>
+        </div>
+
         {% for domain in domains %}
             {% if domain['subdomains']|length > 0 %}
-                <div style="clear: both; margin-bottom: 10px" id="{{ domain['id'] }}" class="topics_list">
+                <li style="clear: both; margin-bottom: 10px" id="{{ domain['id'] }}" class="topics_list">
                 <h2>{{ domain['title'] }}</h2>
                 <ul>
                     {% for subdomain in domain['subdomains'] %}
                     <li class="subtopic">
                         <div class="subtopic_col">
                         <h4>{{ subdomain['title'] }}</h4>
-                            <ul>
+                            <ul id="subtopic_list">
                                 {% for dataset in subdomain['datasets'] %}
                                 <li><a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }}</a></li>
                                 {% endfor %}
@@ -48,9 +58,10 @@
                     </li>
                     {% endfor %}
                 </ul>
-                </div>
+                </li>
             {% endif %}
         {% endfor %}
+      </ul>
     </div>
 </section>
 

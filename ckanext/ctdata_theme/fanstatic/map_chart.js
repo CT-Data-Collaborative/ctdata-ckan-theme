@@ -1,5 +1,10 @@
 var chart;
 
+function swap(array,i,j){
+  temp = array[i]
+  array[i] = array[j]
+  array[j] = temp
+}
 function draw_map() {
 var dataset_id = $("#dataset_id").val(),
     dataset_title = $("dataset_title").val();
@@ -23,16 +28,24 @@ $.ajax({type: "POST",
 handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
+var asterisks_counter = 0;
+// debugger
 $.each(data.data, function(i){
   if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
     return "Skip data for all of connecticut"
+  }
+  if (data.data[i]['value'] == SUPPRESSED_VALUE){
+    data.data[i]['value'] = '*'
+    asterisks_counter++;
+    return "Skip supressed data"
   }
   if(data.data[i]['value'] > max)
     max = data.data[i]['value'];
   if(data.data[i]['value'] < min)
     min = data.data[i]['value'];
 });
+
 //Split data into classes for discrete map coloring
 var cur_mt = $(".MeasureType:checked").first().val(),
     cur_mt_is_number  = (cur_mt == "number" && cur_mt == "Number"),
@@ -42,14 +55,22 @@ var cur_mt = $(".MeasureType:checked").first().val(),
     step              = Math.ceil(range/numClasses),
     dataClasses       = [];
 
+// Data Class for Supressed data
+if (asterisks_counter > 0) dataClasses.push({name: 'Suppressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
+
 for(i = 0; i < numClasses; i++){
   to   = Math.floor(min+(step*(i+1)))
   from = Math.floor(min+(step*i))
 
-  if (to.toString().length > 3)   to   = Math.floor(to/100)*100;
-  if (from.toString().length > 3) from = Math.floor(from/100)*100;
+  if (cur_mt_is_number){
+    if (to.toString().length > 3 && i != 7)   to = Math.floor(to/100)*100;
+    if (from.toString().length > 3) from = Math.floor(from/100)*100;
+  }
 
-  dataClasses.push({from: from, to:  to > 100 && cur_mt_is_percent && 100 || to });
+  if (to > 100 && cur_mt_is_percent)
+    to = 100
+  dataClasses.push({name: unit_for_value(from, cur_mt) + ' - ' + unit_for_value(to, cur_mt),
+                    from: from, to:  to });
 }
 
 if(dataClasses[dataClasses.length-1]['to'] < max+1 && cur_mt_is_number)
@@ -69,13 +90,27 @@ legend_html = legend_html.substring(0, legend_html.length-2);
 legend_html += "</div>"
 
 var units = "";
-if (cur_mt_is_percent) units = "%";
 if (cur_mt_is_number && ($("#dataset_id").val() == 'cmt-results' || $("#dataset_id").val() == 'chronic-absenteeism'))
   units = " Students";
 
 var series_name = 'value';
 if (data['years'] !== undefined)
   series_name = data['years'][0];
+
+
+sortedDataClasses = dataClasses
+
+// // sort DataClasses to show in normal order
+//   swap(sortedDataClasses,1,2)
+//   swap(sortedDataClasses,1,4)
+//   swap(sortedDataClasses,3,6)
+// if (sortedDataClasses.length == 8){
+//   swap(sortedDataClasses,5,3)
+// } else{
+//   swap(sortedDataClasses,1,8)
+//   swap(sortedDataClasses,5,1)
+//   swap(sortedDataClasses,5,7)
+// }
 
 // Initiate the chart
 chart = new Highcharts.Chart({
@@ -87,11 +122,11 @@ chart = new Highcharts.Chart({
     backgroundColor:null,
     animation: false
   },
-   mapNavigation: {
+  mapNavigation: {
     enabled: false,
   },
   colorAxis: {
-    dataClasses: dataClasses
+    dataClasses: sortedDataClasses
   },
   tooltip:{
     valueSuffix: units
@@ -148,6 +183,18 @@ chart = new Highcharts.Chart({
     minRange: 1,
     lineColor: 'transparent',
     tickColor: 'transparent'
+  },
+  tooltip: {
+    formatter: function () {
+      value = this.point.value
+      if (this.point.value == '*'){
+        value = 'Suppressed'
+      }
+
+      return '<b>' + this.series.name + '</b><br>' +
+             this.point.name + '<br>' +
+             'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
+    }
   },
   exporting: {enabled: false},
    series : [{
