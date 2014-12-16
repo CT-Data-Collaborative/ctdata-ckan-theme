@@ -100,17 +100,17 @@ if (data['years'] !== undefined)
 
 sortedDataClasses = dataClasses
 
-// sort DataClasses to show in normal order
-  swap(sortedDataClasses,1,2)
-  swap(sortedDataClasses,1,4)
-  swap(sortedDataClasses,3,6)
-if (sortedDataClasses.length == 8){
-  swap(sortedDataClasses,5,3)
-} else{
-  swap(sortedDataClasses,1,8)
-  swap(sortedDataClasses,5,1)
-  swap(sortedDataClasses,5,7)
-}
+// // sort DataClasses to show in normal order
+//   swap(sortedDataClasses,1,2)
+//   swap(sortedDataClasses,1,4)
+//   swap(sortedDataClasses,3,6)
+// if (sortedDataClasses.length == 8){
+//   swap(sortedDataClasses,5,3)
+// } else{
+//   swap(sortedDataClasses,1,8)
+//   swap(sortedDataClasses,5,1)
+//   swap(sortedDataClasses,5,7)
+// }
 
 // Initiate the chart
 chart = new Highcharts.Chart({
