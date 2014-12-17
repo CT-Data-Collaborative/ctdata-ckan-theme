@@ -109,7 +109,7 @@ def _link_to_dataset_with_filters(dataset, filters, view = 'table'):
                                  json.loads(filters))
 
     link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
-    link         = "/visualization/" + str(dataset_url) + link_params #+ "?ind=" + str(indicator.id)
+    link         = "/visualization/" + str(dataset_url) + link_params
 
     return link
 
@@ -157,12 +157,7 @@ class CTDataController(base.BaseController):
 
     def visualization(self, dataset_name):
         try:
-            # indicator_id = http_request.GET.get('ind')
-            # indicator    = self.community_profile_service.get_indicators_by_ids([indicator_id])[0]
-            # filters      = map(lambda fl: {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}, json.loads(indicator.filters))
-            # ind_filters  = ast.literal_eval(json.dumps(dict(i.items()[0] for i in filters)))
             ind_filters =  json.dumps(json.loads( http_request.GET.get('f') ))
-            # embed()
         except IndexError:
             ind_filters = None
 
