@@ -156,10 +156,11 @@ class CTDataController(base.BaseController):
         return json.dumps({'success': True})
 
     def visualization(self, dataset_name):
-        try:
-            ind_filters =  json.dumps(json.loads( http_request.GET.get('f') ))
-        except IndexError:
-            ind_filters = None
+
+        ind_filters =  http_request.GET.get('f')
+        if ind_filters:
+            ind_filters =  json.dumps(json.loads(ind_filters))
+
 
         try:
             dataset = DatasetService.get_dataset(dataset_name)
