@@ -710,4 +710,5 @@ $(function () {
 
     //move suppression between full description and source
     $('#Suppression').appendTo( $("li[id='Full Description']") )
+    $('#Contributor').appendTo( $('#Contributor').closest('ul').find('li').last())
 });

@@ -38,7 +38,7 @@ class CommunityProfileService(object):
         return self.session.query(Town).order_by(Town.name).all()
 
 
-    def get_towns_by_names(self, town_names):
+    def get_towns_by_names(self, towns_names):
         return self.session.query(Town).filter(Town.name.in_(set(towns_names))).all()
 
     ################ COMMUNITY PROFILES #################################
