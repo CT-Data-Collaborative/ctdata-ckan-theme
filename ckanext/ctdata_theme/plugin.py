@@ -185,7 +185,7 @@ class CTDataController(base.BaseController):
             metadata_fields = yaml.load(visible_metadata_fields[0]['value'])
             metadata_fields.split(',')
         except IndexError:
-            metadata_fields = ['Description', 'Full Description', 'Suppression' ,'Source']
+            metadata_fields = ['Description', 'Full Description', 'Suppression' ,'Source', 'Contributor']
 
         # load units
         visible_metadata_fields = filter(lambda x: x['key'] == 'Units', metadata)
