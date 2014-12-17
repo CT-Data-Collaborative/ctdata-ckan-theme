@@ -95,8 +95,26 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         return route_map
 
     def get_helpers(self):
-        return {'communities_helper': communities}
+        return {'communities_helper': communities,
+                'link_to_dataset_with_filters': _link_to_dataset_with_filters}
 
+
+
+####### HELPER METHODS ##########
+
+def _link_to_dataset_with_filters(dataset, filters, view = 'table'):
+    dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
+    filters_hash = {}
+    filters      = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}),
+                                 json.loads(filters))
+
+    link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
+    link         = "/visualization/" + str(dataset_url) + link_params
+
+    return link
+
+
+####### Main Controller ##########
 
 class CTDataController(base.BaseController):
     def __init__(self):
@@ -139,10 +157,7 @@ class CTDataController(base.BaseController):
 
     def visualization(self, dataset_name):
         try:
-            indicator_id = http_request.GET.get('ind')
-            indicator    = self.community_profile_service.get_indicators_by_ids([indicator_id])[0]
-            filters      = map(lambda fl: {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}, json.loads(indicator.filters))
-            ind_filters  = ast.literal_eval(json.dumps(dict(i.items()[0] for i in filters)))
+            ind_filters =  json.dumps(json.loads( http_request.GET.get('f') ))
         except IndexError:
             ind_filters = None
 
@@ -213,7 +228,9 @@ class CTDataController(base.BaseController):
         except ValueError:
             abort(400)
 
-        request_view       = json_body.get('view')
+        view_param         = json_body.get('view')
+        request_view       = 'chart' if view_param in ['table', 'column', 'line'] else view_param
+
         request_filters    = json_body.get('filters')
         omit_single_values = json_body.get('omit_single_values')
 
@@ -234,6 +251,9 @@ class CTDataController(base.BaseController):
         data = view.get_data(request_filters)
         if omit_single_values:
             data = self._hide_dims_with_one_value(data)
+
+
+        data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps(data)

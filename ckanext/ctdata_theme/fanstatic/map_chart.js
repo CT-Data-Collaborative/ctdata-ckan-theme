@@ -25,6 +25,8 @@ $.ajax({type: "POST",
                               filters: filters
                              }),
         contentType: 'application/json; charset=utf-8'}).done(function(    data) {
+
+change_page_url(data['link']);
 handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
