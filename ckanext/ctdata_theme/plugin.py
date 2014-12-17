@@ -108,7 +108,7 @@ def _link_to_dataset_with_filters(dataset, indicator):
     filters      = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}),
                                  json.loads(indicator.filters))
 
-    link_params  =  "?v='table'&f=" + json.dumps(filters_hash)
+    link_params  =  "?v=table&f=" + json.dumps(filters_hash)
     link         = "/visualization/" + str(dataset_url) + link_params #+ "?ind=" + str(indicator.id)
 
     return link
@@ -233,7 +233,9 @@ class CTDataController(base.BaseController):
         except ValueError:
             abort(400)
 
-        request_view       = json_body.get('view')
+        view_param         = json_body.get('view')
+        request_view       = 'chart' if view_param in ['table', 'column', 'line'] else view_param
+
         request_filters    = json_body.get('filters')
         omit_single_values = json_body.get('omit_single_values')
 
@@ -254,6 +256,14 @@ class CTDataController(base.BaseController):
         data = view.get_data(request_filters)
         if omit_single_values:
             data = self._hide_dims_with_one_value(data)
+
+
+        filters_hash = {}
+        filters = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}), request_filters)
+
+        link_params  =  "?v=" + view_param + "&f=" + json.dumps(filters_hash)
+        link         = "/visualization/" + str(dataset_name) + link_params
+        data['link'] = link
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps(data)
