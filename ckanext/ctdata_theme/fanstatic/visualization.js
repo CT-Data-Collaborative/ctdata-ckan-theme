@@ -1,4 +1,4 @@
-var display_type  = "table",
+var display_type  =  (location.search.split('v=')[1]||'').split('&')[0] || "table",
     map_filters   = [],
     chart_filters = [],
     dataset_id    = $("#dataset_id").val(),
@@ -280,8 +280,11 @@ function display_error(message){
 }
 
 function display_data(){
+
   display_filters();
   display_spinner();
+  set_icon(display_type);
+
   if(display_type == 'column'){
     new_type = 'bar';
   } else {
@@ -301,6 +304,7 @@ function display_data(){
     hide_spinner();
     return display_error("Please select a year");
   }
+
   switch(display_type){
     case "map":
      //Show the print and save icons
@@ -366,7 +370,7 @@ function draw_table(){
       dataset_title = $("dataset_title").val();
   $.ajax({type: "POST",
           url: "/vizualization_data/"+dataset_id,
-          data: JSON.stringify({view: 'chart',
+          data: JSON.stringify({view: 'table',
                                filters: get_filters(),
                                omit_single_values: true
                                }),
@@ -374,7 +378,7 @@ function draw_table(){
 
 
       handle_incompatibilities(data['compatibles']);
-
+      change_page_url(data['link']);
       first_idx = 0;
       while(data['data'][first_idx] && !data['data'][first_idx]['dims'])
         first_idx++;
@@ -502,6 +506,10 @@ function format_numbers(){
       }
     });
 }
+function change_page_url(link){
+  title = $('title').text();
+  window.history.pushState(title, title, link);
+}
 function draw_chart(){
   var dataset_id = $("#dataset_id").val(),
       dataset_title = $("#dataset_title").val(),
@@ -510,11 +518,13 @@ function draw_chart(){
 
   $.ajax({type: "POST",
             url: "/vizualization_data/" + dataset_id,
-            data: JSON.stringify({view: 'chart',
+            data: JSON.stringify({view: display_type,
                                   filters: get_filters(),
                                   omit_single_values: true
                                   }),
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
+        change_page_url(data['link']);
+
         var type = checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
         var series = [];
         var legend_series = [];
