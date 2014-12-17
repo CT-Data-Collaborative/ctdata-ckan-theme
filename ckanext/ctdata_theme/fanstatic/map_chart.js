@@ -48,7 +48,7 @@ $.each(data.data, function(i){
 
 //Split data into classes for discrete map coloring
 var cur_mt = $(".MeasureType:checked").first().val(),
-    cur_mt_is_number  = (cur_mt == "number" && cur_mt == "Number"),
+    cur_mt_is_number  = (cur_mt == "number" || cur_mt == "Number"),
     cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent"),
     numClasses        = 8,
     range             = max-min,
@@ -64,9 +64,10 @@ for(i = 0; i < numClasses; i++){
   to   = Math.floor(min+(step*(i+1)))
   from = Math.floor(min+(step*i))
 
-  if (cur_mt_is_number){
-    if (to.toString().length > 3 && i != 7)   to = Math.floor(to/100)*100;
-    if (from.toString().length > 3) from = Math.floor(from/100)*100;
+  console.log()
+  if (cur_mt_is_number ){
+    if (to > 80  && i != 7)  to = Math.floor(to/10)*10;
+    if (from > 80) from = Math.floor(from/10)*10;
   }
 
   if (to > 100 && cur_mt_is_percent)
