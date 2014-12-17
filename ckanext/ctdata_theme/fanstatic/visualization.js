@@ -283,6 +283,8 @@ function display_data(){
 
   display_filters();
   display_spinner();
+  set_icon(display_type);
+
   if(display_type == 'column'){
     new_type = 'bar';
   } else {
