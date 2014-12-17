@@ -102,13 +102,13 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
 ####### HELPER METHODS ##########
 
-def _link_to_dataset_with_filters(dataset, indicator):
+def _link_to_dataset_with_filters(dataset, filters, view = 'table'):
     dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
     filters_hash = {}
     filters      = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}),
-                                 json.loads(indicator.filters))
+                                 json.loads(filters))
 
-    link_params  =  "?v=table&f=" + json.dumps(filters_hash)
+    link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
     link         = "/visualization/" + str(dataset_url) + link_params #+ "?ind=" + str(indicator.id)
 
     return link
@@ -258,12 +258,7 @@ class CTDataController(base.BaseController):
             data = self._hide_dims_with_one_value(data)
 
 
-        filters_hash = {}
-        filters = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}), request_filters)
-
-        link_params  =  "?v=" + view_param + "&f=" + json.dumps(filters_hash)
-        link         = "/visualization/" + str(dataset_name) + link_params
-        data['link'] = link
+        data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps(data)
