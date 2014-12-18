@@ -6,6 +6,7 @@ $(function(){
     ids_to_remove.push( $(this).attr('id'));
 
     $(this).closest('tr').hide();
+    $('#update_user_communities').removeClass('disabled');
   });
 
   $('.edit_name').click( function(){
@@ -15,6 +16,7 @@ $(function(){
 
   $('input.edit_profile_name').on('change', function(){
     names_hash[$(this).attr('id')] = $(this).val();
+    $('#update_user_communities').removeClass('disabled');
   });
 
   $('#update_user_communities').on('click', function(){
