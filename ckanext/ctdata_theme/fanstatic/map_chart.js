@@ -66,10 +66,9 @@ for(i = 0; i < numClasses; i++){
   to   = Math.floor(min+(step*(i+1)))
   from = Math.floor(min+(step*i))
 
-  console.log()
   if (cur_mt_is_number ){
-    if (to > 80  && i != 7)  to = Math.floor(to/10)*10;
-    if (from > 80) from = Math.floor(from/10)*10;
+    if (to > 80  && i != 7)  to = Math.round(to/10)*10;
+    if (from > 80) from = Math.round(from/10)*10;
   }
 
   if (to > 100 && cur_mt_is_percent)
