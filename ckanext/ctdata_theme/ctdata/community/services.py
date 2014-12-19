@@ -357,6 +357,7 @@ class CommunityProfileService(object):
             qb      = QueryBuilderFactory.get_query_builder('profile', dataset)
             view    = ViewFactory.get_view('profile', qb)
 
+            # Indicators logic is depends on Towns, for now we will show only datasets with Town column.
             if geography_param == 'Town':
                 filters.append({'field': 'Town', 'values': map(lambda t: t.name, towns)})
                 data         = view.get_data(filters)
