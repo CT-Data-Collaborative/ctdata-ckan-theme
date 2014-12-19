@@ -298,7 +298,7 @@ function display_data(){
   towns = $("input." + geography_param + ":checked");
   towns = $("input.Region:checked");
   years = $("input.Year:checked");
-  if(towns.length == 0){
+  if(towns.length == 0 && display_type != 'map'){
     hide_spinner();
     return display_error("Please select a " + geography_param);
   }
