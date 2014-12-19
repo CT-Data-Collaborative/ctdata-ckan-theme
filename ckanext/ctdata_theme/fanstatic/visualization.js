@@ -297,7 +297,7 @@ function display_data(){
     }
   towns = $("input.Town:checked");
   years = $("input.Year:checked");
-  if(towns.length == 0){
+  if(towns.length == 0 && display_type != 'map'){
     hide_spinner();
     return display_error("Please select a town");
   }

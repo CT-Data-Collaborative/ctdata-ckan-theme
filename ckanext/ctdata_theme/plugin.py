@@ -102,11 +102,14 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
 ####### HELPER METHODS ##########
 
-def _link_to_dataset_with_filters(dataset, filters, view = 'table'):
+def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = ''):
     dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
     filters_hash = {}
     filters      = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}),
                                  json.loads(filters))
+
+    if location != '':
+        filters_hash['Town'] = [location]
 
     link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
     link         = "/visualization/" + str(dataset_url) + link_params
