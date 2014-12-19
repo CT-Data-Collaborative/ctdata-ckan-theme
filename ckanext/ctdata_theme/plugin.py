@@ -165,6 +165,8 @@ class CTDataController(base.BaseController):
         try:
             dataset = DatasetService.get_dataset(dataset_name)
             dataset_meta = DatasetService.get_dataset_meta(dataset_name)
+            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
+            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
         except toolkit.ObjectNotFound:
             abort(404)
 
@@ -189,7 +191,7 @@ class CTDataController(base.BaseController):
             default_filters = defaults
         else:
             try:
-                ind_filters['Town'] = defaults['Town']
+                ind_filters[geography_param] = defaults[geography_param]
                 default_filters = ind_filters
             except TypeError:
                 default_filters = ind_filters
@@ -220,7 +222,8 @@ class CTDataController(base.BaseController):
                                                              'metadata': metadata,
                                                              'disabled': disabled,
                                                              'default_filters': default_filters,
-                                                             'headline_indicators': headline_indicators})
+                                                             'headline_indicators': headline_indicators,
+                                                             'geography_param': geography_param})
 
 
     def get_vizualization_data(self, dataset_name):
@@ -243,6 +246,8 @@ class CTDataController(base.BaseController):
 
         try:
             dataset = DatasetService.get_dataset(dataset_name)
+            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
+            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
         except toolkit.ObjectNotFound:
             abort(404)
 
@@ -251,7 +256,7 @@ class CTDataController(base.BaseController):
 
         data = view.get_data(request_filters)
         if omit_single_values:
-            data = self._hide_dims_with_one_value(data)
+            data = self._hide_dims_with_one_value(data, geography_param)
 
 
         data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
@@ -259,7 +264,7 @@ class CTDataController(base.BaseController):
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps(data)
 
-    def _hide_dims_with_one_value(self, data):
+    def _hide_dims_with_one_value(self, data, geography_param):
         size         = len(data['data'])
         try:
             keys         = data['data'][size-1]['dims'].keys()
@@ -272,7 +277,7 @@ class CTDataController(base.BaseController):
             for item in data['data']:
                 try:
                     for key in keys:
-                        if item['dims'][key] == initial_data[key] and key != 'Town':
+                        if item['dims'][key] == initial_data[key] and key != geography_param:
                             counters[key] += 1
                 except KeyError:
                     size -= 1

@@ -3,7 +3,8 @@ var display_type  =  (location.search.split('v=')[1]||'').split('&')[0] || "tabl
     chart_filters = [],
     dataset_id    = $("#dataset_id").val(),
     create_popup  = $("#create_indicator_popup"),
-    edit_popup    = $("#edit_indicators_popup");
+    edit_popup    = $("#edit_indicators_popup"),
+    checkboxes_except_town = $("input[type='checkbox']:not(." + geography_param + ")")
     SUPPRESSED_VALUE = -9999;
 
 window.ids_to_remove = [];
@@ -138,7 +139,7 @@ function check_defaults(){
         $input.prop('checked', true);
       });
     } else {
-        $input = $("input[class*="+i.replace(/ /g, '')+"]"+"[value='"+defaults[i]+"']");
+        $input = $("input[class*="+i.replace(/ /g, '')+"]"+'[value="' +defaults[i] + '"]');
         $input.prop('checked', true);
     }
     });
@@ -243,17 +244,17 @@ function set_chart_checkbox(){
 
 //If showing map, only allow one of each filter to be checked at a time
 function set_map_checkbox(){
-  $("input[type='checkbox']:not(.Town)").click(function(){
+  checkboxes_except_town.click(function(){
     var val = $(this).prop('checked');
     $(this).parent().parent().find("input[type='checkbox']").prop('checked', false);
     $(this).prop('checked', val);
     display_data();
   });
-  $("input[type='checkbox']:not(.Town)").unbind("change");
+  checkboxes_except_town.unbind("change");
   //Uncheck all but the first checked for each filter
   filter_lists = $('.filter');
   $.each(filter_lists, function(i){
-    $(filter_lists[i]).find("input:checked:not(.Town, .Year)").slice(1).prop('checked', false);
+    $(filter_lists[i]).find("input:checked:not(." + geography_param+ ", .Year)").slice(1).prop('checked', false);
   });
 
   //Check most recent year
@@ -269,8 +270,8 @@ function set_map_checkbox(){
 
 //When not showing map, allow multiple filters to be checked
 function reset_checkbox(){
-  $("input[type='checkbox']:not(.Town)").unbind("click");
-  $('input[type="checkbox"]:not(.Town)').change(function(){
+  checkboxes_except_town.unbind("click");
+  checkboxes_except_town.change(function(){
       display_data();
   });
 }
@@ -294,11 +295,12 @@ function display_data(){
       display_error("This visualization is disabled for this dataset")
       return 0;
     }
-  towns = $("input.Town:checked");
+  towns = $("input." + geography_param + ":checked");
+  towns = $("input.Region:checked");
   years = $("input.Year:checked");
   if(towns.length == 0){
     hide_spinner();
-    return display_error("Please select a town");
+    return display_error("Please select a " + geography_param);
   }
   else if (years.length == 0){
     hide_spinner();
@@ -392,7 +394,7 @@ function draw_table(){
      $.each(data['data'], function(d){
         $.each(all_dims, function(dim_name){
           if(data['data'][d]['dims']){
-          if((data['data'][d]['dims'][dim_name] != "NA" && data['data'][d]['dims'][dim_name] != "All" && dim_name != "Town")){
+          if((data['data'][d]['dims'][dim_name] != "NA" && data['data'][d]['dims'][dim_name] != "All" && dim_name != geography_param)){
             selected_dims[dim_name] = all_dims[dim_name];
           }
           }
@@ -421,7 +423,7 @@ function draw_table(){
         $.each(data['data'], function(row_index){
           if (!data['data'][row_index]['dims']) return "No data for this row";
           col_num = 2;
-          html += "<tr>"+ "<td class='col-1'>"+data['data'][row_index]['dims']['Town']+"</td>";
+          html += "<tr>"+ "<td class='col-1'>"+data['data'][row_index]['dims'][geography_param]+"</td>";
           $.each(selected_dims, function(dim_name){
                html += "<td class='col-"+col_num+"'>"+data['data'][row_index]['dims'][dim_name]+"</td>";
                col_num++;
@@ -544,9 +546,9 @@ function draw_chart(){
           cur_legend_series['data'] = cur_series_data;
 
           delete cur_series_dims['Measure Type'];
-          name = "<div id='legendTown'>"+ cur_series_dims['Town'] + "<div id='legendDims'>";
+          name = "<div id='legendTown'>"+ cur_series_dims[geography_param] + "<div id='legendDims'>";
           town_name = name
-          delete cur_series_dims['Town'];
+          delete cur_series_dims[geography_param];
           var first_flag = 0;
           town = cur_series_dims
           $.each(cur_series_dims, function(dim_index){
@@ -642,7 +644,7 @@ function display_filters(){
   filters = get_filters();
   filter_text = "";
   $.each(filters, function(i){
-    if (filters[i]['field'] == "Town") return "Skip town";
+    if (filters[i]['field'] == geography_param) return "Skip town";
     filter_text += filters[i]['field']+": "+filters[i]['values'] + " | ";
   });
   filter_text = filter_text.replace('Select AllDeselect All', '').substring(0, filter_text.length - 2);
@@ -666,7 +668,7 @@ $(function () {
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         $('#default.head_ind_link').prop('selected', true)
-        if ($(this).attr('name') == 'Town'){
+        if ($(this).attr('name') == geography_param){
           $li = $(this).closest('li')
           $li.prependTo($li.closest('ul'));
         }
@@ -684,7 +686,7 @@ $(function () {
     $('.tooltip_a').tooltip();
 
     var towns_names = []
-    $.map( $('li', $('#collapseTown')), function(item){
+    $.map( $('li', $('#collapse' + geography_param)), function(item){
       towns_names.push( $(item).attr('id'))
     });
 
@@ -703,7 +705,7 @@ $(function () {
     });
 
     // move checked checkboxes to the top of their lists
-    $.each( $("input:checked", $('div#collapseTown')), function(i, item){
+    $.each( $("input:checked", $('div#collapse' + geography_param)), function(i, item){
       $li = $(item).closest('li');
       $li.prependTo($li.closest('ul'));
     });

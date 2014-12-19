@@ -232,6 +232,12 @@
 var defaults = [];
 var disabled = [];
 var units = {};
+var geaography_param = 'Town'
+
+{% if geography_param %}
+geography_param = '{{geography_param | safe}}'
+{% endif %}
+
 {% if units %}
 units = {{units | safe}}
 {% endif %}

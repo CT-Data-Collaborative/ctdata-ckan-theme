@@ -13,7 +13,7 @@ filters = get_filters();
 //Remove town filter, since for a map we want all of them
 var town_index = -1;
 $.each(filters, function(i){
-  if(filters[i]['field'] == "Town")
+  if(filters[i]['field'] == geography_param)
     town_index = i
 });
 if (town_index >= 0)
@@ -87,7 +87,7 @@ $.getJSON('/common/map.json', function (geojson) {
 var legend_html = "<div>" ,
     cur_filters = get_filters();
 $.each(cur_filters, function(i){
-  if (cur_filters[i].field == 'Town') return "Skip this filter";
+  if (cur_filters[i].field == geography_param) return "Skip this filter";
   legend_html += cur_filters[i].field + ": " + cur_filters[i].values + " | ";
 });
 
