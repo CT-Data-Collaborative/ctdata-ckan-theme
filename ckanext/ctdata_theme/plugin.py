@@ -161,7 +161,6 @@ class CTDataController(base.BaseController):
         if ind_filters:
             ind_filters =  json.dumps(json.loads(ind_filters))
 
-
         try:
             dataset = DatasetService.get_dataset(dataset_name)
             dataset_meta = DatasetService.get_dataset_meta(dataset_name)

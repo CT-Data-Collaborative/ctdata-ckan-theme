@@ -135,11 +135,12 @@ function check_defaults(){
 
     if(defaults[i] instanceof Array){
       $.each(defaults[i], function(j){
+
         $input = $("input[class*="+i.replace(/ /g, '')+"]"+'[value="'+defaults[i][j]+'"]');
         $input.prop('checked', true);
       });
     } else {
-        $input = $("input[class*="+i.replace(/ /g, '')+"]"+'[value="' +defaults[i] + '"]');
+        $input = $("input[class*="+i.replace(/ /g, '')+"]"+'[value="'+defaults[i]+'"]');
         $input.prop('checked', true);
     }
     });
