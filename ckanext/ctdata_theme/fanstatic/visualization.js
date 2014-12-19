@@ -444,8 +444,10 @@ function draw_table(){
               if (type != undefined)
                 cur_value = unit_for_value(cur_value, type)
               else{
-                checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
-                cur_value = unit_for_value(cur_value, checked_measure);
+
+                checked_measure = $('input:checked', $('#collapseMeasureType'))[0]
+                if (checked_measure != undefined)
+                  cur_value = unit_for_value(cur_value, checked_measure.value);
               }
 
 
@@ -491,11 +493,15 @@ function unit_for_value(value, type){
     return value
 
   if ( units[type] != undefined){
-    if (units[type] == '$')
+    if (units[type] == '$'){
       return '$' + value.toString()
-    else
+    }
+    else{
       return value.toString() + units[type]
-
+    }
+  }
+  else{
+    return value
   }
 }
 
