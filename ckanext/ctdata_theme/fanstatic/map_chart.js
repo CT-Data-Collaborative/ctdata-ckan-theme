@@ -25,6 +25,8 @@ $.ajax({type: "POST",
                               filters: filters
                              }),
         contentType: 'application/json; charset=utf-8'}).done(function(    data) {
+
+change_page_url(data['link']);
 handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
@@ -48,12 +50,14 @@ $.each(data.data, function(i){
 
 //Split data into classes for discrete map coloring
 var cur_mt = $(".MeasureType:checked").first().val(),
-    cur_mt_is_number  = (cur_mt == "number" && cur_mt == "Number"),
+    cur_mt_is_number  = (cur_mt == "number" || cur_mt == "Number"),
     cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent"),
     numClasses        = 8,
     range             = max-min,
     step              = Math.ceil(range/numClasses),
-    dataClasses       = [];
+    dataClasses       = [],
+    colors            = ['rgb(239,239,255)', 'rgb(171,187,216)', 'rgb(137,161,196)', 'rgb(102,134,176)',
+                         'rgb(68,108,156)', 'rgb(34,82,137)', 'rgb(0,56,117)'];
 
 // Data Class for Supressed data
 if (asterisks_counter > 0) dataClasses.push({name: 'Suppressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
@@ -62,15 +66,15 @@ for(i = 0; i < numClasses; i++){
   to   = Math.floor(min+(step*(i+1)))
   from = Math.floor(min+(step*i))
 
-  if (cur_mt_is_number){
-    if (to.toString().length > 3 && i != 7)   to = Math.floor(to/100)*100;
-    if (from.toString().length > 3) from = Math.floor(from/100)*100;
+  if (cur_mt_is_number ){
+    if (to > 80  && i != 7)  to = Math.round(to/10)*10;
+    if (from > 80) from = Math.round(from/10)*10;
   }
 
   if (to > 100 && cur_mt_is_percent)
     to = 100
   dataClasses.push({name: unit_for_value(from, cur_mt) + ' - ' + unit_for_value(to, cur_mt),
-                    from: from, to:  to });
+                    from: from, to: to, color: colors[i] });
 }
 
 if(dataClasses[dataClasses.length-1]['to'] < max+1 && cur_mt_is_number)
@@ -100,17 +104,17 @@ if (data['years'] !== undefined)
 
 sortedDataClasses = dataClasses
 
-// // sort DataClasses to show in normal order
-//   swap(sortedDataClasses,1,2)
-//   swap(sortedDataClasses,1,4)
-//   swap(sortedDataClasses,3,6)
-// if (sortedDataClasses.length == 8){
-//   swap(sortedDataClasses,5,3)
-// } else{
-//   swap(sortedDataClasses,1,8)
-//   swap(sortedDataClasses,5,1)
-//   swap(sortedDataClasses,5,7)
-// }
+// sort DataClasses to show in normal order
+  swap(sortedDataClasses,1,2)
+  swap(sortedDataClasses,1,4)
+  swap(sortedDataClasses,3,6)
+if (sortedDataClasses.length == 8){
+  swap(sortedDataClasses,5,3)
+} else{
+  swap(sortedDataClasses,1,8)
+  swap(sortedDataClasses,5,1)
+  swap(sortedDataClasses,5,7)
+}
 
 // Initiate the chart
 chart = new Highcharts.Chart({
