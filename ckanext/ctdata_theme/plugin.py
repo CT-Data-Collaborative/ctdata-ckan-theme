@@ -111,6 +111,7 @@ def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = '
 
     if location != '':
         filters_hash['Town'] = [location]
+
     link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
     link         = "/visualization/" + str(dataset_url) + link_params
 
