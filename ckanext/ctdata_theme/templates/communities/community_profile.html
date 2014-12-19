@@ -43,7 +43,7 @@
         </thead>
         <tbody>
             {% for indicator in indicators %}
-                {% snippet 'communities/snippets/indicators_table_tr.html', indicator=indicator %}
+                {% snippet 'communities/snippets/indicators_table_tr.html', indicator=indicator, location=location %}
             {% endfor %}
         </tbody>
     </table>
