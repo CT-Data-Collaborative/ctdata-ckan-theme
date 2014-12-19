@@ -102,9 +102,10 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
 ####### HELPER METHODS ##########
 
-def _link_to_dataset_with_filters(dataset, filters, view = 'table'):
+def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = 'Connecticut'):
     dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
     filters_hash = {}
+
     filters      = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}),
                                  json.loads(filters))
 
@@ -190,7 +191,8 @@ class CTDataController(base.BaseController):
             default_filters = defaults
         else:
             try:
-                ind_filters[geography_param] = defaults[geography_param]
+                if len(defaults) > 0:
+                    ind_filters[geography_param] = defaults[geography_param]
                 default_filters = ind_filters
             except TypeError:
                 default_filters = ind_filters

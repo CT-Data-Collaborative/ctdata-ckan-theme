@@ -5,7 +5,7 @@
             <span class="text-warning temp">*</span>
         {% endif %}
 
-        <a href="{{ h.link_to_dataset_with_filters(indicator['dataset'], indicator['indicator'].filters) }}">
+        <a href="{{ h.link_to_dataset_with_filters(indicator['dataset'], indicator['indicator'].filters,'table',location) }}">
             {{indicator['dataset']}}, {{indicator['indicator'].variable}}
         </a>
         <span>

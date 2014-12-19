@@ -297,10 +297,10 @@ function display_data(){
       return 0;
     }
   towns = $("input." + geography_param + ":checked");
-  towns = $("input.Region:checked");
   years = $("input.Year:checked");
   if(towns.length == 0 && display_type != 'map'){
     hide_spinner();
+    console.log('here')
     return display_error("Please select a " + geography_param);
   }
   else if (years.length == 0){
