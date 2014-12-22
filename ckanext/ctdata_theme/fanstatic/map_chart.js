@@ -50,11 +50,11 @@ $.each(data.data, function(i){
 
 //Split data into classes for discrete map coloring
 var cur_mt = $(".MeasureType:checked").first().val(),
-    cur_mt_is_number  = (cur_mt == "number" || cur_mt == "Number"),
+    cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number" ),
     cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent"),
     numClasses        = 8,
     range             = max-min,
-    step              = Math.ceil(range/numClasses),
+    step              = (Math.round(Math.ceil((range)/numClasses)/10))*10,
     dataClasses       = [],
     colors            = ['rgb(239,239,255)', 'rgb(171,187,216)', 'rgb(137,161,196)', 'rgb(102,134,176)',
                          'rgb(68,108,156)', 'rgb(34,82,137)', 'rgb(0,56,117)'];
@@ -68,6 +68,7 @@ for(i = 0; i < numClasses; i++){
 
   if (cur_mt_is_number ){
     if (to > 80  && i != 7)  to = Math.round(to/10)*10;
+    if (i == 7) to = max;
     if (from > 80) from = Math.round(from/10)*10;
   }
 
