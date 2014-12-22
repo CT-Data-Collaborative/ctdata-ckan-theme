@@ -161,9 +161,14 @@ class CTDataController(base.BaseController):
 
     def visualization(self, dataset_name):
 
-        ind_filters =  http_request.GET.get('f')
-        if ind_filters:
-            ind_filters =  json.dumps(json.loads(ind_filters))
+
+        ind_filters = http_request.GET.get('f')
+
+        try:
+            if ind_filters:
+                ind_filters =  json.dumps(json.loads(ind_filters))
+        except ValueError:
+            ind_filters = None
 
         try:
             dataset = DatasetService.get_dataset(dataset_name)
