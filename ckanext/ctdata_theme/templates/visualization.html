@@ -46,7 +46,7 @@
   <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
   <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
     <span>
-      {% if dimension.name == 'Town' %}
+      {% if dimension.name == geography_param %}
         <a href="javascript:void(0);" class="select-all">Select All</a>
         <a href="javascript:void(0);" class="deselect-all">Deselect All</a>
 
@@ -232,6 +232,12 @@
 var defaults = [];
 var disabled = [];
 var units = {};
+var geaography_param = 'Town'
+
+{% if geography_param %}
+geography_param = '{{geography_param | safe}}'
+{% endif %}
+
 {% if units %}
 units = {{units | safe}}
 {% endif %}

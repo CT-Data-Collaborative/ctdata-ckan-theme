@@ -1,5 +1,7 @@
 from ..utils import OrderedSet, dict_with_key_value
-
+from IPython import embed
+from ..visualization.services import DatasetService
+import yaml
 
 class QueryBuilder(object):
     """
@@ -129,7 +131,9 @@ class MapQueryBuilder(QueryBuilder):
       return table_columns
 
     def get_order_by(self, filters):
-        return ['Town']
+        geography = filter(lambda x: x['key'] == 'Geography', self.dataset.ckan_meta['extras'])
+        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+        return [geography_param]
 
 
 class ProfileQueryBuilder(QueryBuilder):
@@ -137,7 +141,11 @@ class ProfileQueryBuilder(QueryBuilder):
         return ['Town', 'Year']
 
     def get_columns(self, filters):
-        return ['Town', 'Year', 'Measure Type', 'Value']
+        geography = filter(lambda x: x['key'] == 'Geography', self.dataset.ckan_meta['extras'])
+        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
+        return [geography_param, 'Year', 'Measure Type', 'Value']
+
 
 
 class QueryBuilderFactory(object):
@@ -148,7 +156,7 @@ class QueryBuilderFactory(object):
         elif name == 'chart':
             return ChartQueryBuilder(dataset)
         elif name == 'map':
-            return MapQueryBuilder(dataset)        
+            return MapQueryBuilder(dataset)
         elif name == 'default':
             return QueryBuilder(dataset)
         elif name == 'profile':
