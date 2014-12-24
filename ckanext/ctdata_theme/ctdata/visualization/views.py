@@ -4,6 +4,7 @@ from ckanext.ctdata_theme.ctdata.utils import dict_with_key_value
 from sets import Set
 from ckanext.ctdata_theme.ctdata.database import Database
 from IPython import embed
+import psycopg2
 
 class View(object):
     """
@@ -32,18 +33,22 @@ class View(object):
 
     def get_data(self, filters):
         query, values = self.query_builder.get_query(filters)
+        result = {}
+        try:
+            conn = self.database.connect()
+            if conn:
+                curs = conn.cursor()
+                curs.execute(query, values)
 
-        conn = self.database.connect()
-        if conn:
-            curs = conn.cursor()
-            curs.execute(query, values)
+                cols = self.query_builder.get_columns(filters)
+                rows = curs.fetchall()
 
-            cols = self.query_builder.get_columns(filters)
-            rows = curs.fetchall()
+                result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
 
-            result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
+                conn.commit()
+        except psycopg2.ProgrammingError:
+            result['data'] = []
 
-            conn.commit()
         return  result
 
     def get_compatibles(self, filters):
@@ -350,9 +355,8 @@ class MapView(View):
         geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
 
         for row in data:
-            result['data'].append({'code': row[geography_param], 'value': float(row['Value'])})
+            result['data'].append({'code': row[geography_param], 'value': float(row['Value']), 'fips': '0' + str(row['FIPS'])})
 
-        # embed()
         result['compatibles'] = self.get_compatibles(filters)
         return result
 

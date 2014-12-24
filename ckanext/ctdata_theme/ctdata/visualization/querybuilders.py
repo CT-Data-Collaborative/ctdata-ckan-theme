@@ -128,6 +128,12 @@ class MapQueryBuilder(QueryBuilder):
     def get_columns(self, filters):
       table_columns = map( lambda (x): x.name, self.dataset.dimensions)
       table_columns.append('Value')
+
+      geography = filter(lambda x: x['key'] == 'Geography', self.dataset.ckan_meta['extras'])
+      geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
+      if geography_param != 'Town':
+        table_columns.append('FIPS')
       return table_columns
 
     def get_order_by(self, filters):

@@ -199,8 +199,8 @@ class CTDataController(base.BaseController):
             default_filters = defaults
         else:
             try:
-                if len(defaults) > 0:
-                    ind_filters[geography_param] = defaults[geography_param]
+                if len(defaults) > 0 and str(geography_param) in list(defaults.keys()):
+                    ind_filters[str(geography_param)] = defaults[str(geography_param)]
                 default_filters = ind_filters
             except TypeError:
                 default_filters = ind_filters
