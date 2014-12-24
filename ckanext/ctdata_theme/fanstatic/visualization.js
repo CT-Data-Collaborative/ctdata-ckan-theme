@@ -581,6 +581,7 @@ function draw_chart(){
           yAxisLabel += ' (' + units[type] + ')'
 
         hide_spinner();
+
         $('#container').highcharts({
             chart: {
               type: display_type

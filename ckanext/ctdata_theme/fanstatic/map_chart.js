@@ -24,14 +24,21 @@ $.ajax({type: "POST",
         data: JSON.stringify({view: 'map',
                               filters: filters
                              }),
-        contentType: 'application/json; charset=utf-8'}).done(function(    data) {
+        contentType: 'application/json; charset=utf-8'}).done(function(data) {
+
+
+if (data.data.length == 0){
+  console.log('here')
+  hide_spinner()
+  return display_error('Map view is not available')
+}
 
 change_page_url(data['link']);
 handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
 var asterisks_counter = 0;
-// debugger
+
 $.each(data.data, function(i){
   if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
@@ -118,6 +125,12 @@ if (sortedDataClasses.length == 8){
 }
 
 // Initiate the chart
+
+var join_by = ['NAME', 'code'];
+if (geography_param != 'Town')
+  join_by = ['GEOID', 'fips'];
+
+
 chart = new Highcharts.Chart({
   chart: {
     renderTo: 'container',
@@ -195,9 +208,8 @@ chart = new Highcharts.Chart({
       if (this.point.value == '*'){
         value = 'Suppressed'
       }
-
       return '<b>' + this.series.name + '</b><br>' +
-             this.point.name + '<br>' +
+             this.point.code + '<br>' +
              'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
     }
   },
@@ -207,7 +219,7 @@ chart = new Highcharts.Chart({
     mapData: geojson,
     borderColor: '#666666',
     name: series_name,
-    joinBy: ['NAME', 'code'],
+    joinBy: join_by,
     states: {
       hover: {
         color: 'highlight',
