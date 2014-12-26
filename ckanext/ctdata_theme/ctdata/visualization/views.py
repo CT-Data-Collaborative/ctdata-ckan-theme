@@ -354,8 +354,14 @@ class MapView(View):
         geography       = filter(lambda x: x['key'] == 'Geography', self.query_builder.dataset.ckan_meta['extras'])
         geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
 
+
+
         for row in data:
-            result['data'].append({'code': row[geography_param], 'value': float(row['Value']), 'fips': '0' + str(row['FIPS'])})
+            if 'FIPS' in list(row.keys()):
+                fips = '0' + str(row['FIPS'])
+            else:
+                fips = ''
+            result['data'].append({'code': row[geography_param], 'value': float(row['Value']), 'fips': fips})
 
         result['compatibles'] = self.get_compatibles(filters)
         return result

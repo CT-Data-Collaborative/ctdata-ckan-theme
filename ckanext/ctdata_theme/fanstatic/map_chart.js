@@ -61,10 +61,16 @@ var cur_mt = $(".MeasureType:checked").first().val(),
     cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent"),
     numClasses        = 8,
     range             = max-min,
-    step              = (Math.round(Math.ceil((range)/numClasses)/10))*10,
+    step              = 0,
     dataClasses       = [],
     colors            = ['rgb(239,239,255)', 'rgb(171,187,216)', 'rgb(137,161,196)', 'rgb(102,134,176)',
-                         'rgb(68,108,156)', 'rgb(34,82,137)', 'rgb(0,56,117)'];
+                         'rgb(68,108,156)', 'rgb(34,82,137)', 'rgb(0,56,117)', 'rgb(1, 35, 73)'];
+
+
+if (!cur_mt_is_percent)
+  step = (Math.round(Math.ceil((range)/numClasses)/10))*10
+else
+  step = Math.ceil(range/numClasses)
 
 // Data Class for Supressed data
 if (asterisks_counter > 0) dataClasses.push({name: 'Suppressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
@@ -73,10 +79,10 @@ for(i = 0; i < numClasses; i++){
   to   = Math.floor(min+(step*(i+1)))
   from = Math.floor(min+(step*i))
 
-  if (cur_mt_is_number ){
-    if (to > 80  && i != 7)  to = Math.round(to/10)*10;
+  if (!cur_mt_is_percent ){
+    if (to > 100  && i != 7)  to = Math.round(to/10)*10;
     if (i == 7) to = max;
-    if (from > 80) from = Math.round(from/10)*10;
+    if (from > 100) from = Math.round(from/10)*10;
   }
 
   if (to > 100 && cur_mt_is_percent)

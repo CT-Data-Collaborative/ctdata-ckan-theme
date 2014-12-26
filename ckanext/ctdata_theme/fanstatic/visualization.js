@@ -144,6 +144,12 @@ function check_defaults(){
         $input.prop('checked', true);
     }
     });
+    if (display_type == 'map'){
+      set_map_checkbox();
+    }else if (display_type == 'column' || display_type == 'line'){
+      reset_checkbox();
+      set_chart_checkbox();
+    }
     display_data();
 }
 
