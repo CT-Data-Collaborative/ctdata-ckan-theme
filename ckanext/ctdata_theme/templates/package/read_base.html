@@ -1,18 +1,20 @@
 {% ckan_extends %}
 
 {% block content_primary_nav %}
-  {#{{ h.build_nav_icon('dataset_read', _('Dataset'), id=pkg.name) }}
+  {{ h.build_nav_icon('dataset_read', _('Dataset'), id=pkg.name) }}
   {{ h.build_nav_icon('dataset_groups', _('Groups'), id=pkg.name) }}
-  {{ h.build_nav_icon('dataset_activity', _('Activity Stream'), id=pkg.name) }}
+  {#{ h.build_nav_icon('dataset_activity', _('Activity Stream'), id=pkg.name) }}
   {{ h.build_nav_icon('related_list', _('Related'), id=pkg.name) }}#}
-<div class="raw_tabs">
+<!-- <div class="raw_tabs">
 <ul>
 <li class="tab1 activated"><a href="{{ h.url_for('dataset_read', id=pkg.name) }}">Datasets</a></li>
 <li class="tab2"><a href="{{ h.url_for('dataset_groups', id=pkg.name) }}">Groups</a></li>
 <li class="tab3"><a href="{{ h.url_for('dataset_activity', id=pkg.name) }}">Activity Stream</a></li>
 <li class="tab4"><a href="{{ h.url_for('related_list', id=pkg.name) }}">Related</a></li>
 </ul>
-</div>
+</div> -->
+
+
 {% endblock %}
 
 {% block secondary_content %}

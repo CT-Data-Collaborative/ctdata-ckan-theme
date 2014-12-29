@@ -415,7 +415,7 @@ label {font-weight: normal; cursor: auto}
   top: 4px;
 }
 
-.raw_tabs li.tab2, .raw_tabs li.tab3, .raw_tabs li.tab4{
+.raw_tabs li.tab3, .raw_tabs li.tab4{
   visibility: hidden;
 }
 
