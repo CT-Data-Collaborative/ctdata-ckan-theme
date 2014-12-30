@@ -21,6 +21,12 @@
     <br>
     <br>
     <br>
+    <p>
+      <i class="icon-info-sign"></i>
+      To add datasets to your group, go to an organization, select a dataset, and click on the Groups tab to add it to the group. Start by clicking the button below.
+      <a href="/dashboard/organizations" class="btn btn-default btn-mini">Click here</a>
+    <p>
+    <br>
     {% snippet 'snippets/search_form.html', type='dataset', query=c.q, sorting=sorting, sorting_selected=c.sort_by_selected, count=c.page.item_count, facets=facets, placeholder=_('Search datasets...'), show_empty=request.params %}
   {% endblock %}
   {% block packages_list %}

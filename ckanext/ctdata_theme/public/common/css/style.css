@@ -466,13 +466,17 @@ label {font-weight: normal; cursor: auto}
 
 
 div.primary{
-  width: 900px;
+  width: 75%;
   float: right;
   margin-top: -20px;
 }
 
+.raw_left aside.secondary{
+  width: 100%;
+}
+
 aside.secondary{
-  width: 300px;
+  width: 25%;
   padding-right: 20px;
   border-right: 1px dotted #dddddd;
 }
