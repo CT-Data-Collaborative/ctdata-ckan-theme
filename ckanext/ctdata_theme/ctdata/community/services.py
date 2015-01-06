@@ -350,16 +350,22 @@ class CommunityProfileService(object):
         for indicator in indicators:
             filters = json.loads(indicator.filters)
             dataset = DatasetService.get_dataset(indicator.dataset_id)
+
+            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
+            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
             qb      = QueryBuilderFactory.get_query_builder('profile', dataset)
             view    = ViewFactory.get_view('profile', qb)
 
-            filters.append({'field': 'Town', 'values': map(lambda t: t.name, towns)})
-            data         = view.get_data(filters)
-            town_ind_ids = map(lambda v: (v.town_id, v.indicator_id), indicator.values)
+            # Indicators logic is depends on Towns, for now we will show only datasets with Town column.
+            if geography_param == 'Town':
+                filters.append({'field': 'Town', 'values': map(lambda t: t.name, towns)})
+                data         = view.get_data(filters)
+                town_ind_ids = map(lambda v: (v.town_id, v.indicator_id), indicator.values)
 
-            for value, town in zip(data['data'], sorted(towns, key=lambda x: x.name)):
-                if not (town.fips, indicator.id) in town_ind_ids:
-                    self.session.add(ProfileIndicatorValue(indicator, town, value['data'][0]))
+                for value, town in zip(data['data'], sorted(towns, key=lambda x: x.name)):
+                    if not (town.fips, indicator.id) in town_ind_ids:
+                        self.session.add(ProfileIndicatorValue(indicator, town, value['data'][0]))
 
     def _add_empty_indicator_values(self,indicators_values, existing_towns):
         towns_inds_hash = map(lambda val: {val.town: val.indicator}, indicators_values)

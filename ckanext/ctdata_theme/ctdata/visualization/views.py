@@ -3,6 +3,8 @@ import datetime
 from ckanext.ctdata_theme.ctdata.utils import dict_with_key_value
 from sets import Set
 from ckanext.ctdata_theme.ctdata.database import Database
+from IPython import embed
+import psycopg2
 
 class View(object):
     """
@@ -31,18 +33,22 @@ class View(object):
 
     def get_data(self, filters):
         query, values = self.query_builder.get_query(filters)
+        result = {}
+        try:
+            conn = self.database.connect()
+            if conn:
+                curs = conn.cursor()
+                curs.execute(query, values)
 
-        conn = self.database.connect()
-        if conn:
-            curs = conn.cursor()
-            curs.execute(query, values)
+                cols = self.query_builder.get_columns(filters)
+                rows = curs.fetchall()
 
-            cols = self.query_builder.get_columns(filters)
-            rows = curs.fetchall()
+                result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
 
-            result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
+                conn.commit()
+        except psycopg2.ProgrammingError:
+            result['data'] = []
 
-            conn.commit()
         return  result
 
     def get_compatibles(self, filters):
@@ -50,10 +56,14 @@ class View(object):
 
       conn = self.database.connect()
       compatibles = []
-      towns_from_filters = dict_with_key_value('field', 'Town', filters)
+
+      geography       = filter(lambda x: x['key'] == 'Geography', self.query_builder.dataset.ckan_meta['extras'])
+      geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
+      towns_from_filters = dict_with_key_value('field', geography_param, filters)
       if towns_from_filters and towns_from_filters['values'][0] == 'all':
         for f in filters:
-          if f['field'] == 'Town':
+          if f['field'] == geography_param:
             pass
             filters.remove(f)
       if conn:
@@ -86,6 +96,9 @@ class TableView(View):
         result['multifield'] = multifield
         result['data'] = []
 
+        geography       = filter(lambda x: x['key'] == 'Geography', self.query_builder.dataset.ckan_meta['extras'])
+        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
         cur_row_multifield = None
         last_town = None
         last_mf = None  # last multifield
@@ -106,7 +119,7 @@ class TableView(View):
               continue
             if not 'Variable' in row:
               row['Variable'] = None
-            if row['Town'] != last_town:
+            if row[geography_param] != last_town:
                 current_mt = {'measure_type': row['Measure Type'], 'variable': row['Variable'], 'data': []}
                 last_mt = row['Measure Type']
                 last_var = row['Variable']
@@ -114,8 +127,8 @@ class TableView(View):
                 current_mf = {'value': str(cur_row_multifield), 'data': [current_mt]}
                 last_mf = cur_row_multifield
 
-                current_town = {'town': row['Town'], 'multifield': [current_mf]}
-                last_town = row['Town']
+                current_town = {geography_param: row[geography_param], 'multifield': [current_mf]}
+                last_town = row[geography_param]
 
                 result['data'].append(current_town)
 
@@ -148,7 +161,10 @@ class ChartView(View):
         result = super(ChartView, self).convert_data(data, filters)
         result['data'] = []
 
-        towns_from_filters = dict_with_key_value('field', 'Town', filters)['values']
+        geography       = filter(lambda x: x['key'] == 'Geography', self.query_builder.dataset.ckan_meta['extras'])
+        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
+        towns_from_filters = dict_with_key_value('field', geography_param, filters)['values']
         years_fltrs = dict_with_key_value('field', 'Year', filters)
         years_from_filters = years_fltrs.get('values') if years_fltrs else None
         sorted_towns = sorted(towns_from_filters)
@@ -176,7 +192,7 @@ class ChartView(View):
                         result['data'][-1]['data'].append(None)
                         check_year += 1
                 # if some of the towns was skipped, append None values for them in the result
-                while check_town < len(sorted_towns) and row['Town'] != sorted_towns[check_town]:
+                while check_town < len(sorted_towns) and row[geography_param] != sorted_towns[check_town]:
                     result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(sorted_years)})
                     check_town += 1
                 current_town = {'dims': {k: str(v) for k, v in next_row_dims.items()},
@@ -296,11 +312,14 @@ class MapView(View):
       cols = self.query_builder.get_columns(filters)
 
       conn = self.database.connect()
+      geography       = filter(lambda x: x['key'] == 'Geography', self.query_builder.dataset.ckan_meta['extras'])
+      geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
       compatibles = []
-      towns_from_filters = dict_with_key_value('field', 'Town', filters)
+      towns_from_filters = dict_with_key_value('field', geography_param, filters)
       if towns_from_filters and towns_from_filters['values'][0] == 'all':
         for f in filters:
-          if f['field'] == 'Town':
+          if f['field'] == geography_param:
             pass
             filters.remove(f)
       if conn:
@@ -314,7 +333,7 @@ class MapView(View):
               filter_string = '"%s" in (%s)' % (column_name, ','.join(['%s'] * len(values)))
               processed_filters.append(filter_string)
               filters_values = filters_values + values
-          processed_filters.append('"Town" not in (%s)')
+          processed_filters.append('"' + geography_param + '" not in (%s)')
           filters_values = filters_values + ['Connecticut']
           filters_string = ' and '.join(processed_filters)
           if filters_string:
@@ -332,8 +351,18 @@ class MapView(View):
         result = super(MapView, self).convert_data(data, filters)
         result['data'] = []
 
+        geography       = filter(lambda x: x['key'] == 'Geography', self.query_builder.dataset.ckan_meta['extras'])
+        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
+
+
         for row in data:
-            result['data'].append({'code': row['Town'], 'value': float(row['Value'])})
+            if 'FIPS' in list(row.keys()):
+                fips = '0' + str(row['FIPS'])
+            else:
+                fips = ''
+            result['data'].append({'code': row[geography_param], 'value': float(row['Value']), 'fips': fips})
+
         result['compatibles'] = self.get_compatibles(filters)
         return result
 

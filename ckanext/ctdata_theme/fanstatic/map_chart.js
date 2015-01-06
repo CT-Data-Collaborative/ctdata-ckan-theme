@@ -13,7 +13,7 @@ filters = get_filters();
 //Remove town filter, since for a map we want all of them
 var town_index = -1;
 $.each(filters, function(i){
-  if(filters[i]['field'] == "Town")
+  if(filters[i]['field'] == geography_param)
     town_index = i
 });
 if (town_index >= 0)
@@ -24,14 +24,21 @@ $.ajax({type: "POST",
         data: JSON.stringify({view: 'map',
                               filters: filters
                              }),
-        contentType: 'application/json; charset=utf-8'}).done(function(    data) {
+        contentType: 'application/json; charset=utf-8'}).done(function(data) {
+
+
+if (data.data.length == 0){
+  console.log('here')
+  hide_spinner()
+  return display_error('Map view is not available')
+}
 
 change_page_url(data['link']);
 handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
 var asterisks_counter = 0;
-// debugger
+
 $.each(data.data, function(i){
   if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
@@ -50,14 +57,20 @@ $.each(data.data, function(i){
 
 //Split data into classes for discrete map coloring
 var cur_mt = $(".MeasureType:checked").first().val(),
-    cur_mt_is_number  = (cur_mt == "number" || cur_mt == "Number"),
+    cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number" ),
     cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent"),
     numClasses        = 8,
     range             = max-min,
-    step              = Math.ceil(range/numClasses),
+    step              = 0,
     dataClasses       = [],
     colors            = ['rgb(239,239,255)', 'rgb(171,187,216)', 'rgb(137,161,196)', 'rgb(102,134,176)',
-                         'rgb(68,108,156)', 'rgb(34,82,137)', 'rgb(0,56,117)'];
+                         'rgb(68,108,156)', 'rgb(34,82,137)', 'rgb(0,56,117)', 'rgb(1, 35, 73)'];
+
+
+if (!cur_mt_is_percent)
+  step = (Math.round(Math.ceil((range)/numClasses)/10))*10
+else
+  step = Math.ceil(range/numClasses)
 
 // Data Class for Supressed data
 if (asterisks_counter > 0) dataClasses.push({name: 'Suppressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
@@ -66,9 +79,10 @@ for(i = 0; i < numClasses; i++){
   to   = Math.floor(min+(step*(i+1)))
   from = Math.floor(min+(step*i))
 
-  if (cur_mt_is_number ){
-    if (to > 80  && i != 7)  to = Math.round(to/10)*10;
-    if (from > 80) from = Math.round(from/10)*10;
+  if (!cur_mt_is_percent ){
+    if (to > 100  && i != 7)  to = Math.round(to/10)*10;
+    if (i == 7) to = max;
+    if (from > 100) from = Math.round(from/10)*10;
   }
 
   if (to > 100 && cur_mt_is_percent)
@@ -86,7 +100,7 @@ $.getJSON('/common/map.json', function (geojson) {
 var legend_html = "<div>" ,
     cur_filters = get_filters();
 $.each(cur_filters, function(i){
-  if (cur_filters[i].field == 'Town') return "Skip this filter";
+  if (cur_filters[i].field == geography_param) return "Skip this filter";
   legend_html += cur_filters[i].field + ": " + cur_filters[i].values + " | ";
 });
 
@@ -117,6 +131,12 @@ if (sortedDataClasses.length == 8){
 }
 
 // Initiate the chart
+
+var join_by = ['NAME', 'code'];
+if (geography_param != 'Town')
+  join_by = ['GEOID', 'fips'];
+
+
 chart = new Highcharts.Chart({
   chart: {
     renderTo: 'container',
@@ -194,9 +214,8 @@ chart = new Highcharts.Chart({
       if (this.point.value == '*'){
         value = 'Suppressed'
       }
-
       return '<b>' + this.series.name + '</b><br>' +
-             this.point.name + '<br>' +
+             this.point.code + '<br>' +
              'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
     }
   },
@@ -206,7 +225,7 @@ chart = new Highcharts.Chart({
     mapData: geojson,
     borderColor: '#666666',
     name: series_name,
-    joinBy: ['NAME', 'code'],
+    joinBy: join_by,
     states: {
       hover: {
         color: 'highlight',

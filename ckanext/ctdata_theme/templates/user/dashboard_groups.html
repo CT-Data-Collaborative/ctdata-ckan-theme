@@ -1,10 +1,13 @@
 {% ckan_extends %}
 
 {% block dashboard_activity_stream_context %}{% endblock %}
-{% block page_name %}Dashboard{% endblock %}
+{% block page_name %}My Groups{% endblock %}
 {% block page_description %}{% endblock %}
 
 {% block page_primary_action %}
+  {% if h.check_access('group_create') %}
+    {% link_for _('Add Group'), controller='group', action='new', class_="btn btn-primary", icon="plus-sign-alt" %}
+  {% endif %}
 {% endblock %}
 
 {% block primary_content_inner %}
@@ -15,9 +18,11 @@
       {% snippet "group/snippets/group_list.html", groups=groups %}
     </div>
   {% else %}
-    <p class="empty text-center">
-      </br>
-      {{ _('Coming soon, the ability to save your work and share it with a group') }}
+    <p class="empty">
+      {{ _('You are not a member of any groups.') }}
+      {% if h.check_access('group_create') %}
+        {% link_for _('Create one now?'), controller='group', action='new' %}
+      {% endif %}
     </p>
   {% endif %}
 {% endblock %}
