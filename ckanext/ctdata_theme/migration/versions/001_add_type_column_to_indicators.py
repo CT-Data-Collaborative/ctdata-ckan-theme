@@ -19,6 +19,6 @@ def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
     table = Table('ctdata_profile_indicators', meta, autoload=True)
 
-    table.c.ind_type.drop()
-    table.c.permission.drop()
+    # table.c.ind_type.drop()
+    # table.c.permission.drop()
 
