@@ -50,12 +50,11 @@ class ProfileIndicator(Base):
     variable   = Column(String)
     filters    = Column(Text)
     name       = Column(String)
-    # headline   = Column(Boolean)
     ind_type   = Column(String)
     temp       = Column(Boolean)
     permission = Column(String)
 
-    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, headline, temp, permission):
+    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, temp, ind_type, permission):
         self.name = name
         self.filters = filters
         self.dataset_id = dataset_id
@@ -63,7 +62,7 @@ class ProfileIndicator(Base):
         self.data_type = data_type
         self.year = year
         self.variable = variable
-        self.headline = headline
+        self.ind_type = ind_type
         self.temp  = temp
         self.permission  = permission
 

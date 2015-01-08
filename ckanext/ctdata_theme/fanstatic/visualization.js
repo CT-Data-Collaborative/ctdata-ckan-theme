@@ -89,16 +89,26 @@ function update_headline_indicators(){
 }
 
 function create_headline_indicator(){
-  $('#create_headline_indicator').on('click', function(){
+  $('.create_headline_indicator').on('click', function(){
     filters = []
     Object.keys(filters_hash).forEach(function (key) {
       filters.push({field: key, values: filters_hash[key]})
     });
 
+    permission = 'public'
+    if ($('input:radio:checked').val() != undefined){
+      permission = $('input:radio:checked').val()
+    }
+
+    $form = $(this).closest('.modal-content').find('form');
+
+    type = $form.find('.indicator_ind_type').val()
+    name = $form.find('.indicator_name').val()
+
     $.ajax({type: "POST",
       url: "/community/add_indicator",
-      data: JSON.stringify({ dataset_id: dataset_id, name: $('#indicator_name').val(),
-                             headline: true, filters: filters}),
+      data: JSON.stringify({ dataset_id: dataset_id, name: name,
+                             ind_type: type, filters: filters, permission: permission }),
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
           window.location.reload();

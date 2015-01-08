@@ -37,7 +37,7 @@ class CommunityProfilesController(base.BaseController):
             filters     = json_body.get('filters')
             dataset_id  = json_body.get('dataset_id')
             name        = json_body.get('name')
-            headline    = json_body.get('headline')
+            ind_type    = json_body.get('ind_type')
             permission  = json_body.get('permission')
 
             http_response.headers['Content-type'] = 'application/json'
@@ -46,7 +46,7 @@ class CommunityProfilesController(base.BaseController):
                 abort(400)
 
             try:
-                self.community_profile_service.create_indicator(name, filters, dataset_id, user, headline, permission)
+                self.community_profile_service.create_indicator(name, filters, dataset_id, user, ind_type, permission)
                 self.session.commit()
                 h.flash_notice('Indicator successfully created.')
                 return json.dumps({'success': True})

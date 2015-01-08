@@ -15,6 +15,8 @@ def upgrade(migrate_engine):
     permission = Column('permission', String, default='public')
     permission.create(table)
 
+    table.c.headline.drop()
+
 def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
     table = Table('ctdata_profile_indicators', meta, autoload=True)

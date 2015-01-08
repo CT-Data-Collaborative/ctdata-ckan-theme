@@ -128,7 +128,7 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
-    def create_indicator(self, name, filters, dataset_id, owner, headline, permission = 'public'):
+    def create_indicator(self, name, filters, dataset_id, owner, ind_type, permission = 'public'):
         # assert owner is not None, "User must be passed in order for indicator creation to work"
 
         dataset = DatasetService.get_dataset(dataset_id)
@@ -168,9 +168,9 @@ class CommunityProfileService(object):
                                              "or have '%Y-%m-%d %H:%M:%S' format")
 
         is_global = False
-        temp      = False if headline else True
+        temp      = False if ind_type == 'headline' or ind_type == 'gallery' else True
         indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
-                                     variable, headline, temp, permission)
+                                     variable, temp, ind_type, permission)
         owner.indicators.append(indicator)
 
         self.session.add(indicator)
@@ -198,7 +198,7 @@ class CommunityProfileService(object):
         assert user is not None, "User must be passed in order for indicator removal to work"
         ind = self.session.query(ProfileIndicator).get(indicator_id)
 
-        if ind and user.is_admin and ind.headline:
+        if ind and user.is_admin and ind_type == 'headline':
             self.session.delete(ind)
             self.remove_indicator_id_from_profiles(ind.id)
 
@@ -222,8 +222,13 @@ class CommunityProfileService(object):
             raise toolkit.ObjectNotFound("Indicator not found")
 
     def get_headline_indicators_for_dataset(self, dataset_id):
-        indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.headline == True,
+        indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.ind_type == 'headline',
                                                                       ProfileIndicator.dataset_id == dataset_id)).all()
+        return indicators
+
+    def get_gallery_indicators_for_user(self, ids):
+        indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.ind_type == 'gallery',
+                                                                      ProfileIndicator.id.in_(ids))).all()
         return indicators
 
     def get_indicators_by_ids(self, ids):
