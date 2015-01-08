@@ -226,9 +226,16 @@ class CommunityProfileService(object):
                                                                       ProfileIndicator.dataset_id == dataset_id)).all()
         return indicators
 
-    def get_gallery_indicators_for_user(self, ids):
-        indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.ind_type == 'gallery',
+    def get_gallery_indicators_for_user(self, user_id, permission = 'all'):
+        ids = self.session.query(UserIndicatorLink.indicator_id).\
+                filter(UserIndicatorLink.user_id == user_id)
+        if permission == 'all':
+            indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.ind_type == 'gallery',
                                                                       ProfileIndicator.id.in_(ids))).all()
+        else:
+            indicators = self.session.query(ProfileIndicator).\
+            filter(and_(ProfileIndicator.ind_type == 'gallery', ProfileIndicator.permission == permission, ProfileIndicator.id.in_(ids))).all()
+
         return indicators
 
     def get_indicators_by_ids(self, ids):

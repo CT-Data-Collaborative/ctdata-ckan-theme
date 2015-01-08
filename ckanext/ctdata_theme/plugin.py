@@ -101,7 +101,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
     def get_helpers(self):
         return {'communities_helper': communities,
-                'link_to_dataset_with_filters': _link_to_dataset_with_filters}
+                'link_to_dataset_with_filters': _link_to_dataset_with_filters,
+                'link_to_indicator': _link_to_indicator}
 
 
 
@@ -116,6 +117,22 @@ def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = '
 
     if location != '':
         filters_hash['Town'] = [location]
+
+    link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
+    link         = "/visualization/" + str(dataset_url) + link_params
+
+    return link
+
+def _link_to_indicator(indicator):
+    view = 'table'
+    location = ''
+    filters_hash = {}
+
+    filters = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}),
+                                 json.loads(indicator.filters))
+
+    dataset = DatasetService.get_dataset_meta(indicator.dataset_id)['title']
+    dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
 
     link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
     link         = "/visualization/" + str(dataset_url) + link_params

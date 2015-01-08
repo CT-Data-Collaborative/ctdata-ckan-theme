@@ -8,7 +8,7 @@ from pylons import session, url
 import ckan.lib.base as base
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
-from ckan.common import response as http_response, request as http_request
+from ckan.common import response as http_response, c, request as http_request
 
 from ..database import Database
 from ..users.services import UserService
@@ -16,6 +16,7 @@ from ..visualization.services import DatasetService
 from ..community.services import CommunityProfileService
 from ..topic.services import TopicSerivce
 from ckan.controllers.user import UserController
+from IPython import embed
 
 class UserController(UserController):
     def __init__(self):
@@ -35,15 +36,21 @@ class UserController(UserController):
         return base.render('user_community_profiles.html', extra_vars={'community_profiles': community_profiles})
 
     def my_gallery(self):
-        user_name = http_request.environ.get("REMOTE_USER")
+        logged_user_name = http_request.environ.get("REMOTE_USER")
+        requested_user_name = http_request.environ.get('wsgiorg.routing_args')[1]['user_id']
+        permission = 'all'
 
-        if not user_name:
+        if not logged_user_name:
             abort(404)
 
-        user = self.user_service.get_or_create_user(user_name) if user_name else None
-        # community_profiles = self.community_profile_service.get_user_profiles(user.ckan_user_id)
+        user = self.user_service.get_or_create_user(requested_user_name) if requested_user_name else None
 
-        return base.render('user/my_gallery.html', extra_vars={})
+        if logged_user_name != requested_user_name:
+            permission = 'public'
+
+        indicators = self.community_profile_service.get_gallery_indicators_for_user(user.ckan_user_id, permission)
+
+        return base.render('user/my_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': requested_user_name})
 
 
     def update_community_profiles(self):
