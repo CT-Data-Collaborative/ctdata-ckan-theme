@@ -9,7 +9,9 @@ import routes.mapper
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.base as base
-from ckan.common import response as http_response, request as http_request
+from ckan.common import response as http_response, c, request as http_request
+import ckan.model as model
+import ckan.logic as logic
 
 from ctdata.database import Database
 from ctdata.visualization.services import DatasetService
@@ -21,6 +23,8 @@ from ctdata.users.services import UserService
 
 from IPython import embed
 
+
+get_action = logic.get_action
 
 def communities():
     db = Database()
@@ -79,6 +83,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
             m.connect('user_community_profiles', '/user/{user_id}/my_community_profiles', action='community_profiles')
+            m.connect('user_gallery', '/user/{user_id}/gallery', action='my_gallery')
             m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
 
         with routes.mapper.SubMapper(
@@ -160,8 +165,6 @@ class CTDataController(base.BaseController):
         return json.dumps({'success': True})
 
     def visualization(self, dataset_name):
-
-
         ind_filters = http_request.GET.get('f')
 
         try:
@@ -225,7 +228,18 @@ class CTDataController(base.BaseController):
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
         headline_indicators = self.community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
-        return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
+
+        # Get list of groups
+        context   = {'model': model, 'session': model.Session,
+                     'user': c.user or c.author, 'for_view': True,
+                     'auth_user_obj': c.userobj, 'use_cache': False}
+        data_dict = {}
+
+        users_groups     = get_action('group_list_authz')(context, data_dict)
+        c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
+        # user_group_ids = set(group['id'] for group in users_groups)
+
+        return base.render('visualization/visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'units':    metadata_units,
                                                              'metadata': metadata,

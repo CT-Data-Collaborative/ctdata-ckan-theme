@@ -34,6 +34,18 @@ class UserController(UserController):
 
         return base.render('user_community_profiles.html', extra_vars={'community_profiles': community_profiles})
 
+    def my_gallery(self):
+        user_name = http_request.environ.get("REMOTE_USER")
+
+        if not user_name:
+            abort(404)
+
+        user = self.user_service.get_or_create_user(user_name) if user_name else None
+        # community_profiles = self.community_profile_service.get_user_profiles(user.ckan_user_id)
+
+        return base.render('user/my_gallery.html', extra_vars={})
+
+
     def update_community_profiles(self):
         user_name    = http_request.environ.get("REMOTE_USER")
 

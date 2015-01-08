@@ -1,0 +1,26 @@
+This is a database migration repository.
+
+More information at
+http://code.google.com/p/sqlalchemy-migrate/
+
+https://sqlalchemy-migrate.readthedocs.org/en/latest/versioning.html#create-a-change-repository
+
+
+
+
+####
+### go to ctdata_theme folder
+### python migration/manage.py version_control postgresql://ckan_default:@localhost/ckan_default
+
+
+### see version
+#   python migration/manage.py version
+
+
+
+python migration/manage.py db_version
+python migration/manage.py script 'add type column to indicators'
+
+# To add new migration script
+
+python migration/manage.py script 'add type column to indicators'

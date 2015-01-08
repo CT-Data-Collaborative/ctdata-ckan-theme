@@ -1,0 +1,55 @@
+{% extends "user/read_base.html" %}
+
+{% block title %}CTData User Gallery {% endblock %}
+{% block page_name %} Gallery {% endblock %}
+{% block page_description %}Created by {{c.userobj.name}}{% endblock %}
+
+
+
+{% block main_content %}
+
+
+<div class="wrapper">
+<!-- {% block breadcrumb_content %}
+  <li><a href="{{ h.url_for(controller='user', action='index') }}">{{ _('Users') }}</a></li>
+  <li><a href="{{ h.url_for(controller='user', action='read', id=c.user_dict.name) }}">{{ c.user_dict.display_name }}</a></li>
+  <li class="active"><a href="#">{{ _('Manage') }}</a></li>
+{% endblock %} -->
+
+<div class="ctdata-wrapper">
+</br></br></br>
+<a href="javascript:void(0)" id="update_user_communities" class="btn pull-right disabled"> Save your Edits </a>
+<span class="help pull-right "> * Click Profile Name to Edit </span>
+
+<!-- <table role="table" class="table">
+  <thead>
+  <th> Default Url</th>
+  <th> Name </th>
+  <th></th>
+  </thead>
+  <tbody>
+    {% for profile in community_profiles%}
+      <tr>
+        <td><a href="{{profile.default_url}}">{{profile.default_url}}</a></td>
+        <td>
+          <input type="text" class="edit_profile_name hidden" id="{{profile.id}}" value="{{profile.name}}"></input>
+          <a href="javascript:void(0)" class="edit_name"> {{profile.name}} </a>
+        </td>
+        <td><a href="javascript:void(0)" class="remove_profile" id="{{profile.id}}"><i class='fa fa-times text-error'></i></a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+ -->
+</div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="/common/css/visualization.css">
+<link rel="stylesheet" type="text/css" href="/common/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="/common/css/tableTools.css">
+
+<!-- {% resource 'ctdata_theme/user_communities.js' %} -->
+
+{% endblock %}
