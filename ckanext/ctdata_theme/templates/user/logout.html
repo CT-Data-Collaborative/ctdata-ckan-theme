@@ -1,0 +1,12 @@
+{% ckan_extends %}
+
+{% block subtitle %}{{ _('Logged Out') }}{% endblock %}
+{% block page_name %}Logged Out{% endblock %}
+
+{% block primary_content %}
+  <section class="module">
+    <div class="module-content">
+      <p class="offset2">{% trans %}You are now logged out.{% endtrans %}</p>
+    </div>
+  </section>
+{% endblock %}
