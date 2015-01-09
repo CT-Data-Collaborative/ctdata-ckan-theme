@@ -4,6 +4,7 @@ var display_type  =  (location.search.split('v=')[1]||'').split('&')[0] || "tabl
     dataset_id    = $("#dataset_id").val(),
     create_popup  = $("#create_indicator_popup"),
     edit_popup    = $("#edit_indicators_popup"),
+    create_for_gallery_popup    = $("#create_gallery_indicator_popup"),
     checkboxes_except_town = $("input[type='checkbox']:not(." + geography_param + ")")
     SUPPRESSED_VALUE = -9999;
 
@@ -14,6 +15,7 @@ edit_popup.modal({show: false});
 $('.close_popup').click(function() {
   create_popup.modal('hide');
   edit_popup.modal('hide');
+  create_for_gallery_popup.modal('hide')
 });
 
 function show_selected_indicator(){
@@ -23,18 +25,22 @@ function show_selected_indicator(){
   }
 }
 
+function show_seleted_filters(){
+  filters_hash = collect_filters_hash();
+  html_text    = "<ul>"
+
+  Object.keys(filters_hash).forEach(function (key) {
+    html_text += "<li><h4>" + key + "</h4><small>" + filters_hash[key].join(', ') + "</small></li>"
+  });
+  html_text += "</ul>"
+  $('.selected_filters').html(
+    html_text
+  );
+}
+
 function show_headline_popup(){
   $('#save_headline_indicator').on('click', function(){
-    filters_hash = collect_filters_hash();
-    html_text    = "<ul>"
-
-    Object.keys(filters_hash).forEach(function (key) {
-      html_text += "<li><h4>" + key + "</h4><small>" + filters_hash[key].join(', ') + "</small></li>"
-    });
-    html_text += "</ul>"
-    $('#selected_filters').html(
-      html_text
-    );
+    show_seleted_filters();
     create_popup.modal('show');
   });
 }
@@ -42,6 +48,14 @@ function show_headline_popup(){
 function show_edit_indicators_popup(){
   $('#edit_headline_indicators').on('click', function(){
     edit_popup.modal('show');
+  });
+}
+
+function show_create_gallery_indicators_popup(){
+
+  $('#save_indicator_to_gallery').on('click', function(){
+    show_seleted_filters();
+    create_for_gallery_popup.modal('show');
   });
 }
 
@@ -75,16 +89,26 @@ function update_headline_indicators(){
 }
 
 function create_headline_indicator(){
-  $('#create_headline_indicator').on('click', function(){
+  $('.create_headline_indicator').on('click', function(){
     filters = []
     Object.keys(filters_hash).forEach(function (key) {
       filters.push({field: key, values: filters_hash[key]})
     });
 
+    permission = 'public'
+    if ($('input:radio:checked').val() != undefined){
+      permission = $('input:radio:checked').val()
+    }
+
+    $form = $(this).closest('.modal-content').find('form');
+
+    type = $form.find('.indicator_ind_type').val()
+    name = $form.find('.indicator_name').val()
+
     $.ajax({type: "POST",
       url: "/community/add_indicator",
-      data: JSON.stringify({ dataset_id: dataset_id, name: $('#indicator_name').val(),
-                             headline: true, filters: filters}),
+      data: JSON.stringify({ dataset_id: dataset_id, name: name,
+                             ind_type: type, filters: filters, permission: permission }),
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
           window.location.reload();
@@ -676,9 +700,11 @@ $(function () {
     check_defaults();
     show_headline_popup();
     show_edit_indicators_popup();
+    show_create_gallery_indicators_popup();
     add_ind_id_to_removing_list();
     update_headline_indicators();
     show_selected_indicator();
+
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"]').change(function(){
         $('#default.head_ind_link').prop('selected', true)

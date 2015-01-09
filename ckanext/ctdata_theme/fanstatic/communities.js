@@ -41,8 +41,8 @@ function load_functions_for_indicators(){
         $("#indicator_adding_error").animate({opacity: 0}, 300);
         $.ajax({type: "POST",
             url: "/community/add_indicator",
-            data: JSON.stringify({dataset_id: current_dataset, name: "", headline: false,
-                                  filters: get_filters()}),
+            data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
+                                   permission: 'public', filters: get_filters()}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 if (data.success == true)

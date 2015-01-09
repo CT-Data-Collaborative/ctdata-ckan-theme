@@ -16,6 +16,7 @@
       {% endif %}
       {{ h.build_nav_icon('user_dashboard_groups', _('My Groups')) }}
       {{ h.build_nav_icon('user_community_profiles', _('My Community Profiles'), user_id=user.name) }}
+      {{ h.build_nav_icon('user_gallery', _('My Gallery'), user_id=user.name) }}
     </ul>
   </header>
 {% endblock %}

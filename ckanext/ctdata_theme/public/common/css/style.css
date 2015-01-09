@@ -464,6 +464,10 @@ label {font-weight: normal; cursor: auto}
   max-width: 250px !important;
 }
 
+td a {
+color: #187794 !important;
+text-decoration: none !important;
+}
 
 div.primary{
   width: 75%;
@@ -492,7 +496,4 @@ ul.activity{
 h2.module-heading{
   height: 30px;
 }
-
-
-
 

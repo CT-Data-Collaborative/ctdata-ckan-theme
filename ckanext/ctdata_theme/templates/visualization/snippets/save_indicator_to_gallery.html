@@ -1,0 +1,46 @@
+<div id="create_gallery_indicator_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            Save Indicator to Gallery
+        </div>
+        <div class="modal-content">
+            <div class="modal-body disable-scroll">
+                <div>
+                  <form class="form-horizontal">
+                    <div class="control-group">
+                      <label class="control-label"> Indicator name </label>
+                      <div class="controls">
+                        <input type="text" name="indicator_name" class="indicator_name">
+                      </div>
+                    </div>
+
+                    <div class="control-group">
+                      <label class="control-label"> Permission </label>
+                      <div class="controls">
+                        <input type="radio" name="indicator_permission" class="indicator_permission" value="public" checked>
+                         Public
+                        <br>
+                        <input type="radio" name="indicator_permission" class="indicator_permission" value="private">
+                         Private
+                        <!-- <input type="radio" name="indicator_permission" class="indicator_permission" value="public"> Public </input> -->
+                      </div>
+                    </div>
+
+                    <input type="hidden" name="indicator_ind_type" class="indicator_ind_type" value="gallery">
+
+                    <div class="control-group">
+                      <label class="control-label"> Selected Fiters </label>
+                      <div class="controls"> <div class="selected_filters" ></div> </div>
+                    </div>
+                  </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button class="create_headline_indicator btn btn-info" >Save</button>
+                    <button class="btn close_popup">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

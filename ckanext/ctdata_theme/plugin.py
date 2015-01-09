@@ -9,7 +9,9 @@ import routes.mapper
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.base as base
-from ckan.common import response as http_response, request as http_request
+from ckan.common import response as http_response, c, request as http_request
+import ckan.model as model
+import ckan.logic as logic
 
 from ctdata.database import Database
 from ctdata.visualization.services import DatasetService
@@ -21,6 +23,8 @@ from ctdata.users.services import UserService
 
 from IPython import embed
 
+
+get_action = logic.get_action
 
 def communities():
     db = Database()
@@ -79,6 +83,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
             m.connect('user_community_profiles', '/user/{user_id}/my_community_profiles', action='community_profiles')
+            m.connect('user_gallery', '/user/{user_id}/gallery', action='my_gallery')
+            m.connect('update_gallery_indicators', '/user/update_gallery_indicators', action='update_gallery_indicators')
             m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
 
         with routes.mapper.SubMapper(
@@ -96,7 +102,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
     def get_helpers(self):
         return {'communities_helper': communities,
-                'link_to_dataset_with_filters': _link_to_dataset_with_filters}
+                'link_to_dataset_with_filters': _link_to_dataset_with_filters,
+                'link_to_indicator': _link_to_indicator}
 
 
 
@@ -111,6 +118,22 @@ def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = '
 
     if location != '':
         filters_hash['Town'] = [location]
+
+    link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
+    link         = "/visualization/" + str(dataset_url) + link_params
+
+    return link
+
+def _link_to_indicator(indicator):
+    view = 'table'
+    location = ''
+    filters_hash = {}
+
+    filters = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}),
+                                 json.loads(indicator.filters))
+
+    dataset = DatasetService.get_dataset_meta(indicator.dataset_id)['title']
+    dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
 
     link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
     link         = "/visualization/" + str(dataset_url) + link_params
@@ -160,8 +183,6 @@ class CTDataController(base.BaseController):
         return json.dumps({'success': True})
 
     def visualization(self, dataset_name):
-
-
         ind_filters = http_request.GET.get('f')
 
         try:
@@ -225,7 +246,18 @@ class CTDataController(base.BaseController):
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
         headline_indicators = self.community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
-        return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
+
+        # Get list of groups
+        context   = {'model': model, 'session': model.Session,
+                     'user': c.user or c.author, 'for_view': True,
+                     'auth_user_obj': c.userobj, 'use_cache': False}
+        data_dict = {}
+
+        users_groups     = get_action('group_list_authz')(context, data_dict)
+        c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
+        # user_group_ids = set(group['id'] for group in users_groups)
+
+        return base.render('visualization/visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'units':    metadata_units,
                                                              'metadata': metadata,
