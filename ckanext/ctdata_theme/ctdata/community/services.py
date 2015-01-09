@@ -128,6 +128,13 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
+    def update_indicator_permission(self, indicator_id, permission):
+        indicator = self.session.query(ProfileIndicator).get(indicator_id)
+
+        if indicator:
+            indicator.permission = permission
+            self.session.commit()
+
     def create_indicator(self, name, filters, dataset_id, owner, ind_type, permission = 'public'):
         # assert owner is not None, "User must be passed in order for indicator creation to work"
 
@@ -198,7 +205,7 @@ class CommunityProfileService(object):
         assert user is not None, "User must be passed in order for indicator removal to work"
         ind = self.session.query(ProfileIndicator).get(indicator_id)
 
-        if ind and user.is_admin and ind_type == 'headline':
+        if ind and user.is_admin and ind.ind_type == 'headline':
             self.session.delete(ind)
             self.remove_indicator_id_from_profiles(ind.id)
 

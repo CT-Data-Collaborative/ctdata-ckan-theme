@@ -463,3 +463,8 @@ label {font-weight: normal; cursor: auto}
   min-width: 100px !important;
   max-width: 250px !important;
 }
+
+td a {
+color: #187794 !important;
+text-decoration: none !important;
+}

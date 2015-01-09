@@ -84,6 +84,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
             m.connect('user_community_profiles', '/user/{user_id}/my_community_profiles', action='community_profiles')
             m.connect('user_gallery', '/user/{user_id}/gallery', action='my_gallery')
+            m.connect('update_gallery_indicators', '/user/update_gallery_indicators', action='update_gallery_indicators')
             m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
 
         with routes.mapper.SubMapper(
