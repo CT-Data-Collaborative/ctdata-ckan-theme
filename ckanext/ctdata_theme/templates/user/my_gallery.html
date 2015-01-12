@@ -7,12 +7,7 @@
 {% block main_content %}
 <div class="wrapper">
 <div class="ctdata-wrapper">
-<br/><br/><br/>
-{% if c.userobj.name == user_name %}
-  <a href="javascript:void(0)" id="update_gallery_indicators" class="btn pull-right disabled"> Save your Edits </a>
-  <span class="help pull-right "> * Click Indicator Name to Edit </span>
-{% endif %}
-<br/><br/><br/>
+
 {% if gallery_indicators %}
     <table class='table my_table'>
         <thead>
@@ -55,6 +50,12 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <br/>
+    {% if c.userobj.name == user_name %}
+      <a href="javascript:void(0)" id="update_gallery_indicators" class="btn pull-right disabled"> Save your Edits </a>
+    {% endif %}
+    <br/>
 {% else %}
     There're no indicators for this gallery yet.
 {% endif %}
