@@ -128,13 +128,6 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
-    def update_indicator_permission(self, indicator_id, permission):
-        indicator = self.session.query(ProfileIndicator).get(indicator_id)
-
-        if indicator:
-            indicator.permission = permission
-            self.session.commit()
-
     def create_indicator(self, name, filters, dataset_id, owner, ind_type, permission = 'public', group_ids = ''):
         # assert owner is not None, "User must be passed in order for indicator creation to work"
 
@@ -200,6 +193,14 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
+    def update_indicator(self, indicator_id, name, permission, group_ids):
+        ind      = self.session.query(ProfileIndicator).get(indicator_id)
+        ind.name = name
+        ind.permission = permission
+        ind.group_ids  = ','.join(str(id) for id in group_ids)
+
+        self.session.commit()
+
     def remove_indicator(self, user, indicator_id):
         # in case someone accidentally forgot to pass a valid user object
         assert user is not None, "User must be passed in order for indicator removal to work"
@@ -244,6 +245,13 @@ class CommunityProfileService(object):
             filter(and_(ProfileIndicator.ind_type == 'gallery', ProfileIndicator.permission == permission, ProfileIndicator.id.in_(ids))).all()
 
         return indicators
+
+    def get_group_indicators(self, group_id):
+        indicators = self.session.query(ProfileIndicator).\
+            filter(and_(ProfileIndicator.ind_type == 'gallery',ProfileIndicator.permission != 'private' )).all()
+
+        group_indicators = filter(lambda ind: group_id in ind.group_ids.split(',') if ind.group_ids != None  else [] , indicators)
+        return group_indicators
 
     def get_indicators_by_ids(self, ids):
         indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.id.in_(ids)).all()

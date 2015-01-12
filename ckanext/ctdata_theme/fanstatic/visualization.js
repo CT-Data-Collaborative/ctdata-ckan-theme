@@ -763,10 +763,13 @@ $(function () {
     $('#Contributor').appendTo( $('#Contributor').closest('ul').find('li').last())
 
     $('input.indicator_group:').on('change', function(){
-      if ($('input.indicator_group:checked').length > 0)
-        $('input.group_permission').removeAttr('disabled');
+      if ($('input.indicator_group:checked').length > 0){
+        $('input.group_permission').removeClass('hidden');
+        $('span.group_label').removeClass('hidden');
+      }
       else{
-        $('input.group_permission').attr('disabled', 'disabled').removeAttr('checked');
+        $('input.group_permission').addClass('hidden').removeAttr('checked');
+        $('span.group_label').addClass('hidden').removeAttr('checked');
       }
 
     });

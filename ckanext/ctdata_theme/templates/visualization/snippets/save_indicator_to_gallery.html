@@ -10,7 +10,7 @@
                     <div class="control-group">
                       <label class="control-label"> Indicator name </label>
                       <div class="controls">
-                        <input type="text" name="indicator_name" class="indicator_name">
+                        <input type="text" name="indicator_name" class="indicator_name" required>
                       </div>
                     </div>
 
@@ -23,8 +23,8 @@
                         <input type="radio" name="indicator_permission" class="indicator_permission" value="private">
                          Private
                         <br>
-                        <input type="radio" name="indicator_permission" class="indicator_permission group_permission" disabled value="group">
-                        Group
+                        <input type="radio" name="indicator_permission" class="indicator_permission group_permission hidden" value="group">
+                        <span class="group_label hidden"> Group </span>
                       </div>
                     </div>
 
@@ -44,7 +44,7 @@
 
                     <input type="hidden" name="indicator_ind_type" class="indicator_ind_type" value="gallery">
 
-                    <div class="control-group">
+                    <div class="control-group filters_info">
                       <label class="control-label"> Selected Fiters </label>
                       <div class="controls"> <div class="selected_filters" ></div> </div>
                     </div>

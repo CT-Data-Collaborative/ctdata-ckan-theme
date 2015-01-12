@@ -49,6 +49,13 @@ class UserController(UserController):
         user       = self.user_service.get_or_create_user(requested_user_name) if requested_user_name else None
         indicators = self.community_profile_service.get_gallery_indicators_for_user(user.ckan_user_id, permission)
 
+        # Get list of groups
+        context   = {'model': model, 'session': model.Session, 'user': c.user or c.author, 'for_view': True,
+                   'auth_user_obj': c.userobj, 'use_cache': False}
+        data_dict = {'am_member': True}
+        users_groups     = get_action('group_list_authz')(context, data_dict)
+        c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
+
         return base.render('user/my_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': requested_user_name})
 
     def update_gallery_indicators(self):
@@ -59,23 +66,20 @@ class UserController(UserController):
         if http_request.method == 'POST':
             user = self.user_service.get_or_create_user(user_name) if user_name else None
 
-            json_body          = json.loads(http_request.body, encoding=http_request.charset)
-            names_hash         = json_body.get('names_hash')
-            permissions_hash   = json_body.get('permissions_hash')
+            json_body            = json.loads(http_request.body, encoding=http_request.charset)
+            updated_inds         = json_body.get('updated_inds')
             indicators_to_remove = json_body.get('indicators_to_remove')
 
-            for indicator_id, name in names_hash.iteritems():
-                self.community_profile_service.update_indicator_name(int(indicator_id), name)
-
-            for indicator_id, permission in permissions_hash.iteritems():
-                self.community_profile_service.update_indicator_permission(int(indicator_id), permission)
+            for indicator in updated_inds.iteritems():
+                id = indicator[0]
+                self.community_profile_service.update_indicator(int(id), indicator[1]['name'],
+                                                                    indicator[1]['permission'], indicator[1]['group_ids'])
 
             for indicator_id in indicators_to_remove:
                 self.community_profile_service.remove_indicator(user, int(indicator_id))
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps({'success': True})
-
 
     def update_community_profiles(self):
         user_name    = http_request.environ.get("REMOTE_USER")

@@ -95,6 +95,11 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
             m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
 
+        with routes.mapper.SubMapper(
+                route_map,
+                controller='ckanext.ctdata_theme.ctdata.group.controllers:GroupController') as m:
+            m.connect('group_indicators', '/group/indicators/{group_id}', action='group_indicators')
+
         return route_map
 
     def after_map(self, route_map):

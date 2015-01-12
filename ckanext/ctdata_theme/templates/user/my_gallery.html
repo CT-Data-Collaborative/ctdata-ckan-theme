@@ -4,17 +4,13 @@
 {% block page_name %} Gallery {% endblock %}
 {% block page_description %}Created by {{user_name}}{% endblock %}
 
-
-
 {% block main_content %}
-
-
 <div class="wrapper">
 <div class="ctdata-wrapper">
-</br></br></br>
+<br/><br/><br/>
 {% if c.userobj.name == user_name %}
-<a href="javascript:void(0)" id="update_gallery_indicators" class="btn pull-right disabled"> Save your Edits </a>
-<span class="help pull-right "> * Click Indicator Name to Edit </span>
+  <a href="javascript:void(0)" id="update_gallery_indicators" class="btn pull-right disabled"> Save your Edits </a>
+  <span class="help pull-right "> * Click Indicator Name to Edit </span>
 {% endif %}
 
 {% if gallery_indicators %}
@@ -22,7 +18,7 @@
         <thead>
             <th>Indicator</th>
             <th>Dataset</th>
-            <th> Groups <th>
+            <th> Groups </th>
             {% if c.userobj.name == user_name %}
               <th>Permission</th>
             {% endif %}
@@ -30,48 +26,44 @@
         <tbody>
             {% for indicator in gallery_indicators %}
               <tr class="table_data">
-                  <td>
-                      <input type="text" class="edit_indicator_name hidden" id="{{indicator.id}}" value="{{indicator.name}}"></input>
-                      <span class='edit_name'> {{indicator.name}} </span>
+                  <td class='name'>
+                    {{indicator.name}}
                   </td>
                   <td>
                     <a href="{{ h.link_to_indicator(indicator) }}">
                       {{indicator.dataset}} {{indicator.variable}}
                     </a>
                   </td>
-                  <td>
+                  <td class='groups'>
                     {% for group in indicator.groups(c) %}
                     <a href="{{'/group/' + group['name']}}"> {{group['title']}} </a>
+                    <span class="group_id hidden">{{group['id']}}</span>
                     ,
                     {% endfor %}
-                  </td>t
+                  </td>
                   {% if c.userobj.name == user_name %}
-                    <td>
-                      <select class="indicator_permission hidden" id="{{indicator.id}}">
-                        {% if indicator.permission == 'private'%}
-                          <option selected>private</option>
-                          <option>public</option>
-                        {% else %}
-                          <option>private</option>
-                          <option selected>public</option>
-                        {% endif %}
-                      </select>
-
-                      <span class="edit_permission">{{indicator.permission}}</span>
-
+                    <td class="permission">
+                      {{indicator.permission}}
                     </td>
-                    <td><a href="javascript:void(0)" class="remove_indicator" id="{{indicator.id}}"><i class='fa fa-times text-error'></i></a></td>
+                    <td>
+                      <a href="javascript:void(0)" class="edit_indicator btn btn-default btn-mini"   id="{{indicator.id}}">Edit</i></a>
+                      <a href="javascript:void(0)" class="remove_indicator" id="{{indicator.id}}"><i class='fa fa-times text-error'></i></a>
+                    </td>
                   {% endif %}
               </tr>
             {% endfor %}
         </tbody>
     </table>
 {% else %}
-    There're no indicators for this community yet.
+    There're no indicators for this gallery yet.
 {% endif %}
 
 </div>
 </div>
+
+<!-- Save Indicator to Gallery -->
+{% snippet 'visualization/snippets/save_indicator_to_gallery.html', group_dropdown=c.group_dropdown %}
+
 {% endblock %}
 {% block scripts %}
 {{ super() }}
