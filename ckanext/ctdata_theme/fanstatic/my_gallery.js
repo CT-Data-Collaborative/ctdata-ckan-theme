@@ -49,7 +49,7 @@ $(function(){
     if (updated_inds[ind_id] == undefined){
       $current_tr = $(this).closest('td').closest('tr')
       permission  = $current_tr.find('td.permission').text().replace(/\s\s/g, "");
-      name        = $current_tr.find('td.name').text().replace(/\s\s/g, "").slice(1, -1);
+      name        = $current_tr.find('td.name').text().replace(/\s\s/g, ""); //.slice(1, -1)
       group_ids   = []
 
       $current_tr.find('.group_id').map(function(){
