@@ -117,6 +117,10 @@ class ProfileIndicator(Base):
 
         return filter(lambda g: g['id'] in group_ids, users_groups)
 
+    def dataset_name(self):
+        return get_action('package_show')(data_dict={'id': self.dataset_id})['title']
+
+
 class ProfileIndicatorValue(Base):
     __tablename__ = 'ctdata_profile_indicator_values'
 
