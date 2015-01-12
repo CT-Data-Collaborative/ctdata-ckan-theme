@@ -1,6 +1,5 @@
 from sqlalchemy import Table, Column, Integer, String, MetaData
 from migrate import *
-from IPython import embed
 
 meta = MetaData()
 

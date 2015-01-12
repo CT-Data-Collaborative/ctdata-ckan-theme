@@ -497,3 +497,7 @@ h2.module-heading{
   height: 30px;
 }
 
+input[type="radio"] {
+  -webkit-appearance: radio !important;
+  float: left;
+}

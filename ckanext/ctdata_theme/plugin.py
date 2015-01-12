@@ -95,6 +95,11 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
             m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
 
+        with routes.mapper.SubMapper(
+                route_map,
+                controller='ckanext.ctdata_theme.ctdata.group.controllers:GroupController') as m:
+            m.connect('group_indicators', '/group/indicators/{group_id}', action='group_indicators')
+
         return route_map
 
     def after_map(self, route_map):
@@ -125,7 +130,7 @@ def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = '
     return link
 
 def _link_to_indicator(indicator):
-    view = 'table'
+    view = indicator.visualization_type
     location = ''
     filters_hash = {}
 
@@ -251,11 +256,10 @@ class CTDataController(base.BaseController):
         context   = {'model': model, 'session': model.Session,
                      'user': c.user or c.author, 'for_view': True,
                      'auth_user_obj': c.userobj, 'use_cache': False}
-        data_dict = {}
+        data_dict = {'am_member': True}
 
         users_groups     = get_action('group_list_authz')(context, data_dict)
         c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
-        # user_group_ids = set(group['id'] for group in users_groups)
 
         return base.render('visualization/visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
