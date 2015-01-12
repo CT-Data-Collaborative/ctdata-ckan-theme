@@ -23,9 +23,10 @@
         <tbody>
             {% for indicator in gallery_indicators %}
               <tr class="table_data">
-                  <td class='name'> {{indicator.name}}</td>
+                  <td class='name'>
+                    <a href="{{ h.link_to_indicator(indicator) }}"> {{indicator.name}} </a> </td>
                   <td>
-                    <a href="{{ h.link_to_indicator(indicator) }}"> {{indicator.dataset_name()}}</a>
+                     {{indicator.dataset_name()}}
                   </td>
                   <td>{{indicator.visualization_type}}</td>
                   <td>{{indicator.created_at.date()}}</td>
@@ -53,7 +54,7 @@
 
     <br/>
     {% if c.userobj.name == user_name %}
-      <a href="javascript:void(0)" id="update_gallery_indicators" class="btn pull-right disabled"> Save your Edits </a>
+      <a href="javascript:void(0)" id="update_gallery_indicators" class="btn disabled"> Save your Edits </a>
     {% endif %}
     <br/>
 {% else %}
