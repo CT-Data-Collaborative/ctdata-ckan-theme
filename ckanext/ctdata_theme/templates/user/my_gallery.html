@@ -30,7 +30,7 @@
               <tr class="table_data">
                   <td class='name'> {{indicator.name}}</td>
                   <td>
-                    <a href="{{ h.link_to_indicator(indicator) }}"> {{indicator.dataset}} {{indicator.variable}}</a>
+                    <a href="{{ h.link_to_indicator(indicator) }}"> {{indicator.dataset_name()}}</a>
                   </td>
                   <td>{{indicator.visualization_type}}</td>
                   <td>{{indicator.created_at.date()}}</td>
