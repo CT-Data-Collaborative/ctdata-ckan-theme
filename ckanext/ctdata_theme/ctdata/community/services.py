@@ -135,7 +135,7 @@ class CommunityProfileService(object):
             indicator.permission = permission
             self.session.commit()
 
-    def create_indicator(self, name, filters, dataset_id, owner, ind_type, permission = 'public'):
+    def create_indicator(self, name, filters, dataset_id, owner, ind_type, permission = 'public', group_ids = ''):
         # assert owner is not None, "User must be passed in order for indicator creation to work"
 
         dataset = DatasetService.get_dataset(dataset_id)
@@ -152,7 +152,7 @@ class CommunityProfileService(object):
         for ex_ind in existing_inds:
             ex_fltrs = json.loads(ex_ind.filters)
             # python allows us to compare lists of dicts
-            if sorted(filters) == sorted(ex_fltrs):
+            if sorted(filters) == sorted(ex_fltrs) and ind_type != 'gallery':
                 raise ProfileAlreadyExists("Profile with such dataset and filters already exists")
         try:
             data_type = dict_with_key_value("field", "Measure Type", filters)['values'][0]
@@ -177,7 +177,7 @@ class CommunityProfileService(object):
         is_global = False
         temp      = False if ind_type == 'headline' or ind_type == 'gallery' else True
         indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
-                                     variable, temp, ind_type, permission)
+                                     variable, temp, ind_type, permission, group_ids)
         owner.indicators.append(indicator)
 
         self.session.add(indicator)

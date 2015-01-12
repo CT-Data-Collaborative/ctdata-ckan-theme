@@ -3,8 +3,13 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Boolean, Table
 from sqlalchemy.orm import relationship, backref
 
-Base = declarative_base()
+import ckan.model as model
+from IPython import embed
+import json
+import ckan.logic as logic
+get_action = logic.get_action
 
+Base = declarative_base()
 
 class CommunityProfile(Base):
     __tablename__ = 'ctdata_community_profiles'
@@ -39,6 +44,30 @@ class Town(Base):
         return "Town %s (%d)" % (self.name, self.fips)
 
 
+#Error:
+#   sqlalchemy.exc.NoReferencedTableError:
+#       Foreign key associated with column 'ctdata_group_indicators.group_id' could not find table 'group'
+#       with which to generate a foreign key to target column 'id'
+
+# class GroupIndicator(Base):
+#     __tablename__ = 'ctdata_group_indicators'
+
+#     id           = Column(Integer, primary_key=True)
+#     indicator_id = Column(String, ForeignKey("ctdata_profile_indicators.id"), nullable = False)
+#     group_id     = Column(Text, ForeignKey('group.id'), nullable = False)
+
+#     indicator = relationship("ProfileIndicator", backref=backref("groups", cascade="save-update, merge, "
+#                                                                                         "delete, delete-orphan"))
+#     group     = relationship("UserInfo", backref="indicators")
+
+#     def __init__(self, indicator_id, group_id):
+#         self.indicator_id = indicator_id
+#         self.group_id = group_id
+
+#     def __repr__(self):
+#         return "Group Indicator %s (%d)" % (self.indicator_id, self.group_id)
+
+
 class ProfileIndicator(Base):
     __tablename__ = 'ctdata_profile_indicators'
 
@@ -53,22 +82,34 @@ class ProfileIndicator(Base):
     ind_type   = Column(String)
     temp       = Column(Boolean)
     permission = Column(String)
+    group_ids  = Column(String)
 
-    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, temp, ind_type, permission):
-        self.name = name
-        self.filters = filters
+    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, temp, ind_type, permission, group_ids):
+        self.name       = name
+        self.filters    = filters
         self.dataset_id = dataset_id
-        self.is_global = is_global
-        self.data_type = data_type
-        self.year = year
-        self.variable = variable
-        self.ind_type = ind_type
-        self.temp  = temp
-        self.permission  = permission
+        self.is_global  = is_global
+        self.data_type  = data_type
+        self.year       = year
+        self.variable   = variable
+        self.ind_type   = ind_type
+        self.temp       = temp
+        self.permission = permission
+        self.group_ids  = group_ids
 
     def __repr__(self):
         return "[Indicator: %s; %s; %s; %s; %s; %s;]" % (self.name, self.id, self.dataset_id, self.data_type, self.year, self.permission)
 
+    def groups(self, c):
+        group_ids = self.group_ids.split(',') if self.group_ids else []
+        context   = {'model': model, 'session': model.Session,
+                     'user': c.user or c.author, 'for_view': True,
+                     'auth_user_obj': c.userobj, 'use_cache': False}
+        data_dict, groups_dict = {}, {}
+
+        users_groups = get_action('group_list_authz')(context, data_dict)
+
+        return filter(lambda g: g['id'] in group_ids, users_groups)
 
 class ProfileIndicatorValue(Base):
     __tablename__ = 'ctdata_profile_indicator_values'

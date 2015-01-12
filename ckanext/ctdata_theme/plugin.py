@@ -251,11 +251,10 @@ class CTDataController(base.BaseController):
         context   = {'model': model, 'session': model.Session,
                      'user': c.user or c.author, 'for_view': True,
                      'auth_user_obj': c.userobj, 'use_cache': False}
-        data_dict = {}
+        data_dict = {'am_member': True}
 
         users_groups     = get_action('group_list_authz')(context, data_dict)
         c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
-        # user_group_ids = set(group['id'] for group in users_groups)
 
         return base.render('visualization/visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,

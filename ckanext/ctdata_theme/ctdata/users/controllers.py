@@ -18,6 +18,9 @@ from ..topic.services import TopicSerivce
 from ckan.controllers.user import UserController
 from IPython import embed
 
+import ckan.logic as logic
+get_action = logic.get_action
+
 class UserController(UserController):
     def __init__(self):
         self.session = Database().session_factory()
@@ -36,18 +39,14 @@ class UserController(UserController):
         return base.render('user_community_profiles.html', extra_vars={'community_profiles': community_profiles})
 
     def my_gallery(self):
-        logged_user_name = http_request.environ.get("REMOTE_USER")
+        logged_user_name    = http_request.environ.get("REMOTE_USER")
         requested_user_name = http_request.environ.get('wsgiorg.routing_args')[1]['user_id']
-        permission = 'all'
+        permission = 'public' if logged_user_name != requested_user_name else'all'
 
         if not logged_user_name:
             abort(404)
 
-        user = self.user_service.get_or_create_user(requested_user_name) if requested_user_name else None
-
-        if logged_user_name != requested_user_name:
-            permission = 'public'
-
+        user       = self.user_service.get_or_create_user(requested_user_name) if requested_user_name else None
         indicators = self.community_profile_service.get_gallery_indicators_for_user(user.ckan_user_id, permission)
 
         return base.render('user/my_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': requested_user_name})

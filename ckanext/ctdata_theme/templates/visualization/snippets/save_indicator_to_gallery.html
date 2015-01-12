@@ -22,7 +22,23 @@
                         <br>
                         <input type="radio" name="indicator_permission" class="indicator_permission" value="private">
                          Private
-                        <!-- <input type="radio" name="indicator_permission" class="indicator_permission" value="public"> Public </input> -->
+                        <br>
+                        <input type="radio" name="indicator_permission" class="indicator_permission group_permission" disabled value="group">
+                        Group
+                      </div>
+                    </div>
+
+                    <div class="control-group">
+                      <label class="control-label"> Groups </label>
+                      <div class="controls">
+                      {% if group_dropdown %}
+
+                          {% for option in group_dropdown %}
+                            <input type="checkbox" value="{{ option[0] }}" class="indicator_group" > {{ option[1] }}
+                            <br>
+                          {% endfor %}
+
+                      {% endif %}
                       </div>
                     </div>
 

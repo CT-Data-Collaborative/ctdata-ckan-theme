@@ -3,6 +3,7 @@ var ids_to_remove    = [],
     names_hash       = {};
 
 $(function(){
+
   $('.remove_indicator').on('click', function(){
     ids_to_remove.push( $(this).attr('id'));
 
@@ -33,7 +34,6 @@ $(function(){
 
 
   $('#update_gallery_indicators').on('click', function(){
-    console.log(permissions_hash)
     $.ajax({type: "POST",
       url: "/user/update_gallery_indicators",
       data: JSON.stringify({ names_hash: names_hash,
@@ -45,5 +45,4 @@ $(function(){
       }
     });
   })
-
 });

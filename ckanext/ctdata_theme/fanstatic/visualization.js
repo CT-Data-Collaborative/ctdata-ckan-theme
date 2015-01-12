@@ -102,13 +102,21 @@ function create_headline_indicator(){
 
     $form = $(this).closest('.modal-content').find('form');
 
-    type = $form.find('.indicator_ind_type').val()
-    name = $form.find('.indicator_name').val()
+    type = $form.find('.indicator_ind_type').val();
+    name = $form.find('.indicator_name').val();
+    group_ids = []
+
+    $form.find('input:checked.indicator_group').map(function(){
+      group_ids.push($(this).val());
+    });
+
 
     $.ajax({type: "POST",
       url: "/community/add_indicator",
       data: JSON.stringify({ dataset_id: dataset_id, name: name,
-                             ind_type: type, filters: filters, permission: permission }),
+                             ind_type: type, filters: filters,
+                             permission: permission,
+                             group_ids: group_ids.join()}),
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
           window.location.reload();
@@ -385,7 +393,7 @@ function get_filters(){
 
 function handle_incompatibilities(compatibles){
 
-  all_inputs = $("input[type='checkbox']");
+  all_inputs = $("input[type='checkbox'][class != 'indicator_group']");
   $.each(all_inputs, function(i){
     if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
       $(all_inputs[i]).removeAttr("disabled");
@@ -706,7 +714,7 @@ $(function () {
     show_selected_indicator();
 
     $('.filter div.collapse').collapse('hide');
-    $('input[type="checkbox"]').change(function(){
+    $('input[type="checkbox"][class != "indicator_group"]').change(function(){
         $('#default.head_ind_link').prop('selected', true)
         if ($(this).attr('name') == geography_param){
           $li = $(this).closest('li')
@@ -753,4 +761,14 @@ $(function () {
     //move suppression between full description and source
     $('#Suppression').appendTo( $("li[id='Full Description']") )
     $('#Contributor').appendTo( $('#Contributor').closest('ul').find('li').last())
+
+    $('input.indicator_group:').on('change', function(){
+      if ($('input.indicator_group:checked').length > 0)
+        $('input.group_permission').removeAttr('disabled');
+      else{
+        $('input.group_permission').attr('disabled', 'disabled').removeAttr('checked');
+      }
+
+    });
+
 });

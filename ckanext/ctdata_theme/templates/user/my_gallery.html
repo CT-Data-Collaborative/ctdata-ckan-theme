@@ -22,6 +22,7 @@
         <thead>
             <th>Indicator</th>
             <th>Dataset</th>
+            <th> Groups <th>
             {% if c.userobj.name == user_name %}
               <th>Permission</th>
             {% endif %}
@@ -38,6 +39,12 @@
                       {{indicator.dataset}} {{indicator.variable}}
                     </a>
                   </td>
+                  <td>
+                    {% for group in indicator.groups(c) %}
+                    <a href="{{'/group/' + group['name']}}"> {{group['title']}} </a>
+                    ,
+                    {% endfor %}
+                  </td>t
                   {% if c.userobj.name == user_name %}
                     <td>
                       <select class="indicator_permission hidden" id="{{indicator.id}}">
