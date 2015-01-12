@@ -1,12 +1,14 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Boolean, Table
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Boolean, Table, DateTime
 from sqlalchemy.orm import relationship, backref
+import datetime
 
 import ckan.model as model
 from IPython import embed
 import json
 import ckan.logic as logic
+
 get_action = logic.get_action
 
 Base = declarative_base()
@@ -83,8 +85,10 @@ class ProfileIndicator(Base):
     temp       = Column(Boolean)
     permission = Column(String)
     group_ids  = Column(String)
+    created_at = Column(DateTime)
+    visualization_type = Column(String)
 
-    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, temp, ind_type, permission, group_ids):
+    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, temp, ind_type, visualization_type, permission, group_ids):
         self.name       = name
         self.filters    = filters
         self.dataset_id = dataset_id
@@ -96,6 +100,8 @@ class ProfileIndicator(Base):
         self.temp       = temp
         self.permission = permission
         self.group_ids  = group_ids
+        self.visualization_type  = visualization_type
+        self.created_at = datetime.datetime.now()
 
     def __repr__(self):
         return "[Indicator: %s; %s; %s; %s; %s; %s;]" % (self.name, self.id, self.dataset_id, self.data_type, self.year, self.permission)

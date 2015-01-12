@@ -19,7 +19,7 @@
         <span class="caretbox"><span class="caret"></span></span>
       </option>
       {% for indicator in headline_indicators %}
-        <option value="/visualization/{{dataset.name}}?ind={{indicator.id}}" class="head_ind_link" id="{{indicator.id}}"> {{indicator.name}} </option>
+        <option value="{{ h.link_to_indicator(indicator) }}" class="head_ind_link" id="{{indicator.id}}"> {{indicator.name}} </option>
       {% endfor %}
     </select>
 

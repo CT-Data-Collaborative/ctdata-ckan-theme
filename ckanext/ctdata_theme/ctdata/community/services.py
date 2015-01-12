@@ -128,7 +128,7 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
-    def create_indicator(self, name, filters, dataset_id, owner, ind_type, permission = 'public', group_ids = ''):
+    def create_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, permission = 'public', group_ids = ''):
         # assert owner is not None, "User must be passed in order for indicator creation to work"
 
         dataset = DatasetService.get_dataset(dataset_id)
@@ -170,7 +170,7 @@ class CommunityProfileService(object):
         is_global = False
         temp      = False if ind_type == 'headline' or ind_type == 'gallery' else True
         indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
-                                     variable, temp, ind_type, permission, group_ids)
+                                     variable, temp, ind_type, visualization_type, permission, group_ids)
         owner.indicators.append(indicator)
 
         self.session.add(indicator)

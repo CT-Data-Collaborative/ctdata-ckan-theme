@@ -116,6 +116,7 @@ function create_headline_indicator(){
       data: JSON.stringify({ dataset_id: dataset_id, name: name,
                              ind_type: type, filters: filters,
                              permission: permission,
+                             visualization_type: display_type,
                              group_ids: group_ids.join()}),
       contentType: 'application/json; charset=utf-8',
       success: function (data) {

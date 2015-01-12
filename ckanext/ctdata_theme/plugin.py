@@ -130,7 +130,7 @@ def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = '
     return link
 
 def _link_to_indicator(indicator):
-    view = 'table'
+    view = indicator.visualization_type
     location = ''
     filters_hash = {}
 
