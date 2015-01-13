@@ -328,30 +328,55 @@ function display_error(message){
 
 function display_data(){
 
-  display_filters();
-  display_spinner();
-  set_icon(display_type);
+    display_filters();
+    display_spinner();
+    set_icon(display_type);
 
-  if(display_type == 'column'){
-    new_type = 'bar';
-  } else {
-    new_type = display_type
-  }
+    if(display_type == 'column'){
+      new_type = 'bar';
+    } else {
+      new_type = display_type
+    }
+
     if(disabled.indexOf(new_type) != -1){
       display_error("This visualization is disabled for this dataset")
       return 0;
     }
-  towns = $("input." + geography_param + ":checked");
-  years = $("input.Year:checked");
-  if(towns.length == 0 && display_type != 'map'){
-    hide_spinner();
-    console.log('here')
-    return display_error("Please select a " + geography_param);
-  }
-  else if (years.length == 0){
-    hide_spinner();
-    return display_error("Please select a year");
-  }
+
+    towns = $("input." + geography_param + ":checked");
+    years = $("input.Year:checked");
+    error = ''
+
+    if(towns.length == 0 && display_type != 'map'){
+      if (window.location.href.indexOf("Town") > -1) {
+          $.ajax({type: "POST",
+              url: "/update_visualization_link/"+dataset_id,
+              data: JSON.stringify({view: 'table', filters: get_filters()}),
+              contentType: 'application/json; charset=utf-8'}).done(function(data) {
+                change_page_url(data.link)
+                window.location.reload();
+              });
+      }
+      hide_spinner();
+      error = "Please select a " + geography_param;
+    }
+
+    if (years.length == 0){
+      if (window.location.href.indexOf("Year") > -1) {
+          $.ajax({type: "POST",
+              url: "/update_visualization_link/"+dataset_id,
+              data: JSON.stringify({view: 'table', filters: get_filters()}),
+              contentType: 'application/json; charset=utf-8'}).done(function(data) {
+                change_page_url(data.link)
+                window.location.reload();
+              });
+      }
+      hide_spinner();
+      error = "Please select a year";
+    }
+
+    if (error != '')
+        return display_error(error)
 
   switch(display_type){
     case "map":

@@ -62,6 +62,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_vizualization_data', '/vizualization_data/{dataset_name}', action='get_vizualization_data')
+            m.connect('update_visualization_link', '/update_visualization_link/{dataset_name}', action='update_visualization_link')
             m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
 
         with routes.mapper.SubMapper(
@@ -270,6 +271,16 @@ class CTDataController(base.BaseController):
                                                              'headline_indicators': headline_indicators,
                                                              'geography_param': geography_param})
 
+    def update_visualization_link(self, dataset_name):
+        json_body = json.loads(http_request.body, encoding=http_request.charset)
+
+        view_param       = json_body.get('view')
+        request_filters  = json_body.get('filters')
+        data = {}
+        data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
+
+        http_response.headers['Content-type'] = 'application/json'
+        return json.dumps(data)
 
     def get_vizualization_data(self, dataset_name):
         try:
