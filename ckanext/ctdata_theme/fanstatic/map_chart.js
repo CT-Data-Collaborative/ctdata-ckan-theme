@@ -5,7 +5,6 @@ function swap(array,i,j){
   array[i] = array[j]
   array[j] = temp
 }
-
 function draw_map() {
 var dataset_id = $("#dataset_id").val(),
     dataset_title = $("dataset_title").val();
@@ -29,6 +28,7 @@ $.ajax({type: "POST",
 
 
 if (data.data.length == 0){
+  console.log('here')
   hide_spinner()
   return display_error('Map view is not available')
 }
@@ -38,10 +38,22 @@ handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
 var asterisks_counter = 0;
-var geo_ids = [];
+var geo_ids = []
+var geo_names = {}
 $.getJSON('/common/map.json', function (geojson) {
 
+  $.each(geojson['features'], function(i){
+    id   = geojson['features'][i]['properties']['GEOID']
+    name = geojson['features'][i]['properties']['NAME']
+    geo_ids.push(id)
+    geo_names[id] = name
+  });
+
 $.each(data.data, function(i){
+
+  if (geo_ids.indexOf(data.data[i]['fips']) > -1){
+    geo_ids.splice(geo_ids.indexOf(data.data[i]['fips']), 1)
+  }
 
   if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
@@ -58,6 +70,10 @@ $.each(data.data, function(i){
     min = data.data[i]['value'];
 });
 
+// debugger
+$.each(geo_ids, function(i){
+  data.data.push({code: geo_names[geo_ids[i]], fips: geo_ids[i], value: 'No value'})
+});
 
 //Split data into classes for discrete map coloring
 var cur_mt = $(".MeasureType:checked").first().val(),
@@ -132,11 +148,13 @@ if (sortedDataClasses.length == 8){
   swap(sortedDataClasses,5,7)
 }
 
+sortedDataClasses.push({name: 'No value', color: '#D8D8D8', to: 'No value', showInLegend: false});
 // Initiate the chart
 
 var join_by = ['NAME', 'code'];
 if (geography_param != 'Town')
   join_by = ['GEOID', 'fips'];
+
 
 chart = new Highcharts.Chart({
   chart: {
@@ -215,9 +233,13 @@ chart = new Highcharts.Chart({
       if (this.point.value == '*'){
         value = 'Suppressed'
       }
-      return '<span class="tooltip"><b>' + this.series.name + '</b><br>' +
+      if (value != 'No value'){
+        return '<b>' + this.series.name + '</b><br>' +
              this.point.code + '<br>' +
-             'Value: <b>' + unit_for_value(value, cur_mt) + '</b></span>';
+             'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
+      }else{
+        return this.point.code + '<br>' + 'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
+      }
     }
   },
   exporting: {enabled: false},
@@ -240,8 +262,12 @@ chart.xAxis[0].setExtremes(-74, -71.5, false);
 chart.yAxis[0].setExtremes(-42.2, -40.8, false);
 chart.redraw();
 
+
+function change_color(){
+  $('path[fill="#7cb5ec"]').attr('fill', '#F9F9F9');
+}
+setTimeout(change_color(),1000)
 hide_spinner();
-$('path[fill="#F8F8F8"]').hide();
 //add gray map background
 $(".highcharts-container").css({
       backgroundImage: "url('/common/images/graymap.png')",
@@ -250,5 +276,6 @@ $(".highcharts-container").css({
       });
 });
 });
-
 }
+
+
