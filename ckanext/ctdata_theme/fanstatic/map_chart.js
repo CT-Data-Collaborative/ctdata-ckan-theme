@@ -42,17 +42,21 @@ var geo_ids = []
 var geo_names = {}
 $.getJSON('/common/map.json', function (geojson) {
 
-  $.each(geojson['features'], function(i){
-    id   = geojson['features'][i]['properties']['GEOID']
-    name = geojson['features'][i]['properties']['NAME']
-    geo_ids.push(id)
-    geo_names[id] = name
-  });
+  if (geography_param != 'Town'){
+    $.each(geojson['features'], function(i){
+      id   = geojson['features'][i]['properties']['GEOID']
+      name = geojson['features'][i]['properties']['NAME']
+      geo_ids.push(id)
+      geo_names[id] = name
+    });
+  }
 
 $.each(data.data, function(i){
 
-  if (geo_ids.indexOf(data.data[i]['fips']) > -1){
-    geo_ids.splice(geo_ids.indexOf(data.data[i]['fips']), 1)
+  if (geography_param != 'Town'){
+    if (geo_ids.indexOf(data.data[i]['fips']) > -1){
+      geo_ids.splice(geo_ids.indexOf(data.data[i]['fips']), 1)
+    }
   }
 
   if (data.data[i]['code'] == "Connecticut"){
@@ -71,9 +75,11 @@ $.each(data.data, function(i){
 });
 
 // debugger
-$.each(geo_ids, function(i){
-  data.data.push({code: geo_names[geo_ids[i]], fips: geo_ids[i], value: 'No value'})
-});
+if (geography_param != 'Town'){
+  $.each(geo_ids, function(i){
+    data.data.push({code: geo_names[geo_ids[i]], fips: geo_ids[i], value: 'No value'})
+  });
+}
 
 //Split data into classes for discrete map coloring
 var cur_mt = $(".MeasureType:checked").first().val(),
@@ -147,11 +153,13 @@ if (sortedDataClasses.length == 8){
   swap(sortedDataClasses,5,1)
   swap(sortedDataClasses,5,7)
 }
-
-sortedDataClasses.push({name: 'No value', color: '#D8D8D8', to: 'No value', showInLegend: false});
+if (geography_param != 'Town'){
+  sortedDataClasses.push({name: 'No value', color: '#D8D8D8', to: 'No value', showInLegend: false});
+}
 // Initiate the chart
 
 var join_by = ['NAME', 'code'];
+
 if (geography_param != 'Town')
   join_by = ['GEOID', 'fips'];
 
