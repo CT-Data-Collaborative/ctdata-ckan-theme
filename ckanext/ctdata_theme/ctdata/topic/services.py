@@ -38,11 +38,9 @@ class TopicSerivce(object):
                         subdomain = extra['value']
 
                 if domain and subdomain and action not in hidden_list:
-                    help_info = filter(lambda x: x['key'] == 'Help', dataset['extras'])
-                    help_str = help_info[0]['value'] if help_info else ''
 
                     dataset_obj = {'name': dataset['name'], 'title': dataset['title'],
-                                   'id': dataset['id'], 'help': help_str}
+                                   'id': dataset['id']}
                     dmn = dict_with_key_value('title', domain, domains)
                     if dmn:
                         subdmn = dict_with_key_value('title', subdomain, dmn['subdomains'])

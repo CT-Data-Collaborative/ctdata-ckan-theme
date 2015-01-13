@@ -202,6 +202,8 @@ class CTDataController(base.BaseController):
             dataset_meta = DatasetService.get_dataset_meta(dataset_name)
             geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
             geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+            help_info = filter(lambda x: x['key'] == 'Help',  dataset.ckan_meta['extras'])
+            help_str  = help_info[0]['value'] if help_info else ''
         except toolkit.ObjectNotFound:
             abort(404)
 
@@ -261,7 +263,7 @@ class CTDataController(base.BaseController):
 
         users_groups     = get_action('group_list_authz')(context, data_dict)
         c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
-
+        c.help_info      = help_str
         return base.render('visualization/visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'units':    metadata_units,

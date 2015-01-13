@@ -5,7 +5,11 @@
 {% block main_content %}
 <div class="ctdata-wrapper">
 <div class='dataset_info'>
-  <h1>{{ dataset.title }}</h1>
+  <h1>{{ dataset.title }}
+  {% if c.help_info != '' %}
+    <a href="javasctipr:void(0);" class="show_dataset_info" data-placement="right" data-toggle="tooltip" title="{{c.help_info}}"><i class="fa fa-info-circle text-info"></i></a>
+  {% endif %}
+  </h1>
   <h3><span id="profile_info"></span></h3>
 </div>
 <a href="/data_by_topic" class="change_dataset_link pull-left"> << change dataset </a>

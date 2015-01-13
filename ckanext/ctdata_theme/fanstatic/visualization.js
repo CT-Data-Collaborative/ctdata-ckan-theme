@@ -760,7 +760,7 @@ $(function () {
     show_selected_indicator();
     hide_or_show_clear_link();
     clear_all();
-
+    $('.show_dataset_info').tooltip();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"][class != "indicator_group"]').change(function(){
         $('#default.head_ind_link').prop('selected', true)
@@ -781,6 +781,7 @@ $(function () {
     }
     create_headline_indicator();
     $('.tooltip_a').tooltip();
+    $('.show_dataset_info').tooltip();
 
     var towns_names = []
     $.map( $('li', $('#collapse' + geography_param)), function(item){
