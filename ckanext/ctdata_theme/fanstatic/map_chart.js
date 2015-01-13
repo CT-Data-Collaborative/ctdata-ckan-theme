@@ -5,6 +5,7 @@ function swap(array,i,j){
   array[i] = array[j]
   array[j] = temp
 }
+
 function draw_map() {
 var dataset_id = $("#dataset_id").val(),
     dataset_title = $("dataset_title").val();
@@ -28,7 +29,6 @@ $.ajax({type: "POST",
 
 
 if (data.data.length == 0){
-  console.log('here')
   hide_spinner()
   return display_error('Map view is not available')
 }
@@ -38,8 +38,11 @@ handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
 var asterisks_counter = 0;
+var geo_ids = [];
+$.getJSON('/common/map.json', function (geojson) {
 
 $.each(data.data, function(i){
+
   if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
     return "Skip data for all of connecticut"
@@ -54,6 +57,7 @@ $.each(data.data, function(i){
   if(data.data[i]['value'] < min)
     min = data.data[i]['value'];
 });
+
 
 //Split data into classes for discrete map coloring
 var cur_mt = $(".MeasureType:checked").first().val(),
@@ -94,8 +98,6 @@ for(i = 0; i < numClasses; i++){
 if(dataClasses[dataClasses.length-1]['to'] < max+1 && cur_mt_is_number)
   dataClasses[dataClasses.length-1]['to'] = max+1;
 
-$.getJSON('/common/map.json', function (geojson) {
-
 //Create legend to display current filters
 var legend_html = "<div>" ,
     cur_filters = get_filters();
@@ -135,7 +137,6 @@ if (sortedDataClasses.length == 8){
 var join_by = ['NAME', 'code'];
 if (geography_param != 'Town')
   join_by = ['GEOID', 'fips'];
-
 
 chart = new Highcharts.Chart({
   chart: {
@@ -214,9 +215,9 @@ chart = new Highcharts.Chart({
       if (this.point.value == '*'){
         value = 'Suppressed'
       }
-      return '<b>' + this.series.name + '</b><br>' +
+      return '<span class="tooltip"><b>' + this.series.name + '</b><br>' +
              this.point.code + '<br>' +
-             'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
+             'Value: <b>' + unit_for_value(value, cur_mt) + '</b></span>';
     }
   },
   exporting: {enabled: false},
@@ -240,6 +241,7 @@ chart.yAxis[0].setExtremes(-42.2, -40.8, false);
 chart.redraw();
 
 hide_spinner();
+$('path[fill="#F8F8F8"]').hide();
 //add gray map background
 $(".highcharts-container").css({
       backgroundImage: "url('/common/images/graymap.png')",
@@ -248,4 +250,5 @@ $(".highcharts-container").css({
       });
 });
 });
+
 }
