@@ -277,9 +277,21 @@ class CTDataController(base.BaseController):
         json_body = json.loads(http_request.body, encoding=http_request.charset)
 
         view_param       = json_body.get('view')
+        request_view     = 'chart' if view_param in ['table', 'column', 'line'] else view_param
         request_filters  = json_body.get('filters')
         data = {}
         data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
+
+        try:
+            dataset = DatasetService.get_dataset(dataset_name)
+            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
+            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+        except toolkit.ObjectNotFound:
+            abort(404)
+
+        query_builder = QueryBuilderFactory.get_query_builder(request_view, dataset)
+        view = ViewFactory.get_view(request_view, query_builder)
+        data['compatibles'] = view.get_compatibles(request_filters)
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps(data)

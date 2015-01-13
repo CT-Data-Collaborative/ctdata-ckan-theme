@@ -5,7 +5,8 @@ var display_type  =  (location.search.split('v=')[1]||'').split('&')[0] || "tabl
     create_popup  = $("#create_indicator_popup"),
     edit_popup    = $("#edit_indicators_popup"),
     create_for_gallery_popup    = $("#create_gallery_indicator_popup"),
-    checkboxes_except_town = $("input[type='checkbox']:not(." + geography_param + ")")
+    checkboxes_except_town = $("input[type='checkbox']:not(." + geography_param + ")"),
+    current_compatibles = undefined,
     SUPPRESSED_VALUE = -9999;
 
 window.ids_to_remove = [];
@@ -348,15 +349,17 @@ function display_data(){
     error = ''
 
     if(towns.length == 0 && display_type != 'map'){
-      if (window.location.href.indexOf("Town") > -1) {
+      if (window.location.href.indexOf(geography_param) > -1) {
           $.ajax({type: "POST",
               url: "/update_visualization_link/"+dataset_id,
               data: JSON.stringify({view: 'table', filters: get_filters()}),
               contentType: 'application/json; charset=utf-8'}).done(function(data) {
                 change_page_url(data.link)
-                window.location.reload();
+
+                handle_incompatibilities(data.compatibles)
               });
       }
+
       hide_spinner();
       error = "Please select a " + geography_param;
     }
@@ -368,7 +371,8 @@ function display_data(){
               data: JSON.stringify({view: 'table', filters: get_filters()}),
               contentType: 'application/json; charset=utf-8'}).done(function(data) {
                 change_page_url(data.link)
-                window.location.reload();
+
+                handle_incompatibilities(data['compatibles'])
               });
       }
       hide_spinner();
@@ -449,7 +453,7 @@ function draw_table(){
                                }),
           contentType: 'application/json; charset=utf-8'}).done(function(data) {
 
-
+      current_compatibles = data['compatibles']
       handle_incompatibilities(data['compatibles']);
       change_page_url(data['link']);
       first_idx = 0;
