@@ -708,6 +708,20 @@ function display_filters(){
 
 }
 
+function hide_or_show_clear_link(){
+  if ($('input[type="checkbox"][class != "indicator_group"]:checked').length > 0)
+    $('span.clear').show();
+  else
+    $('span.clear').hide();
+}
+
+function clear_all(){
+  $('.clear_all').on('click', function(){
+    $('input[type="checkbox"][class != "indicator_group"]:checked').prop('checked', false);
+    $('span.clear').hide();
+    display_data();
+  });
+}
 $(function () {
 
     select_all();
@@ -719,6 +733,8 @@ $(function () {
     add_ind_id_to_removing_list();
     update_headline_indicators();
     show_selected_indicator();
+    hide_or_show_clear_link();
+    clear_all();
 
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"][class != "indicator_group"]').change(function(){
@@ -727,6 +743,7 @@ $(function () {
           $li = $(this).closest('li')
           $li.prependTo($li.closest('ul'));
         }
+        hide_or_show_clear_link();
         display_data();
     });
     hide_spinner();

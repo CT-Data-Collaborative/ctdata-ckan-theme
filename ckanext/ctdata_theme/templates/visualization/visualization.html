@@ -38,8 +38,13 @@
 <section class="visualisation">
 
 <div class="refine_wrap">
+<span class="clear">
+  <a href="javascript:void(0);" class="clear_all"> Clear All </a>
+  <hr/>
+</span>
 <h2>Refine This Indicator <img src="/common/images/arrowimg.png" alt="" /></h2>
 <ul>
+
 {% for dimension in dimensions %}
 {% if dimension.possible_values %}
 
@@ -73,8 +78,6 @@
 {% endif %}
 {% endfor %}
 </ul>
-
-</br>
 {% if c.userobj.sysadmin %}
   <a href="javascript:void(0);" id="save_headline_indicator" class="btn"> Save Filters </a>
 {% endif %}
