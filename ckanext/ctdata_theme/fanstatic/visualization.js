@@ -299,13 +299,19 @@ function set_map_checkbox(){
 
   //Check most recent year
   values = []
-  $("input:checked.Year").map(function(){
-    values.push(parseInt($(this).val()))
-  });
-  max_year = Math.max.apply(null, values).toString()
+  if ($("input.Year").length > 1){
 
-  $("input:checked.Year").prop('checked', false);
-  $("input:#"+ max_year +"Check.Year").prop('checked', true);
+    $("input:checked.Year").map(function(){
+      values.push(parseInt($(this).val()))
+    });
+    max_year = Math.max.apply(null, values).toString()
+
+    $("input:checked.Year").prop('checked', false);
+    $("input:#"+ max_year +"Check.Year").prop('checked', true);
+  }
+  else{
+    $("input.Year").prop('checked', true);
+  }
 }
 
 //When not showing map, allow multiple filters to be checked
@@ -322,30 +328,55 @@ function display_error(message){
 
 function display_data(){
 
-  display_filters();
-  display_spinner();
-  set_icon(display_type);
+    display_filters();
+    display_spinner();
+    set_icon(display_type);
 
-  if(display_type == 'column'){
-    new_type = 'bar';
-  } else {
-    new_type = display_type
-  }
+    if(display_type == 'column'){
+      new_type = 'bar';
+    } else {
+      new_type = display_type
+    }
+
     if(disabled.indexOf(new_type) != -1){
       display_error("This visualization is disabled for this dataset")
       return 0;
     }
-  towns = $("input." + geography_param + ":checked");
-  years = $("input.Year:checked");
-  if(towns.length == 0 && display_type != 'map'){
-    hide_spinner();
-    console.log('here')
-    return display_error("Please select a " + geography_param);
-  }
-  else if (years.length == 0){
-    hide_spinner();
-    return display_error("Please select a year");
-  }
+
+    towns = $("input." + geography_param + ":checked");
+    years = $("input.Year:checked");
+    error = ''
+
+    if(towns.length == 0 && display_type != 'map'){
+      if (window.location.href.indexOf("Town") > -1) {
+          $.ajax({type: "POST",
+              url: "/update_visualization_link/"+dataset_id,
+              data: JSON.stringify({view: 'table', filters: get_filters()}),
+              contentType: 'application/json; charset=utf-8'}).done(function(data) {
+                change_page_url(data.link)
+                window.location.reload();
+              });
+      }
+      hide_spinner();
+      error = "Please select a " + geography_param;
+    }
+
+    if (years.length == 0){
+      if (window.location.href.indexOf("Year") > -1) {
+          $.ajax({type: "POST",
+              url: "/update_visualization_link/"+dataset_id,
+              data: JSON.stringify({view: 'table', filters: get_filters()}),
+              contentType: 'application/json; charset=utf-8'}).done(function(data) {
+                change_page_url(data.link)
+                window.location.reload();
+              });
+      }
+      hide_spinner();
+      error = "Please select a year";
+    }
+
+    if (error != '')
+        return display_error(error)
 
   switch(display_type){
     case "map":
@@ -702,6 +733,20 @@ function display_filters(){
 
 }
 
+function hide_or_show_clear_link(){
+  if ($('input[type="checkbox"][class != "indicator_group"]:checked').length > 0)
+    $('span.clear').show();
+  else
+    $('span.clear').hide();
+}
+
+function clear_all(){
+  $('.clear_all').on('click', function(){
+    $('input[type="checkbox"][class != "indicator_group"]:checked').prop('checked', false);
+    $('span.clear').hide();
+    display_data();
+  });
+}
 $(function () {
 
     select_all();
@@ -713,7 +758,9 @@ $(function () {
     add_ind_id_to_removing_list();
     update_headline_indicators();
     show_selected_indicator();
-
+    hide_or_show_clear_link();
+    clear_all();
+    $('.show_dataset_info').tooltip();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"][class != "indicator_group"]').change(function(){
         $('#default.head_ind_link').prop('selected', true)
@@ -721,6 +768,7 @@ $(function () {
           $li = $(this).closest('li')
           $li.prependTo($li.closest('ul'));
         }
+        hide_or_show_clear_link();
         display_data();
     });
     hide_spinner();
@@ -733,6 +781,7 @@ $(function () {
     }
     create_headline_indicator();
     $('.tooltip_a').tooltip();
+    $('.show_dataset_info').tooltip();
 
     var towns_names = []
     $.map( $('li', $('#collapse' + geography_param)), function(item){

@@ -1,5 +1,4 @@
 $(document).ready(function(){
-    $('#data_by_topic_link').addClass('header_link_active');
 
     var topics = ['civic_vitality', 'demographics', 'economy', 'health', 'education', 'housing', 'safety'],
         last_clicked_link = '';
@@ -33,7 +32,7 @@ $(document).ready(function(){
         $(current_hash + "_link").trigger('click');
     }
 
-
+    $('.show_dataset_info').tooltip();
 
     //topics search
 

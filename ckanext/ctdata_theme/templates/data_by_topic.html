@@ -51,8 +51,11 @@
                         <h4>{{ subdomain['title'] }}</h4>
                             <ul id="subtopic_list">
                                 {% for dataset in subdomain['datasets'] %}
-                                <li><a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }}</a></li>
+                                <li>
+                                <a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }} </a>
+                                </li>
                                 {% endfor %}
+
                             </ul>
                         </div>
                     </li>
