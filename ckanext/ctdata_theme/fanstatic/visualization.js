@@ -299,13 +299,19 @@ function set_map_checkbox(){
 
   //Check most recent year
   values = []
-  $("input:checked.Year").map(function(){
-    values.push(parseInt($(this).val()))
-  });
-  max_year = Math.max.apply(null, values).toString()
+  if ($("input.Year").length > 1){
 
-  $("input:checked.Year").prop('checked', false);
-  $("input:#"+ max_year +"Check.Year").prop('checked', true);
+    $("input:checked.Year").map(function(){
+      values.push(parseInt($(this).val()))
+    });
+    max_year = Math.max.apply(null, values).toString()
+
+    $("input:checked.Year").prop('checked', false);
+    $("input:#"+ max_year +"Check.Year").prop('checked', true);
+  }
+  else{
+    $("input.Year").prop('checked', true);
+  }
 }
 
 //When not showing map, allow multiple filters to be checked
