@@ -501,3 +501,7 @@ input[type="radio"] {
   -webkit-appearance: radio !important;
   float: left;
 }
+
+.show_dataset_info{
+  margin-left: 5px;
+}

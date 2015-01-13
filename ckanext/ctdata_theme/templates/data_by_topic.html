@@ -51,8 +51,14 @@
                         <h4>{{ subdomain['title'] }}</h4>
                             <ul id="subtopic_list">
                                 {% for dataset in subdomain['datasets'] %}
-                                <li><a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }}</a></li>
+                                <li>
+                                <a href="/visualization/{{ dataset['name'] }}">{{ dataset['title'] }} </a>
+                                {% if dataset['help'] != '' %}
+                                  <a href="javasctipr:void(0);" class="show_dataset_info" data-placement="right" data-toggle="tooltip" title="{{dataset['help']}}"><i class="fa fa-info-circle text-info"></i></a>
+                                {% endif %}
+                                </li>
                                 {% endfor %}
+
                             </ul>
                         </div>
                     </li>
