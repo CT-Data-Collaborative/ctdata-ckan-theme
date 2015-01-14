@@ -201,6 +201,8 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
+        return ind
+
     def remove_indicator(self, user, indicator_id):
         # in case someone accidentally forgot to pass a valid user object
         assert user is not None, "User must be passed in order for indicator removal to work"
