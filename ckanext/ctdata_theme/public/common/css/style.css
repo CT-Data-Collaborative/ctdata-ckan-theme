@@ -505,3 +505,10 @@ input[type="radio"] {
 .show_dataset_info{
   margin-left: 5px;
 }
+
+.ajax_spinner{
+  position: absolute;
+  top: 150px;
+  left: 300px;
+
+}

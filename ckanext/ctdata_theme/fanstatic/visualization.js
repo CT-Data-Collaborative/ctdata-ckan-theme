@@ -110,7 +110,7 @@ function create_headline_indicator(){
       group_ids.push($(this).val());
     });
 
-
+    $('span.ajax_spinner').removeClass('hidden')
     $.ajax({type: "POST",
       url: "/community/add_indicator",
       data: JSON.stringify({ dataset_id: dataset_id, name: name,
@@ -814,14 +814,13 @@ $(function () {
     $('#Suppression').appendTo( $("li[id='Full Description']") )
     $('#Contributor').appendTo( $('#Contributor').closest('ul').find('li').last())
 
-    $('input.indicator_group:').on('change', function(){
-      if ($('input.indicator_group:checked').length > 0){
-        $('input.group_permission').removeClass('hidden');
-        $('span.group_label').removeClass('hidden');
+    $('input.indicator_permission:').on('change', function(){
+      if ($('input.private_permission:checked').length > 0 ){
+        $('input.indicator_group:checked').prop('checked', false);
+        $('.groups_inputs').addClass('hidden')
       }
       else{
-        $('input.group_permission').addClass('hidden').removeAttr('checked');
-        $('span.group_label').addClass('hidden').removeAttr('checked');
+        $('.groups_inputs').removeClass('hidden')
       }
 
     });

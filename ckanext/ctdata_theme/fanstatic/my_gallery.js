@@ -2,14 +2,14 @@ var ids_to_remove    = [],
     updated_inds     = {},
     $current_tr      = undefined;
 
-function show_group_permission_input(){
-  if ($('input.indicator_group:checked').length > 0){
-    $('input.group_permission').removeClass('hidden');
-    $('span.group_label').removeClass('hidden');
+
+function show_groups_list_or_hide(){
+  if ($('input.private_permission:checked').length > 0 ){
+    $('input.indicator_group:checked').prop('checked', false);
+    $('.groups_inputs').addClass('hidden')
   }
   else{
-    $('input.group_permission').addClass('hidden').removeAttr('checked');
-    $('span.group_label').addClass('hidden').removeAttr('checked');
+    $('.groups_inputs').removeClass('hidden')
   }
 }
 
@@ -45,40 +45,34 @@ $(function(){
 
     $('.filters_info').addClass('hidden')
 
-    if (updated_inds[ind_id] == undefined){
-      $current_tr = $(this).closest('td').closest('tr')
-      permission  = $current_tr.find('td.permission').text().replace(/\s\s/g, "");
-      name        = $current_tr.find('td.name').text().replace(/\s\s/g, ""); //.slice(1, -1)
-      group_ids   = []
+    $current_tr = $(this).closest('td').closest('tr')
+    permission  = $current_tr.find('td.permission').text().replace(/\s\s/g, "");
+    name        = $current_tr.find('td.name').text().replace(/\s\s/g, ""); //.slice(1, -1)
+    group_ids   = []
 
-      $current_tr.find('.group_id').map(function(){
-        id = $(this).text().replace(/\s\s/g, "");
-        group_ids.push(id)
-      });
+    $current_tr.find('.group_id').map(function(){
+      id = $(this).text().replace(/\s\s/g, "");
+      group_ids.push(id)
+    });
 
-      updated_inds[ind_id] = {name: name, permission: permission, group_ids: group_ids}
-    }
-    else{
-      name        = updated_inds[ind_id]['name'];
-      permission  = updated_inds[ind_id]['permission'];
-      group_ids   = updated_inds[ind_id]['group_ids'];
-    }
-
+    console.log($current_tr)
+    console.log(group_ids)
     $('.indicator_name').val(name)
     $('input.indicator_permission').removeAttr('checked')
-    $('input.indicator_group').removeAttr('checked')
     $('input.indicator_permission[value=' + permission + ']').attr('checked', true)
-    group_ids.map(function(){
-      $('input.indicator_group[value='+ $(this) +']').attr('checked', true)
-    })
+    $('input.indicator_group').prop('checked', false)
 
-    show_group_permission_input();
+    $.each(group_ids, function(i){
+      $('input.indicator_group[value='+ group_ids[i] +']').attr('checked', true)
+    });
+
+    show_groups_list_or_hide();
 
     $("#create_gallery_indicator_popup").modal('show');
   });
 
-  $('input.indicator_group:').on('change', function(){
-    show_group_permission_input();
+  $('input.indicator_permission').on('change', function(){
+     show_groups_list_or_hide();
   });
 
   ///////////////////// Remember edits for indicator //////////////
@@ -99,6 +93,7 @@ $(function(){
 
     ind_params = {id: ind_id, name: name, permission: permission, group_ids: group_ids}
 
+    $('span.ajax_spinner').removeClass('hidden')
     $.ajax({type: "POST",
       url: "/user/update_gallery_indicator",
       data: JSON.stringify({ ind_params: ind_params }),
@@ -108,6 +103,6 @@ $(function(){
       }
     });
 
-    $("#create_gallery_indicator_popup").modal('hide')
+
   })
 });
