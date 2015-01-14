@@ -20,15 +20,15 @@
                         <input type="radio" name="indicator_permission" class="indicator_permission" value="public" checked>
                          Public
                         <br>
-                        <input type="radio" name="indicator_permission" class="indicator_permission" value="private">
+                        <input type="radio" name="indicator_permission" class="indicator_permission private_permission" value="private">
                          Private
                         <br>
-                        <input type="radio" name="indicator_permission" class="indicator_permission group_permission hidden" value="group">
-                        <span class="group_label hidden"> Group </span>
+                        <input type="radio" name="indicator_permission" class="indicator_permission group_permission" value="group">
+                        <span class="group_label"> Group </span>
                       </div>
                     </div>
 
-                    <div class="control-group">
+                    <div class="control-group groups_inputs">
                       <label class="control-label"> Groups </label>
                       <div class="controls">
                       {% if group_dropdown %}
@@ -53,6 +53,7 @@
             </div>
             <div class="modal-footer">
                 <div style="float: right">
+                    <span class='ajax_spinner hidden'><img src="/common/images/ajax-loader.gif"></span>
                     <button class="create_headline_indicator btn btn-info" >Save</button>
                     <button class="btn close_popup">Cancel</button>
                 </div>
