@@ -23,8 +23,7 @@
     <br>
     <p>
       <i class="icon-info-sign"></i>
-      To add indicators to your group...
-      <a href="" class="btn btn-default btn-mini">Click here</a>
+      To add indicators to your group select a dataset, customize your indicator and click on the "Save To Gallery" button.
     <p>
     <br>
 
@@ -35,7 +34,7 @@
           <li class="dataset-item">
             <div class= 'dataset-content'>
               <h3 class='dataset-heading'>
-                <a href="{{ h.link_to_indicator(indicator) }}">
+                <a href="{{ indicator.link_to_visualization() }}">
                   {{indicator.name}}
                 </a>
               </h3>

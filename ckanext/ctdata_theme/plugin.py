@@ -85,7 +85,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
             m.connect('user_community_profiles', '/user/{user_id}/my_community_profiles', action='community_profiles')
             m.connect('user_gallery', '/user/{user_id}/gallery', action='my_gallery')
-            m.connect('update_gallery_indicators', '/user/update_gallery_indicators', action='update_gallery_indicators')
+            m.connect('remove_gallery_indicators', '/user/remove_gallery_indicators', action='remove_gallery_indicators')
+            m.connect('update_gallery_indicator',  '/user/update_gallery_indicator', action='update_gallery_indicator')
             m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
 
         with routes.mapper.SubMapper(
@@ -108,8 +109,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
     def get_helpers(self):
         return {'communities_helper': communities,
-                'link_to_dataset_with_filters': _link_to_dataset_with_filters,
-                'link_to_indicator': _link_to_indicator}
+                'link_to_dataset_with_filters': _link_to_dataset_with_filters}
 
 
 
@@ -129,23 +129,6 @@ def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = '
     link         = "/visualization/" + str(dataset_url) + link_params
 
     return link
-
-def _link_to_indicator(indicator):
-    view = indicator.visualization_type
-    location = ''
-    filters_hash = {}
-
-    filters = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}),
-                                 json.loads(indicator.filters))
-
-    dataset = DatasetService.get_dataset_meta(indicator.dataset_id)['title']
-    dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
-
-    link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
-    link         = "/visualization/" + str(dataset_url) + link_params
-
-    return link
-
 
 ####### Main Controller ##########
 

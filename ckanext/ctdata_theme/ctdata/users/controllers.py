@@ -54,22 +54,30 @@ class UserController(UserController):
 
         return base.render('user/my_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': requested_user_name})
 
-    def update_gallery_indicators(self):
+    def update_gallery_indicator(self):
         user_name    = http_request.environ.get("REMOTE_USER")
 
         if not user_name:
             abort(401)
         if http_request.method == 'POST':
-            user = self.user_service.get_or_create_user(user_name) if user_name else None
+            user       = self.user_service.get_or_create_user(user_name) if user_name else None
+            json_body  = json.loads(http_request.body, encoding=http_request.charset)
+            ind_params = json_body.get('ind_params')
+            indicator  = self.community_profile_service.update_indicator(int(ind_params['id']), ind_params['name'],
+                                                            ind_params['permission'], ind_params['group_ids'])
 
+        http_response.headers['Content-type'] = 'application/json'
+        return json.dumps({'success': True, 'link': link })
+
+    def remove_gallery_indicators(self):
+        user_name    = http_request.environ.get("REMOTE_USER")
+
+        if not user_name:
+            abort(401)
+        if http_request.method == 'POST':
+            user                 = self.user_service.get_or_create_user(user_name) if user_name else None
             json_body            = json.loads(http_request.body, encoding=http_request.charset)
-            updated_inds         = json_body.get('updated_inds')
             indicators_to_remove = json_body.get('indicators_to_remove')
-
-            for indicator in updated_inds.iteritems():
-                id = indicator[0]
-                self.community_profile_service.update_indicator(int(id), indicator[1]['name'],
-                                                                    indicator[1]['permission'], indicator[1]['group_ids'])
 
             for indicator_id in indicators_to_remove:
                 self.community_profile_service.remove_indicator(user, int(indicator_id))

@@ -23,15 +23,14 @@ $(function(){
     ids_to_remove.push( $(this).attr('id'));
 
     $(this).closest('tr').hide();
-    $('#update_gallery_indicators').removeClass('disabled');
+    $('#remove_gallery_indicators').removeClass('disabled');
   });
 
 
-  $('#update_gallery_indicators').on('click', function(){
+  $('#remove_gallery_indicators').on('click', function(){
     $.ajax({type: "POST",
-      url: "/user/update_gallery_indicators",
-      data: JSON.stringify({ updated_inds: updated_inds,
-                             indicators_to_remove: ids_to_remove}),
+      url: "/user/remove_gallery_indicators",
+      data: JSON.stringify({indicators_to_remove: ids_to_remove}),
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
         window.location.reload();
@@ -98,10 +97,17 @@ $(function(){
       group_ids.push($(this).val());
     });
 
-    updated_inds[ind_id] = {name: name, permission: permission, group_ids: group_ids}
-    $current_tr.addClass('info')
+    ind_params = {id: ind_id, name: name, permission: permission, group_ids: group_ids}
 
-    $('#update_gallery_indicators').removeClass('disabled');
+    $.ajax({type: "POST",
+      url: "/user/update_gallery_indicator",
+      data: JSON.stringify({ ind_params: ind_params }),
+      contentType: 'application/json; charset=utf-8',
+      success: function (data) {
+        window.location.reload();
+      }
+    });
+
     $("#create_gallery_indicator_popup").modal('hide')
   })
 });

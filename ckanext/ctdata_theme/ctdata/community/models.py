@@ -120,6 +120,22 @@ class ProfileIndicator(Base):
     def dataset_name(self):
         return get_action('package_show')(data_dict={'id': self.dataset_id})['title']
 
+    def link_to_visualization(self):
+        view = self.visualization_type
+        location = ''
+        filters_hash = {}
+
+        filters = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}),
+                                     json.loads(self.filters))
+
+        dataset = get_action('package_show')(data_dict={'id': self.dataset_id})['title']
+        dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
+
+        link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
+        link         = "/visualization/" + str(dataset_url) + link_params
+
+        return link
+
 
 class ProfileIndicatorValue(Base):
     __tablename__ = 'ctdata_profile_indicator_values'
