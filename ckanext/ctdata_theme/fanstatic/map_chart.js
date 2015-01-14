@@ -74,7 +74,6 @@ $.each(data.data, function(i){
     min = data.data[i]['value'];
 });
 
-// debugger
 if (geography_param != 'Town'){
   $.each(geo_ids, function(i){
     data.data.push({code: geo_names[geo_ids[i]], fips: geo_ids[i], value: 'No value'})
@@ -83,8 +82,8 @@ if (geography_param != 'Town'){
 
 //Split data into classes for discrete map coloring
 var cur_mt = $(".MeasureType:checked").first().val(),
-    cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number" ),
-    cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent"),
+    cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number"),
+    cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent" || cur_mt == undefined),
     numClasses        = 8,
     range             = max-min,
     step              = 0,

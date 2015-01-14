@@ -6,7 +6,6 @@ var display_type  =  (location.search.split('v=')[1]||'').split('&')[0] || "tabl
     edit_popup    = $("#edit_indicators_popup"),
     create_for_gallery_popup    = $("#create_gallery_indicator_popup"),
     checkboxes_except_town = $("input[type='checkbox']:not(." + geography_param + ")"),
-    current_compatibles = undefined,
     SUPPRESSED_VALUE = -9999;
 
 window.ids_to_remove = [];
@@ -453,7 +452,6 @@ function draw_table(){
                                }),
           contentType: 'application/json; charset=utf-8'}).done(function(data) {
 
-      current_compatibles = data['compatibles']
       handle_incompatibilities(data['compatibles']);
       change_page_url(data['link']);
       first_idx = 0;
