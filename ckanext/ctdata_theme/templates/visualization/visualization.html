@@ -5,7 +5,11 @@
 {% block main_content %}
 <div class="ctdata-wrapper">
 <div class='dataset_info'>
-  <h1>{{ dataset.title }}</h1>
+  <h1>{{ dataset.title }}
+  {% if c.help_info != '' %}
+    <a href="javasctipr:void(0);" class="show_dataset_info" data-placement="right" data-toggle="tooltip" title="{{c.help_info}}"><i class="fa fa-info-circle text-info"></i></a>
+  {% endif %}
+  </h1>
   <h3><span id="profile_info"></span></h3>
 </div>
 <a href="/data_by_topic" class="change_dataset_link pull-left"> << change dataset </a>
@@ -19,7 +23,7 @@
         <span class="caretbox"><span class="caret"></span></span>
       </option>
       {% for indicator in headline_indicators %}
-        <option value="/visualization/{{dataset.name}}?ind={{indicator.id}}" class="head_ind_link" id="{{indicator.id}}"> {{indicator.name}} </option>
+        <option value="{{ h.link_to_indicator(indicator) }}" class="head_ind_link" id="{{indicator.id}}"> {{indicator.name}} </option>
       {% endfor %}
     </select>
 
@@ -29,6 +33,7 @@
   {% endif %}
 </div>
 
+
 <form>
     <input type="hidden" id="dataset_id" value="{{ dataset.name }}">
     <input type="hidden" id="dataset_title" value="{{ dataset.title }}">
@@ -37,8 +42,13 @@
 <section class="visualisation">
 
 <div class="refine_wrap">
+<span class="clear">
+  <a href="javascript:void(0);" class="clear_all"> Clear All </a>
+  <hr/>
+</span>
 <h2>Refine This Indicator <img src="/common/images/arrowimg.png" alt="" /></h2>
 <ul>
+
 {% for dimension in dimensions %}
 {% if dimension.possible_values %}
 
@@ -72,10 +82,11 @@
 {% endif %}
 {% endfor %}
 </ul>
-
-</br>
 {% if c.userobj.sysadmin %}
-<a href="javascript:void(0);" id="save_headline_indicator" class="btn"> Save Filters </a>
+  <a href="javascript:void(0);" id="save_headline_indicator" class="btn"> Save Filters </a>
+{% endif %}
+{% if c.userobj %}
+  <a href="javascript:void(0);" id="save_indicator_to_gallery" class="btn"> Save to Gallery </a>
 {% endif %}
 </div>
 
@@ -147,70 +158,19 @@
 
 </div>
 
-<div id="create_indicator_popup" class="modal fade" style="display: none">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-header">
-            Create Headline Indicator
-        </div>
-        <div class="modal-content">
-            <div class="modal-body disable-scroll">
-                <div>
-                  <form class="form-horizontal">
-                    <div class="control-group">
-                      <label class="control-label"> Indicator name </label>
-                      <div class="controls">
-                        <input type="text" name="indicator_name" id="indicator_name"> </input>
-                      </div>
-                    </div>
-                    <div class="control-group">
-                      <label class="control-label"> Selected Fiters </label>
-                      <div class="controls"> <div id="selected_filters" ></div> </div>
-                    </div>
-                  </form>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div style="float: right">
-                    <button id="create_headline_indicator" class="btn btn-info">Save</button>
-                    <button class="btn close_popup">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Create Headline Indicator Popup -->
+{% snippet 'visualization/snippets/create_headline_indicator.html' %}
 
-<div id="edit_indicators_popup" class="modal fade" style="display: none">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-header">
-            Update Headline Indicators
-        </div>
-        <div class="modal-content">
-            <div class="modal-body disable-scroll">
-                <div id="error" class="error" style="opacity: 0"> </div>
-                <div>
-                  <form class="form-horizontal">
-                    {% for indicator in headline_indicators %}
-                      <div class="control-group">
-                        <label class="control-label"> Indicator {{indicator.id}} </label>
-                        <div class="controls">
-                          <input type="text" name="indicator_name" id="{{indicator.id}}" value="{{indicator.name}}" class="edit_name"></input>
-                          <a href="javascript:void(0);" class="remove_indicator" id="{{indicator.id}}"> <i class='fa fa-times text-error'></i> </a>
-                        </div>
-                      </div>
-                    {% endfor %}
-                  </form>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div style="float: right">
-                    <button id="update_headline_indicators" class="btn btn-info">Update</button>
-                    <button class="btn close_popup">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Edit Headline Indicator Popup -->
+{% snippet 'visualization/snippets/edit_headline_indicators.html', headline_indicators = headline_indicators %}
+
+<!-- Save Indicator to Gallery -->
+{% snippet 'visualization/snippets/save_indicator_to_gallery.html', group_dropdown=c.group_dropdown %}
+
+
 </section>
+
+
 {% endblock %}
 
 {% block scripts %}

@@ -3,7 +3,7 @@ import ckan.plugins.toolkit as toolkit
 
 from ..utils import dict_with_key_value
 from ..visualization.services import DatasetService
-
+from IPython import embed
 
 class TopicSerivce(object):
     @staticmethod
@@ -38,7 +38,9 @@ class TopicSerivce(object):
                         subdomain = extra['value']
 
                 if domain and subdomain and action not in hidden_list:
-                    dataset_obj = {'name': dataset['name'], 'title': dataset['title'], 'id': dataset['id']}
+
+                    dataset_obj = {'name': dataset['name'], 'title': dataset['title'],
+                                   'id': dataset['id']}
                     dmn = dict_with_key_value('title', domain, domains)
                     if dmn:
                         subdmn = dict_with_key_value('title', subdomain, dmn['subdomains'])

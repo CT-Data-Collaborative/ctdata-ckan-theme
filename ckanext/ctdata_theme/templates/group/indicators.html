@@ -1,0 +1,56 @@
+{% extends "group/read_base.html" %}
+
+{% block subtitle %}{{ c.group_dict.display_name }}{% endblock %}
+
+{% block primary_content_inner %}
+  {% block groups_search_form %}
+    {% set facets = {
+      'fields': c.fields_grouped,
+      'search': c.search_facets,
+      'titles': c.facet_titles,
+      'translated_fields': c.translated_fields,
+      'remove_field': c.remove_field }
+    %}
+    {% set sorting = [
+      (_('Relevance'), 'score desc, metadata_modified desc'),
+      (_('Name Ascending'), 'title_string asc'),
+      (_('Name Descending'), 'title_string desc'),
+      (_('Last Modified'), 'metadata_modified desc'),
+      (_('Popular'), 'views_recent desc') if g.tracking_enabled else (false, false) ]
+    %}
+    <br>
+    <br>
+    <br>
+    <p>
+      <i class="icon-info-sign"></i>
+      To add indicators to your group select a dataset, customize your indicator and click on the "Save To Gallery" button.
+    <p>
+    <br>
+
+
+    <div>
+      <ul>
+        {% for indicator in group_indicators %}
+          <li class="dataset-item">
+            <div class= 'dataset-content'>
+              <h3 class='dataset-heading'>
+                <a href="{{ indicator.link_to_visualization() }}">
+                  {{indicator.name}}
+                </a>
+              </h3>
+              Dataset: {{indicator.dataset_name()}}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endblock %}
+  {% block packages_list %}
+
+  {% endblock %}
+
+{% endblock %}
+
+{% block secondary_content %}
+  {{ super() }}
+{% endblock %}

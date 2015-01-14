@@ -38,8 +38,27 @@ handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
 var asterisks_counter = 0;
+var geo_ids = []
+var geo_names = {}
+$.getJSON('/common/map.json', function (geojson) {
+
+  if (geography_param != 'Town'){
+    $.each(geojson['features'], function(i){
+      id   = geojson['features'][i]['properties']['GEOID']
+      name = geojson['features'][i]['properties']['NAME']
+      geo_ids.push(id)
+      geo_names[id] = name
+    });
+  }
 
 $.each(data.data, function(i){
+
+  if (geography_param != 'Town'){
+    if (geo_ids.indexOf(data.data[i]['fips']) > -1){
+      geo_ids.splice(geo_ids.indexOf(data.data[i]['fips']), 1)
+    }
+  }
+
   if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
     return "Skip data for all of connecticut"
@@ -55,10 +74,16 @@ $.each(data.data, function(i){
     min = data.data[i]['value'];
 });
 
+if (geography_param != 'Town'){
+  $.each(geo_ids, function(i){
+    data.data.push({code: geo_names[geo_ids[i]], fips: geo_ids[i], value: 'No value'})
+  });
+}
+
 //Split data into classes for discrete map coloring
 var cur_mt = $(".MeasureType:checked").first().val(),
-    cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number" ),
-    cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent"),
+    cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number"),
+    cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent" || cur_mt == undefined),
     numClasses        = 8,
     range             = max-min,
     step              = 0,
@@ -94,8 +119,6 @@ for(i = 0; i < numClasses; i++){
 if(dataClasses[dataClasses.length-1]['to'] < max+1 && cur_mt_is_number)
   dataClasses[dataClasses.length-1]['to'] = max+1;
 
-$.getJSON('/common/map.json', function (geojson) {
-
 //Create legend to display current filters
 var legend_html = "<div>" ,
     cur_filters = get_filters();
@@ -129,10 +152,13 @@ if (sortedDataClasses.length == 8){
   swap(sortedDataClasses,5,1)
   swap(sortedDataClasses,5,7)
 }
-
+if (geography_param != 'Town'){
+  sortedDataClasses.push({name: 'No value', color: '#D8D8D8', to: 'No value', showInLegend: false});
+}
 // Initiate the chart
 
 var join_by = ['NAME', 'code'];
+
 if (geography_param != 'Town')
   join_by = ['GEOID', 'fips'];
 
@@ -214,9 +240,13 @@ chart = new Highcharts.Chart({
       if (this.point.value == '*'){
         value = 'Suppressed'
       }
-      return '<b>' + this.series.name + '</b><br>' +
+      if (value != 'No value'){
+        return '<b>' + this.series.name + '</b><br>' +
              this.point.code + '<br>' +
              'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
+      }else{
+        return this.point.code + '<br>' + 'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
+      }
     }
   },
   exporting: {enabled: false},
@@ -239,6 +269,11 @@ chart.xAxis[0].setExtremes(-74, -71.5, false);
 chart.yAxis[0].setExtremes(-42.2, -40.8, false);
 chart.redraw();
 
+
+function change_color(){
+  $('path[fill="#7cb5ec"]').attr('fill', '#F9F9F9');
+}
+setTimeout(change_color(),1000)
 hide_spinner();
 //add gray map background
 $(".highcharts-container").css({
@@ -249,3 +284,5 @@ $(".highcharts-container").css({
 });
 });
 }
+
+

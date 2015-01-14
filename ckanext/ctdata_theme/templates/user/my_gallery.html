@@ -1,0 +1,80 @@
+{% extends "user/read_base.html" %}
+
+{% block title %}CTData User Gallery {% endblock %}
+{% block page_name %} Gallery {% endblock %}
+{% block page_description %}Created by {{user_name}}{% endblock %}
+
+{% block main_content %}
+<div class="wrapper">
+<div class="ctdata-wrapper">
+
+{% if gallery_indicators %}
+    <table class='table my_table'>
+        <thead>
+            <th> Indicator </th>
+            <th> Dataset </th>
+            <th> Visualization Type </th>
+            <th> Date Created </th>
+            <th> Groups </th>
+            {% if c.userobj.name == user_name %}
+              <th>Permission</th>
+            {% endif %}
+        </thead>
+        <tbody>
+            {% for indicator in gallery_indicators %}
+              <tr class="table_data" id="{{indicator.id}}">
+                  <td class='name'>
+                    <a href="{{ indicator.link_to_visualization() }}"> {{indicator.name}} </a> </td>
+                  <td>
+                     {{indicator.dataset_name()}}
+                  </td>
+                  <td>{{indicator.visualization_type}}</td>
+                  <td>{{indicator.created_at.date()}}</td>
+                  <td class='groups'>
+                    {% for group in indicator.groups(c) %}
+                      <a href="{{'/group/' + group['name']}}"> {{group['title']}} </a>
+                      <br/>
+                      <span class="group_id hidden">{{group['id']}}</span>
+                      <span class="group_name hidden">{{group['title']}}</span>
+
+                    {% endfor %}
+                  </td>
+                  {% if c.userobj.name == user_name %}
+                    <td class="permission">
+                      {{indicator.permission}}
+                    </td>
+                    <td>
+                      <a href="javascript:void(0)" class="edit_indicator btn btn-default btn-mini"   id="{{indicator.id}}">Edit</i></a>
+                      <a href="javascript:void(0)" class="remove_indicator" id="{{indicator.id}}"><i class='fa fa-times text-error'></i></a>
+                    </td>
+                  {% endif %}
+              </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br/>
+    {% if c.userobj.name == user_name %}
+      <a href="javascript:void(0)" id="remove_gallery_indicators" class="btn disabled"> Remove Indicators </a>
+    {% endif %}
+    <br/>
+{% else %}
+    There're no indicators for this gallery yet.
+{% endif %}
+
+</div>
+</div>
+
+<!-- Save Indicator to Gallery -->
+{% snippet 'visualization/snippets/save_indicator_to_gallery.html', group_dropdown=c.group_dropdown %}
+
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="/common/css/visualization.css">
+<link rel="stylesheet" type="text/css" href="/common/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="/common/css/tableTools.css">
+
+{% resource 'ctdata_theme/my_gallery.js' %}
+
+{% endblock %}

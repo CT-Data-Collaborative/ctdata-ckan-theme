@@ -87,7 +87,7 @@ h1, h2, h3, h4 {
 	width:1024px;
 }
 #hdr .logo {
-	margin:-35px 0 0 0;
+	margin: -35px 0 0 -50px;
 	float:left;
 	/*width: 217px;*/
 }
@@ -98,10 +98,12 @@ h1, h2, h3, h4 {
 #hdr ul {
 	list-style-type:none;
 	margin:0;
+	margin-left: 250px;
 	padding:0;
 	font-family:'Roboto Condensed', Helvetica, Arial, Sans-Serif;
 	font-weight:normal;
-	float:right;
+	width: 1000px;
+	/*float:right;*/
 }
 #hdr li {
 	float:left;
@@ -134,6 +136,7 @@ h1, h2, h3, h4 {
 #gallery .gallerytitle {
 	position:absolute;
 	top:200px;
+	left: -50px;
 	color:#fff;
 	font-size:14px;
 	padding:15px 0 0 140px;

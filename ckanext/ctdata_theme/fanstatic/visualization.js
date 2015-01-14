@@ -4,7 +4,8 @@ var display_type  =  (location.search.split('v=')[1]||'').split('&')[0] || "tabl
     dataset_id    = $("#dataset_id").val(),
     create_popup  = $("#create_indicator_popup"),
     edit_popup    = $("#edit_indicators_popup"),
-    checkboxes_except_town = $("input[type='checkbox']:not(." + geography_param + ")")
+    create_for_gallery_popup    = $("#create_gallery_indicator_popup"),
+    checkboxes_except_town = $("input[type='checkbox']:not(." + geography_param + ")"),
     SUPPRESSED_VALUE = -9999;
 
 window.ids_to_remove = [];
@@ -14,6 +15,7 @@ edit_popup.modal({show: false});
 $('.close_popup').click(function() {
   create_popup.modal('hide');
   edit_popup.modal('hide');
+  create_for_gallery_popup.modal('hide')
 });
 
 function show_selected_indicator(){
@@ -23,18 +25,22 @@ function show_selected_indicator(){
   }
 }
 
+function show_seleted_filters(){
+  filters_hash = collect_filters_hash();
+  html_text    = "<ul>"
+
+  Object.keys(filters_hash).forEach(function (key) {
+    html_text += "<li><h4>" + key + "</h4><small>" + filters_hash[key].join(', ') + "</small></li>"
+  });
+  html_text += "</ul>"
+  $('.selected_filters').html(
+    html_text
+  );
+}
+
 function show_headline_popup(){
   $('#save_headline_indicator').on('click', function(){
-    filters_hash = collect_filters_hash();
-    html_text    = "<ul>"
-
-    Object.keys(filters_hash).forEach(function (key) {
-      html_text += "<li><h4>" + key + "</h4><small>" + filters_hash[key].join(', ') + "</small></li>"
-    });
-    html_text += "</ul>"
-    $('#selected_filters').html(
-      html_text
-    );
+    show_seleted_filters();
     create_popup.modal('show');
   });
 }
@@ -42,6 +48,14 @@ function show_headline_popup(){
 function show_edit_indicators_popup(){
   $('#edit_headline_indicators').on('click', function(){
     edit_popup.modal('show');
+  });
+}
+
+function show_create_gallery_indicators_popup(){
+
+  $('#save_indicator_to_gallery').on('click', function(){
+    show_seleted_filters();
+    create_for_gallery_popup.modal('show');
   });
 }
 
@@ -75,16 +89,35 @@ function update_headline_indicators(){
 }
 
 function create_headline_indicator(){
-  $('#create_headline_indicator').on('click', function(){
+  $('.create_headline_indicator').on('click', function(){
     filters = []
     Object.keys(filters_hash).forEach(function (key) {
       filters.push({field: key, values: filters_hash[key]})
     });
 
+    permission = 'public'
+    if ($('input:radio:checked').val() != undefined){
+      permission = $('input:radio:checked').val()
+    }
+
+    $form = $(this).closest('.modal-content').find('form');
+
+    type = $form.find('.indicator_ind_type').val();
+    name = $form.find('.indicator_name').val();
+    group_ids = []
+
+    $form.find('input:checked.indicator_group').map(function(){
+      group_ids.push($(this).val());
+    });
+
+    $('span.ajax_spinner').removeClass('hidden')
     $.ajax({type: "POST",
       url: "/community/add_indicator",
-      data: JSON.stringify({ dataset_id: dataset_id, name: $('#indicator_name').val(),
-                             headline: true, filters: filters}),
+      data: JSON.stringify({ dataset_id: dataset_id, name: name,
+                             ind_type: type, filters: filters,
+                             permission: permission,
+                             visualization_type: display_type,
+                             group_ids: group_ids.join()}),
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
           window.location.reload();
@@ -266,13 +299,19 @@ function set_map_checkbox(){
 
   //Check most recent year
   values = []
-  $("input:checked.Year").map(function(){
-    values.push(parseInt($(this).val()))
-  });
-  max_year = Math.max.apply(null, values).toString()
+  if ($("input.Year").length > 1){
 
-  $("input:checked.Year").prop('checked', false);
-  $("input:#"+ max_year +"Check.Year").prop('checked', true);
+    $("input:checked.Year").map(function(){
+      values.push(parseInt($(this).val()))
+    });
+    max_year = Math.max.apply(null, values).toString()
+
+    $("input:checked.Year").prop('checked', false);
+    $("input:#"+ max_year +"Check.Year").prop('checked', true);
+  }
+  else{
+    $("input.Year").prop('checked', true);
+  }
 }
 
 //When not showing map, allow multiple filters to be checked
@@ -289,30 +328,58 @@ function display_error(message){
 
 function display_data(){
 
-  display_filters();
-  display_spinner();
-  set_icon(display_type);
+    display_filters();
+    display_spinner();
+    set_icon(display_type);
 
-  if(display_type == 'column'){
-    new_type = 'bar';
-  } else {
-    new_type = display_type
-  }
+    if(display_type == 'column'){
+      new_type = 'bar';
+    } else {
+      new_type = display_type
+    }
+
     if(disabled.indexOf(new_type) != -1){
       display_error("This visualization is disabled for this dataset")
       return 0;
     }
-  towns = $("input." + geography_param + ":checked");
-  years = $("input.Year:checked");
-  if(towns.length == 0 && display_type != 'map'){
-    hide_spinner();
-    console.log('here')
-    return display_error("Please select a " + geography_param);
-  }
-  else if (years.length == 0){
-    hide_spinner();
-    return display_error("Please select a year");
-  }
+
+    towns = $("input." + geography_param + ":checked");
+    years = $("input.Year:checked");
+    error = ''
+
+    if(towns.length == 0 && display_type != 'map'){
+      if (window.location.href.indexOf(geography_param) > -1) {
+          $.ajax({type: "POST",
+              url: "/update_visualization_link/"+dataset_id,
+              data: JSON.stringify({view: 'table', filters: get_filters()}),
+              contentType: 'application/json; charset=utf-8'}).done(function(data) {
+                change_page_url(data.link)
+
+                handle_incompatibilities(data.compatibles)
+              });
+      }
+
+      hide_spinner();
+      error = "Please select a " + geography_param;
+    }
+
+    if (years.length == 0){
+      if (window.location.href.indexOf("Year") > -1) {
+          $.ajax({type: "POST",
+              url: "/update_visualization_link/"+dataset_id,
+              data: JSON.stringify({view: 'table', filters: get_filters()}),
+              contentType: 'application/json; charset=utf-8'}).done(function(data) {
+                change_page_url(data.link)
+
+                handle_incompatibilities(data['compatibles'])
+              });
+      }
+      hide_spinner();
+      error = "Please select a year";
+    }
+
+    if (error != '')
+        return display_error(error)
 
   switch(display_type){
     case "map":
@@ -361,7 +428,7 @@ function get_filters(){
 
 function handle_incompatibilities(compatibles){
 
-  all_inputs = $("input[type='checkbox']");
+  all_inputs = $("input[type='checkbox'][class != 'indicator_group']");
   $.each(all_inputs, function(i){
     if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
       $(all_inputs[i]).removeAttr("disabled");
@@ -384,7 +451,6 @@ function draw_table(){
                                omit_single_values: true
                                }),
           contentType: 'application/json; charset=utf-8'}).done(function(data) {
-
 
       handle_incompatibilities(data['compatibles']);
       change_page_url(data['link']);
@@ -669,6 +735,20 @@ function display_filters(){
 
 }
 
+function hide_or_show_clear_link(){
+  if ($('input[type="checkbox"][class != "indicator_group"]:checked').length > 0)
+    $('span.clear').show();
+  else
+    $('span.clear').hide();
+}
+
+function clear_all(){
+  $('.clear_all').on('click', function(){
+    $('input[type="checkbox"][class != "indicator_group"]:checked').prop('checked', false);
+    $('span.clear').hide();
+    display_data();
+  });
+}
 $(function () {
 
     select_all();
@@ -676,16 +756,21 @@ $(function () {
     check_defaults();
     show_headline_popup();
     show_edit_indicators_popup();
+    show_create_gallery_indicators_popup();
     add_ind_id_to_removing_list();
     update_headline_indicators();
     show_selected_indicator();
+    hide_or_show_clear_link();
+    clear_all();
+    $('.show_dataset_info').tooltip();
     $('.filter div.collapse').collapse('hide');
-    $('input[type="checkbox"]').change(function(){
+    $('input[type="checkbox"][class != "indicator_group"]').change(function(){
         $('#default.head_ind_link').prop('selected', true)
         if ($(this).attr('name') == geography_param){
           $li = $(this).closest('li')
           $li.prependTo($li.closest('ul'));
         }
+        hide_or_show_clear_link();
         display_data();
     });
     hide_spinner();
@@ -698,6 +783,7 @@ $(function () {
     }
     create_headline_indicator();
     $('.tooltip_a').tooltip();
+    $('.show_dataset_info').tooltip();
 
     var towns_names = []
     $.map( $('li', $('#collapse' + geography_param)), function(item){
@@ -727,4 +813,16 @@ $(function () {
     //move suppression between full description and source
     $('#Suppression').appendTo( $("li[id='Full Description']") )
     $('#Contributor').appendTo( $('#Contributor').closest('ul').find('li').last())
+
+    $('input.indicator_permission:').on('change', function(){
+      if ($('input.private_permission:checked').length > 0 ){
+        $('input.indicator_group:checked').prop('checked', false);
+        $('.groups_inputs').addClass('hidden')
+      }
+      else{
+        $('.groups_inputs').removeClass('hidden')
+      }
+
+    });
+
 });

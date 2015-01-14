@@ -43,11 +43,15 @@ class Database(object):
 
         self.session_factory = sessionmaker(bind=self.engine)
 
-    def add_column(self, table, column, connection_string):
+    def create_table(self, table_name, columns, connection_string):
+        self.engine = create_engine(connection_string)
+        self.engine.execute("CREATE TABLE %s (id INT NOT NULL, %s)" % (table_name, columns))
+
+    def add_column(self, table, column, connection_string, default_value):
         self.engine = create_engine(connection_string)
         column_name = column.compile(dialect=self.engine.dialect)
         column_type = column.type.compile(self.engine.dialect)
-        self.engine.execute('ALTER TABLE %s ADD COLUMN %s %s' % (table, column_name, column_type))
+        self.engine.execute("ALTER TABLE %s ADD COLUMN %s %s DEFAULT '%s'" % (table, column_name, column_type, default_value))
 
     def remove_column(self, table, column, connection_string):
         self.engine = create_engine(connection_string)

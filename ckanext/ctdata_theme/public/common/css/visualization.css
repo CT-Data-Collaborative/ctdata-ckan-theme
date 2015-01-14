@@ -153,13 +153,18 @@ div#error_message{
   visibility: hidden;
 }
 
-.select-all, .deselect-all{
+.select-all, .deselect-all {
   text-decoration: underline !important;
   color: #3970ba !important;
   font-size: 10pt;
   margin-left: 10px;
 }
 
+a.clear_all{
+  text-decoration: underline !important;
+  color: #3970ba !important;
+  margin-left: 90px;
+}
 #container{
   position: relative;
   min-height: 500px;
@@ -186,7 +191,7 @@ div#error_message{
 }
 
 #save_headline_indicator{
-  margin-left: 55px;
+  margin-left: 5px;
 }
 .headline_indicators{
   margin-top: 40px;

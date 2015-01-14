@@ -128,7 +128,7 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
-    def create_indicator(self, name, filters, dataset_id, owner, headline):
+    def create_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, permission = 'public', group_ids = ''):
         # assert owner is not None, "User must be passed in order for indicator creation to work"
 
         dataset = DatasetService.get_dataset(dataset_id)
@@ -145,7 +145,7 @@ class CommunityProfileService(object):
         for ex_ind in existing_inds:
             ex_fltrs = json.loads(ex_ind.filters)
             # python allows us to compare lists of dicts
-            if sorted(filters) == sorted(ex_fltrs):
+            if sorted(filters) == sorted(ex_fltrs) and ind_type != 'gallery':
                 raise ProfileAlreadyExists("Profile with such dataset and filters already exists")
         try:
             data_type = dict_with_key_value("field", "Measure Type", filters)['values'][0]
@@ -168,9 +168,9 @@ class CommunityProfileService(object):
                                              "or have '%Y-%m-%d %H:%M:%S' format")
 
         is_global = False
-        temp      = False if headline else True
+        temp      = False if ind_type == 'headline' or ind_type == 'gallery' else True
         indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
-                                     variable, headline, temp)
+                                     variable, temp, ind_type, visualization_type, permission, group_ids)
         owner.indicators.append(indicator)
 
         self.session.add(indicator)
@@ -193,12 +193,22 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
+    def update_indicator(self, indicator_id, name, permission, group_ids):
+        ind      = self.session.query(ProfileIndicator).get(indicator_id)
+        ind.name = name
+        ind.permission = permission
+        ind.group_ids  = ','.join(str(id) for id in group_ids)
+
+        self.session.commit()
+
+        return ind
+
     def remove_indicator(self, user, indicator_id):
         # in case someone accidentally forgot to pass a valid user object
         assert user is not None, "User must be passed in order for indicator removal to work"
         ind = self.session.query(ProfileIndicator).get(indicator_id)
 
-        if ind and user.is_admin and ind.headline:
+        if ind and user.is_admin and ind.ind_type == 'headline':
             self.session.delete(ind)
             self.remove_indicator_id_from_profiles(ind.id)
 
@@ -222,9 +232,28 @@ class CommunityProfileService(object):
             raise toolkit.ObjectNotFound("Indicator not found")
 
     def get_headline_indicators_for_dataset(self, dataset_id):
-        indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.headline == True,
+        indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.ind_type == 'headline',
                                                                       ProfileIndicator.dataset_id == dataset_id)).all()
         return indicators
+
+    def get_gallery_indicators_for_user(self, user_id, permission = 'all'):
+        ids = self.session.query(UserIndicatorLink.indicator_id).\
+                filter(UserIndicatorLink.user_id == user_id)
+        if permission == 'all':
+            indicators = self.session.query(ProfileIndicator).filter(and_(ProfileIndicator.ind_type == 'gallery',
+                                                                      ProfileIndicator.id.in_(ids))).all()
+        else:
+            indicators = self.session.query(ProfileIndicator).\
+            filter(and_(ProfileIndicator.ind_type == 'gallery', ProfileIndicator.permission == permission, ProfileIndicator.id.in_(ids))).all()
+
+        return indicators
+
+    def get_group_indicators(self, group_id):
+        indicators = self.session.query(ProfileIndicator).\
+            filter(and_(ProfileIndicator.ind_type == 'gallery',ProfileIndicator.permission != 'private' )).all()
+
+        group_indicators = filter(lambda ind: group_id in ind.group_ids.split(',') if ind.group_ids != None  else [] , indicators)
+        return group_indicators
 
     def get_indicators_by_ids(self, ids):
         indicators = self.session.query(ProfileIndicator).filter(ProfileIndicator.id.in_(ids)).all()

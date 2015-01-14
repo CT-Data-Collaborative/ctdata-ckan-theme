@@ -9,7 +9,9 @@ import routes.mapper
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.base as base
-from ckan.common import response as http_response, request as http_request
+from ckan.common import response as http_response, c, request as http_request
+import ckan.model as model
+import ckan.logic as logic
 
 from ctdata.database import Database
 from ctdata.visualization.services import DatasetService
@@ -21,6 +23,8 @@ from ctdata.users.services import UserService
 
 from IPython import embed
 
+
+get_action = logic.get_action
 
 def communities():
     db = Database()
@@ -58,6 +62,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_vizualization_data', '/vizualization_data/{dataset_name}', action='get_vizualization_data')
+            m.connect('update_visualization_link', '/update_visualization_link/{dataset_name}', action='update_visualization_link')
             m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
 
         with routes.mapper.SubMapper(
@@ -79,6 +84,9 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
             m.connect('user_community_profiles', '/user/{user_id}/my_community_profiles', action='community_profiles')
+            m.connect('user_gallery', '/user/{user_id}/gallery', action='my_gallery')
+            m.connect('remove_gallery_indicators', '/user/remove_gallery_indicators', action='remove_gallery_indicators')
+            m.connect('update_gallery_indicator',  '/user/update_gallery_indicator', action='update_gallery_indicator')
             m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
 
         with routes.mapper.SubMapper(
@@ -88,6 +96,11 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('page_news', '/pages/news', action='news')
             m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
             m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
+
+        with routes.mapper.SubMapper(
+                route_map,
+                controller='ckanext.ctdata_theme.ctdata.group.controllers:GroupController') as m:
+            m.connect('group_indicators', '/group/indicators/{group_id}', action='group_indicators')
 
         return route_map
 
@@ -116,7 +129,6 @@ def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = '
     link         = "/visualization/" + str(dataset_url) + link_params
 
     return link
-
 
 ####### Main Controller ##########
 
@@ -160,8 +172,6 @@ class CTDataController(base.BaseController):
         return json.dumps({'success': True})
 
     def visualization(self, dataset_name):
-
-
         ind_filters = http_request.GET.get('f')
 
         try:
@@ -175,6 +185,8 @@ class CTDataController(base.BaseController):
             dataset_meta = DatasetService.get_dataset_meta(dataset_name)
             geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
             geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+            help_info = filter(lambda x: x['key'] == 'Help',  dataset.ckan_meta['extras'])
+            help_str  = help_info[0]['value'] if help_info else ''
         except toolkit.ObjectNotFound:
             abort(404)
 
@@ -225,7 +237,17 @@ class CTDataController(base.BaseController):
         metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
         headline_indicators = self.community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
-        return base.render('visualization.html', extra_vars={'dataset': dataset.ckan_meta,
+
+        # Get list of groups
+        context   = {'model': model, 'session': model.Session,
+                     'user': c.user or c.author, 'for_view': True,
+                     'auth_user_obj': c.userobj, 'use_cache': False}
+        data_dict = {'am_member': True}
+
+        users_groups     = get_action('group_list_authz')(context, data_dict)
+        c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
+        c.help_info      = help_str
+        return base.render('visualization/visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'units':    metadata_units,
                                                              'metadata': metadata,
@@ -234,6 +256,28 @@ class CTDataController(base.BaseController):
                                                              'headline_indicators': headline_indicators,
                                                              'geography_param': geography_param})
 
+    def update_visualization_link(self, dataset_name):
+        json_body = json.loads(http_request.body, encoding=http_request.charset)
+
+        view_param       = json_body.get('view')
+        request_view     = 'chart' if view_param in ['table', 'column', 'line'] else view_param
+        request_filters  = json_body.get('filters')
+        data = {}
+        data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
+
+        try:
+            dataset = DatasetService.get_dataset(dataset_name)
+            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
+            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+        except toolkit.ObjectNotFound:
+            abort(404)
+
+        query_builder = QueryBuilderFactory.get_query_builder(request_view, dataset)
+        view = ViewFactory.get_view(request_view, query_builder)
+        data['compatibles'] = view.get_compatibles(request_filters)
+
+        http_response.headers['Content-type'] = 'application/json'
+        return json.dumps(data)
 
     def get_vizualization_data(self, dataset_name):
         try:
