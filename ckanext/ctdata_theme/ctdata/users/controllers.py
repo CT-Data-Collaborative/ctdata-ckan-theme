@@ -67,7 +67,7 @@ class UserController(UserController):
                                                             ind_params['permission'], ind_params['group_ids'])
 
         http_response.headers['Content-type'] = 'application/json'
-        return json.dumps({'success': True, 'link': link })
+        return json.dumps({'success': True})
 
     def remove_gallery_indicators(self):
         user_name    = http_request.environ.get("REMOTE_USER")
