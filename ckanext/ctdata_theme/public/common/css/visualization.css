@@ -20,6 +20,9 @@ div.panel-collapse.collapse.in{
 ul.scrollable{
   overflow-y: scroll !important;
   max-height: 200px;
+
+
+  -webkit-overflow-scrolling: touch !important;
 }
 
 input[type="checkbox"],input[type="radio"]{
@@ -229,4 +232,27 @@ a.change_dataset_link:hover{
 .dataset_info h3{
   color: #63CEBE;
   font-weight: 400;
+}
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+::-webkit-scrollbar:vertical {
+    width: 6px;
+}
+
+::-webkit-scrollbar:horizontal {
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, .5);
+    border-radius: 5px;
+    border: 2px solid #ffffff;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background-color: #ffffff;
 }
