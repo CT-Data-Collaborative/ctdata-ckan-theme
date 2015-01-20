@@ -435,6 +435,7 @@ function handle_incompatibilities(compatibles){
       $(all_inputs[i]).parent().find("label").css("color", "gray");
     }else{
       $(all_inputs[i]).attr("disabled", true);
+      $(all_inputs[i]).attr("checked", false);
       $(all_inputs[i]).parent().find("label").css("color", "lightgray");
     }
   });
