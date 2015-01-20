@@ -212,6 +212,8 @@ class ChartView(View):
                 current_town['data'].append(float(cur_value))
             except ValueError:
                 current_town['data'].append(None)
+            except TypeError:
+                current_town['data'].append(None)
 
             check_year += 1
 
