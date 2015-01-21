@@ -773,6 +773,12 @@ $(function () {
     show_selected_indicator();
     hide_or_show_clear_link();
     clear_all();
+    $('.filter').on('mouseover', function(){
+      $(this).closest('ul').find('span.more_copy').removeClass('hidden')
+    });
+    $('.filter').on('mouseout', function(){
+      $(this).closest('ul').find('span.more_copy').addClass('hidden')
+    });
     $('.show_dataset_info').tooltip();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"][class != "indicator_group"]').change(function(){

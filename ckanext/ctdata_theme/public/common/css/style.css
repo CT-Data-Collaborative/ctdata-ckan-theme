@@ -511,14 +511,3 @@ input[type="radio"] {
   top: 150px;
   left: 300px;
 }
-
-.container_2{
-  min-width: 310px; min-height: 400px;
-  position:relative;
-  overflow: scroll;
-  height: 500px;
-}
-
-.results_table a.togglebtn { font-size:16px; color:#444; padding:10px 0; border-bottom:1px solid #eee; display:inline-block; width:100%; background:url(../images/tgl_down.png) no-repeat right center;}
-
-

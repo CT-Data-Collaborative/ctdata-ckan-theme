@@ -77,8 +77,13 @@
     {% endif %}
   {% endfor %}
   </ul>
+
   </div>
 </li>
+{% if dimension.possible_values|length > 8 %}
+  <span class="more_copy text-center hidden"> More ↓ </span>
+{% endif %}
+
 {% endif %}
 {% endfor %}
 </ul>
