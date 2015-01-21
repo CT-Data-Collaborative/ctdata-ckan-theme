@@ -35,6 +35,19 @@
             <div class= 'dataset-content'>
               <h3 class='dataset-heading'>
                 <a href="{{ indicator.link_to_visualization() }}">
+                  {% if  indicator.visualization_type == 'table' %}
+                    <img id="table_icon" src="/common/images/displayopt1-inv.png" alt="" />
+                  {% endif %}
+                  {% if  indicator.visualization_type == 'chart' %}
+                    <img id="bar_icon" src="/common/images/displayopt2.png" alt="" />
+                  {% endif %}
+                  {% if  indicator.visualization_type == 'line' %}
+                    <img id="line_icon" src="/common/images/displayopt3.png" alt="" />
+                  {% endif %}
+                  {% if  indicator.visualization_type == 'map' %}
+                    <img id="line_icon" src="/common/images/displayopt4.png" alt="" />
+                  {% endif %}
+
                   {{indicator.name}}
                 </a>
               </h3>
