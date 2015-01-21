@@ -126,14 +126,20 @@
 <div class="spinner"> <img src="/common/images/loading.gif"/> </div>
 <div class="results_table">
     <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>
+    <hr>
+    <a href="#second_table" data-toggle="collapse" class="togglebtn">Table View</a>
+    <div id="second_table" class="">
+      <div><div id="container_2" class="container_2"></div></div>
+    </div>
 
-    <div id="metadata" >
-      <a class="togglebtn metadata_container">About this dataset</a>
+    <div id="metadata">
+      <a class="togglebtn metadata_container" href="#collapseMetadata" data-toggle="collapse">About this dataset</a>
+      <hr>
       <div id="collapseMetadata">
         <ul>
         {% for property in metadata %}
           <li id="{{property['key']}}">
-            <a class="togglebtn" >{{property['key']}}</a>
+            <a class="" >{{property['key']}}</a>
             <div class="dataValue">
                 {% if property['key'] == "Suppression" %}
                   <span class="red">{{property['value']}}</span>

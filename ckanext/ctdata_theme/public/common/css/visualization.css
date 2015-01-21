@@ -135,6 +135,7 @@ div#metadata{
   padding-top:15px;
   padding-bottom: 15px;
   padding-left:15px;
+  padding-right:15px;
   border-radius: 10px;
 }
 div#error_message{
