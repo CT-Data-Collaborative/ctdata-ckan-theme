@@ -513,7 +513,8 @@ function draw_table(){
               array = text.split('.')
 
               if (jQuery.isNumeric(text) == true && array.length == 1){
-                cur_value = parseInt(text).toLocaleString('en-US')
+                // cur_value = parseInt(text).toLocaleString('en-US')
+                cur_value = parseInt(text).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
               }
 
               type = data['data'][row_index]['dims']['Measure Type']
