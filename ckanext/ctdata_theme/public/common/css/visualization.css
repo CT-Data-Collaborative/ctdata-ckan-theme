@@ -14,7 +14,7 @@ color: #000000;
 div.panel-collapse.collapse.in{
   max-height: 200px;
   overflow-x: hidden;
-  overflow-y: none;
+  overflow-y: hidden;
 }
 
 ul.scrollable{
@@ -135,6 +135,7 @@ div#metadata{
   padding-top:15px;
   padding-bottom: 15px;
   padding-left:15px;
+  padding-right:15px;
   border-radius: 10px;
 }
 div#error_message{
@@ -229,4 +230,20 @@ a.change_dataset_link:hover{
 .dataset_info h3{
   color: #63CEBE;
   font-weight: 400;
+}
+
+.container_2{
+  min-width: 310px; min-height: 400px;
+  position:relative;
+  overflow: scroll;
+  height: 500px;
+}
+
+.results_table a.togglebtn { font-size:16px; color:#444; padding:10px 0; border-bottom:1px solid #eee; display:inline-block; width:100%; background:url(../images/tgl_down.png) no-repeat right center;}
+
+.more_copy{
+  width: 200px;
+  width: 250px;
+  background: rgb(244, 241, 241);
+  display: block;
 }

@@ -26,14 +26,13 @@ $.ajax({type: "POST",
                              }),
         contentType: 'application/json; charset=utf-8'}).done(function(data) {
 
+change_page_url(data['link']);
 
 if (data.data.length == 0){
-  console.log('here')
   hide_spinner()
   return display_error('Map view is not available')
 }
 
-change_page_url(data['link']);
 handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
