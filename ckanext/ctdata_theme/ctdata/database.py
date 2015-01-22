@@ -9,7 +9,7 @@ from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Bo
 from visualization.models import VisualizationOrmBase
 from .utils import Singleton
 from community.models import Base, CommunityProfile, Town
-
+from sqlalchemy.pool import NullPool
 
 class Database(object):
     __metaclass__ = Singleton
@@ -37,7 +37,7 @@ class Database(object):
         )
 
     def init_sa(self, connection_string):
-        self.engine = create_engine(connection_string, pool_size=100)
+        self.engine = create_engine(connection_string, poolclass=NullPool)
         Base.metadata.create_all(self.engine)
         VisualizationOrmBase.metadata.create_all(self.engine)
 
