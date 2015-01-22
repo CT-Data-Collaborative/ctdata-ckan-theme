@@ -1,0 +1,54 @@
+<div id="edit_indicators_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            Update Group Indicators
+        </div>
+        <div class="modal-content">
+           <div class="modal-body disable-scroll">
+              <input type="hidden" id="group_id" value="{{group_id}}">
+              <table class="table">
+                  {% for indicator in user_indicators%}
+                    <tr>
+                      <td> {{indicator.name}} </td>
+                      <td> {{indicator.permission}} </td>
+                      <td>
+                        {% if  group_id in indicator.group_ids.split(',') %}
+                          <input type="checkbox" value="{{indicator.id}}" class="indicator_group" checked> In the group
+                        {% else %}
+                          <input type="checkbox" value="{{indicator.id}}" class="indicator_group" > In the group
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  <br>
+              </table>
+              {% if indicators_to_edit %}
+                Added by other members:
+              {% endif %}
+              <table class="table">
+                  {% for indicator in indicators_to_edit%}
+                    <tr>
+                      <td> {{indicator.name}} </td>
+                      <td> {{indicator.permission}} </td>
+                      <td>
+                        {% if  group_id in indicator.group_ids.split(',') %}
+                          <input type="checkbox" value="{{indicator.id}}" class="indicator_group" checked> In the group
+                        {% else %}
+                          <input type="checkbox" value="{{indicator.id}}" class="indicator_group" > In the group
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+              </table>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+                  <div style="float: right">
+                      <span class='ajax_spinner hidden'><img src="/common/images/ajax-loader.gif"></span>
+                      <button id="update_indicators" class="btn btn-info">Save</button>
+                      <button class="btn close_popup">Cancel</button>
+                  </div>
+              </div>
+          </div>
+</div>

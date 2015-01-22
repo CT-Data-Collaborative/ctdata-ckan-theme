@@ -136,18 +136,21 @@ class ProfileIndicator(Base):
 
         return link
 
+    def user_id(self):
+        ckan_user_id = model.Session.query(UserIndicatorLink.user_id).filter(UserIndicatorLink.indicator_id == self.id).first()
+        return ckan_user_id[0]
 
 class ProfileIndicatorValue(Base):
     __tablename__ = 'ctdata_profile_indicator_values'
 
-    id = Column(Integer, primary_key=True)
+    id           = Column(Integer, primary_key=True)
     indicator_id = Column(Integer, ForeignKey('ctdata_profile_indicators.id'))
-    town_id = Column(BigInteger, ForeignKey('ctdata_towns.fips'))
-    value = Column(String)
+    town_id      = Column(BigInteger, ForeignKey('ctdata_towns.fips'))
+    value        = Column(String)
 
-    indicator = relationship("ProfileIndicator", backref=backref('values', cascade="save-update, merge, "
+    town         = relationship("Town", backref=backref('values'))
+    indicator    = relationship("ProfileIndicator", backref=backref('values', cascade="save-update, merge, "
                                                                                    "delete, delete-orphan"))
-    town = relationship("Town", backref=backref('values'))
 
     def __init__(self, indicator, town, value):
         self.indicator = indicator
@@ -161,14 +164,14 @@ class ProfileIndicatorValue(Base):
 class UserIndicatorLink(Base):
     __tablename__ = 'ctdata_users_indicators'
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(String, ForeignKey('ctdata_user_info.ckan_user_id'))
+    id           = Column(Integer, primary_key=True)
+    user_id      = Column(String, ForeignKey('ctdata_user_info.ckan_user_id'))
     indicator_id = Column(Integer, ForeignKey('ctdata_profile_indicators.id'))
-    deleted = Column(Boolean, default=False)
+    deleted      = Column(Boolean, default=False)
 
-    indicator = relationship("ProfileIndicator", backref=backref("users_links", cascade="save-update, merge, "
+    user         = relationship("UserInfo", backref="indicators_links")
+    indicator    = relationship("ProfileIndicator", backref=backref("users_links", cascade="save-update, merge, "
                                                                                         "delete, delete-orphan"))
-    user = relationship("UserInfo", backref="indicators_links")
 
     def __init__(self, indicator=None, user=None, deleted=False):
         self.indicator = indicator
