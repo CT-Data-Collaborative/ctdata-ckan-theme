@@ -5,8 +5,8 @@ var ids_to_remove    = [],
 
 $(function(){
 
-  $('.close_popup').click(function() {
-    $("#create_gallery_indicator_popup").modal('hide')
+  $('.close_popup').on('click', function() {
+    $("#edit_indicators_popup").modal('hide')
   });
 
 

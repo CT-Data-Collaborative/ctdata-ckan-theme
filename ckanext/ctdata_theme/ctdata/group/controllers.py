@@ -36,6 +36,7 @@ class GroupController(GroupController):
       user_name        = http_request.environ.get("REMOTE_USER")
       group_indicators = self.community_profile_service.get_group_indicators(group['id'])
       user_indicators  = self.community_profile_service.get_gallery_indicators_for_user(c.userobj.id)
+      user_indicators  = filter(lambda ind: ind.permission != 'private', user_indicators)
 
       indicators_to_edit = []
       if c.userobj.sysadmin:
