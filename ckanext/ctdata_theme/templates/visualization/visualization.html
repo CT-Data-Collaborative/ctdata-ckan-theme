@@ -23,7 +23,7 @@
         <span class="caretbox"><span class="caret"></span></span>
       </option>
       {% for indicator in headline_indicators %}
-        <option value="{{ h.link_to_indicator(indicator) }}" class="head_ind_link" id="{{indicator.id}}"> {{indicator.name}} </option>
+        <option value="{{ indicator.link_to_visualization() }}" class="head_ind_link" id="{{indicator.id}}"> {{indicator.name}} </option>
       {% endfor %}
     </select>
 
