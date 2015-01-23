@@ -23,7 +23,7 @@
         <span class="caretbox"><span class="caret"></span></span>
       </option>
       {% for indicator in headline_indicators %}
-        <option value="{{ h.link_to_indicator(indicator) }}" class="head_ind_link" id="{{indicator.id}}"> {{indicator.name}} </option>
+        <option value="{{ indicator.link_to_visualization() }}" class="head_ind_link" id="{{indicator.id}}"> {{indicator.name}} </option>
       {% endfor %}
     </select>
 
@@ -81,7 +81,7 @@
   </div>
 </li>
 {% if dimension.possible_values|length > 8 %}
-  <span class="more_copy text-center hidden"> More ↓ </span>
+  <span class="more_copy text-center hidden"> scroll to see more ↓  </span>
 {% endif %}
 
 {% endif %}
@@ -131,12 +131,15 @@
 <div class="spinner"> <img src="/common/images/loading.gif"/> </div>
 <div class="results_table">
     <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>
-    <hr>
-    <a href="#second_table" data-toggle="collapse" class="togglebtn">Table View</a>
-    <div id="second_table" class="">
-      <div><div id="container_2" class="container_2"></div></div>
-    </div>
 
+    <span id="link_to_second_table" class="hidden">
+      <hr>
+      <a href="#second_table" data-toggle="collapse" class="togglebtn">Table Data</a>
+      </span>
+      <div id="second_table" class="">
+        <div><div id="container_2" class=""></div></div>
+    </div>
+    <br>
     <div id="metadata">
       <a class="togglebtn metadata_container" href="#collapseMetadata" data-toggle="collapse">About this dataset</a>
       <hr>

@@ -9,15 +9,15 @@
               <table class="table">
                   {% for indicator in user_indicators%}
                     <tr>
-                      <td> {{indicator.name}} </td>
-                      <td> {{indicator.permission}} </td>
                       <td>
                         {% if  group_id in indicator.group_ids.split(',') %}
-                          <input type="checkbox" value="{{indicator.id}}" class="indicator_group" checked> In the group
+                          <input type="checkbox" value="{{indicator.id}}" class="indicator_group" checked>
                         {% else %}
-                          <input type="checkbox" value="{{indicator.id}}" class="indicator_group" > In the group
+                          <input type="checkbox" value="{{indicator.id}}" class="indicator_group" >
                         {% endif %}
                       </td>
+                      <td> {{indicator.name}} </td>
+                      <td> {{indicator.permission}} </td>
                     </tr>
                   {% endfor %}
                   <br>

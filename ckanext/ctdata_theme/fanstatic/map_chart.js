@@ -19,6 +19,10 @@ $.each(filters, function(i){
 if (town_index >= 0)
   filters.splice(town_index, 1)
 
+$("#container_2").addClass('hidden');
+$("#link_to_second_table").addClass('hidden');
+$("#container_2").html('');
+
 $.ajax({type: "POST",
         url: "/vizualization_data/" + dataset_id,
         data: JSON.stringify({view: 'map',
