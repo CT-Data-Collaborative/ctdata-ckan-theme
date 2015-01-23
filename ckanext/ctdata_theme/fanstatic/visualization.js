@@ -382,6 +382,7 @@ function display_data(){
     if (error != ''){
         $("#container_2").html('');
         $("#container_2").addClass('hidden');
+        $("#link_to_second_table").addClass('hidden');
         return display_error(error)
     }
 
@@ -554,10 +555,12 @@ function draw_table(){
       if (needed_view_type == 'line_or_chart'){
         $("#container_2").html(html);
         $("#container_2").removeClass('hidden')
+        $("#link_to_second_table").removeClass('hidden')
       }
       else{
         $("#container").html(html);
         $("#container_2").addClass('hidden');
+        $("#link_to_second_table").addClass('hidden');
         $("#container_2").html('');
 
         $("#table").DataTable({
@@ -569,6 +572,7 @@ function draw_table(){
         });
       }
   //format_numbers();
+  $('#second_table').collapse('hide')
   hide_spinner();
 });
 }
@@ -774,12 +778,19 @@ $(function () {
     show_selected_indicator();
     hide_or_show_clear_link();
     clear_all();
-    $('.filter').on('mouseover', function(){
-      $(this).closest('ul').find('span.more_copy').removeClass('hidden')
+    $('li.filter').on('mouseover', function(){
+      $(this).next('span.more_copy').removeClass('hidden')
     });
-    $('.filter').on('mouseout', function(){
-      $(this).closest('ul').find('span.more_copy').addClass('hidden')
+
+    $('li.filter').on('mouseout', function(){
+      $(this).next('span.more_copy').addClass('hidden')
     });
+
+    $('ul.scrollable').on('scroll', function(){
+      $(this).closest('li.filter').next('span.more_copy').addClass('hidden')
+    });
+
+
     $('.show_dataset_info').tooltip();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"][class != "indicator_group"]').change(function(){
