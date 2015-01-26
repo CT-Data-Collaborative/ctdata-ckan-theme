@@ -81,7 +81,7 @@
   </div>
 </li>
 {% if dimension.possible_values|length > 8 %}
-  <span class="more_copy text-center hidden"> scroll to see more ↓  </span>
+  <span class="more_copy hidden_visibility text-center"> scroll to see more ↓  </span>
 {% endif %}
 
 {% endif %}
@@ -133,17 +133,16 @@
     <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>
 
     <span id="link_to_second_table" class="hidden">
-      <hr>
       <a href="#second_table" data-toggle="collapse" class="togglebtn">Table Data</a>
-      </span>
-      <div id="second_table" class="">
-        <div><div id="container_2" class=""></div></div>
+    </span>
+    <div id="second_table" class="in collapse">
+      <div id="container_2" class=""></div>
     </div>
     <br>
     <div id="metadata">
-      <a class="togglebtn metadata_container" href="#collapseMetadata" data-toggle="collapse">About this dataset</a>
+      <a class="metadata_container" href="#collapseMetadata" data-toggle="collapse">About this dataset</a>
       <hr>
-      <div id="collapseMetadata">
+      <div id="collapseMetadata" class="collapse">
         <ul>
         {% for property in metadata %}
           <li id="{{property['key']}}">
@@ -159,10 +158,10 @@
         {% endfor %}
 
         </ul>
-      </div>
-      <div class="full_metadata_link">
+        <div class="full_metadata_link">
         <a href="/dataset/{{dataset.name}}#additional_info" >View Full Metadata</a>
       <div>
+      </div>
     </div>
 
 

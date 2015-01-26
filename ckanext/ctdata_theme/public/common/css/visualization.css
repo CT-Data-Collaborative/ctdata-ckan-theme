@@ -235,10 +235,9 @@ a.change_dataset_link:hover{
 }
 
 .container_2{
-  /*min-width: 310px; min-height: 400px;*/
+  min-width: 310px; min-height: 400px;
   position:relative;
-  overflow: scroll;
-  height: 500px;
+  /*overflow: scroll;*/
   display: block;
 }
 
@@ -259,7 +258,11 @@ a.change_dataset_link:hover{
   width: 240px;
   display: block;
   color: rgb(160, 159, 159);
-  border-bottom: 1px dotted rgb(160, 159, 159);
+  border-bottom: 1px dotted #ddd;
+}
+
+.hidden_visibility{
+  visibility: hidden;
 }
 
 input[type=checkbox] {
