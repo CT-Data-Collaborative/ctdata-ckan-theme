@@ -134,15 +134,15 @@
 
     <span id="link_to_second_table" class="hidden">
       <a href="#second_table" data-toggle="collapse" class="togglebtn">Table Data</a>
-      </span>
-      <div id="second_table" class="">
-        <div id="container_2" class=""></div>
+    </span>
+    <div id="second_table" class="in collapse">
+      <div id="container_2" class=""></div>
     </div>
     <br>
     <div id="metadata">
-      <a class=" metadata_container" href="#collapseMetadata" data-toggle="collapse">About this dataset</a>
+      <a class="metadata_container" href="#collapseMetadata" data-toggle="collapse">About this dataset</a>
       <hr>
-      <div id="collapseMetadata">
+      <div id="collapseMetadata" class="collapse">
         <ul>
         {% for property in metadata %}
           <li id="{{property['key']}}">
@@ -158,10 +158,10 @@
         {% endfor %}
 
         </ul>
-      </div>
-      <div class="full_metadata_link">
+        <div class="full_metadata_link">
         <a href="/dataset/{{dataset.name}}#additional_info" >View Full Metadata</a>
       <div>
+      </div>
     </div>
 
 
