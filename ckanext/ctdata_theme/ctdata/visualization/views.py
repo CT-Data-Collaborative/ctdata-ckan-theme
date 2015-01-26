@@ -353,6 +353,11 @@ class MapView(View):
           rows = curs.fetchall()
           for row in rows:
             compatibles.append(str(row[0]))
+
+        curs.close()
+        del curs
+        conn.close()
+
       return compatibles
 
 
