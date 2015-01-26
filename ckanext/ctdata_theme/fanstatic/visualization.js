@@ -779,15 +779,15 @@ $(function () {
     hide_or_show_clear_link();
     clear_all();
     $('li.filter').on('mouseover', function(){
-      $(this).next('span.more_copy').removeClass('hidden')
+      $(this).next('span.more_copy').removeClass('hidden_visibility')
     });
 
     $('li.filter').on('mouseout', function(){
-      $(this).next('span.more_copy').addClass('hidden')
+      $(this).next('span.more_copy').addClass('hidden_visibility')
     });
 
     $('ul.scrollable').on('scroll', function(){
-      $(this).closest('li.filter').next('span.more_copy').addClass('hidden')
+      $(this).closest('li.filter').next('span.more_copy').addClass('hidden_visibility')
     });
 
 

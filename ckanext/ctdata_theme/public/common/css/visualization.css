@@ -259,7 +259,11 @@ a.change_dataset_link:hover{
   width: 240px;
   display: block;
   color: rgb(160, 159, 159);
-  border-bottom: 1px dotted rgb(160, 159, 159);
+  border-bottom: 1px dotted #ddd;
+}
+
+.hidden_visibility{
+  visibility: hidden;
 }
 
 input[type=checkbox] {
