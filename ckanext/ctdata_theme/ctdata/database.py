@@ -75,4 +75,8 @@ class Database(object):
                 new_town = Town(town[1], town[0])
                 session.add_all([comm_prof, new_town])
 
+            curs.close()
+            del curs
+            conn.close()
+
         session.commit()
