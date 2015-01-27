@@ -113,6 +113,7 @@ class Dataset(object):
 
                 # check whether we have info about incompatibles
                 has_inc = True if self.incs_meta_url else False
+
                 curs.close()
                 del curs
                 conn.close()

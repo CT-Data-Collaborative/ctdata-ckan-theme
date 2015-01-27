@@ -46,9 +46,11 @@ class View(object):
                 result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
 
                 conn.commit()
+
                 curs.close()
                 del curs
                 conn.close()
+
         except psycopg2.ProgrammingError:
             result['data'] = []
 
@@ -89,10 +91,10 @@ class View(object):
           rows = curs.fetchall()
           for row in rows:
             compatibles.append(str(row[0]))
+
         curs.close()
         del curs
         conn.close()
-
       return compatibles
 
 class TableView(View):
