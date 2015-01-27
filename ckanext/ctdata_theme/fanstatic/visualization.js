@@ -865,4 +865,5 @@ $(function () {
 
     });
 
+    $('#collapseMetadata').collapse()
 });
