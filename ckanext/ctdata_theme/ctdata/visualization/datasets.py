@@ -126,6 +126,7 @@ class Dataset(object):
 #                sess.commit()
 #
 #                conn.commit()
+        sess.close()
 
 
 class Dimension(object):
