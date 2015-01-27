@@ -786,11 +786,6 @@ $(function () {
       $(this).next('span.more_copy').addClass('hidden_visibility')
     });
 
-    $('ul.scrollable').on('scroll', function(){
-      $(this).closest('li.filter').next('span.more_copy').addClass('hidden_visibility')
-    });
-
-
     $('.show_dataset_info').tooltip();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"][class != "indicator_group"]').change(function(){
@@ -812,17 +807,19 @@ $(function () {
 
     var width = $(window).width() * 0.6;
     $("#container").width(width);
-    $("#container_2").width(width);
+    $("#container_2").width(width + 0.1);
     $("a.togglebtn", $('.results_table')).width(width);
-    $("#second_table").width(width);
+    $("#second_table").width(width + 60);
     $("#metadata").width(width);
+    $("#collapseMetadata").width(width + 50);
     window.onresize = function() {
       var width = $(window).width() * 0.6;
       $("#container").width(width);
-      $("#container_2").width(width);
+      $("#container_2").width(width + 50);
       $("a.togglebtn", $('.results_table')).width(width);
-      $("#second_table").width(width);
+      $("#second_table").width(width + 50);
       $("#metadata").width(width);
+      $("#collapseMetadata").width(width+50);
     }
     create_headline_indicator();
     $('.tooltipsecond_table_a').tooltip();
@@ -868,4 +865,5 @@ $(function () {
 
     });
 
+    $('#collapseMetadata').collapse()
 });

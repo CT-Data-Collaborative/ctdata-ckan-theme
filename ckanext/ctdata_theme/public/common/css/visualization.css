@@ -138,6 +138,7 @@ div#metadata{
   padding-left:15px;
   padding-right:15px;
   border-radius: 3px;
+  margin-left: 50px;
 }
 div#error_message{
   font-size: 30px;
@@ -233,11 +234,10 @@ a.change_dataset_link:hover{
   font-weight: 400;
 }
 
-.container_2{
-  min-width: 310px; min-height: 400px;
-  position:relative;
-  /*overflow: scroll;*/
-  display: block;
+
+#container_2  table.results_table{
+   margin-left: 50px;
+   width: 100%;
 }
 
 .results_table{
@@ -251,7 +251,9 @@ a.change_dataset_link:hover{
   border-top:1px solid #eee;
   display: inline-block;
   width:100%;
-  background:url(../images/tgl_down.png) no-repeat right center;}
+  background:url(../images/tgl_down.png) no-repeat right center;
+  margin-left: 50px;
+}
 
 .more_copy{
   width: 240px;
@@ -279,6 +281,9 @@ position: relative;
 margin-top: 0;
 }
 
+.less_max_height{
+  max-height: 130px !important;
+}
 a.gray_back{
   background: none !important;
   background-color: rgba(190, 187, 187, 0.19) !important;
