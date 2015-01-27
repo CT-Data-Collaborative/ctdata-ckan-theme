@@ -75,6 +75,7 @@ class CommunityProfileService(object):
         self.session.commit()
         new_profile.default_url += '?p=' + str(new_profile.id)
         self.session.commit()
+        self.session.close()
         return new_profile
 
     def update_community_profile_name(self, community_id, name, user_id ):
@@ -82,12 +83,14 @@ class CommunityProfileService(object):
         if community and community.user_id == user_id:
             community.name = name
             self.session.commit()
+            self.session.close()
 
     def remove_community_profile(self, community_id, user_id ):
         community = self.session.query(CommunityProfile).get(community_id)
         if community.user_id == user_id:
             self.session.delete(community)
             self.session.commit()
+            self.session.close()
 
     def get_town(self, town_name):
         town = self.session.query(Town).filter(Town.name == town_name).first()
@@ -127,6 +130,7 @@ class CommunityProfileService(object):
             self.session.delete(indicator)
 
         self.session.commit()
+        self.session.close()
 
     def create_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, permission = 'public', group_ids = ''):
         # assert owner is not None, "User must be passed in order for indicator creation to work"
@@ -186,12 +190,14 @@ class CommunityProfileService(object):
                 profile.indicator_ids =  ','.join(str(x) for x in ids)
 
         self.session.commit()
+        self.session.close()
 
     def update_indicator_name(self, indicator_id, name):
         ind = self.session.query(ProfileIndicator).get(indicator_id)
         ind.name = name
 
         self.session.commit()
+        self.session.close()
 
     def move_or_add_to_group(self, indicator_id, group_id, action):
         ind       = self.session.query(ProfileIndicator).get(indicator_id)
@@ -203,6 +209,7 @@ class CommunityProfileService(object):
             ind.group_ids = ','.join(str(id) for id in list( set(group_ids) - set([group_id])))
 
         self.session.commit()
+        self.session.close()
 
     def update_indicator(self, indicator_id, name, permission, group_ids):
         ind      = self.session.query(ProfileIndicator).get(indicator_id)
@@ -211,6 +218,7 @@ class CommunityProfileService(object):
         ind.group_ids  = ','.join(str(id) for id in group_ids)
 
         self.session.commit()
+        self.session.close()
 
         return ind
 
