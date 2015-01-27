@@ -67,7 +67,11 @@
         </div>
       {% endif %}
   </span>
-  <ul class="scrollable">
+  {% if dimension.name == geography_param %}
+    <ul class="scrollable less_max_height">
+  {% else %}
+    <ul class="scrollable">
+  {% endif %}
   {% for value in dimension.possible_values %}
     {% if value|length > 0 %}
     <li id = "{{value}}">
@@ -132,6 +136,10 @@
 <div class="results_table">
     <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>
 
+    <br>
+    <br>
+    <br>
+    <br>
     <span id="link_to_second_table" class="hidden">
       <a href="#second_table" data-toggle="collapse" class="togglebtn gray_back">
         Table Data
