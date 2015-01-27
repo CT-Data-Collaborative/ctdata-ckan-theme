@@ -800,6 +800,12 @@ $(function () {
           $li.prependTo($li.closest('ul'));
         }
         hide_or_show_clear_link();
+        is_checked = $(this).prop('checked')
+        if (display_type == 'map'){
+          $ul = $(this).closest('li').closest('ul')
+          $ul.find('input').prop('checked', false)
+          $(this).prop('checked', is_checked)
+        }
         display_data();
     });
     hide_spinner();
