@@ -80,3 +80,4 @@ class Database(object):
             conn.close()
 
         session.commit()
+        session.close()
