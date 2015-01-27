@@ -6,7 +6,8 @@ var display_type  =  (location.search.split('v=')[1]||'').split('&')[0] || "tabl
     edit_popup    = $("#edit_indicators_popup"),
     create_for_gallery_popup    = $("#create_gallery_indicator_popup"),
     checkboxes_except_town = $("input[type='checkbox']:not(." + geography_param + ")"),
-    SUPPRESSED_VALUE = -9999;
+    SUPPRESSED_VALUE = -9999,
+    needed_view_type = '';
 
 window.ids_to_remove = [];
 
@@ -378,35 +379,35 @@ function display_data(){
       error = "Please select a year";
     }
 
-    if (error != '')
+    if (error != ''){
+        $("#container_2").html('');
+        $("#container_2").addClass('hidden');
+        $("#link_to_second_table").addClass('hidden');
         return display_error(error)
+    }
 
   switch(display_type){
     case "map":
      //Show the print and save icons
+      needed_view_type = 'map'
       $(".operations").css("visibility","visible");
       draw_map();
       break;
     case "table":
       //Don't show the print and save icons
+      needed_view_type = 'table'
       $(".operations").css("visibility","hidden");
       draw_table();
       break;
     default:
       //Show the print and save icons
+      needed_view_type = 'line_or_chart'
       $(".operations").css("visibility","visible");
+      draw_table();
       draw_chart();
   }
 }
-/*
-function check_defaults(){
-  $.each(default_filters, function(i){
-    $("li.filter").find("input[value='"+default_filters[i]+"']").prop('checked', true);
-    });
-  $(".MeasureType").first().prop('checked', true);
-  $(".Variable").first().prop('checked', true);
-}
-*/
+
 function get_filters(){
   var filters = [];
   dimensions = $("li.filter");
@@ -435,6 +436,7 @@ function handle_incompatibilities(compatibles){
       $(all_inputs[i]).parent().find("label").css("color", "gray");
     }else{
       $(all_inputs[i]).attr("disabled", true);
+      $(all_inputs[i]).attr("checked", false);
       $(all_inputs[i]).parent().find("label").css("color", "lightgray");
     }
   });
@@ -453,7 +455,8 @@ function draw_table(){
           contentType: 'application/json; charset=utf-8'}).done(function(data) {
 
       handle_incompatibilities(data['compatibles']);
-      change_page_url(data['link']);
+      if (needed_view_type == 'table')
+        change_page_url(data['link']);
       first_idx = 0;
       while(data['data'][first_idx] && !data['data'][first_idx]['dims'])
         first_idx++;
@@ -511,7 +514,8 @@ function draw_table(){
               array = text.split('.')
 
               if (jQuery.isNumeric(text) == true && array.length == 1){
-                cur_value = parseInt(text).toLocaleString('en-US')
+                // cur_value = parseInt(text).toLocaleString('en-US')
+                cur_value = parseInt(text).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
               }
 
               type = data['data'][row_index]['dims']['Measure Type']
@@ -548,15 +552,27 @@ function draw_table(){
           }
         });
      html = html+"</tbody></table>";
-      $("#container").html(html);
-      $("#table").DataTable({
-        dom: 'T<"clear">lfrtip',
-        tableTools:{
-          "sSwfPath": "/common/swf/copy_csv_xls_pdf.swf",
-          "aButtons": ["print", "pdf", "csv"]
-        }
-      });
+      if (needed_view_type == 'line_or_chart'){
+        $("#container_2").html(html);
+        $("#container_2").removeClass('hidden')
+        $("#link_to_second_table").removeClass('hidden')
+      }
+      else{
+        $("#container").html(html);
+        $("#container_2").addClass('hidden');
+        $("#link_to_second_table").addClass('hidden');
+        $("#container_2").html('');
+
+        $("#table").DataTable({
+          dom: 'T<"clear">lfrtip',
+          tableTools:{
+            "sSwfPath": "/common/swf/copy_csv_xls_pdf.swf",
+            "aButtons": ["print", "pdf", "csv"]
+          }
+        });
+      }
   //format_numbers();
+  // $('#second_table').collapse()
   hide_spinner();
 });
 }
@@ -762,6 +778,14 @@ $(function () {
     show_selected_indicator();
     hide_or_show_clear_link();
     clear_all();
+    $('li.filter').on('mouseover', function(){
+      $(this).next('span.more_copy').removeClass('hidden_visibility')
+    });
+
+    $('li.filter').on('mouseout', function(){
+      $(this).next('span.more_copy').addClass('hidden_visibility')
+    });
+
     $('.show_dataset_info').tooltip();
     $('.filter div.collapse').collapse('hide');
     $('input[type="checkbox"][class != "indicator_group"]').change(function(){
@@ -771,18 +795,34 @@ $(function () {
           $li.prependTo($li.closest('ul'));
         }
         hide_or_show_clear_link();
+        is_checked = $(this).prop('checked')
+        if (display_type == 'map'){
+          $ul = $(this).closest('li').closest('ul')
+          $ul.find('input').prop('checked', false)
+          $(this).prop('checked', is_checked)
+        }
         display_data();
     });
     hide_spinner();
 
     var width = $(window).width() * 0.6;
     $("#container").width(width);
+    $("#container_2").width(width + 0.1);
+    $("a.togglebtn", $('.results_table')).width(width);
+    $("#second_table").width(width + 60);
+    $("#metadata").width(width);
+    $("#collapseMetadata").width(width + 50);
     window.onresize = function() {
       var width = $(window).width() * 0.6;
       $("#container").width(width);
+      $("#container_2").width(width + 50);
+      $("a.togglebtn", $('.results_table')).width(width);
+      $("#second_table").width(width + 50);
+      $("#metadata").width(width);
+      $("#collapseMetadata").width(width+50);
     }
     create_headline_indicator();
-    $('.tooltip_a').tooltip();
+    $('.tooltipsecond_table_a').tooltip();
     $('.show_dataset_info').tooltip();
 
     var towns_names = []
@@ -825,4 +865,5 @@ $(function () {
 
     });
 
+    $('#collapseMetadata').collapse()
 });

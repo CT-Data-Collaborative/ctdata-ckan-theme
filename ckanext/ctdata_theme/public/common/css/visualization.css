@@ -14,7 +14,7 @@ color: #000000;
 div.panel-collapse.collapse.in{
   max-height: 200px;
   overflow-x: hidden;
-  overflow-y: none;
+  overflow-y: hidden;
 }
 
 ul.scrollable{
@@ -131,24 +131,27 @@ div#metadata li a{
 }
 div#metadata{
   background: #eee;
+  position: relative;
   margin-top:15px;
   padding-top:15px;
   padding-bottom: 15px;
   padding-left:15px;
-  border-radius: 10px;
+  padding-right:15px;
+  border-radius: 3px;
+  margin-left: 50px;
 }
 div#error_message{
   font-size: 30px;
   color: #444;
   background-color: #eee;
   border-radius: 5px;
-  width: 70%;
   margin-left: 15%;
-  text-align: center;
   height: auto;
   line-height: 50px;
-
+  position: relative;
+  top: 20px;
 }
+
 .highcharts-button{
   visibility: hidden;
 }
@@ -229,4 +232,61 @@ a.change_dataset_link:hover{
 .dataset_info h3{
   color: #63CEBE;
   font-weight: 400;
+}
+
+
+#container_2  table.results_table{
+   margin-left: 50px;
+   width: 100%;
+}
+
+.results_table{
+  float: none;
+}
+.results_table a.togglebtn {
+  font-size:16px;
+  color:#444;
+  padding:10px 0;
+  border-bottom:1px solid #eee;
+  border-top:1px solid #eee;
+  display: inline-block;
+  width:100%;
+  background:url(../images/tgl_down.png) no-repeat right center;
+  margin-left: 50px;
+}
+
+.more_copy{
+  width: 240px;
+  display: block;
+  color: rgb(160, 159, 159);
+  border-bottom: 1px dotted #ddd;
+}
+
+.hidden_visibility{
+  visibility: hidden;
+}
+
+input[type=checkbox] {
+position: relative;
+top: 7px;
+padding: 0;
+margin: 0;
+}
+
+.visual_right .option_row {
+width: 100%;
+clear: both;
+top: -15px;
+position: relative;
+margin-top: 0;
+}
+
+.less_max_height{
+  max-height: 130px !important;
+}
+a.gray_back{
+  background: none !important;
+  background-color: rgba(190, 187, 187, 0.19) !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
 }

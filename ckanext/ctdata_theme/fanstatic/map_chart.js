@@ -19,6 +19,10 @@ $.each(filters, function(i){
 if (town_index >= 0)
   filters.splice(town_index, 1)
 
+$("#container_2").addClass('hidden');
+$("#link_to_second_table").addClass('hidden');
+$("#container_2").html('');
+
 $.ajax({type: "POST",
         url: "/vizualization_data/" + dataset_id,
         data: JSON.stringify({view: 'map',
@@ -26,20 +30,21 @@ $.ajax({type: "POST",
                              }),
         contentType: 'application/json; charset=utf-8'}).done(function(data) {
 
+change_page_url(data['link']);
 
 if (data.data.length == 0){
-  console.log('here')
   hide_spinner()
   return display_error('Map view is not available')
 }
 
-change_page_url(data['link']);
 handle_incompatibilities(data['compatibles']);
 var max = -Infinity;
 var min = 0;
 var asterisks_counter = 0;
-var geo_ids = []
-var geo_names = {}
+var geo_ids    = []
+var geo_names  = {}
+var value_counters = {}
+
 $.getJSON('/common/map.json', function (geojson) {
 
   if (geography_param != 'Town'){
@@ -48,6 +53,12 @@ $.getJSON('/common/map.json', function (geojson) {
       name = geojson['features'][i]['properties']['NAME']
       geo_ids.push(id)
       geo_names[id] = name
+      value_counters[id] = 0
+     });
+  } else{
+    $.each(geojson['features'], function(i){
+      name = geojson['features'][i]['properties']['NAME']
+      value_counters[name] = 0
     });
   }
 
@@ -58,6 +69,15 @@ $.each(data.data, function(i){
       geo_ids.splice(geo_ids.indexOf(data.data[i]['fips']), 1)
     }
   }
+
+  if (geography_param != 'Town')
+    id = data.data[i]['fips']
+  else
+    id = data.data[i]['code']
+
+  if (value_counters[id] != undefined)
+    value_counters[id] += 1
+
 
   if (data.data[i]['code'] == "Connecticut"){
     delete data.data[i];
@@ -141,6 +161,14 @@ if (data['years'] !== undefined)
 
 sortedDataClasses = dataClasses
 
+var keys = Object.keys(value_counters);
+var error = false
+$.each(keys, function(i){
+  if (value_counters[keys[i]] > 1)
+  error = true
+  return  display_error('Please select more filters.')
+});
+
 // sort DataClasses to show in normal order
   swap(sortedDataClasses,1,2)
   swap(sortedDataClasses,1,4)
@@ -158,11 +186,10 @@ if (geography_param != 'Town'){
 // Initiate the chart
 
 var join_by = ['NAME', 'code'];
-
 if (geography_param != 'Town')
   join_by = ['GEOID', 'fips'];
 
-
+if (!error){
 chart = new Highcharts.Chart({
   chart: {
     renderTo: 'container',
@@ -269,7 +296,7 @@ chart.xAxis[0].setExtremes(-74, -71.5, false);
 chart.yAxis[0].setExtremes(-42.2, -40.8, false);
 chart.redraw();
 
-
+}
 function change_color(){
   $('path[fill="#7cb5ec"]').attr('fill', '#F9F9F9');
 }

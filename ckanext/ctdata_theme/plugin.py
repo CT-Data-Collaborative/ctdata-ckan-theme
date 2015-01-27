@@ -34,6 +34,7 @@ def communities():
     communities = srvc.get_profiles_for_data_by_location()
 
     sess.commit()
+    sess.close()
     return communities
 
 
@@ -78,12 +79,12 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('community_remove_indicator',
                       '/community/remove_indicator/{indicator_id}',
                       action='remove_indicator')
-            m.connect('community_profiles', '/community/{community_name}', action='community_profile')
+            # m.connect('community_profiles', '/community/{community_name}', action='community_profile')
 
         with routes.mapper.SubMapper(
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
-            m.connect('user_community_profiles', '/user/{user_id}/my_community_profiles', action='community_profiles')
+            # m.connect('user_community_profiles', '/user/{user_id}/my_community_profiles', action='community_profiles')
             m.connect('user_gallery', '/user/{user_id}/gallery', action='my_gallery')
             m.connect('remove_gallery_indicators', '/user/remove_gallery_indicators', action='remove_gallery_indicators')
             m.connect('update_gallery_indicator',  '/user/update_gallery_indicator', action='update_gallery_indicator')
@@ -101,6 +102,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.group.controllers:GroupController') as m:
             m.connect('group_indicators', '/group/indicators/{group_id}', action='group_indicators')
+            m.connect('update_group_indicators', '/group/update_group_indicators', action='update_group_indicators')
 
         return route_map
 

@@ -46,9 +46,11 @@ class View(object):
                 result = self.convert_data(map(lambda r: dict(zip(cols, r)), rows), filters)
 
                 conn.commit()
-            curs.close()
-            del curs
-            conn.close()
+
+                curs.close()
+                del curs
+                conn.close()
+
         except psycopg2.ProgrammingError:
             result['data'] = []
 
@@ -218,6 +220,8 @@ class ChartView(View):
             try:
                 current_town['data'].append(float(cur_value))
             except ValueError:
+                current_town['data'].append(None)
+            except TypeError:
                 current_town['data'].append(None)
 
             check_year += 1

@@ -193,6 +193,17 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
+    def move_or_add_to_group(self, indicator_id, group_id, action):
+        ind       = self.session.query(ProfileIndicator).get(indicator_id)
+        group_ids = ind.group_ids.split(',')
+
+        if action == 'add':
+            ind.group_ids = ','.join(str(id) for id in list( set(group_ids) | set([group_id])))
+        else:
+            ind.group_ids = ','.join(str(id) for id in list( set(group_ids) - set([group_id])))
+
+        self.session.commit()
+
     def update_indicator(self, indicator_id, name, permission, group_ids):
         ind      = self.session.query(ProfileIndicator).get(indicator_id)
         ind.name = name
