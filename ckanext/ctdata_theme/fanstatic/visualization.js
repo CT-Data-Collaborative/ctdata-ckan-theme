@@ -572,7 +572,7 @@ function draw_table(){
         });
       }
   //format_numbers();
-  $('#second_table').collapse()
+  // $('#second_table').collapse()
   hide_spinner();
 });
 }
@@ -779,7 +779,7 @@ $(function () {
     hide_or_show_clear_link();
     clear_all();
     $('li.filter').on('mouseover', function(){
-      $(this).next('span.more_copy').removeClass('hidden')
+      $(this).next('span.more_copy').removeClass('hidden_visibility')
     });
 
     $('li.filter').on('mouseout', function(){
@@ -800,6 +800,12 @@ $(function () {
           $li.prependTo($li.closest('ul'));
         }
         hide_or_show_clear_link();
+        is_checked = $(this).prop('checked')
+        if (display_type == 'map'){
+          $ul = $(this).closest('li').closest('ul')
+          $ul.find('input').prop('checked', false)
+          $(this).prop('checked', is_checked)
+        }
         display_data();
     });
     hide_spinner();
@@ -819,7 +825,7 @@ $(function () {
       $("#metadata").width(width);
     }
     create_headline_indicator();
-    $('.tooltip_a').tooltip();
+    $('.tooltipsecond_table_a').tooltip();
     $('.show_dataset_info').tooltip();
 
     var towns_names = []
