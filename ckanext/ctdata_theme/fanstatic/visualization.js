@@ -866,4 +866,19 @@ $(function () {
     });
 
     $('#collapseMetadata').collapse()
+
+    $('a[href="#collapseMetadata"]').on('click', function(){
+
+      i_minus = $(this).find('i.fa-minus')
+      i_plus  = $(this).find('i.fa-plus')
+      i_minus.removeClass('fa-minus').addClass('fa-plus')
+      i_plus.removeClass('fa-plus').addClass('fa-minus')
+    })
+
+    $('a[href="#second_table"]').on('click', function(){
+      i_minus = $(this).find('i.fa-minus')
+      i_plus  = $(this).find('i.fa-plus')
+      i_minus.removeClass('fa-minus').addClass('fa-plus')
+      i_plus.removeClass('fa-plus').addClass('fa-minus')
+    })
 });
