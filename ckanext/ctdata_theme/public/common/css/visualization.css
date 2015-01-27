@@ -279,3 +279,10 @@ top: -15px;
 position: relative;
 margin-top: 0;
 }
+
+a.gray_back{
+  background: none !important;
+  background-color: rgba(190, 187, 187, 0.19) !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
