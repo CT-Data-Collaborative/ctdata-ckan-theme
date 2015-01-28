@@ -50,6 +50,7 @@ class GroupController(GroupController):
         if user_name not in group_user_names:
           group_indicators = filter(lambda ind: ind.permission == 'public', group_indicators)
 
+      self.session.close()
       return base.render('group/indicators.html', extra_vars={'group_indicators': group_indicators,
                                                               'indicators_to_edit': indicators_to_edit,
                                                               'user_indicators': user_indicators})
@@ -68,6 +69,7 @@ class GroupController(GroupController):
           self.community_profile_service.move_or_add_to_group(int(indicator_id), str(group_id), 'remove')
 
       http_response.headers['Content-type'] = 'application/json'
+      self.session.close()
       return json.dumps({'success': True})
 
 
