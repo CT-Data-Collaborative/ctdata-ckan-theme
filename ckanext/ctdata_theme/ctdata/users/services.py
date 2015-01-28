@@ -17,11 +17,13 @@ class UserService(object):
             if not user:
                 user = UserInfo(user_info['id'], user_info['sysadmin'])
                 self.session.add(user)
+                self.session.close()
         else:
             user = self.session.query(UserInfo).filter(UserInfo.ckan_user_id == user_id).first()
             if not user:
                 user = UserInfo("guest_" + str(datetime.date.today()), False)
                 self.session.add(user)
+                self.session.close()
         return user
 
 
@@ -36,10 +38,12 @@ class UserService(object):
                 user = UserInfo(user_info['id'], user_info['sysadmin'])
                 self.session.add(user)
                 self.session.commit()
+                self.session.close()
         else:
             user = self.session.query(UserInfo).filter(UserInfo.ckan_user_id == user_id).first()
             if not user:
                 user = UserInfo("guest_" + session_id, False)
                 self.session.add(user)
                 self.session.commit()
+                self.session.close()
         return user
