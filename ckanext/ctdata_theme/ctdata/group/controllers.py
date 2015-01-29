@@ -17,12 +17,17 @@ from ..community.services import CommunityProfileService
 from ..topic.services import TopicSerivce
 from ckan.controllers.group import GroupController
 from IPython import embed
+import ckan.lib.navl.dictization_functions as dict_fns
 
+import ckan.lib.helpers as h
 import ckan.logic as logic
-get_action = logic.get_action
-NotFound = logic.NotFound
-NotAuthorized = logic.NotAuthorized
+get_action      = logic.get_action
+NotFound        = logic.NotFound
+NotAuthorized   = logic.NotAuthorized
 ValidationError = logic.ValidationError
+clean_dict      = logic.clean_dict
+tuplize_dict    = logic.tuplize_dict
+parse_params    = logic.parse_params
 
 class GroupController(GroupController):
     def __init__(self):
@@ -95,6 +100,53 @@ class GroupController(GroupController):
             abort(404, _('Group not found'))
         return self._render_template('group/members.html')
 
+    def member_new(self, id):
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user or c.author}
+
+        #self._check_access('group_delete', context, {'id': id})
+        try:
+            if http_request.method == 'POST':
+                data_dict = clean_dict(dict_fns.unflatten(
+                    tuplize_dict(parse_params(http_request.params))))
+                data_dict['id'] = id
+
+                email = data_dict.get('email')
+
+                if email and not self.user_service.check_if_email_exits(email):
+                  user_data_dict = {
+                      'email': email,
+                      'group_id': data_dict['id'],
+                      'role': data_dict['role']
+                  }
+                  del data_dict['email']
+                  user_dict = self._action('user_invite')(context,
+                          user_data_dict)
+                  data_dict['username'] = user_dict['name']
+                  c.group_dict = self._action('group_member_create')(context, data_dict)
+                else:
+                  h.flash_error('User with this email already exists')
+
+                self._redirect_to(controller='group', action='members', id=id)
+            else:
+                user = http_request.params.get('user')
+                if user:
+                    c.user_dict = get_action('user_show')(context, {'id': user})
+                    c.user_role = new_authz.users_role_for_group_or_org(id, user) or 'member'
+                else:
+                    c.user_role = 'member'
+                c.group_dict = self._action('group_show')(context, {'id': id})
+                group_type = 'organization' if c.group_dict['is_organization'] else 'group'
+                c.roles = self._action('member_roles_list')(
+                    context, {'group_type': group_type}
+                )
+        except NotAuthorized:
+            abort(401, _('Unauthorized to add member to group %s') % '')
+        except NotFound:
+            abort(404, _('Group not found'))
+        except ValidationError, e:
+            h.flash_error(e.error_summary)
+        return self._render_template('group/member_new.html')
 
 
 
