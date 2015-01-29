@@ -2,10 +2,18 @@ import ckan.plugins.toolkit as toolkit
 
 from ..community.models import UserInfo
 import datetime
+from IPython import embed
 
 class UserService(object):
     def __init__(self, session):
         self.session = session
+
+    def get_user_state(self, user_id):
+
+        user_info = toolkit.get_action('user_show')(data_dict={'id': user_id})
+        user = self.session.query(UserInfo).filter(UserInfo.ckan_user_id == user_info['id']).first()
+
+        return user_info['state']
 
     def get_or_create_user(self, user_id):
         # user_id must be passed

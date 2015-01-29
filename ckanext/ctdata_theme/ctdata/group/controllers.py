@@ -20,6 +20,9 @@ from IPython import embed
 
 import ckan.logic as logic
 get_action = logic.get_action
+NotFound = logic.NotFound
+NotAuthorized = logic.NotAuthorized
+ValidationError = logic.ValidationError
 
 class GroupController(GroupController):
     def __init__(self):
@@ -69,6 +72,28 @@ class GroupController(GroupController):
 
       http_response.headers['Content-type'] = 'application/json'
       return json.dumps({'success': True})
+
+    def members(self, id):
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user or c.author}
+
+        try:
+            members    = self._action('member_list')(context, {'id': id, 'object_type': 'user'})
+            c.group_dict = self._action('group_show')(context, {'id': id})
+            c.members  = []
+
+            for member in members:
+              user_id = member[0]
+              state   = self.user_service.get_user_state(user_id)
+              member  = member + (state,)
+
+              c.members.append(member)
+
+        except NotAuthorized:
+            abort(401, _('Unauthorized to delete group %s') % '')
+        except NotFound:
+            abort(404, _('Group not found'))
+        return self._render_template('group/members.html')
 
 
 
