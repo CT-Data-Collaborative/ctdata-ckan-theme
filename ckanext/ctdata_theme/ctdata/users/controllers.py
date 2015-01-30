@@ -39,6 +39,14 @@ class UserController(UserController):
         return base.render('user_community_profiles.html', extra_vars={'community_profiles': community_profiles})
 
     def my_gallery(self):
+        indicators, requested_user_name = self._prepare_for_user_gallery(http_request)
+        return base.render('user/my_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': requested_user_name})
+
+    def user_gallery(self):
+        indicators, requested_user_name = self._prepare_for_user_gallery(http_request)
+        return base.render('user/user_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': requested_user_name})
+
+    def _prepare_for_user_gallery(self, http_request):
         logged_user_name    = http_request.environ.get("REMOTE_USER")
         requested_user_name = http_request.environ.get('wsgiorg.routing_args')[1]['user_id']
         permission = 'public' if logged_user_name != requested_user_name else'all'
@@ -52,7 +60,7 @@ class UserController(UserController):
         users_groups     = get_action('group_list_authz')(context, data_dict)
         c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
 
-        return base.render('user/my_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': requested_user_name})
+        return indicators, requested_user_name
 
     def update_gallery_indicator(self):
         user_name    = http_request.environ.get("REMOTE_USER")

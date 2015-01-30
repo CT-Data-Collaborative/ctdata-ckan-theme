@@ -20,9 +20,10 @@ $(function(){
   });
 
   $('.remove_indicator').on('click', function(){
-    ids_to_remove.push( $(this).attr('id'));
+    id = $(this).attr('id')
+    ids_to_remove.push( id);
 
-    $(this).closest('tr').hide();
+    $('li.dataset-item[id="'+id +'"]').addClass('hidden')
     $('#remove_gallery_indicators').removeClass('disabled');
   });
 
@@ -44,8 +45,8 @@ $(function(){
     ind_id = $(this).attr('id')
 
     $('.filters_info').addClass('hidden')
-
-    $current_tr = $(this).closest('td').closest('tr')
+    id = $(this).attr('id')
+    $current_tr = $('tr#' + id)
     permission  = $current_tr.find('td.permission').text().replace(/\s\s/g, "");
     name        = $current_tr.find('td.name').text().replace(/\s\s/g, ""); //.slice(1, -1)
     group_ids   = []
