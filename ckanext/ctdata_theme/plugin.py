@@ -104,6 +104,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('group_indicators', '/group/indicators/{group_id}', action='group_indicators')
             m.connect('group_members', '/group/members/{id}', action='members', ckan_icon='group')
             m.connect('group_action', '/group/{action}/{id}', action = 'member_new')
+            m.connect('group_user_autocomplete', '/group/user_autocomplete', action = 'user_autocomplete')
             m.connect('update_group_indicators', '/group/update_group_indicators', action='update_group_indicators')
 
         return route_map

@@ -6,7 +6,7 @@ from pylons.controllers.util import abort, redirect
 from pylons import session, url
 
 import ckan.lib.base as base
-import ckan.model as model
+import ckan.model    as model
 import ckan.plugins.toolkit as toolkit
 from ckan.common import response as http_response, c, request as http_request
 
@@ -20,7 +20,9 @@ from IPython import embed
 import ckan.lib.navl.dictization_functions as dict_fns
 
 import ckan.lib.helpers as h
-import ckan.logic as logic
+import ckan.logic       as logic
+import ckan.lib.jsonp   as jsonp
+
 get_action      = logic.get_action
 NotFound        = logic.NotFound
 NotAuthorized   = logic.NotAuthorized
@@ -100,6 +102,24 @@ class GroupController(GroupController):
             abort(404, _('Group not found'))
         return self._render_template('group/members.html')
 
+    @jsonp.jsonpify
+    def user_autocomplete(self):
+      q         = http_request.params.get('q', '')
+      limit     = http_request.params.get('limit', 20)
+      user_list = []
+      if q:
+          context = {'model': model, 'session': model.Session,
+                     'user': c.user or c.author, 'auth_user_obj': c.userobj}
+
+          data_dict = {'q': q, 'limit': limit}
+          user_list = get_action('user_autocomplete')(context, data_dict)
+
+          for user in user_list:
+            if user['fullname'] and user['name'] != user['fullname']:
+              user['name'] = user['fullname'] + ' ( ' + user['name'] + ' )'
+
+      return user_list
+
     def member_new(self, id):
         context = {'model': model, 'session': model.Session,
                    'user': c.user or c.author}
@@ -111,21 +131,21 @@ class GroupController(GroupController):
                     tuplize_dict(parse_params(http_request.params))))
                 data_dict['id'] = id
 
-                email = data_dict.get('email')
+                email     = data_dict.get('email')
+                user_name = data_dict['username'].split(' ')[len(data_dict['username'].split(' ')) - 2]
 
-                if email and not self.user_service.check_if_email_exits(email):
-                  user_data_dict = {
-                      'email': email,
-                      'group_id': data_dict['id'],
-                      'role': data_dict['role']
-                  }
-                  del data_dict['email']
-                  user_dict = self._action('user_invite')(context,
-                          user_data_dict)
-                  data_dict['username'] = user_dict['name']
+                if user_name:
+                  data_dict['username'] = user_name
                   c.group_dict = self._action('group_member_create')(context, data_dict)
-                else:
-                  h.flash_error('User with this email already exists')
+
+                if email:
+                  if not self.user_service.check_if_email_exits(email):
+                    user_data_dict = { 'email': email, 'group_id': data_dict['id'], 'role': data_dict['role']}
+                    del data_dict['email']
+                    user_dict    = self._action('user_invite')(context, user_data_dict)
+                    c.group_dict = self._action('group_member_create')(context, user_dict)
+                  else:
+                    h.flash_error('User with this email already exists')
 
                 self._redirect_to(controller='group', action='members', id=id)
             else:
@@ -147,6 +167,7 @@ class GroupController(GroupController):
         except ValidationError, e:
             h.flash_error(e.error_summary)
         return self._render_template('group/member_new.html')
+
 
 
 
