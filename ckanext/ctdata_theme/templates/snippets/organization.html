@@ -12,7 +12,11 @@
 
     {% if show_nums %}
     <div class="raw_report">
+        <div class="follow_button">
+            {{ h.follow_button('group', organization.id) }}
+        </div>
         <h2>{{ organization.num_followers }}<span>Followers</span></h2>
     </div>
+
     {% endif %}
 {% endwith %}
