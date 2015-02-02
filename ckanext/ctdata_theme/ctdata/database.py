@@ -11,6 +11,7 @@ from .utils import Singleton
 from community.models import Base, CommunityProfile, Town
 
 from sqlalchemy.pool import NullPool
+from termcolor import colored
 
 class Database(object):
     __metaclass__ = Singleton
@@ -30,6 +31,7 @@ class Database(object):
 
         # we can't just connect using the connection string, because it doesn't work with older versions
         # of Postgres (and there's an older version on the staging server)
+
         return psycopg2.connect(
             database=parsed_url.path[1:],
             user=parsed_url.username,

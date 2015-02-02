@@ -23,7 +23,6 @@ from ctdata.users.services import UserService
 
 from IPython import embed
 
-
 get_action = logic.get_action
 
 def communities():
@@ -149,6 +148,7 @@ class CTDataController(base.BaseController):
     def data_by_topic(self):
         domains = TopicSerivce.get_topics('data_by_topic')
 
+        self.session.close()
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def update_indicators(self, dataset_name):
@@ -171,6 +171,7 @@ class CTDataController(base.BaseController):
                     self.community_profile_service.remove_indicator(user, int(indicator_id))
 
         http_response.headers['Content-type'] = 'application/json'
+        self.session.close()
         return json.dumps({'success': True})
 
     def visualization(self, dataset_name):
@@ -249,6 +250,8 @@ class CTDataController(base.BaseController):
         users_groups     = get_action('group_list_authz')(context, data_dict)
         c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
         c.help_info      = help_str
+
+        self.session.close()
         return base.render('visualization/visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'units':    metadata_units,
@@ -279,6 +282,7 @@ class CTDataController(base.BaseController):
         data['compatibles'] = view.get_compatibles(request_filters)
 
         http_response.headers['Content-type'] = 'application/json'
+        self.session.close()
         return json.dumps(data)
 
     def get_vizualization_data(self, dataset_name):
@@ -317,6 +321,7 @@ class CTDataController(base.BaseController):
         data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
 
         http_response.headers['Content-type'] = 'application/json'
+        self.session.close()
         return json.dumps(data)
 
     def _hide_dims_with_one_value(self, data, geography_param):

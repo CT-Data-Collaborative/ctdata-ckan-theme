@@ -8,6 +8,8 @@ import ckan.plugins.toolkit as toolkit
 from ..database import Database
 from models import DatasetCache
 
+from termcolor import colored
+
 
 class Dataset(object):
     def __init__(self, table_name, ckan_meta, incs_meta_url=None, defaults_meta_url=None, meta_url=None):
