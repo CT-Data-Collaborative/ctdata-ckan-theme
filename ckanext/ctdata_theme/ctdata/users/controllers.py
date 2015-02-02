@@ -36,6 +36,7 @@ class UserController(UserController):
         user = self.user_service.get_or_create_user(user_name) if user_name else None
         community_profiles = self.community_profile_service.get_user_profiles(user.ckan_user_id)
 
+        self.session.close()
         return base.render('user_community_profiles.html', extra_vars={'community_profiles': community_profiles})
 
     def my_gallery(self):
@@ -60,6 +61,7 @@ class UserController(UserController):
         users_groups     = get_action('group_list_authz')(context, data_dict)
         c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
 
+        self.session.close()
         return indicators, requested_user_name
 
     def update_gallery_indicator(self):
@@ -75,6 +77,7 @@ class UserController(UserController):
                                                             ind_params['permission'], ind_params['group_ids'])
 
         http_response.headers['Content-type'] = 'application/json'
+        self.session.close()
         return json.dumps({'success': True})
 
     def remove_gallery_indicators(self):
@@ -91,6 +94,7 @@ class UserController(UserController):
                 self.community_profile_service.remove_indicator(user, int(indicator_id))
 
         http_response.headers['Content-type'] = 'application/json'
+        self.session.close()
         return json.dumps({'success': True})
 
     def update_community_profiles(self):
@@ -112,4 +116,5 @@ class UserController(UserController):
                 self.community_profile_service.remove_community_profile(int(community_id), user.ckan_user_id)
 
         http_response.headers['Content-type'] = 'application/json'
+        self.session.close()
         return json.dumps({'success': True})

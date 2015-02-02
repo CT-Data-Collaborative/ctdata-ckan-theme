@@ -17,10 +17,6 @@ from ..community.services import CommunityProfileService
 from ..topic.services import TopicSerivce
 
 class PageController(base.BaseController):
-    def __init__(self):
-        self.session = Database().session_factory()
-        self.community_profile_service = CommunityProfileService(self.session)
-        self.user_service = UserService(self.session)
 
     def about(self):
         return  base.render('pages/about.html', extra_vars={})
