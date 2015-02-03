@@ -478,20 +478,20 @@ function draw_table(){
       });
       var years = data['years'];
       var col_num = 2;
-      var html = '<table id="table" class="results_table">'+
+      var html = '<table id="table" class="table results_table">'+
                  "<thead>"+
                    "<tr>"+
-                     "<th class='col-1'>Location</th>";
+                     "<th>Location</th>";
                    $.each(selected_dims, function(dim_name){
-                     html += "<th class='col-"+col_num+"'>"+dim_name+"</th>";
+                     html += "<th>"+dim_name+"</th>";
                      col_num++;
                    });
                  if (years !== undefined) {
                    $.each(years, function (i) {
-                       html = html + "<th class='col-" + (col_num + i) + "'>" + years[i] + "</th>";
+                       html = html + "<th class='right_align'>" + years[i] + "</th>";
                    });
                  } else {
-                   html = html + "<th class='col-" + (col_num) + "'>Value</th>";
+                   html = html + "<th>Value</th>";
                  }
                  html+=  "</tr>"+
                  "</thead>"+
@@ -499,9 +499,9 @@ function draw_table(){
         $.each(data['data'], function(row_index){
           if (!data['data'][row_index]['dims']) return "No data for this row";
           col_num = 2;
-          html += "<tr>"+ "<td class='col-1'>"+data['data'][row_index]['dims'][geography_param]+"</td>";
+          html += "<tr>"+ "<td>"+data['data'][row_index]['dims'][geography_param]+"</td>";
           $.each(selected_dims, function(dim_name){
-               html += "<td class='col-"+col_num+"'>"+data['data'][row_index]['dims'][dim_name]+"</td>";
+               html += "<td>"+data['data'][row_index]['dims'][dim_name]+"</td>";
                col_num++;
           });
           if (years !== undefined) {
@@ -529,7 +529,7 @@ function draw_table(){
               }
 
 
-              html += "<td class='right_align col-" + col_num + "'>" + cur_value + "</td>";
+              html += "<td class='right_align'>" + cur_value + "</td>";
               col_num++;
             });
           } else {

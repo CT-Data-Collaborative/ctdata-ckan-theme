@@ -242,6 +242,10 @@ a.change_dataset_link:hover{
 
 .results_table{
   float: none;
+  min-width: 400px;
+}
+.results_table table tr{
+  height: 10px;
 }
 .results_table a.togglebtn {
   font-size:16px;
@@ -290,3 +294,5 @@ a.gray_back{
   padding-left: 20px !important;
   padding-right: 20px !important;
 }
+
+td.right_align, th.right_align {text-align: right; padding: 0px;}
