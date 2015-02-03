@@ -23,15 +23,18 @@ $(function(){
     id = $(this).attr('id')
     ids_to_remove.push( id);
 
-    $('li.dataset-item[id="'+id +'"]').addClass('hidden')
+    var r = confirm("Are you sure you want to delete this indicator?");
+    if (r == true) {
+      $('li.dataset-item[id="'+id +'"]').addClass('hidden')
 
-    $.ajax({type: "POST",
-      url: "/user/remove_gallery_indicators",
-      data: JSON.stringify({indicators_to_remove: ids_to_remove}),
-      contentType: 'application/json; charset=utf-8',
-      success: function (data) {
-      }
-    });
+      $.ajax({type: "POST",
+        url: "/user/remove_gallery_indicators",
+        data: JSON.stringify({indicators_to_remove: ids_to_remove}),
+        contentType: 'application/json; charset=utf-8',
+        success: function (data) {
+        }
+      });
+    }
   });
 
   ///////////////// SHOW POPUP ////////////////////

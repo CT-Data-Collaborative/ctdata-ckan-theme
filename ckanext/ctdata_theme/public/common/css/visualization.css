@@ -296,3 +296,14 @@ a.gray_back{
 }
 
 td.right_align, th.right_align {text-align: right; padding: 0px;}
+
+table.results_table tr td{
+  padding-left: 3px !important;
+}
+table.results_table tr{
+  max-height: 10px !important;
+}
+
+#container.scroll{
+  overflow: scroll !important;
+}
