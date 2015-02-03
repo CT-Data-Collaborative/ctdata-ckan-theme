@@ -480,7 +480,7 @@ function draw_table(){
       var col_num = 2;
       var html = '<table id="table" class="table results_table">'+
                  "<thead>"+
-                   "<tr>"+
+                   "<tr class='head'>"+
                      "<th>Location</th>";
                    $.each(selected_dims, function(dim_name){
                      html += "<th>"+dim_name+"</th>";
@@ -574,6 +574,7 @@ function draw_table(){
   //format_numbers();
   // $('#second_table').collapse()
   hide_spinner();
+  // add_scroll_to_table();
 });
 }
 
@@ -767,6 +768,26 @@ function clear_all(){
     display_data();
   });
 }
+
+// function add_scroll_to_table(){
+//    height_val = 32
+//     $('tr[class!="head"]').map(function(i){
+//       el_height = $($('tr[class!="head"]')[i]).height()
+//       if (height_val < el_height )
+//         height_val = el_height
+//     });
+
+//     console.log(height_val)
+//     self_width = $('table.results_table').width()
+//     if (height_val > 35){
+//       $('table.results_table').width(self_width + 400);
+//       $('div#container').addClass('scroll')
+//     }
+//     else{
+//       $('table.results_table').width('100%');
+//       $('div#container').removeClass('scroll')
+//     }
+// }
 $(function () {
 
     select_all();
@@ -864,7 +885,6 @@ $(function () {
       else{
         $('.groups_inputs').removeClass('hidden')
       }
-
     });
 
     $('#collapseMetadata').collapse()
@@ -883,4 +903,5 @@ $(function () {
       i_minus.removeClass('fa-minus').addClass('fa-plus')
       i_plus.removeClass('fa-plus').addClass('fa-minus')
     })
+
 });
