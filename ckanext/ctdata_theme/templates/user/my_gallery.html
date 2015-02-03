@@ -5,7 +5,6 @@
 {% block page_description %}Created by {{user_name}}{% endblock %}
 
 {% block  primary_content_inner %}
-<div class="ctdata-wrapper">
 
 {% if gallery_indicators %}
     <table class='table my_table hidden'>
@@ -71,21 +70,32 @@
               Dataset: {{indicator.dataset_name()}}
               <br>
               Created: {{indicator.created_at.date()}}
+              {% if indicator.groups(c) %}
+              <br>
+              Groups:
+              {% for group in indicator.groups(c) %}
+                <a href="{{'/group/' + group['name']}}"> {{group['title']}} </a>
+
+                {% if loop.index != indicator.groups(c)|length %}
+                  ,
+                {% endif %}
+              {% endfor %}
+              {% endif %}
+              <br>
+              {% if c.userobj.name == user_name %}
+                Permission: {{indicator.permission}}
+              {% endif %}
             </div>
           </li>
         {% endfor %}
       </ul>
 
     <br/>
-    {% if c.userobj.name == user_name %}
-      <a href="javascript:void(0)" id="remove_gallery_indicators" class="btn disabled"> Remove Indicators </a>
-    {% endif %}
     <br/>
 {% else %}
     There're no indicators for this gallery yet.
 {% endif %}
 
-</div>
 
 <!-- Save Indicator to Gallery -->
 {% snippet 'visualization/snippets/save_indicator_to_gallery.html', group_dropdown=c.group_dropdown %}

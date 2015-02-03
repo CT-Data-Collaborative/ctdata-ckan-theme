@@ -139,15 +139,27 @@
               Dataset: {{indicator.dataset_name()}}
               <br>
               Created: {{indicator.created_at.date()}}
+              {% if indicator.groups(c) %}
+              <br>
+              Groups:
+              {% for group in indicator.groups(c) %}
+                <a href="{{'/group/' + group['name']}}"> {{group['title']}} </a>
+
+                {% if loop.index != indicator.groups(c)|length %}
+                  ,
+                {% endif %}
+              {% endfor %}
+              {% endif %}
+              <br>
+              {% if c.userobj.name == user_name %}
+                Permission: {{indicator.permission}}
+              {% endif %}
             </div>
           </li>
         {% endfor %}
       </ul>
 
     <br/>
-    {% if c.userobj.name == user_name %}
-      <a href="javascript:void(0)" id="remove_gallery_indicators" class="btn disabled"> Remove Indicators </a>
-    {% endif %}
     <br/>
 {% else %}
     There're no indicators for this gallery yet.
