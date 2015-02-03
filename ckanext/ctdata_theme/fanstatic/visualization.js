@@ -686,7 +686,9 @@ function draw_chart(){
                     width: 1,
                     color: '#808080'
                 }],
-                title: {text: yAxisLabel}
+                title: {text: yAxisLabel},
+                min: 0,
+                minRange: 0.1
             },
             plotOptions: {
                 column: {
