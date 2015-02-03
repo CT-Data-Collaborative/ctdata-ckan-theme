@@ -478,20 +478,20 @@ function draw_table(){
       });
       var years = data['years'];
       var col_num = 2;
-      var html = '<table id="table" class="results_table">'+
+      var html = '<table id="table" class="table results_table">'+
                  "<thead>"+
-                   "<tr>"+
-                     "<th class='col-1'>Location</th>";
+                   "<tr class='head'>"+
+                     "<th>Location</th>";
                    $.each(selected_dims, function(dim_name){
-                     html += "<th class='col-"+col_num+"'>"+dim_name+"</th>";
+                     html += "<th>"+dim_name+"</th>";
                      col_num++;
                    });
                  if (years !== undefined) {
                    $.each(years, function (i) {
-                       html = html + "<th class='col-" + (col_num + i) + "'>" + years[i] + "</th>";
+                       html = html + "<th class='right_align'>" + years[i] + "</th>";
                    });
                  } else {
-                   html = html + "<th class='col-" + (col_num) + "'>Value</th>";
+                   html = html + "<th>Value</th>";
                  }
                  html+=  "</tr>"+
                  "</thead>"+
@@ -499,9 +499,9 @@ function draw_table(){
         $.each(data['data'], function(row_index){
           if (!data['data'][row_index]['dims']) return "No data for this row";
           col_num = 2;
-          html += "<tr>"+ "<td class='col-1'>"+data['data'][row_index]['dims'][geography_param]+"</td>";
+          html += "<tr>"+ "<td>"+data['data'][row_index]['dims'][geography_param]+"</td>";
           $.each(selected_dims, function(dim_name){
-               html += "<td class='col-"+col_num+"'>"+data['data'][row_index]['dims'][dim_name]+"</td>";
+               html += "<td>"+data['data'][row_index]['dims'][dim_name]+"</td>";
                col_num++;
           });
           if (years !== undefined) {
@@ -529,7 +529,7 @@ function draw_table(){
               }
 
 
-              html += "<td class='right_align col-" + col_num + "'>" + cur_value + "</td>";
+              html += "<td class='right_align'>" + cur_value + "</td>";
               col_num++;
             });
           } else {
@@ -574,6 +574,7 @@ function draw_table(){
   //format_numbers();
   // $('#second_table').collapse()
   hide_spinner();
+  // add_scroll_to_table();
 });
 }
 
@@ -686,7 +687,9 @@ function draw_chart(){
                     width: 1,
                     color: '#808080'
                 }],
-                title: {text: yAxisLabel}
+                title: {text: yAxisLabel},
+                floor: 0,
+                minRange: 0.1
             },
             plotOptions: {
                 column: {
@@ -765,6 +768,26 @@ function clear_all(){
     display_data();
   });
 }
+
+// function add_scroll_to_table(){
+//    height_val = 32
+//     $('tr[class!="head"]').map(function(i){
+//       el_height = $($('tr[class!="head"]')[i]).height()
+//       if (height_val < el_height )
+//         height_val = el_height
+//     });
+
+//     console.log(height_val)
+//     self_width = $('table.results_table').width()
+//     if (height_val > 35){
+//       $('table.results_table').width(self_width + 400);
+//       $('div#container').addClass('scroll')
+//     }
+//     else{
+//       $('table.results_table').width('100%');
+//       $('div#container').removeClass('scroll')
+//     }
+// }
 $(function () {
 
     select_all();
@@ -862,8 +885,23 @@ $(function () {
       else{
         $('.groups_inputs').removeClass('hidden')
       }
-
     });
 
     $('#collapseMetadata').collapse()
+
+    $('a[href="#collapseMetadata"]').on('click', function(){
+
+      i_minus = $(this).find('i.fa-minus')
+      i_plus  = $(this).find('i.fa-plus')
+      i_minus.removeClass('fa-minus').addClass('fa-plus')
+      i_plus.removeClass('fa-plus').addClass('fa-minus')
+    })
+
+    $('a[href="#second_table"]').on('click', function(){
+      i_minus = $(this).find('i.fa-minus')
+      i_plus  = $(this).find('i.fa-plus')
+      i_minus.removeClass('fa-minus').addClass('fa-plus')
+      i_plus.removeClass('fa-plus').addClass('fa-minus')
+    })
+
 });

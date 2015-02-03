@@ -6,6 +6,8 @@ from ckanext.ctdata_theme.ctdata.database import Database
 from IPython import embed
 import psycopg2
 
+from termcolor import colored
+
 class View(object):
     """
     Gets a query from the QueryBuilder and uses it to retrieve the data from the DB.
@@ -359,7 +361,6 @@ class MapView(View):
         curs.close()
         del curs
         conn.close()
-
       return compatibles
 
 

@@ -23,7 +23,6 @@ from ctdata.users.services import UserService
 
 from IPython import embed
 
-
 get_action = logic.get_action
 
 def communities():
@@ -85,7 +84,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
             # m.connect('user_community_profiles', '/user/{user_id}/my_community_profiles', action='community_profiles')
-            m.connect('user_gallery', '/user/{user_id}/gallery', action='my_gallery')
+            m.connect('my_gallery', '/user/{user_id}/my_gallery', action='my_gallery')
+            m.connect('user_gallery', '/user/{user_id}/gallery', action='user_gallery')
             m.connect('remove_gallery_indicators', '/user/remove_gallery_indicators', action='remove_gallery_indicators')
             m.connect('update_gallery_indicator',  '/user/update_gallery_indicator', action='update_gallery_indicator')
             m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
@@ -102,6 +102,9 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.group.controllers:GroupController') as m:
             m.connect('group_indicators', '/group/indicators/{group_id}', action='group_indicators')
+            m.connect('group_members', '/group/members/{id}', action='members', ckan_icon='group')
+            m.connect('group_action', '/group/{action}/{id}', action = 'member_new')
+            m.connect('group_user_autocomplete', '/group/user_autocomplete', action = 'user_autocomplete')
             m.connect('update_group_indicators', '/group/update_group_indicators', action='update_group_indicators')
 
         return route_map
@@ -149,6 +152,7 @@ class CTDataController(base.BaseController):
     def data_by_topic(self):
         domains = TopicSerivce.get_topics('data_by_topic')
 
+        self.session.close()
         return base.render('data_by_topic.html', extra_vars={'domains': domains})
 
     def update_indicators(self, dataset_name):
@@ -171,6 +175,7 @@ class CTDataController(base.BaseController):
                     self.community_profile_service.remove_indicator(user, int(indicator_id))
 
         http_response.headers['Content-type'] = 'application/json'
+        self.session.close()
         return json.dumps({'success': True})
 
     def visualization(self, dataset_name):
@@ -249,6 +254,8 @@ class CTDataController(base.BaseController):
         users_groups     = get_action('group_list_authz')(context, data_dict)
         c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
         c.help_info      = help_str
+
+        self.session.close()
         return base.render('visualization/visualization.html', extra_vars={'dataset': dataset.ckan_meta,
                                                              'dimensions': dataset.dimensions,
                                                              'units':    metadata_units,
@@ -279,6 +286,7 @@ class CTDataController(base.BaseController):
         data['compatibles'] = view.get_compatibles(request_filters)
 
         http_response.headers['Content-type'] = 'application/json'
+        self.session.close()
         return json.dumps(data)
 
     def get_vizualization_data(self, dataset_name):
@@ -317,6 +325,7 @@ class CTDataController(base.BaseController):
         data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
 
         http_response.headers['Content-type'] = 'application/json'
+        self.session.close()
         return json.dumps(data)
 
     def _hide_dims_with_one_value(self, data, geography_param):

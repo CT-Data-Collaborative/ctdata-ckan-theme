@@ -20,23 +20,22 @@ $(function(){
   });
 
   $('.remove_indicator').on('click', function(){
-    ids_to_remove.push( $(this).attr('id'));
+    id = $(this).attr('id')
+    ids_to_remove.push( id);
 
-    $(this).closest('tr').hide();
-    $('#remove_gallery_indicators').removeClass('disabled');
+    var r = confirm("Are you sure you want to delete this indicator?");
+    if (r == true) {
+      $('li.dataset-item[id="'+id +'"]').addClass('hidden')
+
+      $.ajax({type: "POST",
+        url: "/user/remove_gallery_indicators",
+        data: JSON.stringify({indicators_to_remove: ids_to_remove}),
+        contentType: 'application/json; charset=utf-8',
+        success: function (data) {
+        }
+      });
+    }
   });
-
-
-  $('#remove_gallery_indicators').on('click', function(){
-    $.ajax({type: "POST",
-      url: "/user/remove_gallery_indicators",
-      data: JSON.stringify({indicators_to_remove: ids_to_remove}),
-      contentType: 'application/json; charset=utf-8',
-      success: function (data) {
-        window.location.reload();
-      }
-    });
-  })
 
   ///////////////// SHOW POPUP ////////////////////
 
@@ -44,8 +43,8 @@ $(function(){
     ind_id = $(this).attr('id')
 
     $('.filters_info').addClass('hidden')
-
-    $current_tr = $(this).closest('td').closest('tr')
+    id = $(this).attr('id')
+    $current_tr = $('tr#' + id)
     permission  = $current_tr.find('td.permission').text().replace(/\s\s/g, "");
     name        = $current_tr.find('td.name').text().replace(/\s\s/g, ""); //.slice(1, -1)
     group_ids   = []
@@ -55,8 +54,6 @@ $(function(){
       group_ids.push(id)
     });
 
-    console.log($current_tr)
-    console.log(group_ids)
     $('.indicator_name').val(name)
     $('input.indicator_permission').removeAttr('checked')
     $('input.indicator_permission[value=' + permission + ']').attr('checked', true)

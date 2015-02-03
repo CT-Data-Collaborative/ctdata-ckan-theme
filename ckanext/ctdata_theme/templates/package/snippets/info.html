@@ -1,3 +1,9 @@
 <div class="raw_report">
-    <h2>{{ h.get_action('dataset_follower_count', {'id': pkg.id}) }}<span>Followers</span></h2>
+  {% if not hide_follow_button %}
+    <div class="follow_button">
+      {{ h.follow_button('dataset', pkg.name) }}
+    </div>
+  {% endif %}
+  <h2>{{ h.get_action('dataset_follower_count', {'id': pkg.id}) }}<span>Followers</span></h2>
 </div>
+

@@ -185,6 +185,7 @@ margin-top:10px; width:35%;}
 .visual_right .option_row .operations ul li { float:left; margin-left:10px;}
 
 .results_table { width:100%; float:left; margin-top:40px;}
+/*
 .results_table ul { clear:both;}
 .results_table ul li {margin-left:1px;}
 .results_table ul.table_head { display:table;}
@@ -214,7 +215,7 @@ margin-top:10px; width:35%;}
 .results_table ul.table_data {text-align:center; height:42px; display:table;}
 .results_table td { color:#444; font-family:'roboto'; font-size:14px; display:table-cell; vertical-align:middle;}
 
-.right_align {text-align: right}
+
 .results_table td.col-1, .results_table td.col-3, .results_table td.col-5, .results_table td.col-7, .results_table td.col-9, .results_table td.col-11, .results_table td.col-13, .results_table td.col-15, .results_table td.col-17{background:#f9f9f9;}
 .results_table td.col-2, .results_table td.col-4, .results_table td.col-6, .results_table td.col-8,  .results_table td.col-10, .results_table td.col-12, .results_table td.col-14, .results_table td.col-16, .results_table td.col-18{ background:#fff;}
 
@@ -236,7 +237,8 @@ margin-top:10px; width:35%;}
 .results_table td.col-15{ border-bottom:1px solid #eee;  width:93px;}
 .results_table td.col-16{ border-bottom:1px solid #eee;  width:93px;}
 .results_table td.col-17{ border-bottom:1px solid #eee;  width:93px;}
-.results_table td.col-18{ border-bottom:1px solid #eee;  width:93px;}
+.results_table td.col-18{ border-bottom:1px solid #eee;  width:93px;}*/
+
 
 .customselectinner { float:left;}
 .customselectinner select {   background: none; color: #888888; left: -999999px; padding: 14px 20px 13px; position: absolute;  width: 450px;}
@@ -517,4 +519,9 @@ position: relative;
 top: 0px;
 padding: 0;
 margin: 0;
+}
+
+
+.members-table{
+  width: 100%;
 }
