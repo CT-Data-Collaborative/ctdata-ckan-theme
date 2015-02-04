@@ -32,7 +32,6 @@ def communities():
     srvc = CommunityProfileService(sess)
     communities = srvc.get_profiles_for_data_by_location()
 
-    sess.commit()
     sess.close()
     return communities
 
