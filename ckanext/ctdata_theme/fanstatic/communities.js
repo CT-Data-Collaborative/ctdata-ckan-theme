@@ -8,7 +8,6 @@
     function load_topics(){
         if ($('#loaded_topics').html() == ""){
             $('#add_indicator').addClass('disabled')
-            $('#update_profile_indicators').addClass('disabled')
             $('#create_profile_button').addClass('disabled')
             $('#save_profile_as_default').addClass('disabled')
             $.ajax({type: "GET",
@@ -16,7 +15,6 @@
                 success: function (data) {
                     $('#loaded_topics').append($(data.html));
                     $('#add_indicator').removeClass('disabled')
-                    $('#update_profile_indicators').removeClass('disabled')
                     $('#create_profile_button').removeClass('disabled')
                     $('#save_profile_as_default').removeClass('disabled')
                 }
@@ -100,7 +98,12 @@ $(function () {
         ids_to_remove.push( $(this).attr('id'));
 
         $(this).closest('tr').hide();
-        $('#update_profile_indicators').show();
+        $.ajax({type: "POST",
+          url: "/community/update_profile_indicators",
+          data: JSON.stringify({ indicators_to_remove: ids_to_remove}),
+          contentType: 'application/json; charset=utf-8',
+          success: function (data) {}
+        });
     });
 
 
@@ -139,18 +142,6 @@ $(function () {
     $('#add_indicator').click(function() {
         $("#indicator_popup").modal('show');
     });
-
-    $('#update_profile_indicators').live('click', function(){
-        $.ajax({type: "POST",
-          url: "/community/update_profile_indicators",
-          data: JSON.stringify({ indicators_to_remove: ids_to_remove}),
-          contentType: 'application/json; charset=utf-8',
-          success: function (data) {
-            window.location.reload();
-          }
-        });
-
-    })
 
     $('#save_towns').click(function() {
         var towns = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
@@ -194,7 +185,7 @@ $(function () {
     });
 
     load_topics();
-    $('#update_profile_indicators').hide();
+
 
     $("#profile_name").keyup(function(event){
         if(event.keyCode == 13){

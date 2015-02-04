@@ -51,8 +51,6 @@ class CommunityProfilesController(base.BaseController):
                 indicator = self.community_profile_service.create_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, group_ids)
                 self.session.commit()
 
-                h.flash_notice('Indicator successfully created.')
-
                 ind_data = {
                          'id': indicator.id,
                     'filters': indicator.filters,
@@ -65,14 +63,11 @@ class CommunityProfilesController(base.BaseController):
 
                 return json.dumps({'success': True, 'indicator': ind_data })
             except toolkit.ObjectNotFound, e:
-                h.flash_error(str(e))
                 return json.dumps({'success': False, 'error': str(e)})
             except ProfileAlreadyExists, e:
-                h.flash_error(str(e))
                 return json.dumps({'success': False, 'error': str(e)})
 
-        h.flash_error('Indicator cannot be saved')
-        return json.dumps({'success': False})
+        return json.dumps({'success': False, 'error': str('Indicator cannot be saved')})
 
     def community_profile(self, community_name):
         session_id      = session.id
@@ -141,7 +136,6 @@ class CommunityProfilesController(base.BaseController):
                     h.flash_error(str(e))
                     return json.dumps({'success': True})
 
-        h.flash_notice('Indicators successfully updated.')
         return json.dumps({'success': True})
 
     def get_topics(self):
@@ -181,7 +175,6 @@ class CommunityProfilesController(base.BaseController):
 
                 self.session.commit()
 
-        h.flash_notice('Default indicators successfully updated.')
         return json.dumps({'success': True})
 
     def add_profile(self):
