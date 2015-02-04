@@ -1,31 +1,113 @@
-var create_popup    = $("#create_profile_popup"),
-    ids_to_remove   = [];
 
-$('.close_popup').click(function() {
-  $(this).closest('div.modal').modal('hide');
-});
+    /////////////////  VARS
 
-$('#create_profile_button').click(function() {
-  create_popup.modal('show');
-});
+    var create_popup    = $("#create_profile_popup"),
+        ids_to_remove   = [],
+        current_dataset ;
 
-$('#add_towns').click(function() {
-    $("#towns_popup").modal('show');
-})
+    function load_topics(){
+        if ($('#loaded_topics').html() == ""){
+            $('#add_indicator').addClass('disabled')
+            $('#remove_temp_indicators').addClass('disabled')
+            $('#update_profile_indicators').addClass('disabled')
+            $('#create_profile_button').addClass('disabled')
+            $('#save_profile_as_default').addClass('disabled')
+            $.ajax({type: "GET",
+                url: "/community/get_topics/",
+                success: function (data) {
+                    $('#loaded_topics').append($(data.html));
+                    // load_functions_for_indicators();
+                    $('#add_indicator').removeClass('disabled')
+                    $('#remove_temp_indicators').removeClass('disabled')
+                    $('#update_profile_indicators').removeClass('disabled')
+                    $('#create_profile_button').removeClass('disabled')
+                    $('#save_profile_as_default').removeClass('disabled')
+                }
+            });
+        }
+    }
 
-$('.remove_indicator').on('click', function(){
-    ids_to_remove.push( $(this).attr('id'));
+    function build_filters(filter_data) {
+        var filters_html = '<ul>';
+        $.each(filter_data, function(i, fltr) {
+            filters_html += '<li>';
+            filters_html += '<h3 class="indicator-filter-name">' + fltr.name + '</h3>';
+            filters_html += '<ul>';
+            $.each(fltr.values, function(j, val) {
+                filters_html += '<li class="indicator-filter">';
+                filters_html += '<span class="indicator-filter-value">' + val + '</span>';
+                filters_html += '<input type="radio" class="indicator-filter-radio" name="' + fltr.name + '" value="' + val + '"';
+                if (j == 0)
+                    filters_html += ' checked';
+                filters_html += '>';
+                filters_html += '</li>';
+            });
+            filters_html += '</ul>';
+            filters_html += '</li>';
+        });
+        filters_html += '</ul>';
 
-    $(this).closest('tr').hide();
-    $('#update_profile_indicators').show();
-});
+        return filters_html;
+    }
 
-function load_functions_for_indicators(){
-    $('.close_popup').click(function() {
-      $(this).closest('div.modal').modal('hide');
+    function get_filters() {
+        return $('#filters').find('input:checked').map(function(i, e) {
+            return {field: $(e).attr('name'), values: [$(e).val()]}
+        }).get();
+    }
+
+    function remove_temp_indicators(){
+        if ($('.temp').size() != 0) {
+            ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
+            $.ajax({type: "POST",
+                url: "/community/remove_temp_indicators",
+                data: JSON.stringify({indicator_ids: ids}),
+                contentType: 'application/json; charset=utf-8'
+            });
+        }
+    }
+
+    function draw_new_row(indicator){
+        tr = "<tr class='table_data'>\
+                <td class='column_1 for_csv'>\
+                    <span class='indicator_id hidden'>" + indicator.id + "</span>\
+                    <span class='text-warning temp'>*</span>\
+                    <a href=" + indicator.link_to + ">" +  indicator.dataset + "," + indicator.variable  + "</a>\
+                </td>\
+                <td class='for_csv'><span class='for_csv'>" + indicator.data_type + "</span></td>\
+                <td class='for_csv'><span class='for_csv'>" + indicator.year  + "</span></td>\
+                <td class='no-border'>\
+                    <a href='javascript:void(0)' id=" + indicator.id + " class='remove_indicator'>\
+                        <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/close_pic.png'>\
+                    </a>\
+                </td>\
+            </tr>"
+
+        $('table.table.my_table').append(tr)
+    }
+
+$(function () {
+    $('.close_popup').live('click', function() {
+        $(this).closest('div.modal').modal('hide');
     });
 
-    $('.dataset_chooser').on('click',function() {
+    $('#create_profile_button').live('click', function() {
+        create_popup.modal('show');
+    });
+
+    $('#add_towns').live('click', function() {
+        $("#towns_popup").modal('show');
+    })
+
+    $('.remove_indicator').live('click', function(){
+        ids_to_remove.push( $(this).attr('id'));
+
+        $(this).closest('tr').hide();
+        $('#update_profile_indicators').show();
+    });
+
+
+    $('.dataset_chooser').live('click',function() {
         $('li', $('ul.indicator-sub-topics')).removeClass('active')
         current_dataset = $(this).attr('id');
         $(this).closest('li').addClass('active');
@@ -37,7 +119,7 @@ function load_functions_for_indicators(){
         });
     });
 
-    $('#save_indicator').click(function() {
+    $('#save_indicator').live('click', function() {
         $("#indicator_adding_error").animate({opacity: 0}, 300);
         $.ajax({type: "POST",
             url: "/community/add_indicator",
@@ -45,8 +127,10 @@ function load_functions_for_indicators(){
                                    permission: 'public', filters: get_filters()}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                if (data.success == true)
-                    window.location.reload();
+                if (data.success == true){
+                    draw_new_row(data.indicator)
+                    $('div.modal').modal('hide');
+                }
                 else {
                     $("#error").html(data.error);
                     $("#error").animate({opacity: 1}, 300);
@@ -55,8 +139,11 @@ function load_functions_for_indicators(){
         });
     });
 
+    $('#add_indicator').click(function() {
+        $("#indicator_popup").modal('show');
+    });
 
-    $('#update_profile_indicators').on('click', function(){
+    $('#update_profile_indicators').live('click', function(){
         $.ajax({type: "POST",
           url: "/community/update_profile_indicators",
           data: JSON.stringify({ indicators_to_remove: ids_to_remove}),
@@ -67,82 +154,13 @@ function load_functions_for_indicators(){
         });
 
     })
-}
-function load_topics(){
-    if ($('#loaded_topics').html() == ""){
-        $('#add_indicator').addClass('disabled')
-        $('#remove_temp_indicators').addClass('disabled')
-        $('#update_profile_indicators').addClass('disabled')
-        $('#create_profile_button').addClass('disabled')
-        $('#save_profile_as_default').addClass('disabled')
-        $.ajax({type: "GET",
-            url: "/community/get_topics/",
-            success: function (data) {
-                $('#loaded_topics').append($(data.html));
-                load_functions_for_indicators();
-                $('#add_indicator').removeClass('disabled')
-                $('#remove_temp_indicators').removeClass('disabled')
-                $('#update_profile_indicators').removeClass('disabled')
-                $('#create_profile_button').removeClass('disabled')
-                $('#save_profile_as_default').removeClass('disabled')
-            }
-        });
-    }
-}
 
-$('#add_indicator').click(function() {
-    $("#indicator_popup").modal('show');
-});
+    // $('#remove_temp_indicators').on( 'click', function(){
+    //     remove_temp_indicators();
 
-function build_filters(filter_data) {
-    var filters_html = '<ul>';
-    $.each(filter_data, function(i, fltr) {
-        filters_html += '<li>';
-        filters_html += '<h3 class="indicator-filter-name">' + fltr.name + '</h3>';
-        filters_html += '<ul>';
-        $.each(fltr.values, function(j, val) {
-            filters_html += '<li class="indicator-filter">';
-            filters_html += '<span class="indicator-filter-value">' + val + '</span>';
-            filters_html += '<input type="radio" class="indicator-filter-radio" name="' + fltr.name + '" value="' + val + '"';
-            if (j == 0)
-                filters_html += ' checked';
-            filters_html += '>';
-            filters_html += '</li>';
-        });
-        filters_html += '</ul>';
-        filters_html += '</li>';
-    });
-    filters_html += '</ul>';
-
-    return filters_html;
-}
-
-function get_filters() {
-    return $('#filters').find('input:checked').map(function(i, e) {
-        return {field: $(e).attr('name'), values: [$(e).val()]}
-    }).get();
-}
-
-function remove_temp_indicators(){
-    if ($('.temp').size() != 0) {
-        ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
-        $.ajax({type: "POST",
-            url: "/community/remove_temp_indicators",
-            data: JSON.stringify({indicator_ids: ids}),
-            contentType: 'application/json; charset=utf-8'
-        });
-    }
-}
-
-$('#remove_temp_indicators').on( 'click', function(){
-    remove_temp_indicators();
-
-    $(this).hide();
-    $('.temp').closest('tr').hide();
-});
-
-$(function(){
-    var current_dataset;
+    //     $(this).hide();
+    //     $('.temp').closest('tr').hide();
+    // });
 
     $('#save_towns').click(function() {
         var towns = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
@@ -194,6 +212,7 @@ $(function(){
             $("#create_profile").click();
         }
     });
+
     // $(window).bind('beforeunload', function(){
     //     remove_temp_indicators()
     // });

@@ -121,7 +121,7 @@ class ProfileIndicator(Base):
         return get_action('package_show')(data_dict={'id': self.dataset_id})['title']
 
     def link_to_visualization(self):
-        view = self.visualization_type
+        view = self.visualization_type or 'table'
         location = ''
         filters_hash = {}
 

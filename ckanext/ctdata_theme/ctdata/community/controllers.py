@@ -40,7 +40,7 @@ class CommunityProfilesController(base.BaseController):
             ind_type    = json_body.get('ind_type')
             permission  = json_body.get('permission')
             group_ids   = json_body.get('group_ids')
-            visualization_type   = json_body.get('visualization_type')
+            visualization_type   = json_body.get('visualization_type') or 'table'
 
             http_response.headers['Content-type'] = 'application/json'
 
@@ -48,10 +48,22 @@ class CommunityProfilesController(base.BaseController):
                 abort(400)
 
             try:
-                self.community_profile_service.create_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, group_ids)
+                indicator = self.community_profile_service.create_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, group_ids)
                 self.session.commit()
+
                 h.flash_notice('Indicator successfully created.')
-                return json.dumps({'success': True})
+
+                ind_data = {
+                         'id': indicator.id,
+                    'filters': indicator.filters,
+                  'data_type': indicator.data_type,
+                       'year': indicator.year,
+                    'link_to': indicator.link_to_visualization(),
+                    'dataset': indicator.dataset_name(),
+                   'variable': indicator.variable,
+                }
+
+                return json.dumps({'success': True, 'indicator': ind_data })
             except toolkit.ObjectNotFound, e:
                 h.flash_error(str(e))
                 return json.dumps({'success': False, 'error': str(e)})

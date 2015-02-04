@@ -175,6 +175,8 @@ class CommunityProfileService(object):
 
         self.session.add(indicator)
 
+        return indicator
+
     def remove_indicator_id_from_profiles(self, indicator_id):
         community_profiles = self.get_all_profiles()
 
