@@ -8,7 +8,6 @@
     function load_topics(){
         if ($('#loaded_topics').html() == ""){
             $('#add_indicator').addClass('disabled')
-            $('#remove_temp_indicators').addClass('disabled')
             $('#update_profile_indicators').addClass('disabled')
             $('#create_profile_button').addClass('disabled')
             $('#save_profile_as_default').addClass('disabled')
@@ -16,9 +15,7 @@
                 url: "/community/get_topics/",
                 success: function (data) {
                     $('#loaded_topics').append($(data.html));
-                    // load_functions_for_indicators();
                     $('#add_indicator').removeClass('disabled')
-                    $('#remove_temp_indicators').removeClass('disabled')
                     $('#update_profile_indicators').removeClass('disabled')
                     $('#create_profile_button').removeClass('disabled')
                     $('#save_profile_as_default').removeClass('disabled')
@@ -155,13 +152,6 @@ $(function () {
 
     })
 
-    // $('#remove_temp_indicators').on( 'click', function(){
-    //     remove_temp_indicators();
-
-    //     $(this).hide();
-    //     $('.temp').closest('tr').hide();
-    // });
-
     $('#save_towns').click(function() {
         var towns = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         window.location.search = 'towns=' + towns.join();
@@ -205,7 +195,6 @@ $(function () {
 
     load_topics();
     $('#update_profile_indicators').hide();
-    if ($('.temp').size() == 0) $('#remove_temp_indicators').hide()
 
     $("#profile_name").keyup(function(event){
         if(event.keyCode == 13){
@@ -213,7 +202,7 @@ $(function () {
         }
     });
 
-    // $(window).bind('beforeunload', function(){
-    //     remove_temp_indicators()
-    // });
+    $(window).bind('beforeunload', function(){
+        remove_temp_indicators()
+    });
 });
