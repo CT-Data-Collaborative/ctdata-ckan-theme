@@ -31,29 +31,13 @@
 </ul>
 
 <div class="locaton_table">
-{% if indicators %}
-    <table class='table my_table'>
-        <thead>
-            <th>Dataset</th>
-            <th>Data Type</th>
-            <th>Year</th>
-            {% for town_name in displayed_towns %}
-                <th>{{town_name}}</th>
-            {% endfor %}
-        </thead>
-        <tbody>
-            {% for indicator in indicators %}
-                {% snippet 'communities/snippets/indicators_table_tr.html', indicator=indicator, location=location %}
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    There're no indicators for this community yet.
-{% endif %}
+    <div class='table-div'>
+        <div class="not_hidden_spinner"> <img src="/common/images/loading.gif"/> </div>
+    </div>
     <form style="display: none">
         <input type="hidden" id="community_name" value="{{community.name}}">
+        <input type="hidden" id="displayed_towns" value="{{towns_raw}}">
     </form>
-
 
     <ul class= 'opt_btn'>
     {% if location == community.name %}

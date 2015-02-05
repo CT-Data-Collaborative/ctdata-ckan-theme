@@ -78,6 +78,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                       '/community/remove_indicator/{indicator_id}',
                       action='remove_indicator')
             m.connect('community_profiles', '/community/{community_name}', action='community_profile')
+            m.connect('get_indicators_data', '/indicators_data/{community_name}', action='get_indicators_data')
 
         with routes.mapper.SubMapper(
                 route_map,

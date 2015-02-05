@@ -15,6 +15,8 @@ from ..database import Database
 from ..users.services import UserService
 from ..visualization.services import DatasetService
 from ..topic.services import TopicSerivce
+from ..visualization.querybuilders import QueryBuilderFactory
+from ..visualization.views import ViewFactory
 from services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
 
 from IPython import embed
@@ -70,14 +72,40 @@ class CommunityProfilesController(base.BaseController):
         return json.dumps({'success': False, 'error': str('Indicator cannot be saved')})
 
     def community_profile(self, community_name):
+        location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
+        profile_to_load = http_request.GET.get('p')
+        towns_raw       = http_request.GET.get('towns')
+        towns_names     = map(lambda x: x.strip(), towns_raw.split(','))  if towns_raw else []
+        towns           = self.community_profile_service.get_all_towns()
+
+        if profile_to_load:
+            community = self.community_profile_service.get_community_profile_by_id(profile_to_load)
+        else:
+            community = self.community_profile_service.get_community_profile(community_name)
+
+        self.session.commit()
+        anti_csrf_token = str(uuid.uuid4())
+        session['anti_csrf'] = anti_csrf_token
+        session.save()
+
+        default_url = '/community/' + location
+        return base.render('communities/community_profile.html', extra_vars={'location': location,
+                                                                 'community': community,
+                                                                 'displayed_towns': towns_names,
+                                                                 'towns_raw': towns_raw,
+                                                                 'towns': towns,
+                                                                 'anti_csrf_token': anti_csrf_token,
+                                                                 'default_url': default_url})
+
+    def get_indicators_data(self, community_name):
         session_id      = session.id
         user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
         location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
         profile_to_load = http_request.GET.get('p')
-        towns_raw       = http_request.GET.get('towns')
+        json_body       = json.loads(http_request.body, encoding=http_request.charset)
+        towns_raw       = json_body.get('towns')
         user            = self.user_service.get_or_create_user_with_session_id(user_name, session_id)
         towns_names     = map(lambda x: x.strip(), towns_raw.split(','))  if towns_raw else []
-        towns           = self.community_profile_service.get_all_towns()
         indicators, displayed_towns, displayed_towns_names = [],[],[]
 
         if profile_to_load:
@@ -96,20 +124,19 @@ class CommunityProfilesController(base.BaseController):
             abort(404, detail=str(e))
 
 
-        self.session.commit()
+        for ind in indicators:
+            ind_object = ind['indicator']
+            del ind['indicator']
 
-        anti_csrf_token = str(uuid.uuid4())
-        session['anti_csrf'] = anti_csrf_token
-        session.save()
+            ind['id']        = ind_object.id,
+            ind['link_to']   = ind_object.link_to_visualization()
+            ind['year']      = ind_object.year
+            ind['data_type'] = ind_object.data_type
+            ind['variable']  = ind_object.variable
 
-        default_url = '/community/' + location
-        return base.render('communities/community_profile.html', extra_vars={'location': location,
-                                                                 'community': community,
-                                                                 'indicators': indicators,
-                                                                 'displayed_towns': displayed_towns_names,
-                                                                 'towns': towns,
-                                                                 'anti_csrf_token': anti_csrf_token,
-                                                                 'default_url': default_url})
+        http_response.headers['Content-type'] = 'application/json'
+        self.session.close()
+        return json.dumps({'indicators': indicators, 'towns': displayed_towns_names})
 
     def update_profile_indicators(self):
         http_response.headers['Content-type'] = 'application/json'

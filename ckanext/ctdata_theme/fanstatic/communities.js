@@ -3,6 +3,9 @@
 
     var create_popup    = $("#create_profile_popup"),
         ids_to_remove   = [],
+        community_name  = $("input#community_name").val(),
+        towns           = $("input#displayed_towns").val(),
+        current_towns   = [],
         current_dataset ;
 
     function load_topics(){
@@ -55,6 +58,7 @@
         if ($('.temp').size() != 0) {
             ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
             $.ajax({type: "POST",
+                async: false,
                 url: "/community/remove_temp_indicators",
                 data: JSON.stringify({indicator_ids: ids}),
                 contentType: 'application/json; charset=utf-8'
@@ -62,23 +66,71 @@
         }
     }
 
-    function draw_new_row(indicator){
-        tr = "<tr class='table_data'>\
-                <td class='column_1 for_csv'>\
-                    <span class='indicator_id hidden'>" + indicator.id + "</span>\
-                    <span class='text-warning temp'>*</span>\
-                    <a href=" + indicator.link_to + ">" +  indicator.dataset + "," + indicator.variable  + "</a>\
-                </td>\
-                <td class='for_csv'><span class='for_csv'>" + indicator.data_type + "</span></td>\
-                <td class='for_csv'><span class='for_csv'>" + indicator.year  + "</span></td>\
-                <td class='no-border'>\
-                    <a href='javascript:void(0)' id=" + indicator.id + " class='remove_indicator'>\
-                        <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/close_pic.png'>\
-                    </a>\
-                </td>\
-            </tr>"
+    function draw_table(indicators_data, towns){
+        table = "<table class='table my_table'>\
+                    <thead>\
+                        <th>Dataset</th>\
+                        <th>Data Type</th>\
+                        <th>Year</th>"
 
-        $('table.table.my_table').append(tr)
+        $(towns).each(function(i){ table = table + '<th>' +towns[i] + '</th>' });
+        table = table + "</thead><tbody>"
+
+        $(indicators_data).each(function(i){
+            ind = indicators_data[i]
+            id  = ind.id[0]
+
+            tr  = "<tr class='table_data'>\
+                    <td class='column_1 for_csv'>\
+                        <span class='indicator_id hidden'>" + id + " </span>"
+            if (ind.temp)
+                tr  = tr + "<span class='text-warning temp'>*</span>"
+            tr  = tr + "<a href=" + ind.link_to + ">" + ind.dataset + ", " + ind.variable + " </a><span>"
+            $(ind.filters).each(function(i){
+                filter = ind.filters[i]
+                tr = tr + filter.field + ': ' + filter.value + ' '
+            });
+            tr = tr + "</span>  <span class='for_csv hidden'>" + ind.dataset + ', ' + ind.variable + ', '
+            $(ind.filters).each(function(i){
+                filter = ind.filters[i]
+                tr = tr + filter.field + ': ' + filter.value + ' ' + ','
+            });
+            tr = tr + "</span>"
+            tr = tr + "</td>\
+                    <td class='for_csv'><span class='for_csv'>" + ind.data_type + "</span></td>\
+                    <td class='for_csv'><span class='for_csv'>" + ind.year  + "</span></td>"
+
+            $(ind.values).each(function(i){
+                value = ind.values[i] || '-'
+                tr = tr + "<td class='for_csv'><span class='for_csv'>" + value + "</span></td>"
+            });
+            tr = tr + "<td class='no-border'>\
+                            <a href='javascript:void(0)' id=" + id + " class='remove_indicator'>\
+                                <img class='close_pic' style='margin-left: 10px' src='/common/images/close_pic.png'>\
+                            </a>\
+                        </td>\
+                    </tr>"
+
+            table = table + tr
+        });
+        table = table +  "</tbody></table>"
+
+        $(".table-div").html(table)
+    }
+
+    function load_indicators_data(){
+        $.ajax({type: "POST",
+            url: "/indicators_data/"+community_name,
+            data: JSON.stringify({towns: towns}),
+            contentType: 'application/json; charset=utf-8'
+        }).done(function(data) {
+            indicators_data = data.indicators
+            current_towns   = data.towns
+            if (indicators_data.length > 0)
+                draw_table(indicators_data, current_towns);
+            else
+                $(".table-div").html("There're no indicators for this community yet.")
+        });
     }
 
 $(function () {
@@ -128,7 +180,7 @@ $(function () {
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 if (data.success == true){
-                    draw_new_row(data.indicator)
+                    load_indicators_data()
                     $('div.modal').modal('hide');
                 }
                 else {
@@ -144,8 +196,10 @@ $(function () {
     });
 
     $('#save_towns').click(function() {
-        var towns = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
-        window.location.search = 'towns=' + towns.join();
+        towns = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+        towns = towns.join(',');
+        load_indicators_data()
+        $('div.modal').modal('hide');
     });
 
     $('#save_profile_as_default').click(function() {
@@ -184,8 +238,12 @@ $(function () {
         $(this).find('.close_pic').animate({opacity: 0.0}, 300);
     });
 
-    load_topics();
+    $(window).bind('beforeunload', function() {
+      return remove_temp_indicators();
+    });
 
+    load_indicators_data();
+    load_topics();
 
     $("#profile_name").keyup(function(event){
         if(event.keyCode == 13){
@@ -193,7 +251,4 @@ $(function () {
         }
     });
 
-    $(window).bind('beforeunload', function(){
-        remove_temp_indicators()
-    });
 });
