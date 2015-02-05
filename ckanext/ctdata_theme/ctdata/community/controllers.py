@@ -218,8 +218,8 @@ class CommunityProfilesController(base.BaseController):
             profile = self.community_profile_service.create_community_profile(name, ids, user_id, '/community/' + location)
 
             if profile:
-                host = host = http_request.environ.get('HTTP_HOST')
-                h.flash_notice('Profile ' + profile.name + ' has been saved. Url: ' + host + profile.default_url)
+                host = http_request.environ.get('HTTP_HOST')
+                # h.flash_notice('Profile ' + profile.name + ' has been saved. Url: ' + host + profile.default_url)
                 return json.dumps({'success': True, 'redirect_link': profile.default_url })
         else:
             h.flash_error('Profile cannot be saved.')

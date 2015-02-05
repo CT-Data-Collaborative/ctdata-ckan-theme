@@ -453,3 +453,7 @@ a.disabled {
   pointer-events: none;
   cursor: default;
 }
+
+a.remove_indicator:hover img{
+	opacity: 1.0 !important;
+}

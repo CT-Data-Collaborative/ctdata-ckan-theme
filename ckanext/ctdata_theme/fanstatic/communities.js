@@ -106,7 +106,7 @@
             });
             tr = tr + "<td class='no-border'>\
                             <a href='javascript:void(0)' id=" + id + " class='remove_indicator'>\
-                                <img class='close_pic' style='margin-left: 10px' src='/common/images/close_pic.png'>\
+                                <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/close_pic.png'>\
                             </a>\
                         </td>\
                     </tr>"
@@ -209,7 +209,9 @@ $(function () {
             data: JSON.stringify({indicator_ids: ids}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                window.location.reload();
+                $('span.temp').addClass('hidden')
+                $('#message').html("<h3> Default indicators are successfully saved.</h3>")
+                $("#message_popup").modal('show');
             }
         });
     });
@@ -225,18 +227,17 @@ $(function () {
                 success: function (data) {
                     data = JSON.parse(data)
                     if (data.success == true){
-                        window.location = data.redirect_link
+                        $('div.modal').modal('hide');
+                        $('span.temp').addClass('hidden')
+                        $('#message').html("<h3>New profile has been successfully saved.</h3>\
+                                          <br>  <a href='"+ data.redirect_link +"'> Click here </a> to check it.")
+                        $("#message_popup").modal('show');
                     }
                 }
             });
         }
     });
 
-    $('.table_data').hover(function() {
-        $(this).find('.close_pic').animate({opacity: 1.0}, 300);
-    }, function () {
-        $(this).find('.close_pic').animate({opacity: 0.0}, 300);
-    });
 
     $(window).bind('beforeunload', function() {
       return remove_temp_indicators();
