@@ -33,6 +33,7 @@
   {% endif %}
 </div>
 
+<span id='string_span' style='font-size: 14;'>BOOO</span>
 
 <form>
     <input type="hidden" id="dataset_id" value="{{ dataset.name }}">
@@ -134,7 +135,7 @@
 </div>
 <div class="spinner"> <img src="/common/images/loading.gif"/> </div>
 <div class="results_table">
-    <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>
+    <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto" class="scroll"></div>
 
     <br>
     <br>
@@ -195,7 +196,6 @@
 
 
 </section>
-
 
 {% endblock %}
 

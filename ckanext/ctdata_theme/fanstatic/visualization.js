@@ -488,7 +488,7 @@ function draw_table(){
                    });
                  if (years !== undefined) {
                    $.each(years, function (i) {
-                       html = html + "<th class='right_align'>" + years[i] + "</th>";
+                       html = html + "<th>" + years[i] + "</th>";
                    });
                  } else {
                    html = html + "<th>Value</th>";
@@ -563,6 +563,8 @@ function draw_table(){
         $("#link_to_second_table").addClass('hidden');
         $("#container_2").html('');
 
+        add_scroll_to_table();
+
         $("#table").DataTable({
           dom: 'T<"clear">lfrtip',
           tableTools:{
@@ -570,11 +572,11 @@ function draw_table(){
             "aButtons": ["print", "pdf", "csv"]
           }
         });
+
+
       }
-  //format_numbers();
-  // $('#second_table').collapse()
+
   hide_spinner();
-  // add_scroll_to_table();
 });
 }
 
@@ -769,25 +771,28 @@ function clear_all(){
   });
 }
 
-// function add_scroll_to_table(){
-//    height_val = 32
-//     $('tr[class!="head"]').map(function(i){
-//       el_height = $($('tr[class!="head"]')[i]).height()
-//       if (height_val < el_height )
-//         height_val = el_height
-//     });
+function add_scroll_to_table(){
+  $('tr[class!=head]').each(function(j){
+    $tr = $($('tr[class!=head]')[j])
+    $tr.find('td').each(function(i){
+      text       = $($tr.find('td')[i]).text()
 
-//     console.log(height_val)
-//     self_width = $('table.results_table').width()
-//     if (height_val > 35){
-//       $('table.results_table').width(self_width + 400);
-//       $('div#container').addClass('scroll')
-//     }
-//     else{
-//       $('table.results_table').width('100%');
-//       $('div#container').removeClass('scroll')
-//     }
-// }
+      $('span#string_span').html(text)
+      text_width = $('span#string_span').width()
+
+
+      if (text_width > 60){
+        th = $('tr.head').find('th')[i]
+        if (text_width > $(th).width()){
+          $(th).width(text_width + 30)
+        }
+      }
+      else
+        $($('tr.head').find('th')[i]).width(70)
+    })
+
+  })
+}
 $(function () {
 
     select_all();
@@ -904,4 +909,9 @@ $(function () {
       i_plus.removeClass('fa-plus').addClass('fa-minus')
     })
 
+    // $('.paginate_button').on('click', function(){
+    //   setTimeout(function() {
+    //    add_scroll_to_table()
+    //   }, 100);
+    // })
 });

@@ -244,8 +244,11 @@ a.change_dataset_link:hover{
   float: none;
   min-width: 400px;
 }
-.results_table table tr{
-  height: 10px;
+
+table.results_table{
+  table-layout: fixed !important;
+  width: 100%;
+  /*white-space: nowrap;*/
 }
 .results_table a.togglebtn {
   font-size:16px;
