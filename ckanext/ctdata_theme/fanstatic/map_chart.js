@@ -210,23 +210,23 @@ chart = new Highcharts.Chart({
   },
   title : {
     text : $("#dataset_title").val(),
-    style: {opacity: "70%", fontFamily: "Questrial, sans-serif", textWrap: "normal", fontWeight: '900',zIndex: '999', fontSize: '24px'},
+    style: {backgroundColor: '#ffffff', height: '50px', minWidth: '500px', textAlign: 'center', padding: '5px'},
     floating: true,
     backgroundColor: 'white',
     borderWidth:1,
     borderRadius:3,
     useHTML: true,
-    y: 30
+    y: 20
   },
   subtitle: {
     text: legend_html,
-    style: {opacity: "70%", fontFamily: "Questrial, sans-serif", backgroundColor: '#ffffff', padding: '5px', paddingTop: '40px', minWidth: '500px', textAlign: 'center', border: '1px solid lightgray'},
+    style: {whiteSpace: 'inherit', wordWrap: 'break-word', backgroundColor: '#ffffff', height: '50px', minWidth: '500px', maxWidth: '500px', textAlign: 'center', padding: '5px'},
     floating: true,
     backgroundColor: 'white',
     borderWidth:1,
     borderRadius:3,
     useHTML: true,
-    y: 10
+    y: 50
   },
 
   legend: {

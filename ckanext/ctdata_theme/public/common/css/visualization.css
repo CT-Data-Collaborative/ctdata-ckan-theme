@@ -84,7 +84,7 @@ span.checkLabel {
 }
 
 .indicator-sub-topics{
-  padding-left: 8px;
+  padding: 5px;
 }
 
 .indicator-sub-topics li{
@@ -301,7 +301,7 @@ a.gray_back{
 td.right_align, th.right_align {text-align: right; padding: 0px;}
 
 table.results_table tr td{
-  padding-left: 3px !important;
+  padding-left: 5px !important;
 }
 table.results_table tr{
   max-height: 10px !important;

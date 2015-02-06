@@ -694,9 +694,12 @@ function draw_chart(){
                 minRange: 0.1
             },
             plotOptions: {
-                column: {
-                    minPointLength: 3
-                    }
+              line: {
+                  dataLabels: { enabled: true}
+              },
+              column: {
+                  dataLabels: { enabled: true}
+              }
             },
             legend: {
                 layout: 'horizontal',
@@ -726,6 +729,7 @@ function draw_chart(){
                     x: -20 //center
                 }
               }
+
             }
         });
     });
