@@ -234,10 +234,18 @@ a.change_dataset_link:hover{
   font-weight: 400;
 }
 
+#double_export{
+  background-color: white;
+}
 
 #container_2  table.results_table{
    margin-left: 50px;
    width: 100%;
+}
+
+#container_2  table.results_table tr td{
+  padding: 10px;
+  padding-right: 20px !important;
 }
 
 .results_table{
@@ -309,4 +317,11 @@ table.results_table tr{
 
 #container.scroll{
   overflow: scroll !important;
+}
+
+#additional_info{
+  padding-left: 80px;
+  padding-right: 30px;
+  padding-bottom: 30px;
+  word-wrap: break-word;
 }

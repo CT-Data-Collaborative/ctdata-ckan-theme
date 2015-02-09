@@ -258,14 +258,73 @@ function print_chart(){
     chart.print();
 }
 function save_chart_image(){
+  if (display_type  != 'map')
+    var r = confirm("Do you want to include data table? ");
+  else
+    r = false
+  if (r == true) {
+    if ($('#second_table').attr('class') == "collapse")
+      $('a[href="#second_table"]').click()
+    title    = $("#dataset_title").val()
+    subtitle = $('#profile_info').text()
+    $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
+
+    html2canvas($('div.#double_export'), {
+      onrendered: function(canvas) {
+          $('#additional_info').html('')
+          theCanvas = canvas;
+          canvas.toBlob(function(blob) {
+              saveAs(blob, "chart.png");
+          });
+      }
+    });
+  }
+  else{
     var chart = $("#container").highcharts();
     var opts = {type:"image/png"};
     chart.exportChart(opts);
+  }
 }
 function save_chart_pdf(){
+  if (display_type  != 'map')
+    var r = confirm("Do you want to include data table? ");
+  else
+    r = false
+
+  if (r == true) {
+    if ($('#second_table').attr('class') == "collapse")
+      $('a[href="#second_table"]').click()
+
+    title    = $("#dataset_title").val()
+    subtitle = $('#profile_info').text()
+    $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
+
+    html2canvas($('div.#double_export'), {
+      onrendered: function(canvas) {
+        $('#additional_info').html('')
+        var imgData = canvas.toDataURL('image/jpeg');
+        var ctx     = canvas.getContext( '2d' );
+        $('#test_canvas').val(imgData)
+        console.log($('#test_canvas').val())
+        console.log('here')
+        var doc = new jsPDF('p', 'mm', [ctx.canvas.height/2, ctx.canvas.width/2]);
+        var imgData = $('#test_canvas').val()
+
+        doc.addImage(imgData, 'jpeg', 0, 20);
+        doc.output('save', 'chart.pdf')
+      }
+    })
+  }
+  else{
     var chart = $("#container").highcharts();
     var opts = {type: "application/pdf"};
     chart.exportChart(opts);
+  }
+}
+
+function save_chart_pdf_with_table(){
+
+
 }
 
 function collapse_all(){
