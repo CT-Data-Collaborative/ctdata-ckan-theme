@@ -3,9 +3,71 @@ import ckan.plugins.toolkit as toolkit
 
 from ..utils import dict_with_key_value
 from ..visualization.services import DatasetService
+from ..community.services import CommunityProfileService
 from IPython import embed
 
 class TopicSerivce(object):
+
+    @staticmethod
+    def get_topics_with_indicators(action):
+      dataset_names = toolkit.get_action('package_list')(data_dict={})
+      all_indicators = []
+      domains = [{'title': 'Civic Vitality', 'id': 'civic_vitality', 'indicators': []},
+                 {'title': 'Demographics',   'id': 'demographics',   'indicators': []},
+                 {'title': 'Economy',        'id': 'economy',        'indicators': []},
+                 {'title': 'Health',         'id': 'health',         'indicators': []},
+                 {'title': 'Education',      'id': 'education',      'indicators': []},
+                 {'title': 'Housing',        'id': 'housing',        'indicators': []},
+                 {'title': 'Safety',         'id': 'safety',         'indicators': []}]
+
+      for dataset_name in dataset_names:
+          dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+          metadata = DatasetService.get_dataset_meta(dataset_name)['extras']
+          hidden_meta = filter(lambda x: x['key'] == 'hidden_in', metadata)
+
+
+          try:
+            hidden_list = []
+            hidden_list.append( yaml.load(hidden_meta[0]['value']))
+          except IndexError:
+            hidden_list = []
+
+          if len(dataset['extras']) > 0:
+              domain = None
+              domain_indicators = []
+              for extra in dataset['extras']:
+                  if extra['key'].lower() == 'domain':
+                      domain = extra['value']
+
+              if domain and action not in hidden_list:
+                  dataset_indicators = CommunityProfileService.get_gallery_indicators_for_dataset(dataset['id'])
+
+                  for indicator in dataset_indicators:
+                    domain_indicators.append({'id': indicator.id, 'description': indicator.description,
+                                              'name': indicator.name, 'viz_type': indicator.visualization_type,
+                                              'created_at': str(indicator.created_at.strftime("%Y-%m-%d %H:%M:%S")),
+                                              'user': indicator.user_name(),
+                                              'dataset_name': dataset['name'],
+                                              'link_to_visualization': indicator.link_to_visualization()})
+
+
+                  dmn = dict_with_key_value('title', domain, domains)
+                  if dmn:
+                      dmn['indicators'] = dmn['indicators'] + (domain_indicators)
+                  else:
+                      domains.append({'title': domain,
+                                      'indicators': domain_indicators,
+                                      'id': "_".join(map(lambda x: x.lower(), domain.split(" ")))})
+
+                  all_indicators = all_indicators + domain_indicators
+
+      domains.sort(key=lambda x: x['title'])
+      all_indicators.sort(key=lambda x: x['created_at'], reverse=True)
+
+      domains = domains + [{'title': 'Most Recent', 'indicators': all_indicators[0:10], 'id': 'most_recent'}]
+
+      return domains
+
     @staticmethod
     def get_topics(action):
         dataset_names = toolkit.get_action('package_list')(data_dict={})

@@ -105,6 +105,7 @@ function create_headline_indicator(){
 
     type = $form.find('.indicator_ind_type').val();
     name = $form.find('.indicator_name').val();
+    description = $form.find('.indicator_description').val()
     group_ids = []
 
     $form.find('input:checked.indicator_group').map(function(){
@@ -117,6 +118,7 @@ function create_headline_indicator(){
       data: JSON.stringify({ dataset_id: dataset_id, name: name,
                              ind_type: type, filters: filters,
                              permission: permission,
+                             description: description,
                              visualization_type: display_type,
                              group_ids: group_ids.join()}),
       contentType: 'application/json; charset=utf-8',
