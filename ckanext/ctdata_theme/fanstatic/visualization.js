@@ -583,7 +583,7 @@ function draw_table(){
                 cur_value = unit_for_value(cur_value, type)
               else{
 
-                checked_measure = $('input:checked', $('#collapseMeasureType'))[0]
+                checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
                 if (checked_measure != undefined)
                   cur_value = unit_for_value(cur_value, checked_measure.value);
               }
@@ -604,8 +604,9 @@ function draw_table(){
             if (type != undefined)
               cur_value = unit_for_value(cur_value, type)
             else{
-              checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
-              cur_value = unit_for_value(cur_value, checked_measure);
+              checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
+              if (checked_measure != undefined)
+                cur_value = unit_for_value(cur_value, checked_measure.value);
             }
 
             html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
@@ -685,7 +686,8 @@ function draw_chart(){
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         change_page_url(data['link']);
 
-        var type = checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
+        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
+        var type = checked_measure.value;
         var series = [];
         var legend_series = [];
         var years = data['years'];
