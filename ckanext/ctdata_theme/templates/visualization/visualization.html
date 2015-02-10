@@ -33,6 +33,7 @@
   {% endif %}
 </div>
 
+<span id='string_span' style='font-size: 14;'></span>
 
 <form>
     <input type="hidden" id="dataset_id" value="{{ dataset.name }}">
@@ -130,12 +131,13 @@
 <li data-toggle="tooltip" title="Save as PDF" class='tooltip_a'><a href="javascript:void(0)" onclick="save_chart_pdf()" ><img src="/common/images/operation3.png" alt="" /></a></li>
 </ul>
 </div>
-
+<input id="test_canvas" class="hidden">
 </div>
 <div class="spinner"> <img src="/common/images/loading.gif"/> </div>
 <div class="results_table">
-    <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>
-
+    <div id="double_export">
+    <div id="additional_info"> </div>
+    <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto" class="scroll"></div>
     <br>
     <br>
     <br>
@@ -148,6 +150,7 @@
     </span>
     <div id="second_table" class="collapse">
       <div id="container_2" class=""></div>
+    </div>
     </div>
     <br>
     <a class="togglebtn gray_back collapsed" href="#collapseMetadata" data-toggle="collapse">
@@ -196,7 +199,6 @@
 
 </section>
 
-
 {% endblock %}
 
 {% block scripts %}
@@ -213,7 +215,20 @@
 {% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/exporting.js' %}
 {% resource 'ctdata_theme/visualization.js' %}
 {% resource 'ctdata_theme/jquery.dataTables.js' %}
+{% resource 'ctdata_theme/jspdf.js' %}
+{% resource 'ctdata_theme/jspdf.plugin.addimage.js' %}
+{% resource 'ctdata_theme/jspdf.plugin.from_html.js' %}
+{% resource 'ctdata_theme/jspdf.plugin.add_html.js' %}
+{% resource 'ctdata_theme/jspdf.plugin.split_text_to_size.js' %}
+{% resource 'ctdata_theme/jspdf.PLUGINTEMPLATE.js' %}
+{% resource 'ctdata_theme/jspdf.plugin.standard_fonts_metrics.js' %}
+{% resource 'ctdata_theme/fileSaver.js' %}
 {% resource 'ctdata_theme/map_chart.js' %}
+{% resource 'ctdata_theme/html2canvas.js' %}
+{% resource 'ctdata_theme/canvas-to-blob.js' %}
+{% resource 'ctdata_theme/bootbox.js' %}
+
+
 <script>
 var defaults = [];
 var disabled = [];

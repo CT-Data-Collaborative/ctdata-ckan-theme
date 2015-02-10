@@ -407,6 +407,7 @@ white-space: nowrap;
 .table th small{
 	font-size: 6pt;
 	color: #717171;
+	width: 200px;
 }
 .table th:nth-child(even){
 	border-bottom: 5px solid #00adef;
