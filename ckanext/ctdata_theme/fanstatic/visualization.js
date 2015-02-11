@@ -1,6 +1,7 @@
 var display_type  =  (location.search.split('v=')[1]||'').split('&')[0] || "table",
     map_filters   = [],
     chart_filters = [],
+    table_filters = [],
     dataset_id    = $("#dataset_id").val(),
     create_popup  = $("#create_indicator_popup"),
     edit_popup    = $("#edit_indicators_popup"),
@@ -190,10 +191,13 @@ function check_defaults(){
 }
 
 function save_filters(display_type){
+  if(display_type == 'table')
+    table_filters = get_filters()
+
   if(display_type == 'map')
-   map_filters = get_filters()
- else
-   chart_filters = get_filters()
+    map_filters = get_filters()
+  else
+    chart_filters = get_filters()
 }
 
 function set_filters(display_type){
@@ -201,8 +205,11 @@ function set_filters(display_type){
   if(display_type == 'map' && map_filters.length > 0){
     filters_to_update = map_filters;
   }
-  if(display_type != 'map' && chart_filters.length > 0){
+  if(display_type != 'map' && display_type != 'table' && chart_filters.length > 0){
     filters_to_update = chart_filters;
+  }
+  if(display_type == 'table' && table_filters.length > 0){
+    filters_to_update = table_filters;
   }
   if(filters_to_update.length > 0){
     $.each(filters_to_update, function(i){
@@ -259,6 +266,7 @@ function print_chart(){
     var chart = $("#container").highcharts();
     chart.print();
 }
+
 function save_chart_image(){
   var chart = $("#container").highcharts();
   var opts  = {type:"image/png"};
@@ -282,12 +290,14 @@ function save_chart_image(){
           }
         });
       }
-      else
+      else{
         chart.exportChart(opts);
-    });
+      }
+    })
   }
-  else
+  else{
     chart.exportChart(opts);
+  }
 }
 function save_chart_pdf(){
   var chart = $("#container").highcharts();
@@ -318,11 +328,13 @@ function save_chart_pdf(){
             doc.output('save', 'chart.pdf')
           }
         })
-      } else
+      } else{
         chart.exportChart(opts);
+      }
     })
-  } else
+  } else{
     chart.exportChart(opts);
+  }
 }
 
 function save_chart_pdf_with_table(){
@@ -395,6 +407,7 @@ function display_data(){
     display_spinner();
     set_icon(display_type);
 
+
     if(display_type == 'column'){
       new_type = 'bar';
     } else {
@@ -409,6 +422,29 @@ function display_data(){
     towns = $("input." + geography_param + ":checked");
     years = $("input.Year:checked");
     error = ''
+
+    if (display_type == 'map'){
+      $('#collapseTown').find('input').addClass('disabled');
+      $('#collapseTown').find('label').addClass('disabled');
+      $('input', $('#collapseTown')).attr("disabled", true);
+      $('#collapseTown').find('label').attr("disabled", true);
+      $('input[type="checkbox"][class != "indicator_group"]').addClass('as_radio');
+    }
+    if (display_type == 'column' || display_type == 'line'){
+      $('#collapseTown').find('input').removeClass('disabled');
+      $('#collapseTown').find('label').removeClass('disabled');
+      $('input', $('#collapseTown')).attr("disabled", false);
+      $('#collapseTown').find('label').attr("disabled", false);
+      $('input[type="checkbox"][class != "indicator_group"]').removeClass('as_radio')
+      $('input[type="checkbox"].MeasureType').addClass('as_radio')
+    }
+    if (display_type == 'table'){
+      $('#collapseTown').find('input').removeClass('disabled');
+      $('#collapseTown').find('label').removeClass('disabled');
+      $('input', $('#collapseTown')).attr("disabled", false);
+      $('#collapseTown').find('label').attr("disabled", false);
+      $('input[type="checkbox"][class != "indicator_group"]').removeClass('as_radio')
+    }
 
     if(towns.length == 0 && display_type != 'map'){
       if (window.location.href.indexOf(geography_param) > -1) {
@@ -468,6 +504,7 @@ function display_data(){
       draw_table();
       draw_chart();
   }
+
 }
 
 function get_filters(){
@@ -569,7 +606,10 @@ function draw_table(){
           if (years !== undefined) {
             $.each(years, function (year_index) {
               cur_value = data['data'][row_index]['data'][year_index];
-              if (!cur_value) cur_value = "-";
+              if (!cur_value && cur_value != 0){
+                // debugger
+                cur_value = "-";
+              }
               if (cur_value == SUPPRESSED_VALUE) cur_value = '*'
 
               text = cur_value.toString()

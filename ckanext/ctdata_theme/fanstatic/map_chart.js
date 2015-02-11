@@ -189,6 +189,7 @@ var join_by = ['NAME', 'code'];
 if (geography_param != 'Town')
   join_by = ['GEOID', 'fips'];
 
+
 if (!error){
 chart = new Highcharts.Chart({
   chart: {
