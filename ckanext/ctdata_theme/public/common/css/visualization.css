@@ -239,8 +239,8 @@ a.change_dataset_link:hover{
 }
 
 #container_2  table.results_table{
-   margin-left: 50px;
-   width: 100%;
+  margin-left: 5%;
+  width: 95%;
 }
 
 #container_2  table.results_table tr td{
