@@ -26,6 +26,13 @@ input[type="checkbox"],input[type="radio"]{
   -webkit-appearance: checkbox;
   float: left;
 }
+
+input.as_radio[type="checkbox"]{
+  -webkit-appearance: radio;
+  float: left;
+}
+
+
 label.checkLabel{
   float:left;
   padding-top: 4px;
@@ -324,4 +331,8 @@ table.results_table tr{
   padding-right: 30px;
   padding-bottom: 30px;
   word-wrap: break-word;
+}
+
+label.disabled{
+  color: rgb(211, 211, 211) !important;
 }

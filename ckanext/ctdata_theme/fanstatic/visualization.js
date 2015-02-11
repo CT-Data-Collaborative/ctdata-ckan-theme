@@ -407,6 +407,7 @@ function display_data(){
     display_spinner();
     set_icon(display_type);
 
+
     if(display_type == 'column'){
       new_type = 'bar';
     } else {
@@ -421,6 +422,29 @@ function display_data(){
     towns = $("input." + geography_param + ":checked");
     years = $("input.Year:checked");
     error = ''
+
+    if (display_type == 'map'){
+      $('#collapseTown').find('input').addClass('disabled');
+      $('#collapseTown').find('label').addClass('disabled');
+      $('input', $('#collapseTown')).attr("disabled", true);
+      $('#collapseTown').find('label').attr("disabled", true);
+      $('input[type="checkbox"][class != "indicator_group"]').addClass('as_radio');
+    }
+    if (display_type == 'column' || display_type == 'line'){
+      $('#collapseTown').find('input').removeClass('disabled');
+      $('#collapseTown').find('label').removeClass('disabled');
+      $('input', $('#collapseTown')).attr("disabled", false);
+      $('#collapseTown').find('label').attr("disabled", false);
+      $('input[type="checkbox"][class != "indicator_group"]').removeClass('as_radio')
+      $('input[type="checkbox"].MeasureType').addClass('as_radio')
+    }
+    if (display_type == 'table'){
+      $('#collapseTown').find('input').removeClass('disabled');
+      $('#collapseTown').find('label').removeClass('disabled');
+      $('input', $('#collapseTown')).attr("disabled", false);
+      $('#collapseTown').find('label').attr("disabled", false);
+      $('input[type="checkbox"][class != "indicator_group"]').removeClass('as_radio')
+    }
 
     if(towns.length == 0 && display_type != 'map'){
       if (window.location.href.indexOf(geography_param) > -1) {
@@ -480,6 +504,7 @@ function display_data(){
       draw_table();
       draw_chart();
   }
+
 }
 
 function get_filters(){
