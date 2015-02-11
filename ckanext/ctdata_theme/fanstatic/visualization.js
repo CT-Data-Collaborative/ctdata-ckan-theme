@@ -105,6 +105,7 @@ function create_headline_indicator(){
 
     type = $form.find('.indicator_ind_type').val();
     name = $form.find('.indicator_name').val();
+    description = $form.find('.indicator_description').val()
     group_ids = []
 
     $form.find('input:checked.indicator_group').map(function(){
@@ -117,6 +118,7 @@ function create_headline_indicator(){
       data: JSON.stringify({ dataset_id: dataset_id, name: name,
                              ind_type: type, filters: filters,
                              permission: permission,
+                             description: description,
                              visualization_type: display_type,
                              group_ids: group_ids.join()}),
       contentType: 'application/json; charset=utf-8',
@@ -258,14 +260,74 @@ function print_chart(){
     chart.print();
 }
 function save_chart_image(){
-    var chart = $("#container").highcharts();
-    var opts = {type:"image/png"};
+  var chart = $("#container").highcharts();
+  var opts  = {type:"image/png"};
+  var title = $("#dataset_title").val();
+  var subtitle = $('#profile_info').text();
+
+  if (display_type != 'map') {
+    bootbox.confirm("Do you want to include data table?", function(r){
+      if (r) {
+        if ($('#second_table').attr('class') == "collapse")
+          $('a[href="#second_table"]').click()
+
+        $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
+        html2canvas($('div.#double_export'), {
+          onrendered: function(canvas) {
+              $('#additional_info').html('')
+              theCanvas = canvas;
+              canvas.toBlob(function(blob) {
+                  saveAs(blob, "chart.png");
+              });
+          }
+        });
+      }
+      else
+        chart.exportChart(opts);
+    });
+  }
+  else
     chart.exportChart(opts);
 }
 function save_chart_pdf(){
-    var chart = $("#container").highcharts();
-    var opts = {type: "application/pdf"};
+  var chart = $("#container").highcharts();
+  var opts  = {type: "application/pdf"};
+  var title = $("#dataset_title").val();
+  var subtitle = $('#profile_info').text();
+
+  if (display_type != 'map') {
+    bootbox.confirm("Do you want to include data table?", function(r){
+      if (r){
+        if ($('#second_table').attr('class') == "collapse")
+          $('a[href="#second_table"]').click()
+
+        $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
+
+        html2canvas($('div.#double_export'), {
+          onrendered: function(canvas) {
+            $('#additional_info').html('')
+            var imgData = canvas.toDataURL('image/jpeg');
+            var ctx     = canvas.getContext( '2d' );
+            $('#test_canvas').val(imgData)
+            console.log($('#test_canvas').val())
+            console.log('here')
+            var doc     = new jsPDF('p', 'mm', [ctx.canvas.height/2, ctx.canvas.width/2]);
+            var imgData = $('#test_canvas').val()
+
+            doc.addImage(imgData, 'jpeg', 0, 20);
+            doc.output('save', 'chart.pdf')
+          }
+        })
+      } else
+        chart.exportChart(opts);
+    })
+  } else
     chart.exportChart(opts);
+}
+
+function save_chart_pdf_with_table(){
+
+
 }
 
 function collapse_all(){
@@ -478,20 +540,20 @@ function draw_table(){
       });
       var years = data['years'];
       var col_num = 2;
-      var html = '<table id="table" class="results_table">'+
+      var html = '<table id="table" class="table results_table">'+
                  "<thead>"+
-                   "<tr>"+
-                     "<th class='col-1'>Location</th>";
+                   "<tr class='head'>"+
+                     "<th>Location</th>";
                    $.each(selected_dims, function(dim_name){
-                     html += "<th class='col-"+col_num+"'>"+dim_name+"</th>";
+                     html += "<th>"+dim_name+"</th>";
                      col_num++;
                    });
                  if (years !== undefined) {
                    $.each(years, function (i) {
-                       html = html + "<th class='col-" + (col_num + i) + "'>" + years[i] + "</th>";
+                       html = html + "<th>" + years[i] + "</th>";
                    });
                  } else {
-                   html = html + "<th class='col-" + (col_num) + "'>Value</th>";
+                   html = html + "<th>Value</th>";
                  }
                  html+=  "</tr>"+
                  "</thead>"+
@@ -499,9 +561,9 @@ function draw_table(){
         $.each(data['data'], function(row_index){
           if (!data['data'][row_index]['dims']) return "No data for this row";
           col_num = 2;
-          html += "<tr>"+ "<td class='col-1'>"+data['data'][row_index]['dims'][geography_param]+"</td>";
+          html += "<tr>"+ "<td>"+data['data'][row_index]['dims'][geography_param]+"</td>";
           $.each(selected_dims, function(dim_name){
-               html += "<td class='col-"+col_num+"'>"+data['data'][row_index]['dims'][dim_name]+"</td>";
+               html += "<td>"+data['data'][row_index]['dims'][dim_name]+"</td>";
                col_num++;
           });
           if (years !== undefined) {
@@ -523,13 +585,13 @@ function draw_table(){
                 cur_value = unit_for_value(cur_value, type)
               else{
 
-                checked_measure = $('input:checked', $('#collapseMeasureType'))[0]
+                checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
                 if (checked_measure != undefined)
                   cur_value = unit_for_value(cur_value, checked_measure.value);
               }
 
 
-              html += "<td class='right_align col-" + col_num + "'>" + cur_value + "</td>";
+              html += "<td class='right_align'>" + cur_value + "</td>";
               col_num++;
             });
           } else {
@@ -544,8 +606,9 @@ function draw_table(){
             if (type != undefined)
               cur_value = unit_for_value(cur_value, type)
             else{
-              checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
-              cur_value = unit_for_value(cur_value, checked_measure);
+              checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
+              if (checked_measure != undefined)
+                cur_value = unit_for_value(cur_value, checked_measure.value);
             }
 
             html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
@@ -563,6 +626,8 @@ function draw_table(){
         $("#link_to_second_table").addClass('hidden');
         $("#container_2").html('');
 
+        add_scroll_to_table();
+
         $("#table").DataTable({
           dom: 'T<"clear">lfrtip',
           tableTools:{
@@ -570,9 +635,10 @@ function draw_table(){
             "aButtons": ["print", "pdf", "csv"]
           }
         });
+
+
       }
-  //format_numbers();
-  // $('#second_table').collapse()
+
   hide_spinner();
 });
 }
@@ -622,7 +688,8 @@ function draw_chart(){
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         change_page_url(data['link']);
 
-        var type = checked_measure = $('input:checked', $('#collapseMeasureType'))[0].value;
+        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
+        var type = checked_measure.value;
         var series = [];
         var legend_series = [];
         var years = data['years'];
@@ -686,12 +753,17 @@ function draw_chart(){
                     width: 1,
                     color: '#808080'
                 }],
-                title: {text: yAxisLabel}
+                title: {text: yAxisLabel},
+                floor: 0,
+                minRange: 0.1
             },
             plotOptions: {
-                column: {
-                    minPointLength: 3
-                    }
+              line: {
+                  dataLabels: { enabled: true}
+              },
+              column: {
+                  dataLabels: { enabled: true}
+              }
             },
             legend: {
                 layout: 'horizontal',
@@ -721,6 +793,7 @@ function draw_chart(){
                     x: -20 //center
                 }
               }
+
             }
         });
     });
@@ -764,6 +837,29 @@ function clear_all(){
     $('span.clear').hide();
     display_data();
   });
+}
+
+function add_scroll_to_table(){
+  $('tr[class!=head]').each(function(j){
+    $tr = $($('tr[class!=head]')[j])
+    $tr.find('td').each(function(i){
+      text       = $($tr.find('td')[i]).text()
+
+      $('span#string_span').html(text)
+      text_width = $('span#string_span').width()
+
+
+      if (text_width > 60){
+        th = $('tr.head').find('th')[i]
+        if (text_width > $(th).width()){
+          $(th).width(text_width + 30)
+        }
+      }
+      else
+        $($('tr.head').find('th')[i]).width(70)
+    })
+
+  })
 }
 $(function () {
 
@@ -862,7 +958,6 @@ $(function () {
       else{
         $('.groups_inputs').removeClass('hidden')
       }
-
     });
 
     $('#collapseMetadata').collapse()
@@ -881,4 +976,10 @@ $(function () {
       i_minus.removeClass('fa-minus').addClass('fa-plus')
       i_plus.removeClass('fa-plus').addClass('fa-minus')
     })
+
+    // $('.paginate_button').on('click', function(){
+    //   setTimeout(function() {
+    //    add_scroll_to_table()
+    //   }, 100);
+    // })
 });

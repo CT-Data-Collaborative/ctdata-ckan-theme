@@ -41,6 +41,7 @@ class CommunityProfilesController(base.BaseController):
             name        = json_body.get('name')
             ind_type    = json_body.get('ind_type')
             permission  = json_body.get('permission')
+            description = json_body.get('description')
             group_ids   = json_body.get('group_ids')
             visualization_type   = json_body.get('visualization_type') or 'table'
 
@@ -50,7 +51,9 @@ class CommunityProfilesController(base.BaseController):
                 abort(400)
 
             try:
-                indicator = self.community_profile_service.create_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, group_ids)
+
+                indicator =  self.community_profile_service.create_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, description, group_ids)
+
                 self.session.commit()
 
                 ind_data = {

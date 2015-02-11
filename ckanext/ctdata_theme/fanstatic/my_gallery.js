@@ -23,21 +23,19 @@ $(function(){
     id = $(this).attr('id')
     ids_to_remove.push( id);
 
-    $('li.dataset-item[id="'+id +'"]').addClass('hidden')
-    $('#remove_gallery_indicators').removeClass('disabled');
+    var r = confirm("Are you sure you want to delete this indicator?");
+    if (r == true) {
+      $('li.dataset-item[id="'+id +'"]').addClass('hidden')
+
+      $.ajax({type: "POST",
+        url: "/user/remove_gallery_indicators",
+        data: JSON.stringify({indicators_to_remove: ids_to_remove}),
+        contentType: 'application/json; charset=utf-8',
+        success: function (data) {
+        }
+      });
+    }
   });
-
-
-  $('#remove_gallery_indicators').on('click', function(){
-    $.ajax({type: "POST",
-      url: "/user/remove_gallery_indicators",
-      data: JSON.stringify({indicators_to_remove: ids_to_remove}),
-      contentType: 'application/json; charset=utf-8',
-      success: function (data) {
-        window.location.reload();
-      }
-    });
-  })
 
   ///////////////// SHOW POPUP ////////////////////
 
@@ -56,8 +54,6 @@ $(function(){
       group_ids.push(id)
     });
 
-    console.log($current_tr)
-    console.log(group_ids)
     $('.indicator_name').val(name)
     $('input.indicator_permission').removeAttr('checked')
     $('input.indicator_permission[value=' + permission + ']').attr('checked', true)

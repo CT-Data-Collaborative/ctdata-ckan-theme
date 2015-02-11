@@ -145,7 +145,9 @@ class GroupController(GroupController):
                     user_data_dict = { 'email': email, 'group_id': data_dict['id'], 'role': data_dict['role']}
                     del data_dict['email']
                     user_dict    = self._action('user_invite')(context, user_data_dict)
-                    c.group_dict = self._action('group_member_create')(context, user_dict)
+                    data_dict['username'] = user_dict['name']
+                    c.group_dict = self._action('group_member_create')(context, data_dict)
+
                   else:
                     h.flash_error('User with this email already exists')
 

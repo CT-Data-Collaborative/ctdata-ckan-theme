@@ -36,3 +36,32 @@
 
   color: #ececec;
 }
+
+#saved_visualizations{
+  border-bottom: 10px solid #849939;
+  padding: 20px;
+  padding-left: 50px;
+}
+
+a.dark_blue{
+  color: #187794 !important;
+}
+
+.gallery_indicator{
+  margin-left: 50px;
+  margin-bottom: 15px;
+  height: 175px;
+  border: dotted 1px #ececec;
+  padding: 10px;
+}
+
+.gallery_indicator div p{
+  height: 100px;
+  overflow: hidden;
+}
+
+.date-info{
+  padding-right: 5px;
+  font-size: 10px;
+  color: black;
+}

@@ -176,7 +176,7 @@ $(function () {
         $.ajax({type: "POST",
             url: "/community/add_indicator",
             data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
-                                   permission: 'public', filters: get_filters()}),
+                                   permission: 'public', filters: get_filters(), description: ''}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 if (data.success == true){
