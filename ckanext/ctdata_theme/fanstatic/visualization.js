@@ -259,6 +259,7 @@ function print_chart(){
     var chart = $("#container").highcharts();
     chart.print();
 }
+
 function save_chart_image(){
   var chart = $("#container").highcharts();
   var opts  = {type:"image/png"};
@@ -282,12 +283,14 @@ function save_chart_image(){
           }
         });
       }
-      else
+      else{
         chart.exportChart(opts);
-    });
+      }
+    })
   }
-  else
+  else{
     chart.exportChart(opts);
+  }
 }
 function save_chart_pdf(){
   var chart = $("#container").highcharts();
@@ -318,11 +321,13 @@ function save_chart_pdf(){
             doc.output('save', 'chart.pdf')
           }
         })
-      } else
+      } else{
         chart.exportChart(opts);
+      }
     })
-  } else
+  } else{
     chart.exportChart(opts);
+  }
 }
 
 function save_chart_pdf_with_table(){
@@ -569,7 +574,10 @@ function draw_table(){
           if (years !== undefined) {
             $.each(years, function (year_index) {
               cur_value = data['data'][row_index]['data'][year_index];
-              if (!cur_value) cur_value = "-";
+              if (!cur_value && cur_value != 0){
+                // debugger
+                cur_value = "-";
+              }
               if (cur_value == SUPPRESSED_VALUE) cur_value = '*'
 
               text = cur_value.toString()
