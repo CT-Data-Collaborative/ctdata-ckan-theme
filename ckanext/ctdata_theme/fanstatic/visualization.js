@@ -1,6 +1,7 @@
 var display_type  =  (location.search.split('v=')[1]||'').split('&')[0] || "table",
     map_filters   = [],
     chart_filters = [],
+    table_filters = [],
     dataset_id    = $("#dataset_id").val(),
     create_popup  = $("#create_indicator_popup"),
     edit_popup    = $("#edit_indicators_popup"),
@@ -190,10 +191,13 @@ function check_defaults(){
 }
 
 function save_filters(display_type){
+  if(display_type == 'table')
+    table_filters = get_filters()
+
   if(display_type == 'map')
-   map_filters = get_filters()
- else
-   chart_filters = get_filters()
+    map_filters = get_filters()
+  else
+    chart_filters = get_filters()
 }
 
 function set_filters(display_type){
@@ -201,8 +205,11 @@ function set_filters(display_type){
   if(display_type == 'map' && map_filters.length > 0){
     filters_to_update = map_filters;
   }
-  if(display_type != 'map' && chart_filters.length > 0){
+  if(display_type != 'map' && display_type != 'table' && chart_filters.length > 0){
     filters_to_update = chart_filters;
+  }
+  if(display_type == 'table' && table_filters.length > 0){
+    filters_to_update = table_filters;
   }
   if(filters_to_update.length > 0){
     $.each(filters_to_update, function(i){
