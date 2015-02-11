@@ -323,7 +323,7 @@ table.results_table tr{
 }
 
 #container.scroll{
-  overflow: scroll !important;
+  overflow: auto !important;
 }
 
 #additional_info{
