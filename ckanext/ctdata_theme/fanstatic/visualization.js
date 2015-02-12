@@ -989,7 +989,7 @@ $(function () {
 
     var width = $(window).width() * 0.6;
     $("#container").width(width);
-    $("#container_2").width(width + 0.1);
+    $("#container_2").width(width);
     $("a.togglebtn", $('.results_table')).width(width);
     $("#second_table").width(width + 60);
     $("#metadata").width(width);
@@ -997,7 +997,7 @@ $(function () {
     window.onresize = function() {
       var width = $(window).width() * 0.6;
       $("#container").width(width);
-      $("#container_2").width(width + 50);
+      $("#container_2").width(width);
       $("a.togglebtn", $('.results_table')).width(width);
       $("#second_table").width(width + 50);
       $("#metadata").width(width);
