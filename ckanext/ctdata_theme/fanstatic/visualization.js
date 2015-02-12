@@ -263,8 +263,29 @@ function set_icon(type){
 }
 
 function print_chart(){
-    var chart = $("#container").highcharts();
-    chart.print();
+    // var chart = $("#container").highcharts();
+    // chart.print();
+
+   html2canvas($('div#container'), {
+    onrendered: function(canvas) {
+      $('#additional_info').html('')
+      var imgData = canvas.toDataURL('image/png');
+      var ctx     = canvas.getContext( '2d' );
+      $('#test_canvas').val(imgData)
+      console.log($('#test_canvas').val())
+      console.log('here')
+
+
+      var tWindow = window.open("");
+      $(tWindow.document.body).html("<img id='Image' src=" + imgData + " style='width:100%;'></img>").ready(function () {
+        tWindow.focus();
+        tWindow.print();
+               });
+
+
+
+    }
+  })
 }
 
 function save_chart_image(){
@@ -280,7 +301,7 @@ function save_chart_image(){
           $('a[href="#second_table"]').click()
 
         $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
-        html2canvas($('div.#double_export'), {
+        html2canvas($('div#double_export'), {
           onrendered: function(canvas) {
               $('#additional_info').html('')
               theCanvas = canvas;
@@ -292,7 +313,7 @@ function save_chart_image(){
       }
       else{
         // chart.exportChart(opts);
-        html2canvas($('div.#double_export'), {
+        html2canvas($('div#double_export'), {
           onrendered: function(canvas) {
               $('#additional_info').html('')
               theCanvas = canvas;
@@ -306,7 +327,7 @@ function save_chart_image(){
   }
   else{
     // chart.exportChart(opts);
-    html2canvas($('div.#double_export'), {
+    html2canvas($('div#double_export'), {
           onrendered: function(canvas) {
               $('#additional_info').html('')
               theCanvas = canvas;
@@ -329,9 +350,9 @@ function save_chart_pdf(){
         if ($('#second_table').attr('class') == "collapse")
           $('a[href="#second_table"]').click()
 
-        // $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
+        $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
 
-        html2canvas($('div.#double_export'), {
+        html2canvas($('div#double_export'), {
           onrendered: function(canvas) {
             $('#additional_info').html('')
             var imgData = canvas.toDataURL('image/jpeg');
@@ -339,17 +360,17 @@ function save_chart_pdf(){
             $('#test_canvas').val(imgData)
             console.log($('#test_canvas').val())
             console.log('here')
-            var doc     = new jsPDF('p', 'mm', [ctx.canvas.height/2, ctx.canvas.width/2]);
+            var doc     = new jsPDF('p', 'pt', [ctx.canvas.height, ctx.canvas.width]);
             var imgData = $('#test_canvas').val()
 
-            doc.addImage(imgData, 'jpeg', 0, 20);
+            doc.addImage(imgData, 'jpeg', 10, 20);
             doc.output('save', 'chart.pdf')
           }
         })
       } else{
         // chart.exportChart(opts);
 
-        html2canvas($('div.#container'), {
+        html2canvas($('div#container'), {
           onrendered: function(canvas) {
             $('#additional_info').html('')
             var imgData = canvas.toDataURL('image/jpeg');
@@ -357,10 +378,10 @@ function save_chart_pdf(){
             $('#test_canvas').val(imgData)
             console.log($('#test_canvas').val())
             console.log('here')
-            var doc     = new jsPDF('p', 'mm', [ctx.canvas.height/2, ctx.canvas.width/2]);
+            var doc     = new jsPDF('p', 'pt', [ctx.canvas.height, ctx.canvas.width]);
             var imgData = $('#test_canvas').val()
 
-            doc.addImage(imgData, 'jpeg', 0, 20);
+            doc.addImage(imgData, 'jpeg', 10, 20);
             doc.output('save', 'chart.pdf')
           }
         })
@@ -369,7 +390,7 @@ function save_chart_pdf(){
     })
   } else{
     // chart.exportChart(opts);
-     html2canvas($('div.#container'), {
+     html2canvas($('div#container'), {
           onrendered: function(canvas) {
             $('#additional_info').html('')
             var imgData = canvas.toDataURL('image/jpeg');
@@ -377,10 +398,10 @@ function save_chart_pdf(){
             $('#test_canvas').val(imgData)
             console.log($('#test_canvas').val())
             console.log('here')
-            var doc     = new jsPDF('p', 'mm', [ctx.canvas.height/2, ctx.canvas.width/2]);
+            var doc     = new jsPDF('p', 'pt', [ctx.canvas.height, ctx.canvas.width]);
             var imgData = $('#test_canvas').val()
 
-            doc.addImage(imgData, 'jpeg', 0, 20);
+            doc.addImage(imgData, 'jpeg', 10, 20);
             doc.output('save', 'chart.pdf')
           }
         })
