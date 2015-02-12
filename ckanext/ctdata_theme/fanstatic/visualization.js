@@ -291,12 +291,30 @@ function save_chart_image(){
         });
       }
       else{
-        chart.exportChart(opts);
+        // chart.exportChart(opts);
+        html2canvas($('div.#double_export'), {
+          onrendered: function(canvas) {
+              $('#additional_info').html('')
+              theCanvas = canvas;
+              canvas.toBlob(function(blob) {
+                  saveAs(blob, "chart.png");
+              });
+          }
+        });
       }
     })
   }
   else{
-    chart.exportChart(opts);
+    // chart.exportChart(opts);
+    html2canvas($('div.#double_export'), {
+          onrendered: function(canvas) {
+              $('#additional_info').html('')
+              theCanvas = canvas;
+              canvas.toBlob(function(blob) {
+                  saveAs(blob, "chart.png");
+              });
+          }
+        });
   }
 }
 function save_chart_pdf(){
@@ -311,7 +329,7 @@ function save_chart_pdf(){
         if ($('#second_table').attr('class') == "collapse")
           $('a[href="#second_table"]').click()
 
-        $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
+        // $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
 
         html2canvas($('div.#double_export'), {
           onrendered: function(canvas) {
@@ -329,11 +347,43 @@ function save_chart_pdf(){
           }
         })
       } else{
-        chart.exportChart(opts);
+        // chart.exportChart(opts);
+
+        html2canvas($('div.#container'), {
+          onrendered: function(canvas) {
+            $('#additional_info').html('')
+            var imgData = canvas.toDataURL('image/jpeg');
+            var ctx     = canvas.getContext( '2d' );
+            $('#test_canvas').val(imgData)
+            console.log($('#test_canvas').val())
+            console.log('here')
+            var doc     = new jsPDF('p', 'mm', [ctx.canvas.height/2, ctx.canvas.width/2]);
+            var imgData = $('#test_canvas').val()
+
+            doc.addImage(imgData, 'jpeg', 0, 20);
+            doc.output('save', 'chart.pdf')
+          }
+        })
+
       }
     })
   } else{
-    chart.exportChart(opts);
+    // chart.exportChart(opts);
+     html2canvas($('div.#container'), {
+          onrendered: function(canvas) {
+            $('#additional_info').html('')
+            var imgData = canvas.toDataURL('image/jpeg');
+            var ctx     = canvas.getContext( '2d' );
+            $('#test_canvas').val(imgData)
+            console.log($('#test_canvas').val())
+            console.log('here')
+            var doc     = new jsPDF('p', 'mm', [ctx.canvas.height/2, ctx.canvas.width/2]);
+            var imgData = $('#test_canvas').val()
+
+            doc.addImage(imgData, 'jpeg', 0, 20);
+            doc.output('save', 'chart.pdf')
+          }
+        })
   }
 }
 
@@ -606,19 +656,15 @@ function draw_table(){
           if (years !== undefined) {
             $.each(years, function (year_index) {
               cur_value = data['data'][row_index]['data'][year_index];
-              if (!cur_value && cur_value != 0){
-                // debugger
-                cur_value = "-";
-              }
+              if (!cur_value && cur_value != 0) cur_value = "-";
+
               if (cur_value == SUPPRESSED_VALUE) cur_value = '*'
 
               text = cur_value.toString()
               array = text.split('.')
 
-              if (jQuery.isNumeric(text) == true && array.length == 1){
-                // cur_value = parseInt(text).toLocaleString('en-US')
+              if (jQuery.isNumeric(text) == true && array.length == 1)
                 cur_value = parseInt(text).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-              }
 
               type = data['data'][row_index]['dims']['Measure Type']
               if (type != undefined)

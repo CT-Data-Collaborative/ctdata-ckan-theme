@@ -183,6 +183,7 @@ a.clear_all{
   max-width: 1300px !important;
   min-width: 310px !important;
   margin-left: 5% !important;
+  background-color: white;
 }
 
 .full_metadata_link{
