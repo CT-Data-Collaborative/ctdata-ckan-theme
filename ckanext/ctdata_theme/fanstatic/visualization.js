@@ -507,7 +507,7 @@ function draw_table(){
           if (years !== undefined) {
             $.each(years, function (year_index) {
               cur_value = data['data'][row_index]['data'][year_index];
-              if (!cur_value) cur_value = "-";
+              if (!cur_value && cur_value != 0) cur_value = "-";
               if (cur_value == SUPPRESSED_VALUE) cur_value = '*'
 
               text = cur_value.toString()
