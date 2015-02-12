@@ -959,11 +959,13 @@ function add_scroll_to_table(){
       if (text_width > 60){
         th = $('tr.head').find('th')[i]
         if (text_width > $(th).width()){
-          $(th).width(text_width + 30)
+          $(th).width(text_width + 40)
         }
       }
       else
-        $($('tr.head').find('th')[i]).width(70)
+        $($('tr.head').find('th')[i]).width(80)
+
+      $('span#string_span').html('')
     })
 
   })
