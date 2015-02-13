@@ -269,8 +269,8 @@ function print_chart(){
   var chart = $("#container").highcharts();
   var svg = chart.getSVG();
   var canvas = document.createElement('canvas');
-      canvas.width = 800;
-      canvas.height = 1200;
+      canvas.width  = $("#container").width();
+      canvas.height = $("#container").height();
 
   var ctx = canvas.getContext('2d');
 
@@ -278,7 +278,12 @@ function print_chart(){
   img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))));
   img.onload = function() {
       ctx.drawImage(img, 0, 0);
-      window.open(canvas.toDataURL('image/png'))
+      myWindow=window.open('','','width=1200,height=1200');
+      myWindow.document.write('<img src="' + canvas.toDataURL('image/png') + '">');
+      myWindow.document.close();
+
+      myWindow.focus();
+      myWindow.print();
   };
 }
 
@@ -290,9 +295,10 @@ function chart_with_table_to_png(){
 
   var chart = $("#container").highcharts();
   var svg = chart.getSVG();
+  var width = $("#highcharts-container").width();
   var canvas = document.createElement('canvas');
-      canvas.width = 800;
-      canvas.height = 500;
+      canvas.width  = $("#container").width();
+      canvas.height = $("#container").height();
 
   var ctx = canvas.getContext('2d');
   var img = document.createElement('img');
@@ -303,7 +309,7 @@ function chart_with_table_to_png(){
       ctx.drawImage(img, 0, 0);
       data_url = canvas.toDataURL('image/png')
       $('img#chart_image').attr('src', data_url)
-
+      $('div#double_export').width(1200);
       html2canvas($('div#double_export')[0], {
           onrendered: function(canvas) {
               theCanvas = canvas;
@@ -328,8 +334,8 @@ function chart_with_table_to_pdf(){
   var chart = $("#container").highcharts();
   var svg = chart.getSVG();
   var canvas = document.createElement('canvas');
-      canvas.width = 768;
-      canvas.height = 400;
+      canvas.width  = $("#container").width();
+      canvas.height = $("#container").height();
 
   var ctx = canvas.getContext('2d');
   var img = document.createElement('img');
@@ -340,14 +346,14 @@ function chart_with_table_to_pdf(){
       ctx.drawImage(img, 0, 0);
       data_url = canvas.toDataURL('image/jpeg')
       $('img#chart_image').attr('src', data_url)
-
+      $('div#double_export').width(1200);
       html2canvas($('div#double_export')[0], {
           onrendered: function(canvas) {
             theCanvas = canvas;
 
             var imgData = canvas.toDataURL('image/jpeg');
             var ctx     = canvas.getContext( '2d' );
-            var doc     = new jsPDF('p', 'pt', [ctx.canvas.height, ctx.canvas.width]);
+            var doc     = new jsPDF('l', 'pt', [ctx.canvas.height, ctx.canvas.width]);
 
             doc.addImage(imgData, 'jpeg', 10, 20);
             doc.output('save', 'chart.pdf')
@@ -369,8 +375,8 @@ function chart_to_pdf(){
   var chart = $("#container").highcharts();
   var svg = chart.getSVG();
   var canvas = document.createElement('canvas');
-      canvas.width = 800;
-      canvas.height = 600;
+      canvas.width  = $("#container").width();
+      canvas.height = $("#container").height();
 
   var ctx = canvas.getContext('2d');
   var img = document.createElement('img');
@@ -411,8 +417,8 @@ function chart_to_png(){
   var chart = $("#container").highcharts();
   var svg = chart.getSVG();
   var canvas = document.createElement('canvas');
-      canvas.width = 800;
-      canvas.height = 600;
+      canvas.width  = $("#container").width;
+      canvas.height = $("#container").height;
 
   var ctx = canvas.getContext('2d');
   var img = document.createElement('img');
@@ -742,7 +748,6 @@ function draw_table(){
             $.each(years, function (year_index) {
               cur_value = data['data'][row_index]['data'][year_index];
               if (!cur_value && cur_value != 0) cur_value = "-";
-
               if (cur_value == SUPPRESSED_VALUE) cur_value = '*'
 
               text = cur_value.toString()
