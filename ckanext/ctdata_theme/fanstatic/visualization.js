@@ -262,6 +262,9 @@ function set_icon(type){
   }
 }
 
+
+///////////////////////// EXPORTING FUNCTIONS /////////////////////
+
 function print_chart(){
   var chart = $("#container").highcharts();
   var svg = chart.getSVG();
@@ -280,6 +283,7 @@ function print_chart(){
 }
 
 function chart_with_table_to_png(){
+  $('#chart_image').removeClass('hidden')
   var title = $("#dataset_title").val();
   var subtitle = $('#profile_info').text();
   $('#title_and_subtitle').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
@@ -307,6 +311,7 @@ function chart_with_table_to_png(){
                   saveAs(blob, "chart.png");
                   $('#chart_image').attr('src', '')
                   $('#title_and_subtitle').html('')
+                  $('#chart_image').addClass('hidden')
               });
           }
         });
@@ -315,6 +320,7 @@ function chart_with_table_to_png(){
 
 
 function chart_with_table_to_pdf(){
+  $('#chart_image').removeClass('hidden')
   var title = $("#dataset_title").val();
   var subtitle = $('#profile_info').text();
   $('#title_and_subtitle').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
@@ -347,12 +353,14 @@ function chart_with_table_to_pdf(){
             doc.output('save', 'chart.pdf')
             $('#chart_image').attr('src', '')
             $('#title_and_subtitle').html('')
+            $('#chart_image').addClass('hidden')
           }
         });
   };
 }
 
 function chart_to_pdf(){
+  $('#only_chart_image').removeClass('hidden')
   var title    = $("#dataset_title").val();
   var subtitle = $('#profile_info').text();
   if (display_type != 'map')
@@ -386,6 +394,7 @@ function chart_to_pdf(){
             doc.output('save', 'chart.pdf')
 
             $('#only_chart_image').attr('src', '')
+            $('#only_chart_image').addClass('hidden')
             $('#title_info').html('')
           }
         });
@@ -393,6 +402,7 @@ function chart_to_pdf(){
 }
 
 function chart_to_png(){
+  $('#only_chart_image').removeClass('hidden')
   var title    = $("#dataset_title").val();
   var subtitle = $('#profile_info').text();
   if (display_type != 'map')
@@ -421,6 +431,7 @@ function chart_to_png(){
                   saveAs(blob, "chart.png");
                   $('#only_chart_image').attr('src', '')
                   $('#title_info').html('')
+                  $('#only_chart_image').addClass('hidden')
               });
           }
         });
@@ -460,14 +471,11 @@ function save_chart_pdf(){
     })
   } else{
     // chart.exportChart(opts);
-    chart_to_pdf
+    chart_to_pdf()
   }
 }
 
-function save_chart_pdf_with_table(){
-
-
-}
+///////////////////////// EXPORTING FUNCTIONS /////////////////////
 
 function collapse_all(){
   $("div.collapse").collapse('hide');
@@ -1147,4 +1155,7 @@ $(function () {
     //    add_scroll_to_table()
     //   }, 100);
     // })
+
+  $('#only_chart_image').addClass('hidden')
+  $('#chart_image').addClass('hidden')
 });
