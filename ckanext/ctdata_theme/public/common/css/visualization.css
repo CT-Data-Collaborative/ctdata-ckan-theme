@@ -243,12 +243,14 @@ a.change_dataset_link:hover{
 }
 
 #double_export{
+  widt: auto;
+  height: auto;
   background-color: white;
 }
 
 #container_2  table.results_table{
   margin-left: 7%;
-  width: 99%;
+  /*/width: 99%;*/
 }
 
 #container_2  table.results_table tr td{
