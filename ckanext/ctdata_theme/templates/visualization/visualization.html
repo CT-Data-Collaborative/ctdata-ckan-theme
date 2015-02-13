@@ -3,7 +3,11 @@
 {%- block underheader %}{% endblock -%}
 
 {% block main_content %}
-<div class="ctdata-wrapper">
+<!-- <div class="ctdata-wrapper">
+<div id="block_for_export">
+  <div id="title_and_subtitle"></div>
+  <img src="" id="chart_image">
+</div> -->
 <div class='dataset_info'>
   <h1>{{ dataset.title }}
   {% if c.help_info != '' %}
@@ -135,13 +139,20 @@
 </div>
 <div class="spinner"> <img src="/common/images/loading.gif"/> </div>
 <div class="results_table">
-    <div id="double_export">
-    <div id="additional_info"> </div>
+
+    <div id="only_chart">
+      <div id="title_info"> </div>
+      <img src="" id="only_chart_image">
+    </div>
     <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto" class="scroll"></div>
+
     <br>
     <br>
     <br>
     <br>
+    <div id="double_export">
+      <div id="title_and_subtitle"></div>
+      <img src="" id="chart_image">
     <span id="link_to_second_table" class="hidden">
       <a href="#second_table" data-toggle="collapse" class="togglebtn gray_back">
         Data Table
@@ -213,10 +224,11 @@
 <script src="/common/js/jspdf.js"></script>
 <script src="/common/js/jspdf.plugin.addimage.js"></script>
 <script src="/common/js/jspdf.plugin.standard_fonts_metrics.js"></script>
-<!-- <script src="/common/js/data_src.js"></script> -->
 
 {% resource 'ctdata_theme/highcharts_src.js' %}
 {% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/map_src.js' %}
+{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/exporting_src.js' %}
+{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/data_src.js' %}
 
 {% resource 'ctdata_theme/fileSaver.js' %}
 

@@ -327,13 +327,20 @@ table.results_table tr{
   overflow: auto !important;
 }
 
-#additional_info{
+#title_and_subtitle, #title_info{
   padding-left: 80px;
   padding-right: 30px;
   padding-bottom: 30px;
   word-wrap: break-word;
 }
 
+#only_chart, .results_table{
+  background-color: white;
+}
+
+canvas{
+  background-color: white;
+}
 label.disabled{
   color: rgb(211, 211, 211) !important;
 }

@@ -262,156 +262,220 @@ function set_icon(type){
   }
 }
 
+
+///////////////////////// EXPORTING FUNCTIONS /////////////////////
+
 function print_chart(){
-    // var chart = $("#container").highcharts();
-    // chart.print();
+  var chart = $("#container").highcharts();
+  var svg = chart.getSVG();
+  var canvas = document.createElement('canvas');
+      canvas.width = 800;
+      canvas.height = 1200;
 
-   html2canvas($('div#container'), {
-    onrendered: function(canvas) {
-      $('#additional_info').html('')
-      var imgData = canvas.toDataURL('image/png');
-      var ctx     = canvas.getContext( '2d' );
-      $('#test_canvas').val(imgData)
-      console.log($('#test_canvas').val())
-      console.log('here')
+  var ctx = canvas.getContext('2d');
+
+  var img = document.createElement('img');
+  img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))));
+  img.onload = function() {
+      ctx.drawImage(img, 0, 0);
+      window.open(canvas.toDataURL('image/png'))
+  };
+}
+
+function chart_with_table_to_png(){
+  $('#chart_image').removeClass('hidden')
+  var title = $("#dataset_title").val();
+  var subtitle = $('#profile_info').text();
+  $('#title_and_subtitle').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
+
+  var chart = $("#container").highcharts();
+  var svg = chart.getSVG();
+  var canvas = document.createElement('canvas');
+      canvas.width = 800;
+      canvas.height = 500;
+
+  var ctx = canvas.getContext('2d');
+  var img = document.createElement('img');
+
+  var data_url = ''
+  img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))));
+  img.onload = function() {
+      ctx.drawImage(img, 0, 0);
+      data_url = canvas.toDataURL('image/png')
+      $('img#chart_image').attr('src', data_url)
+
+      html2canvas($('div#double_export')[0], {
+          onrendered: function(canvas) {
+              theCanvas = canvas;
+              canvas.toBlob(function(blob) {
+                  saveAs(blob, "chart.png");
+                  $('#chart_image').attr('src', '')
+                  $('#title_and_subtitle').html('')
+                  $('#chart_image').addClass('hidden')
+              });
+          }
+        });
+  };
+}
 
 
-      var tWindow = window.open("");
-      $(tWindow.document.body).html("<img id='Image' src=" + imgData + " style='width:100%;'></img>").ready(function () {
-        tWindow.focus();
-        tWindow.print();
-               });
+function chart_with_table_to_pdf(){
+  $('#chart_image').removeClass('hidden')
+  var title = $("#dataset_title").val();
+  var subtitle = $('#profile_info').text();
+  $('#title_and_subtitle').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
 
+  var chart = $("#container").highcharts();
+  var svg = chart.getSVG();
+  var canvas = document.createElement('canvas');
+      canvas.width = 768;
+      canvas.height = 400;
 
+  var ctx = canvas.getContext('2d');
+  var img = document.createElement('img');
 
-    }
-  })
+  var data_url = ''
+  img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))));
+  img.onload = function() {
+      ctx.drawImage(img, 0, 0);
+      data_url = canvas.toDataURL('image/jpeg')
+      $('img#chart_image').attr('src', data_url)
+
+      html2canvas($('div#double_export')[0], {
+          onrendered: function(canvas) {
+            theCanvas = canvas;
+
+            var imgData = canvas.toDataURL('image/jpeg');
+            var ctx     = canvas.getContext( '2d' );
+            var doc     = new jsPDF('p', 'pt', [ctx.canvas.height, ctx.canvas.width]);
+
+            doc.addImage(imgData, 'jpeg', 10, 20);
+            doc.output('save', 'chart.pdf')
+            $('#chart_image').attr('src', '')
+            $('#title_and_subtitle').html('')
+            $('#chart_image').addClass('hidden')
+          }
+        });
+  };
+}
+
+function chart_to_pdf(){
+  $('#only_chart_image').removeClass('hidden')
+  var title    = $("#dataset_title").val();
+  var subtitle = $('#profile_info').text();
+  if (display_type != 'map')
+    $('#title_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
+
+  var chart = $("#container").highcharts();
+  var svg = chart.getSVG();
+  var canvas = document.createElement('canvas');
+      canvas.width = 800;
+      canvas.height = 600;
+
+  var ctx = canvas.getContext('2d');
+  var img = document.createElement('img');
+
+  var data_url = ''
+  img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))));
+  img.onload = function() {
+      ctx.drawImage(img, 0, 0);
+      data_url = canvas.toDataURL('image/png')
+      $('img#only_chart_image').attr('src', data_url)
+
+      html2canvas($('div#only_chart')[0], {
+          onrendered: function(canvas) {
+              theCanvas = canvas;
+
+            var imgData = canvas.toDataURL('image/jpeg');
+            var ctx     = canvas.getContext( '2d' );
+            var doc     = new jsPDF('l', 'pt', [ctx.canvas.height, ctx.canvas.width]);
+
+            doc.addImage(imgData, 'jpeg', 10, 20);
+            doc.output('save', 'chart.pdf')
+
+            $('#only_chart_image').attr('src', '')
+            $('#only_chart_image').addClass('hidden')
+            $('#title_info').html('')
+          }
+        });
+  };
+}
+
+function chart_to_png(){
+  $('#only_chart_image').removeClass('hidden')
+  var title    = $("#dataset_title").val();
+  var subtitle = $('#profile_info').text();
+  if (display_type != 'map')
+    $('#title_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
+
+  var chart = $("#container").highcharts();
+  var svg = chart.getSVG();
+  var canvas = document.createElement('canvas');
+      canvas.width = 800;
+      canvas.height = 600;
+
+  var ctx = canvas.getContext('2d');
+  var img = document.createElement('img');
+
+  var data_url = ''
+  img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))));
+  img.onload = function() {
+      ctx.drawImage(img, 0, 0);
+      data_url = canvas.toDataURL('image/png')
+      $('img#only_chart_image').attr('src', data_url)
+
+      html2canvas($('div#only_chart')[0], {
+          onrendered: function(canvas) {
+              theCanvas = canvas;
+              canvas.toBlob(function(blob) {
+                  saveAs(blob, "chart.png");
+                  $('#only_chart_image').attr('src', '')
+                  $('#title_info').html('')
+                  $('#only_chart_image').addClass('hidden')
+              });
+          }
+        });
+
+  };
 }
 
 function save_chart_image(){
-  var chart = $("#container").highcharts();
-  var opts  = {type:"image/png"};
-  var title = $("#dataset_title").val();
-  var subtitle = $('#profile_info').text();
-
   if (display_type != 'map') {
     bootbox.confirm("Do you want to include data table?", function(r){
       if (r) {
         if ($('#second_table').attr('class') == "collapse")
           $('a[href="#second_table"]').click()
 
-        $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
-        html2canvas($('div#double_export'), {
-          onrendered: function(canvas) {
-              $('#additional_info').html('')
-              theCanvas = canvas;
-              canvas.toBlob(function(blob) {
-                  saveAs(blob, "chart.png");
-              });
-          }
-        });
+        chart_with_table_to_png()
       }
-      else{
-        // chart.exportChart(opts);
-        html2canvas($('div#double_export'), {
-          onrendered: function(canvas) {
-              $('#additional_info').html('')
-              theCanvas = canvas;
-              canvas.toBlob(function(blob) {
-                  saveAs(blob, "chart.png");
-              });
-          }
-        });
-      }
+      else
+        chart_to_png();
     })
   }
   else{
     // chart.exportChart(opts);
-    html2canvas($('div#double_export'), {
-          onrendered: function(canvas) {
-              $('#additional_info').html('')
-              theCanvas = canvas;
-              canvas.toBlob(function(blob) {
-                  saveAs(blob, "chart.png");
-              });
-          }
-        });
+    chart_to_png();
   }
 }
-function save_chart_pdf(){
-  var chart = $("#container").highcharts();
-  var opts  = {type: "application/pdf"};
-  var title = $("#dataset_title").val();
-  var subtitle = $('#profile_info').text();
 
+function save_chart_pdf(){
   if (display_type != 'map') {
     bootbox.confirm("Do you want to include data table?", function(r){
       if (r){
         if ($('#second_table').attr('class') == "collapse")
           $('a[href="#second_table"]').click()
 
-        $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
-
-        html2canvas($('div#double_export'), {
-          onrendered: function(canvas) {
-            $('#additional_info').html('')
-            var imgData = canvas.toDataURL('image/jpeg');
-            var ctx     = canvas.getContext( '2d' );
-            $('#test_canvas').val(imgData)
-            console.log($('#test_canvas').val())
-            console.log('here')
-            var doc     = new jsPDF('p', 'pt', [ctx.canvas.height, ctx.canvas.width]);
-            var imgData = $('#test_canvas').val()
-
-            doc.addImage(imgData, 'jpeg', 10, 20);
-            doc.output('save', 'chart.pdf')
-          }
-        })
-      } else{
-        // chart.exportChart(opts);
-
-        html2canvas($('div#container'), {
-          onrendered: function(canvas) {
-            $('#additional_info').html('')
-            var imgData = canvas.toDataURL('image/jpeg');
-            var ctx     = canvas.getContext( '2d' );
-            $('#test_canvas').val(imgData)
-            console.log($('#test_canvas').val())
-            console.log('here')
-            var doc     = new jsPDF('p', 'pt', [ctx.canvas.height, ctx.canvas.width]);
-            var imgData = $('#test_canvas').val()
-
-            doc.addImage(imgData, 'jpeg', 10, 20);
-            doc.output('save', 'chart.pdf')
-          }
-        })
-
-      }
+        chart_with_table_to_pdf()
+      } else
+        chart_to_pdf()
     })
   } else{
     // chart.exportChart(opts);
-     html2canvas($('div#container'), {
-          onrendered: function(canvas) {
-            $('#additional_info').html('')
-            var imgData = canvas.toDataURL('image/jpeg');
-            var ctx     = canvas.getContext( '2d' );
-            $('#test_canvas').val(imgData)
-            console.log($('#test_canvas').val())
-            console.log('here')
-            var doc     = new jsPDF('p', 'pt', [ctx.canvas.height, ctx.canvas.width]);
-            var imgData = $('#test_canvas').val()
-
-            doc.addImage(imgData, 'jpeg', 10, 20);
-            doc.output('save', 'chart.pdf')
-          }
-        })
+    chart_to_pdf()
   }
 }
 
-function save_chart_pdf_with_table(){
-
-
-}
+///////////////////////// EXPORTING FUNCTIONS /////////////////////
 
 function collapse_all(){
   $("div.collapse").collapse('hide');
@@ -1091,4 +1155,7 @@ $(function () {
     //    add_scroll_to_table()
     //   }, 100);
     // })
+
+  $('#only_chart_image').addClass('hidden')
+  $('#chart_image').addClass('hidden')
 });
