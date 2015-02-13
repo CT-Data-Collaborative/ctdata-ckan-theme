@@ -963,7 +963,7 @@ function add_scroll_to_table(){
         }
       }
       else
-        $($('tr.head').find('th')[i]).width(80)
+        $($('tr.head').find('th')[i]).width(100)
 
       $('span#string_span').html('')
     })
