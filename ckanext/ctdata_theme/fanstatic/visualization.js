@@ -490,7 +490,7 @@ function collapse_all(){
 function choose_measure_type_for_charts(){
   measure = $('input:checked', $('#collapseMeasureType'))[0]
   if (measure == undefined){
-    $($('input[class!="disabled"]', $('#collapseMeasureType'))[0]).prop('checked', true);
+    $($('input:not(:disabled)', $('#collapseMeasureType'))).prop('checked', true);
   }
 }
 //Charts can't have more than one measure type at a time
