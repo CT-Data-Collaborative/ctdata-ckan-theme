@@ -26,7 +26,58 @@
 
   {% for domain in domains %}
     <div class="domain row" id="{{ domain['id'] }}">
+      {% if domain['title'] == 'Most Recent' %}
+      <h2 class="pull-center"> See the Most Recently Created Visualizations. </h2>
+      <br>
+      <br>
+      <br>
+      {% endif %}
       <div class="text-left">
+        {% if domain['title'] == 'Most Recent' %}
+
+        <table class="table">
+          <col width="20%"></col>
+          <col width="15%"></col>
+          <col width="35%"></col>
+          <col width="15%"></col>
+          <col width="15%"></col>
+          <thead>
+            <th> Title </th>
+            <th> Dataset </th>
+            <th> Description </th>
+            <th> Date </th>
+            <th> Creator </th>
+          </thead>
+          <tbody>
+            {% for indicator in domain['indicators'] %}
+              <tr>
+              <td>
+                <a href="{{ indicator['link_to_visualization'] }}">
+                    {% if  indicator['viz_type'] == 'table' %}
+                      <img id="table_icon" src="/common/images/displayopt1-inv.png" alt="" />
+                    {% endif %}
+                    {% if  indicator['viz_type'] == 'chart' or indicator['viz_type'] == 'column' %}
+                      <img id="bar_icon" src="/common/images/displayopt2.png" alt="" />
+                    {% endif %}
+                    {% if  indicator['viz_type'] == 'line' %}
+                      <img id="line_icon" src="/common/images/displayopt3.png" alt="" />
+                    {% endif %}
+                    {% if  indicator['viz_type'] == 'map' %}
+                      <img id="line_icon" src="/common/images/displayopt4.png" alt="" />
+                    {% endif %}
+
+                    {{indicator.name}}
+                  </a>
+              </td>
+              <td><a href="/dataset/{{indicator['dataset_name']}}">  {{indicator['dataset_name']}} </a> </span></td>
+              <td><p>{{indicator['description']}}</p></td>
+              <td> <span>{{indicator['created_at']}}</span></td>
+              <td><a href="/user/{{indicator['user']}}"> {{indicator['user']}} </a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
         <ul class="">
           {% if domain['indicators']|length > 0 %}
             {% for indicator in domain['indicators'] %}
@@ -62,6 +113,7 @@
           </ul>
         {% else %}
           There're no indicators for this gallery yet.
+        {% endif %}
         {% endif %}
       </div>
     </div>
