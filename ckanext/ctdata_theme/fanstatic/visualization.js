@@ -536,6 +536,7 @@ function set_map_checkbox(){
   else{
     $("input.Year").prop('checked', true);
   }
+  choose_measure_type_for_charts();
 }
 
 //When not showing map, allow multiple filters to be checked
