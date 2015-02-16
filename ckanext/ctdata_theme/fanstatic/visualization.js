@@ -288,7 +288,6 @@ function set_chart_checkbox(){
 //If showing map, only allow one of each filter to be checked at a time
 function set_map_checkbox(){
   checkboxes_except_town.click(function(){
-    choose_measure_type_for_charts();
     var val = $(this).prop('checked');
     $(this).parent().parent().find("input[type='checkbox']").prop('checked', false);
     $(this).prop('checked', val);
