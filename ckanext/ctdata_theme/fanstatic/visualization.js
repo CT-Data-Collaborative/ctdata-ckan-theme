@@ -487,6 +487,12 @@ function collapse_all(){
   $("div.collapse").collapse('hide');
 }
 
+function choose_measure_type_for_charts(){
+  measure = $('input:checked', $('#collapseMeasureType'))[0]
+  if (measure == undefined){
+    $($('input[class!="disabled"]', $('#collapseMeasureType'))[0]).prop('checked', true);
+  }
+}
 //Charts can't have more than one measure type at a time
 function set_chart_checkbox(){
   $("input.MeasureType").click(function(){
@@ -496,11 +502,13 @@ function set_chart_checkbox(){
   });
   $("input.MeasureType").unbind("change");
   $("input.MeasureType:checked").slice(1).prop('checked', false);
+  choose_measure_type_for_charts();
 }
 
 //If showing map, only allow one of each filter to be checked at a time
 function set_map_checkbox(){
   checkboxes_except_town.click(function(){
+    choose_measure_type_for_charts();
     var val = $(this).prop('checked');
     $(this).parent().parent().find("input[type='checkbox']").prop('checked', false);
     $(this).prop('checked', val);
@@ -759,13 +767,6 @@ function draw_table(){
               type = data['data'][row_index]['dims']['Measure Type']
               if (type != undefined)
                 cur_value = unit_for_value(cur_value, type)
-              else{
-
-                checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
-                if (checked_measure != undefined)
-                  cur_value = unit_for_value(cur_value, checked_measure.value);
-              }
-
 
               html += "<td class='right_align'>" + cur_value + "</td>";
               col_num++;
@@ -781,11 +782,6 @@ function draw_table(){
             type = data['data'][row_index]['dims']['Measure Type']
             if (type != undefined)
               cur_value = unit_for_value(cur_value, type)
-            else{
-              checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
-              if (checked_measure != undefined)
-                cur_value = unit_for_value(cur_value, checked_measure.value);
-            }
 
             html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
           }
@@ -854,7 +850,7 @@ function draw_chart(){
       dataset_title = $("#dataset_title").val(),
       description = $("#profile_info").text(),
       source = $('#Source').text();
-
+  set_chart_checkbox();
   $.ajax({type: "POST",
             url: "/vizualization_data/" + dataset_id,
             data: JSON.stringify({view: display_type,
@@ -864,7 +860,7 @@ function draw_chart(){
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         change_page_url(data['link']);
 
-        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
+        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0] //|| $('input', $('#collapseMeasureType'))[0]
         var type = checked_measure.value;
         var series = [];
         var legend_series = [];
@@ -1040,7 +1036,6 @@ function add_scroll_to_table(){
   })
 }
 $(function () {
-
     select_all();
     deselect_all();
     check_defaults();
