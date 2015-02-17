@@ -45,9 +45,9 @@ class TopicSerivce(object):
                   for indicator in dataset_indicators:
                     domain_indicators.append({'id': indicator.id, 'description': indicator.description,
                                               'name': indicator.name, 'viz_type': indicator.visualization_type,
-                                              'created_at': str(indicator.created_at.strftime("%Y-%m-%d %H:%M:%S")),
+                                              'created_at': str(indicator.created_at.strftime("%B %d, %Y")),
                                               'user': indicator.user_name(),
-                                              'dataset_name': dataset['name'],
+                                              'dataset_name': indicator.dataset_name(),
                                               'link_to_visualization': indicator.link_to_visualization()})
 
 
@@ -64,7 +64,7 @@ class TopicSerivce(object):
       domains.sort(key=lambda x: x['title'])
       all_indicators.sort(key=lambda x: x['created_at'], reverse=True)
 
-      domains = domains + [{'title': 'Most Recent', 'indicators': all_indicators[0:10], 'id': 'most_recent'}]
+      domains = domains + [{'title': 'the Most Recently Created', 'indicators': all_indicators[0:10], 'id': 'most_recent'}]
 
       return domains
 
