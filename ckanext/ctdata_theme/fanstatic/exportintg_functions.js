@@ -45,7 +45,7 @@ function chart_with_table_to_png(){
       ctx.drawImage(img, 0, 0);
       data_url = canvas.toDataURL('image/png')
       $('img#chart_image').attr('src', data_url)
-      $('div#double_export').width(1200);
+      $('div#double_export').width($('#second_table').width() + 100)
       html2canvas($('div#double_export')[0], {
           onrendered: function(canvas) {
               theCanvas = canvas;
@@ -55,6 +55,7 @@ function chart_with_table_to_png(){
                   $('#title_and_subtitle').html('')
                   $('#chart_image').addClass('hidden')
                   $('#link_to_second_table').removeClass('hidden')
+                  $('div#double_export').width('auto')
               });
           }
         });
@@ -85,7 +86,7 @@ function chart_with_table_to_pdf(){
       ctx.drawImage(img, 0, 0);
       data_url = canvas.toDataURL('image/jpeg')
       $('img#chart_image').attr('src', data_url)
-      $('div#double_export').width(1200);
+      $('div#double_export').width( $('#second_table').width() + 100);
       html2canvas($('div#double_export')[0], {
           onrendered: function(canvas) {
             theCanvas = canvas;
@@ -100,6 +101,7 @@ function chart_with_table_to_pdf(){
             $('#title_and_subtitle').html('')
             $('#chart_image').addClass('hidden')
             $('#link_to_second_table').removeClass('hidden')
+            $('div#double_export').width('auto')
           }
         });
   };
@@ -197,10 +199,8 @@ function save_chart_image(){
         chart_to_png();
     })
   }
-  else{
-    // chart.exportChart(opts);
+  else
     chart_to_png();
-  }
 }
 
 function save_chart_pdf(){
@@ -214,10 +214,8 @@ function save_chart_pdf(){
       } else
         chart_to_pdf()
     })
-  } else{
-    // chart.exportChart(opts);
+  } else
     chart_to_pdf()
-  }
 }
 
 ///////////////////////// EXPORTING FUNCTIONS /////////////////////
