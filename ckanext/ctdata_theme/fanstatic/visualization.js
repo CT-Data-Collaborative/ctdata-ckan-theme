@@ -263,230 +263,16 @@ function set_icon(type){
 }
 
 
-///////////////////////// EXPORTING FUNCTIONS /////////////////////
-
-function print_chart(){
-  var chart = $("#container").highcharts();
-  var svg = chart.getSVG();
-  var canvas = document.createElement('canvas');
-      canvas.width  = $("#container").width();
-      canvas.height = $("#container").height();
-
-  var ctx = canvas.getContext('2d');
-
-  var img = document.createElement('img');
-  img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))));
-  img.onload = function() {
-      ctx.drawImage(img, 0, 0);
-      myWindow=window.open('','','width=1200,height=1200');
-      myWindow.document.write('<img src="' + canvas.toDataURL('image/png') + '">');
-      myWindow.document.close();
-
-      myWindow.focus();
-      myWindow.print();
-  };
-}
-
-function chart_with_table_to_png(){
-  $('#chart_image').removeClass('hidden')
-  var title = $("#dataset_title").val();
-  var subtitle = $('#profile_info').text();
-  $('#title_and_subtitle').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
-
-  var chart = $("#container").highcharts();
-  var svg = chart.getSVG();
-  var width = $("#highcharts-container").width();
-  var canvas = document.createElement('canvas');
-      canvas.width  = $("#container").width();
-      canvas.height = $("#container").height();
-
-  var ctx = canvas.getContext('2d');
-  var img = document.createElement('img');
-
-  var data_url = ''
-  img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))));
-  img.onload = function() {
-      ctx.drawImage(img, 0, 0);
-      data_url = canvas.toDataURL('image/png')
-      $('img#chart_image').attr('src', data_url)
-      $('div#double_export').width(1200);
-      html2canvas($('div#double_export')[0], {
-          onrendered: function(canvas) {
-              theCanvas = canvas;
-              canvas.toBlob(function(blob) {
-                  saveAs(blob, "chart.png");
-                  $('#chart_image').attr('src', '')
-                  $('#title_and_subtitle').html('')
-                  $('#chart_image').addClass('hidden')
-              });
-          }
-        });
-  };
-}
-
-
-function chart_with_table_to_pdf(){
-  $('#chart_image').removeClass('hidden')
-  var title = $("#dataset_title").val();
-  var subtitle = $('#profile_info').text();
-  $('#title_and_subtitle').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
-
-  var chart = $("#container").highcharts();
-  var svg = chart.getSVG();
-  var canvas = document.createElement('canvas');
-      canvas.width  = $("#container").width();
-      canvas.height = $("#container").height();
-
-  var ctx = canvas.getContext('2d');
-  var img = document.createElement('img');
-
-  var data_url = ''
-  img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))));
-  img.onload = function() {
-      ctx.drawImage(img, 0, 0);
-      data_url = canvas.toDataURL('image/jpeg')
-      $('img#chart_image').attr('src', data_url)
-      $('div#double_export').width(1200);
-      html2canvas($('div#double_export')[0], {
-          onrendered: function(canvas) {
-            theCanvas = canvas;
-
-            var imgData = canvas.toDataURL('image/jpeg');
-            var ctx     = canvas.getContext( '2d' );
-            var doc     = new jsPDF('l', 'pt', [ctx.canvas.height, ctx.canvas.width]);
-
-            doc.addImage(imgData, 'jpeg', 10, 20);
-            doc.output('save', 'chart.pdf')
-            $('#chart_image').attr('src', '')
-            $('#title_and_subtitle').html('')
-            $('#chart_image').addClass('hidden')
-          }
-        });
-  };
-}
-
-function chart_to_pdf(){
-  $('#only_chart_image').removeClass('hidden')
-  var title    = $("#dataset_title").val();
-  var subtitle = $('#profile_info').text();
-  if (display_type != 'map')
-    $('#title_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
-
-  var chart = $("#container").highcharts();
-  var svg = chart.getSVG();
-  var canvas = document.createElement('canvas');
-      canvas.width  = $("#container").width();
-      canvas.height = $("#container").height();
-
-  var ctx = canvas.getContext('2d');
-  var img = document.createElement('img');
-
-  var data_url = ''
-  img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))));
-  img.onload = function() {
-      ctx.drawImage(img, 0, 0);
-      data_url = canvas.toDataURL('image/png')
-      $('img#only_chart_image').attr('src', data_url)
-
-      html2canvas($('div#only_chart')[0], {
-          onrendered: function(canvas) {
-              theCanvas = canvas;
-
-            var imgData = canvas.toDataURL('image/jpeg');
-            var ctx     = canvas.getContext( '2d' );
-            var doc     = new jsPDF('l', 'pt', [ctx.canvas.height, ctx.canvas.width]);
-
-            doc.addImage(imgData, 'jpeg', 10, 20);
-            doc.output('save', 'chart.pdf')
-
-            $('#only_chart_image').attr('src', '')
-            $('#only_chart_image').addClass('hidden')
-            $('#title_info').html('')
-          }
-        });
-  };
-}
-
-function chart_to_png(){
-  $('#only_chart_image').removeClass('hidden')
-  var title    = $("#dataset_title").val();
-  var subtitle = $('#profile_info').text();
-  if (display_type != 'map')
-    $('#title_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
-
-  var chart = $("#container").highcharts();
-  var svg = chart.getSVG();
-  var canvas = document.createElement('canvas');
-      canvas.width  = $("#container").width;
-      canvas.height = $("#container").height;
-
-  var ctx = canvas.getContext('2d');
-  var img = document.createElement('img');
-
-  var data_url = ''
-  img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))));
-  img.onload = function() {
-      ctx.drawImage(img, 0, 0);
-      data_url = canvas.toDataURL('image/png')
-      $('img#only_chart_image').attr('src', data_url)
-
-      html2canvas($('div#only_chart')[0], {
-          onrendered: function(canvas) {
-              theCanvas = canvas;
-              canvas.toBlob(function(blob) {
-                  saveAs(blob, "chart.png");
-                  $('#only_chart_image').attr('src', '')
-                  $('#title_info').html('')
-                  $('#only_chart_image').addClass('hidden')
-              });
-          }
-        });
-
-  };
-}
-
-function save_chart_image(){
-  if (display_type != 'map') {
-    bootbox.confirm("Do you want to include data table?", function(r){
-      if (r) {
-        if ($('#second_table').attr('class') == "collapse")
-          $('a[href="#second_table"]').click()
-
-        chart_with_table_to_png()
-      }
-      else
-        chart_to_png();
-    })
-  }
-  else{
-    // chart.exportChart(opts);
-    chart_to_png();
-  }
-}
-
-function save_chart_pdf(){
-  if (display_type != 'map') {
-    bootbox.confirm("Do you want to include data table?", function(r){
-      if (r){
-        if ($('#second_table').attr('class') == "collapse")
-          $('a[href="#second_table"]').click()
-
-        chart_with_table_to_pdf()
-      } else
-        chart_to_pdf()
-    })
-  } else{
-    // chart.exportChart(opts);
-    chart_to_pdf()
-  }
-}
-
-///////////////////////// EXPORTING FUNCTIONS /////////////////////
-
 function collapse_all(){
   $("div.collapse").collapse('hide');
 }
 
+function choose_measure_type_for_charts(){
+  measure = $('input:checked', $('#collapseMeasureType'))[0]
+  if (measure == undefined){
+    $($('input:not(:disabled)', $('#collapseMeasureType'))).prop('checked', true);
+  }
+}
 //Charts can't have more than one measure type at a time
 function set_chart_checkbox(){
   $("input.MeasureType").click(function(){
@@ -496,6 +282,7 @@ function set_chart_checkbox(){
   });
   $("input.MeasureType").unbind("change");
   $("input.MeasureType:checked").slice(1).prop('checked', false);
+  choose_measure_type_for_charts();
 }
 
 //If showing map, only allow one of each filter to be checked at a time
@@ -528,6 +315,7 @@ function set_map_checkbox(){
   else{
     $("input.Year").prop('checked', true);
   }
+  choose_measure_type_for_charts();
 }
 
 //When not showing map, allow multiple filters to be checked
@@ -759,13 +547,6 @@ function draw_table(){
               type = data['data'][row_index]['dims']['Measure Type']
               if (type != undefined)
                 cur_value = unit_for_value(cur_value, type)
-              else{
-
-                checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
-                if (checked_measure != undefined)
-                  cur_value = unit_for_value(cur_value, checked_measure.value);
-              }
-
 
               html += "<td class='right_align'>" + cur_value + "</td>";
               col_num++;
@@ -781,11 +562,6 @@ function draw_table(){
             type = data['data'][row_index]['dims']['Measure Type']
             if (type != undefined)
               cur_value = unit_for_value(cur_value, type)
-            else{
-              checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
-              if (checked_measure != undefined)
-                cur_value = unit_for_value(cur_value, checked_measure.value);
-            }
 
             html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
           }
@@ -854,7 +630,7 @@ function draw_chart(){
       dataset_title = $("#dataset_title").val(),
       description = $("#profile_info").text(),
       source = $('#Source').text();
-
+  set_chart_checkbox();
   $.ajax({type: "POST",
             url: "/vizualization_data/" + dataset_id,
             data: JSON.stringify({view: display_type,
@@ -864,7 +640,7 @@ function draw_chart(){
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         change_page_url(data['link']);
 
-        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
+        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0] //|| $('input', $('#collapseMeasureType'))[0]
         var type = checked_measure.value;
         var series = [];
         var legend_series = [];
@@ -1040,7 +816,6 @@ function add_scroll_to_table(){
   })
 }
 $(function () {
-
     select_all();
     deselect_all();
     check_defaults();

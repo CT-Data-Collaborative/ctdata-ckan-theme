@@ -140,7 +140,7 @@ if(dataClasses[dataClasses.length-1]['to'] < max+1 && cur_mt_is_number)
   dataClasses[dataClasses.length-1]['to'] = max+1;
 
 //Create legend to display current filters
-var legend_html = "<div>" ,
+var legend_html = "" ,
     cur_filters = get_filters();
 $.each(cur_filters, function(i){
   if (cur_filters[i].field == geography_param) return "Skip this filter";
@@ -148,7 +148,6 @@ $.each(cur_filters, function(i){
 });
 
 legend_html = legend_html.substring(0, legend_html.length-2);
-legend_html += "</div>"
 
 var units = "";
 if (cur_mt_is_number && ($("#dataset_id").val() == 'cmt-results' || $("#dataset_id").val() == 'chronic-absenteeism'))
@@ -211,7 +210,7 @@ chart = new Highcharts.Chart({
   },
   title : {
     text : $("#dataset_title").val(),
-    style: {backgroundColor: '#ffffff', height: '50px', minWidth: '500px', textAlign: 'center', padding: '5px'},
+    style: {backgroundColor: '#ffffff', height: '35px', minWidth: '500px', textAlign: 'center', padding: '5px'},
     floating: true,
     backgroundColor: 'white',
     borderWidth:1,
@@ -221,7 +220,7 @@ chart = new Highcharts.Chart({
   },
   subtitle: {
     text: legend_html,
-    style: {whiteSpace: 'inherit', wordWrap: 'break-word', backgroundColor: '#ffffff', height: '50px', minWidth: '500px', maxWidth: '500px', textAlign: 'center', padding: '5px'},
+    style: {backgroundColor: '#ffffff', minHeight: '30px', minWidth: '500px', maxWidth: '500px', padding: '5px', textAlign: 'center'},
     floating: true,
     backgroundColor: 'white',
     borderWidth:1,
