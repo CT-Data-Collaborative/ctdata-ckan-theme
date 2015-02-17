@@ -38,13 +38,12 @@
 }
 
 #saved_visualizations{
-  padding-top: 30px;
-  padding-left: 30px;
+  padding: 1%;
 }
 
 #saved_visualizations table{
   margin-right: 5%;
-  margin-left: 5%;
+  margin-left: 6%;
 }
 
 a.dark_blue{
