@@ -7,7 +7,7 @@
 
 <div id="databytopic" class="green">
   <div class="spacing">
-    <h2>Explore Saved Visualizations</h2>
+    <h2>Explore Saved Indicators</h2>
     <ul class="nav_links">
       <li><a href="javascript:void(0);" id="civic_vitality"><i class="fa fa-institution fa-2x"></i>     <br/>Civic Vitality</a></li>
       <li><a href="javascript:void(0);" id="demographics">  <i class="fa fa-pie-chart fa-2x"></i>       <br/>Demographics</a></li>
@@ -27,7 +27,7 @@
   {% for domain in domains %}
     <div class="domain row" id="{{ domain['id'] }}">
       {% if domain['title'] != '' %}
-      <h2 class="pull-center"> See {{ domain['title'] }} Visualizations. </h2>
+      <h2 class="pull-center"> {{ domain['title'] }} Indicators </h2>
       <br>
       <br>
       <br>
@@ -77,7 +77,7 @@
             </tbody>
           </table>
         {% else %}
-          <p> There're no indicators for this domain yet. </p>
+          <p> There are no indicators for this domain yet. </p>
         {% endif %}
       </div>
     </div>
