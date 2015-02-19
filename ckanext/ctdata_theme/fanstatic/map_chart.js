@@ -101,9 +101,13 @@ if (geography_param != 'Town'){
 }
 
 //Split data into classes for discrete map coloring
-var cur_mt = $(".MeasureType:checked").first().val(),
-    cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number"),
-    cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent" || cur_mt == undefined),
+
+var cur_mt = $(".MeasureType:checked").first().val();
+  if (cur_mt == undefined)
+    choose_measure_type_for_charts()
+
+var cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number" || cur_mt == undefined),
+    cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent" ),
     numClasses        = 8,
     range             = max-min,
     step              = 0,
@@ -111,9 +115,10 @@ var cur_mt = $(".MeasureType:checked").first().val(),
     colors            = ['rgb(239,239,255)', 'rgb(171,187,216)', 'rgb(137,161,196)', 'rgb(102,134,176)',
                          'rgb(68,108,156)', 'rgb(34,82,137)', 'rgb(0,56,117)', 'rgb(1, 35, 73)'];
 
-
 if (!cur_mt_is_percent)
-  step = (Math.round(Math.ceil((range)/numClasses)/10))*10
+  step = Math.ceil(range/numClasses)
+  if (step > 10 )
+    step = ( Math.round( step/10) )*10
 else
   step = Math.ceil(range/numClasses)
 
