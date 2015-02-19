@@ -7,7 +7,7 @@
 
 <div id="databytopic" class="green">
   <div class="spacing">
-    <h2>Explore Saved Visualizations</h2>
+    <h2>Explore Saved Indicators</h2>
     <ul class="nav_links">
       <li><a href="javascript:void(0);" id="civic_vitality"><i class="fa fa-institution fa-2x"></i>     <br/>Civic Vitality</a></li>
       <li><a href="javascript:void(0);" id="demographics">  <i class="fa fa-pie-chart fa-2x"></i>       <br/>Demographics</a></li>
@@ -26,42 +26,58 @@
 
   {% for domain in domains %}
     <div class="domain row" id="{{ domain['id'] }}">
-      <div class="text-left">
-        <ul class="">
-          {% if domain['indicators']|length > 0 %}
-            {% for indicator in domain['indicators'] %}
-            <li class="span7 gallery_indicator" id="{{indicator.id}}">
-              <div class='text-left'>
-                <h3 class='dataset-heading'>
+      {% if domain['title'] != '' %}
+      <h2 class="pull-center"> {{ domain['title'] }} Indicators </h2>
+      <br>
+      <br>
+      <br>
+      {% endif %}
+      <div class="">
+        {% if domain['indicators']|length > 0 %}
+          <table class="table">
+            <col width="20%"></col>
+            <col width="15%"></col>
+            <col width="35%"></col>
+            <col width="15%"></col>
+            <col width="15%"></col>
+            <thead>
+              <th> Title </th>
+              <th> Dataset </th>
+              <th> Description </th>
+              <th> Date </th>
+              <th> Creator </th>
+            </thead>
+            <tbody>
+              {% for indicator in domain['indicators'] %}
+                <tr>
+                <td>
                   <a href="{{ indicator['link_to_visualization'] }}">
-                    {% if  indicator['viz_type'] == 'table' %}
-                      <img id="table_icon" src="/common/images/displayopt1-inv.png" alt="" />
-                    {% endif %}
-                    {% if  indicator['viz_type'] == 'chart' or indicator['viz_type'] == 'column' %}
-                      <img id="bar_icon" src="/common/images/displayopt2.png" alt="" />
-                    {% endif %}
-                    {% if  indicator['viz_type'] == 'line' %}
-                      <img id="line_icon" src="/common/images/displayopt3.png" alt="" />
-                    {% endif %}
-                    {% if  indicator['viz_type'] == 'map' %}
-                      <img id="line_icon" src="/common/images/displayopt4.png" alt="" />
-                    {% endif %}
+                      {% if  indicator['viz_type'] == 'table' %}
+                        <img id="table_icon" src="/common/images/displayopt1-inv.png" alt="" />
+                      {% endif %}
+                      {% if  indicator['viz_type'] == 'chart' or indicator['viz_type'] == 'column' %}
+                        <img id="bar_icon" src="/common/images/displayopt2.png" alt="" />
+                      {% endif %}
+                      {% if  indicator['viz_type'] == 'line' %}
+                        <img id="line_icon" src="/common/images/displayopt3.png" alt="" />
+                      {% endif %}
+                      {% if  indicator['viz_type'] == 'map' %}
+                        <img id="line_icon" src="/common/images/displayopt4.png" alt="" />
+                      {% endif %}
 
-                    {{indicator.name}}
-                  </a>
-
-                  <span class="pull-right date-info">{{indicator['created_at']}}</span>
-                </h3>
-                <p>{{indicator['description']}}</p>
-                <span> Dataset: <a href="/dataset/{{indicator['dataset_name']}}">  {{indicator['dataset_name']}} </a> </span>
-
-                <span class="pull-right"> Creator: <a href="/user/{{indicator['user']}}"> {{indicator['user']}} </a> </span>
-              </div>
-            </li>
-            {% endfor %}
-          </ul>
+                      {{indicator.name}}
+                    </a>
+                </td>
+                <td><a href="/dataset/{{indicator['dataset_name']}}">  {{indicator['dataset_name']}} </a> </span></td>
+                <td><p>{{indicator['description']}}</p></td>
+                <td> <span>{{indicator['created_at']}}</span></td>
+                <td><a href="/user/{{indicator['user']}}"> {{indicator['user']}} </a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         {% else %}
-          There're no indicators for this gallery yet.
+          <p> There are no indicators for this domain yet. </p>
         {% endif %}
       </div>
     </div>
@@ -71,38 +87,6 @@
 </div>
 
 
-
-<div id="newsmods">
-<div class="spacing">
-
-<div class="newsbox">
-<img src="/common/images/news-education.jpg" alt="" border="0" />
-<a href="#"><h2>Education</h2></a>
-Coming Soon..
-<br />
-<br />
-<a href="#"> <button class="button-warning pure-button">Learn More</button> </a>
-</div>
-<div class="newsbox">
-<img src="/common/images/news-housing.jpg" alt="" border="0" />
-<a href="#"><h2>Civic Vitality</h2></a>
-Interactive visualization of Earned Income Tax Credit data.
-<br />
-<br />
-<a href="" data-uv-trigger data-uv-position="top"><button class="button-warning pure-button">Learn More</button> </a>
-</div>
-<div class="newsbox">
-<img src="/common/images/news-health.jpg" alt="" border="0" />
-<a href="#"><h2>Health</h2></a>
-Coming Soon..
-<br />
-<br />
-<a href=""> <button class="button-warning pure-button">Learn More</button> </a>
-</div>
-
-</div>
-</div>
-
 <br clear="all"/>
 
 <div id="leadmessage">
@@ -111,8 +95,6 @@ Coming Soon..
 - Joseph Stiglitz
 </div>
 </div>
-
-
 
 
 {% block scripts %}

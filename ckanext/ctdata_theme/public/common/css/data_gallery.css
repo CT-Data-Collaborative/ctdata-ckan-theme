@@ -38,9 +38,12 @@
 }
 
 #saved_visualizations{
-  border-bottom: 10px solid #849939;
-  padding: 20px;
-  padding-left: 50px;
+  padding: 1%;
+}
+
+#saved_visualizations table{
+  margin-right: 5%;
+  margin-left: 6%;
 }
 
 a.dark_blue{

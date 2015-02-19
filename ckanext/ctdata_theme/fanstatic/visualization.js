@@ -1,6 +1,7 @@
 var display_type  =  (location.search.split('v=')[1]||'').split('&')[0] || "table",
     map_filters   = [],
     chart_filters = [],
+    table_filters = [],
     dataset_id    = $("#dataset_id").val(),
     create_popup  = $("#create_indicator_popup"),
     edit_popup    = $("#edit_indicators_popup"),
@@ -190,10 +191,13 @@ function check_defaults(){
 }
 
 function save_filters(display_type){
+  if(display_type == 'table')
+    table_filters = get_filters()
+
   if(display_type == 'map')
-   map_filters = get_filters()
- else
-   chart_filters = get_filters()
+    map_filters = get_filters()
+  else
+    chart_filters = get_filters()
 }
 
 function set_filters(display_type){
@@ -201,8 +205,11 @@ function set_filters(display_type){
   if(display_type == 'map' && map_filters.length > 0){
     filters_to_update = map_filters;
   }
-  if(display_type != 'map' && chart_filters.length > 0){
+  if(display_type != 'map' && display_type != 'table' && chart_filters.length > 0){
     filters_to_update = chart_filters;
+  }
+  if(display_type == 'table' && table_filters.length > 0){
+    filters_to_update = table_filters;
   }
   if(filters_to_update.length > 0){
     $.each(filters_to_update, function(i){
@@ -255,85 +262,17 @@ function set_icon(type){
   }
 }
 
-function print_chart(){
-    var chart = $("#container").highcharts();
-    chart.print();
-}
-function save_chart_image(){
-  var chart = $("#container").highcharts();
-  var opts  = {type:"image/png"};
-  var title = $("#dataset_title").val();
-  var subtitle = $('#profile_info').text();
-
-  if (display_type != 'map') {
-    bootbox.confirm("Do you want to include data table?", function(r){
-      if (r) {
-        if ($('#second_table').attr('class') == "collapse")
-          $('a[href="#second_table"]').click()
-
-        $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
-        html2canvas($('div.#double_export'), {
-          onrendered: function(canvas) {
-              $('#additional_info').html('')
-              theCanvas = canvas;
-              canvas.toBlob(function(blob) {
-                  saveAs(blob, "chart.png");
-              });
-          }
-        });
-      }
-      else
-        chart.exportChart(opts);
-    });
-  }
-  else
-    chart.exportChart(opts);
-}
-function save_chart_pdf(){
-  var chart = $("#container").highcharts();
-  var opts  = {type: "application/pdf"};
-  var title = $("#dataset_title").val();
-  var subtitle = $('#profile_info').text();
-
-  if (display_type != 'map') {
-    bootbox.confirm("Do you want to include data table?", function(r){
-      if (r){
-        if ($('#second_table').attr('class') == "collapse")
-          $('a[href="#second_table"]').click()
-
-        $('#additional_info').html('<h2>' + title + '</h2>' + '<h4>' + subtitle + '</h4>');
-
-        html2canvas($('div.#double_export'), {
-          onrendered: function(canvas) {
-            $('#additional_info').html('')
-            var imgData = canvas.toDataURL('image/jpeg');
-            var ctx     = canvas.getContext( '2d' );
-            $('#test_canvas').val(imgData)
-            console.log($('#test_canvas').val())
-            console.log('here')
-            var doc     = new jsPDF('p', 'mm', [ctx.canvas.height/2, ctx.canvas.width/2]);
-            var imgData = $('#test_canvas').val()
-
-            doc.addImage(imgData, 'jpeg', 0, 20);
-            doc.output('save', 'chart.pdf')
-          }
-        })
-      } else
-        chart.exportChart(opts);
-    })
-  } else
-    chart.exportChart(opts);
-}
-
-function save_chart_pdf_with_table(){
-
-
-}
 
 function collapse_all(){
   $("div.collapse").collapse('hide');
 }
 
+function choose_measure_type_for_charts(){
+  measure = $('input:checked', $('#collapseMeasureType'))[0]
+  if (measure == undefined){
+    $($('input:not(:disabled)', $('#collapseMeasureType'))).prop('checked', true);
+  }
+}
 //Charts can't have more than one measure type at a time
 function set_chart_checkbox(){
   $("input.MeasureType").click(function(){
@@ -343,6 +282,7 @@ function set_chart_checkbox(){
   });
   $("input.MeasureType").unbind("change");
   $("input.MeasureType:checked").slice(1).prop('checked', false);
+  choose_measure_type_for_charts();
 }
 
 //If showing map, only allow one of each filter to be checked at a time
@@ -375,6 +315,7 @@ function set_map_checkbox(){
   else{
     $("input.Year").prop('checked', true);
   }
+  choose_measure_type_for_charts();
 }
 
 //When not showing map, allow multiple filters to be checked
@@ -395,6 +336,7 @@ function display_data(){
     display_spinner();
     set_icon(display_type);
 
+
     if(display_type == 'column'){
       new_type = 'bar';
     } else {
@@ -409,6 +351,29 @@ function display_data(){
     towns = $("input." + geography_param + ":checked");
     years = $("input.Year:checked");
     error = ''
+
+    if (display_type == 'map'){
+      $('#collapseTown').find('input').addClass('disabled');
+      $('#collapseTown').find('label').addClass('disabled');
+      $('input', $('#collapseTown')).attr("disabled", true);
+      $('#collapseTown').find('label').attr("disabled", true);
+      $('input[type="checkbox"][class != "indicator_group"]').addClass('as_radio');
+    }
+    if (display_type == 'column' || display_type == 'line'){
+      $('#collapseTown').find('input').removeClass('disabled');
+      $('#collapseTown').find('label').removeClass('disabled');
+      $('input', $('#collapseTown')).attr("disabled", false);
+      $('#collapseTown').find('label').attr("disabled", false);
+      $('input[type="checkbox"][class != "indicator_group"]').removeClass('as_radio')
+      $('input[type="checkbox"].MeasureType').addClass('as_radio')
+    }
+    if (display_type == 'table'){
+      $('#collapseTown').find('input').removeClass('disabled');
+      $('#collapseTown').find('label').removeClass('disabled');
+      $('input', $('#collapseTown')).attr("disabled", false);
+      $('#collapseTown').find('label').attr("disabled", false);
+      $('input[type="checkbox"][class != "indicator_group"]').removeClass('as_radio')
+    }
 
     if(towns.length == 0 && display_type != 'map'){
       if (window.location.href.indexOf(geography_param) > -1) {
@@ -468,6 +433,7 @@ function display_data(){
       draw_table();
       draw_chart();
   }
+
 }
 
 function get_filters(){
@@ -569,27 +535,18 @@ function draw_table(){
           if (years !== undefined) {
             $.each(years, function (year_index) {
               cur_value = data['data'][row_index]['data'][year_index];
-              if (!cur_value) cur_value = "-";
+              if (!cur_value && cur_value != 0) cur_value = "-";
               if (cur_value == SUPPRESSED_VALUE) cur_value = '*'
 
               text = cur_value.toString()
               array = text.split('.')
 
-              if (jQuery.isNumeric(text) == true && array.length == 1){
-                // cur_value = parseInt(text).toLocaleString('en-US')
+              if (jQuery.isNumeric(text) == true && array.length == 1)
                 cur_value = parseInt(text).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-              }
 
               type = data['data'][row_index]['dims']['Measure Type']
               if (type != undefined)
                 cur_value = unit_for_value(cur_value, type)
-              else{
-
-                checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
-                if (checked_measure != undefined)
-                  cur_value = unit_for_value(cur_value, checked_measure.value);
-              }
-
 
               html += "<td class='right_align'>" + cur_value + "</td>";
               col_num++;
@@ -605,11 +562,6 @@ function draw_table(){
             type = data['data'][row_index]['dims']['Measure Type']
             if (type != undefined)
               cur_value = unit_for_value(cur_value, type)
-            else{
-              checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
-              if (checked_measure != undefined)
-                cur_value = unit_for_value(cur_value, checked_measure.value);
-            }
 
             html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
           }
@@ -678,7 +630,7 @@ function draw_chart(){
       dataset_title = $("#dataset_title").val(),
       description = $("#profile_info").text(),
       source = $('#Source').text();
-
+  set_chart_checkbox();
   $.ajax({type: "POST",
             url: "/vizualization_data/" + dataset_id,
             data: JSON.stringify({view: display_type,
@@ -688,7 +640,7 @@ function draw_chart(){
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         change_page_url(data['link']);
 
-        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0] || $('input', $('#collapseMeasureType'))[0]
+        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0] //|| $('input', $('#collapseMeasureType'))[0]
         var type = checked_measure.value;
         var series = [];
         var legend_series = [];
@@ -852,17 +804,18 @@ function add_scroll_to_table(){
       if (text_width > 60){
         th = $('tr.head').find('th')[i]
         if (text_width > $(th).width()){
-          $(th).width(text_width + 30)
+          $(th).width(text_width + 40)
         }
       }
       else
-        $($('tr.head').find('th')[i]).width(70)
+        $($('tr.head').find('th')[i]).width(100)
+
+      $('span#string_span').html('')
     })
 
   })
 }
 $(function () {
-
     select_all();
     deselect_all();
     check_defaults();
@@ -903,7 +856,7 @@ $(function () {
 
     var width = $(window).width() * 0.6;
     $("#container").width(width);
-    $("#container_2").width(width + 0.1);
+    $("#container_2").width(width);
     $("a.togglebtn", $('.results_table')).width(width);
     $("#second_table").width(width + 60);
     $("#metadata").width(width);
@@ -911,7 +864,7 @@ $(function () {
     window.onresize = function() {
       var width = $(window).width() * 0.6;
       $("#container").width(width);
-      $("#container_2").width(width + 50);
+      $("#container_2").width(width);
       $("a.togglebtn", $('.results_table')).width(width);
       $("#second_table").width(width + 50);
       $("#metadata").width(width);
@@ -982,4 +935,7 @@ $(function () {
     //    add_scroll_to_table()
     //   }, 100);
     // })
+
+  $('#only_chart_image').addClass('hidden')
+  $('#chart_image').addClass('hidden')
 });

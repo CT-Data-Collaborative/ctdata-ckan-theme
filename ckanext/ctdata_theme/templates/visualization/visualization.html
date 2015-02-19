@@ -4,6 +4,7 @@
 
 {% block main_content %}
 <div class="ctdata-wrapper">
+
 <div class='dataset_info'>
   <h1>{{ dataset.title }}
   {% if c.help_info != '' %}
@@ -135,13 +136,20 @@
 </div>
 <div class="spinner"> <img src="/common/images/loading.gif"/> </div>
 <div class="results_table">
-    <div id="double_export">
-    <div id="additional_info"> </div>
+
+    <div id="only_chart">
+      <div id="title_info"> </div>
+      <img src="" id="only_chart_image">
+    </div>
     <div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto" class="scroll"></div>
+
     <br>
     <br>
     <br>
     <br>
+    <div id="double_export">
+      <div id="title_and_subtitle"></div>
+      <img src="" id="chart_image">
     <span id="link_to_second_table" class="hidden">
       <a href="#second_table" data-toggle="collapse" class="togglebtn gray_back">
         Data Table
@@ -184,7 +192,6 @@
 </div>
 
 </div>
-
 </div>
 
 <!-- Create Headline Indicator Popup -->
@@ -208,22 +215,29 @@
 <link rel="stylesheet" type="text/css" href="/common/css/tableTools.css">
 <link rel="stylesheet" type="text/css" href="/common/css/jquery_ui.css">
 
-{% resource 'ctdata_theme/jquery_ui.js' %}
-{% resource 'ctdata_theme/highcharts.js' %}
-{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/map.js' %}
-{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/data.js' %}
-{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/exporting.js' %}
-{% resource 'ctdata_theme/visualization.js' %}
-{% resource 'ctdata_theme/jquery.dataTables.js' %}
-{% resource 'ctdata_theme/jspdf.js' %}
-{% resource 'ctdata_theme/jspdf.plugin.addimage.js' %}
-{% resource 'ctdata_theme/jspdf.plugin.add_html.js' %}
-{% resource 'ctdata_theme/jspdf.plugin.standard_fonts_metrics.js' %}
+<script src="/common/js/html2canvas.js"></script>
+<script src="/common/js/canvas-to-blob.js"></script>
+<script src="/common/js/jspdf.js"></script>
+<script src="/common/js/jspdf.plugin.addimage.js"></script>
+<script src="/common/js/jspdf.plugin.standard_fonts_metrics.js"></script>
+
+{% resource 'ctdata_theme/highcharts_src.js' %}
+{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/map_src.js' %}
+{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/exporting_src.js' %}
+{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/data_src.js' %}
+
 {% resource 'ctdata_theme/fileSaver.js' %}
-{% resource 'ctdata_theme/map_chart.js' %}
-{% resource 'ctdata_theme/html2canvas.js' %}
-{% resource 'ctdata_theme/canvas-to-blob.js' %}
+
+{% resource 'ctdata_theme/jquery.dataTables.js' %}
+
+
 {% resource 'ctdata_theme/bootbox.js' %}
+{% resource 'ctdata_theme/jquery_ui.js' %}
+
+{% resource 'ctdata_theme/map_chart.js' %}
+{% resource 'ctdata_theme/visualization.js' %}
+{% resource 'ctdata_theme/exportintg_functions.js' %}
+
 
 
 <script>
