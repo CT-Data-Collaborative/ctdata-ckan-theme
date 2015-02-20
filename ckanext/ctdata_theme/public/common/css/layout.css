@@ -211,17 +211,6 @@ h1, h2, h3, h4 {
 	height:auto;
 	clear:both;
 }
-
-#databytopic.green {
-	background: #849939;
-}
-
-#databytopic.green .spacing{
-
-	background:#849939;
-
-}
-
 #databytopic .spacing {
 	margin:0 10%;
 	width:80%;
@@ -236,7 +225,7 @@ h1, h2, h3, h4 {
 	padding:0;
 	font-family:'Roboto Condensed', Helvetica, Arial, Sans-Serif;
 	font-weight:normal;
-	background: inherit;
+	background:#4670a7;
 }
 #databytopic li {
 	display:inline-block;
@@ -418,7 +407,6 @@ white-space: nowrap;
 .table th small{
 	font-size: 6pt;
 	color: #717171;
-	width: 200px;
 }
 .table th:nth-child(even){
 	border-bottom: 5px solid #00adef;

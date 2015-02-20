@@ -8,7 +8,6 @@ import ckan.model as model
 from IPython import embed
 import json
 import ckan.logic as logic
-import ckan.plugins.toolkit as toolkit
 
 get_action = logic.get_action
 
@@ -88,9 +87,8 @@ class ProfileIndicator(Base):
     group_ids  = Column(String)
     created_at = Column(DateTime)
     visualization_type = Column(String)
-    description        = Column(Text)
 
-    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, temp, ind_type, visualization_type, permission, description, group_ids):
+    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, temp, ind_type, visualization_type, permission, group_ids):
         self.name       = name
         self.filters    = filters
         self.dataset_id = dataset_id
@@ -103,7 +101,6 @@ class ProfileIndicator(Base):
         self.permission = permission
         self.group_ids  = group_ids
         self.visualization_type  = visualization_type
-        self.description  = description
         self.created_at = datetime.datetime.now()
 
     def __repr__(self):
@@ -142,11 +139,6 @@ class ProfileIndicator(Base):
     def user_id(self):
         ckan_user_id = model.Session.query(UserIndicatorLink.user_id).filter(UserIndicatorLink.indicator_id == self.id).first()
         return ckan_user_id[0]
-
-    def user_name(self):
-        ckan_user_id = model.Session.query(UserIndicatorLink.user_id).filter(UserIndicatorLink.indicator_id == self.id).first()
-        user = model.User.get(ckan_user_id[0])
-        return user.name
 
 class ProfileIndicatorValue(Base):
     __tablename__ = 'ctdata_profile_indicator_values'
