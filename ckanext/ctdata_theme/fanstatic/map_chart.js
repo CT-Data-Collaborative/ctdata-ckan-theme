@@ -101,9 +101,13 @@ if (geography_param != 'Town'){
 }
 
 //Split data into classes for discrete map coloring
-var cur_mt = $(".MeasureType:checked").first().val(),
-    cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number"),
-    cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent" || cur_mt == undefined),
+
+var cur_mt = $(".MeasureType:checked").first().val();
+  if (cur_mt == undefined)
+    choose_measure_type_for_charts()
+
+var cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number" || cur_mt == undefined),
+    cur_mt_is_percent = (cur_mt == "percent" || cur_mt == "Percent" ),
     numClasses        = 8,
     range             = max-min,
     step              = 0,
@@ -111,9 +115,10 @@ var cur_mt = $(".MeasureType:checked").first().val(),
     colors            = ['rgb(239,239,255)', 'rgb(171,187,216)', 'rgb(137,161,196)', 'rgb(102,134,176)',
                          'rgb(68,108,156)', 'rgb(34,82,137)', 'rgb(0,56,117)', 'rgb(1, 35, 73)'];
 
-
 if (!cur_mt_is_percent)
-  step = (Math.round(Math.ceil((range)/numClasses)/10))*10
+  step = Math.ceil(range/numClasses)
+  if (step > 10 )
+    step = ( Math.round( step/10) )*10
 else
   step = Math.ceil(range/numClasses)
 
@@ -140,7 +145,7 @@ if(dataClasses[dataClasses.length-1]['to'] < max+1 && cur_mt_is_number)
   dataClasses[dataClasses.length-1]['to'] = max+1;
 
 //Create legend to display current filters
-var legend_html = "<div>" ,
+var legend_html = "" ,
     cur_filters = get_filters();
 $.each(cur_filters, function(i){
   if (cur_filters[i].field == geography_param) return "Skip this filter";
@@ -148,7 +153,6 @@ $.each(cur_filters, function(i){
 });
 
 legend_html = legend_html.substring(0, legend_html.length-2);
-legend_html += "</div>"
 
 var units = "";
 if (cur_mt_is_number && ($("#dataset_id").val() == 'cmt-results' || $("#dataset_id").val() == 'chronic-absenteeism'))
@@ -189,6 +193,7 @@ var join_by = ['NAME', 'code'];
 if (geography_param != 'Town')
   join_by = ['GEOID', 'fips'];
 
+
 if (!error){
 chart = new Highcharts.Chart({
   chart: {
@@ -210,23 +215,23 @@ chart = new Highcharts.Chart({
   },
   title : {
     text : $("#dataset_title").val(),
-    style: {opacity: "70%", fontFamily: "Questrial, sans-serif", textWrap: "normal", fontWeight: '900',zIndex: '999', fontSize: '24px'},
+    style: {backgroundColor: '#ffffff', height: '35px', minWidth: '500px', textAlign: 'center', padding: '5px'},
     floating: true,
     backgroundColor: 'white',
     borderWidth:1,
     borderRadius:3,
     useHTML: true,
-    y: 30
+    y: 20
   },
   subtitle: {
     text: legend_html,
-    style: {opacity: "70%", fontFamily: "Questrial, sans-serif", backgroundColor: '#ffffff', padding: '5px', paddingTop: '40px', minWidth: '500px', textAlign: 'center', border: '1px solid lightgray'},
+    style: {backgroundColor: '#ffffff', minHeight: '30px', minWidth: '500px', maxWidth: '500px', padding: '5px', textAlign: 'center'},
     floating: true,
     backgroundColor: 'white',
     borderWidth:1,
     borderRadius:3,
     useHTML: true,
-    y: 10
+    y: 50
   },
 
   legend: {
