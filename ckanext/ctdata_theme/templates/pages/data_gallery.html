@@ -2,90 +2,50 @@
 
 {% block content %}
 
-<div align="center">
-<div id="master">
-
-<div id="databytopic" class="green">
+<div id="gallery">
   <div class="spacing">
-    <h2>Explore Saved Indicators</h2>
-    <ul class="nav_links">
-      <li><a href="javascript:void(0);" id="civic_vitality"><i class="fa fa-institution fa-2x"></i>     <br/>Civic Vitality</a></li>
-      <li><a href="javascript:void(0);" id="demographics">  <i class="fa fa-pie-chart fa-2x"></i>       <br/>Demographics</a></li>
-      <li><a href="javascript:void(0);" id="economy">       <i class="fa fa-line-chart fa-2x"></i>      <br/>Economy</a></li>
-      <li><a href="javascript:void(0);" id="health">        <i class="fa fa-medkit fa-2x"></i>          <br/>Health</a></li>
-      <li><a href="javascript:void(0);" id="education">     <i class="fa fa-graduation-cap fa-2x"></i>  <br/>Education</a></li>
-      <li><a href="javascript:void(0);" id="housing">       <i class="fa fa-home fa-2x"></i>            <br/>Housing</a></li>
-      <li><a href="javascript:void(0);" id="safety">        <i class="fa fa-lock fa-2x"></i>            <br/>Safety</a></li>
-    </ul>
-    <br clear="all" />
+    <div class="gallerytitle">
+      <h2>Changing the way Connecticut uses data</h2>
+
+      <br /><br /> <br /><br /> <br /><br /> <br /><br />
+      <a href="/pages/about"><button class="button-warning pure-button">More Data Stories</button></a>
+      <br /><br />
+      </div>
+    <img src="/common/images/g-datastories.jpg" alt="CT Data Collaborative" border="0" />
   </div>
 </div>
 
 
-<div id="saved_visualizations">
+<div id="newsmods">
+<div class="spacing">
 
-  {% for domain in domains %}
-    <div class="domain row" id="{{ domain['id'] }}">
-      {% if domain['title'] != '' %}
-      <h2 class="pull-center"> {{ domain['title'] }} Indicators </h2>
-      <br>
-      <br>
-      <br>
-      {% endif %}
-      <div class="">
-        {% if domain['indicators']|length > 0 %}
-          <table class="table">
-            <col width="20%"></col>
-            <col width="15%"></col>
-            <col width="35%"></col>
-            <col width="15%"></col>
-            <col width="15%"></col>
-            <thead>
-              <th> Title </th>
-              <th> Dataset </th>
-              <th> Description </th>
-              <th> Date </th>
-              <th> Creator </th>
-            </thead>
-            <tbody>
-              {% for indicator in domain['indicators'] %}
-                <tr>
-                <td>
-                  <a href="{{ indicator['link_to_visualization'] }}">
-                      {% if  indicator['viz_type'] == 'table' %}
-                        <img id="table_icon" src="/common/images/displayopt1-inv.png" alt="" />
-                      {% endif %}
-                      {% if  indicator['viz_type'] == 'chart' or indicator['viz_type'] == 'column' %}
-                        <img id="bar_icon" src="/common/images/displayopt2.png" alt="" />
-                      {% endif %}
-                      {% if  indicator['viz_type'] == 'line' %}
-                        <img id="line_icon" src="/common/images/displayopt3.png" alt="" />
-                      {% endif %}
-                      {% if  indicator['viz_type'] == 'map' %}
-                        <img id="line_icon" src="/common/images/displayopt4.png" alt="" />
-                      {% endif %}
-
-                      {{indicator.name}}
-                    </a>
-                </td>
-                <td><a href="/dataset/{{indicator['dataset_name']}}">  {{indicator['dataset_name']}} </a> </span></td>
-                <td><p>{{indicator['description']}}</p></td>
-                <td> <span>{{indicator['created_at']}}</span></td>
-                <td><a href="/user/{{indicator['user']}}"> {{indicator['user']}} </a></td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {% else %}
-          <p> There are no indicators for this domain yet. </p>
-        {% endif %}
-      </div>
-    </div>
-
-  {% endfor %}
-
+<div class="newsbox">
+<img src="/common/images/news-education.jpg" alt="" border="0" />
+<a href="#"><h2>Education</h2></a>
+Coming Soon..
+<br />
+<br />
+<a href="#"> <button class="button-warning pure-button">Learn More</button> </a>
+</div>
+<div class="newsbox">
+<img src="/common/images/news-housing.jpg" alt="" border="0" />
+<a href="#"><h2>Civic Vitality</h2></a>
+Interactive visualization of Earned Income Tax Credit data.
+<br />
+<br />
+<a href="" data-uv-trigger data-uv-position="top"><button class="button-warning pure-button">Learn More</button> </a>
+</div>
+<div class="newsbox">
+<img src="/common/images/news-health.jpg" alt="" border="0" />
+<a href="#"><h2>Health</h2></a>
+Coming Soon..
+<br />
+<br />
+<a href=""> <button class="button-warning pure-button">Learn More</button> </a>
 </div>
 
+</div>
+</div>
 
 <br clear="all"/>
 
@@ -97,10 +57,10 @@
 </div>
 
 
+
+
 {% block scripts %}
 {{ super() }}
-  <link rel="stylesheet" type="text/css" href="/common/css/data_gallery.css">
-  {% resource 'ctdata_theme/data_gallery.js' %}
-
+    <link rel="stylesheet" type="text/css" href="/common/css/data_gallery.css">
 {% endblock %}
 {% endblock %}
