@@ -15,7 +15,6 @@ from ..users.services import UserService
 from ..visualization.services import DatasetService
 from ..community.services import CommunityProfileService
 from ..topic.services import TopicSerivce
-from IPython import embed
 
 class PageController(base.BaseController):
 
@@ -29,5 +28,4 @@ class PageController(base.BaseController):
         return  base.render('pages/special_projects.html', extra_vars={})
 
     def data_gallery(self):
-        domains = TopicSerivce.get_topics_with_indicators('data_gallery')
-        return  base.render('pages/data_gallery.html', extra_vars={'show_green_logo': True, 'domains': domains})
+        return  base.render('pages/data_gallery.html', extra_vars={'show_green_logo': True})
