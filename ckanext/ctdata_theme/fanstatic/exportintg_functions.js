@@ -187,6 +187,9 @@ function chart_to_png(){
 }
 
 function save_chart_image(){
+  $('.as_image_spinner').removeClass('hidden')
+  $('.as_image').addClass('hidden')
+
   if (display_type != 'map') {
     bootbox.confirm("Do you want to include data table?", function(r){
       if (r) {
@@ -194,16 +197,28 @@ function save_chart_image(){
           $('a[href="#second_table"]').click()
 
         chart_with_table_to_png()
+        $('.as_image_spinner').addClass('hidden')
+        $('.as_image').removeClass('hidden')
       }
-      else
+      else{
         chart_to_png();
+        $('.as_image_spinner').addClass('hidden')
+        $('.as_image').removeClass('hidden')
+      }
     })
   }
-  else
+  else{
     chart_to_png();
+    $('.as_image_spinner').addClass('hidden')
+    $('.as_image').removeClass('hidden')
+  }
+
 }
 
 function save_chart_pdf(){
+  $('.as_pdf_spinner').removeClass('hidden')
+  $('.as_pdf').addClass('hidden')
+
   if (display_type != 'map') {
     bootbox.confirm("Do you want to include data table?", function(r){
       if (r){
@@ -211,11 +226,19 @@ function save_chart_pdf(){
           $('a[href="#second_table"]').click()
 
         chart_with_table_to_pdf()
-      } else
+        $('.as_pdf_spinner').addClass('hidden')
+        $('.as_pdf').removeClass('hidden')
+      } else{
         chart_to_pdf()
+        $('.as_pdf_spinner').addClass('hidden')
+        $('.as_pdf').removeClass('hidden')
+      }
     })
-  } else
+  } else{
     chart_to_pdf()
+    $('.as_pdf_spinner').addClass('hidden')
+    $('.as_pdf').removeClass('hidden')
+  }
 }
 
 ///////////////////////// EXPORTING FUNCTIONS /////////////////////
