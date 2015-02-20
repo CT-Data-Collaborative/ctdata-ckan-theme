@@ -190,7 +190,6 @@ function save_chart_image(){
   $('.as_image_spinner').removeClass('hidden')
   $('.as_image').addClass('hidden')
 
-  // debugger
   if (display_type != 'map') {
     bootbox.confirm("Do you want to include data table?", function(r){
       if (r) {
