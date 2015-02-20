@@ -378,10 +378,7 @@ class MapView(View):
                 fips = '0' + str(row['FIPS'])
             else:
                 fips = ''
-
-            value = '' if row['Value'] == None else float(row['Value'])
-
-            result['data'].append({'code': row[geography_param], 'value': value, 'fips': fips})
+            result['data'].append({'code': row[geography_param], 'value': float(row['Value']), 'fips': fips})
 
         result['compatibles'] = self.get_compatibles(filters)
         return result

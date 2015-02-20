@@ -42,7 +42,7 @@ function load_functions_for_indicators(){
         $.ajax({type: "POST",
             url: "/community/add_indicator",
             data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
-                                   permission: 'public', filters: get_filters(), description: ''}),
+                                   permission: 'public', filters: get_filters()}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 if (data.success == true)
