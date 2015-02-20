@@ -26,6 +26,13 @@ input[type="checkbox"],input[type="radio"]{
   -webkit-appearance: checkbox;
   float: left;
 }
+
+input.as_radio[type="checkbox"]{
+  -webkit-appearance: radio;
+  float: left;
+}
+
+
 label.checkLabel{
   float:left;
   padding-top: 4px;
@@ -84,7 +91,7 @@ span.checkLabel {
 }
 
 .indicator-sub-topics{
-  padding-left: 8px;
+  padding: 5px;
 }
 
 .indicator-sub-topics li{
@@ -138,7 +145,7 @@ div#metadata{
   padding-left:15px;
   padding-right:15px;
   border-radius: 3px;
-  margin-left: 50px;
+  margin-left: 43px;
 }
 div#error_message{
   font-size: 30px;
@@ -176,6 +183,7 @@ a.clear_all{
   max-width: 1300px !important;
   min-width: 310px !important;
   margin-left: 5% !important;
+  background-color: white;
 }
 
 .full_metadata_link{
@@ -234,18 +242,33 @@ a.change_dataset_link:hover{
   font-weight: 400;
 }
 
+#double_export{
+  widt: auto;
+  height: auto;
+  background-color: white;
+  border: none !important;
+  background-color: white !important;
+}
 
 #container_2  table.results_table{
-   margin-left: 50px;
-   width: 100%;
+  margin-left: 5%;
+  /*/width: 99%;*/
+}
+
+#container_2  table.results_table tr td{
+  padding: 10px;
+  padding-right: 20px !important;
 }
 
 .results_table{
   float: none;
   min-width: 400px;
 }
-.results_table table tr{
-  height: 10px;
+
+table.results_table{
+  table-layout: fixed !important;
+  width: 100%;
+  /*white-space: nowrap;*/
 }
 .results_table a.togglebtn {
   font-size:16px;
@@ -256,7 +279,7 @@ a.change_dataset_link:hover{
   display: inline-block;
   width:100%;
   background:url(../images/tgl_down.png) no-repeat right center;
-  margin-left: 50px;
+  margin-left: 5%;
 }
 
 .more_copy{
@@ -298,12 +321,35 @@ a.gray_back{
 td.right_align, th.right_align {text-align: right; padding: 0px;}
 
 table.results_table tr td{
-  padding-left: 3px !important;
+  padding-left: 5px !important;
 }
 table.results_table tr{
   max-height: 10px !important;
 }
 
 #container.scroll{
-  overflow: scroll !important;
+  overflow: auto !important;
+}
+
+#title_and_subtitle, #title_info{
+  padding-left: 80px;
+  padding-right: 30px;
+  padding-bottom: 30px;
+  word-wrap: break-word;
+  background-color: white;
+}
+
+#only_chart, .results_table{
+  background-color: white;
+}
+
+canvas{
+  background-color: white;
+}
+label.disabled{
+  color: rgb(211, 211, 211) !important;
+}
+.main_body_content{
+  webkit-box-shadow: none !important;
+  box-shadow: none !important;
 }
