@@ -22,6 +22,7 @@ import ckan.lib.navl.dictization_functions as dict_fns
 import ckan.lib.helpers as h
 import ckan.logic       as logic
 import ckan.lib.jsonp   as jsonp
+import ckan.new_authz   as new_authz
 
 get_action      = logic.get_action
 NotFound        = logic.NotFound
