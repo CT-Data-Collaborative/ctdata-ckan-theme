@@ -1,0 +1,47 @@
+{% extends "page.html" %}
+
+{% block page_name %} Manage Locations {% endblock %}
+{% block page_description %}{% endblock %}
+{% block main_content %}
+
+
+
+<form role="role" id="new_location" class="span4">
+  <h2> Create Location </h2>
+  <div class="control-group">
+
+    <label class="control-label"> Location Name </label>
+    <div class="controls">
+      <input type="text" name="location_name" id="location_name"> </input>
+    </div>
+
+    <label class="control-label"> Location FIPS </label>
+    <div class="controls">
+      <input type="text" name="location_fips" id="location_fips"> </input>
+    </div>
+
+    <a href="javascript:void(0);" class="btn btn-default" id="save_location" > Save </a>
+
+  </div>
+</form>
+
+<ul id="locations_list" class="span10">
+  {% for location in locations %}
+  <li class="span3">
+    <span class="pull-left"><b> {{ location.name }} </b> </span> :
+    <span class="pull-right"> {{ location.fips }} </span>
+  </li>
+  {% endfor %}
+</ul>
+
+
+{% block scripts %}
+{{ super() }}
+  <link rel="stylesheet" type="text/css" href="/common/css/data_gallery.css">
+  {% resource 'ctdata_theme/locations.js' %}
+
+{% endblock %}
+
+
+
+{% endblock %}

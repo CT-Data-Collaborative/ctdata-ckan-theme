@@ -20,20 +20,21 @@ from ctdata.visualization.views import ViewFactory
 from ctdata.community.services import CommunityProfileService
 from ctdata.topic.services import TopicSerivce
 from ctdata.users.services import UserService
+from ctdata.location.services import LocationService
 
 from IPython import embed
 
 get_action = logic.get_action
 
-def communities():
-    db = Database()
+def locations():
+    db   = Database()
     sess = db.session_factory()
 
-    srvc = CommunityProfileService(sess)
-    communities = srvc.get_profiles_for_data_by_location()
+    location_service = LocationService(sess)
+    locations = location_service.get_all_locations()
 
     sess.close()
-    return communities
+    return locations
 
 
 class CTDataThemePlugin(plugins.SingletonPlugin):
@@ -52,7 +53,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         db.set_connection_string(config['ckan.datastore.write_url'])
 
         db.init_sa(config['sqlalchemy.url'])
-        db.init_community_data(config['ctdata.communities_source'])
+        # db.init_community_data(config['ctdata.communities_source'])
 
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
@@ -107,13 +108,21 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('group_user_autocomplete', '/group/user_autocomplete', action = 'user_autocomplete')
             m.connect('update_group_indicators', '/group/update_group_indicators', action='update_group_indicators')
 
+        with routes.mapper.SubMapper(
+                route_map,
+                controller='ckanext.ctdata_theme.ctdata.location.controllers:LocationsController') as m:
+            m.connect('location', '/location/{location_name}', action='show')
+            m.connect('data_by_location', '/data-by-location', action='data_by_location')
+            m.connect('manage_locations', '/manage-locations', action='manage_locations')
+            m.connect('create_location',  '/create_location',  action='create_location')
+
         return route_map
 
     def after_map(self, route_map):
         return route_map
 
     def get_helpers(self):
-        return {'communities_helper': communities,
+        return {'locations_helper': locations,
                 'link_to_dataset_with_filters': _link_to_dataset_with_filters}
 
 

@@ -50,8 +50,8 @@
         <span class="caretbox"><span class="caret"></span></span>
       </button>
       <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-        {% for community in h.communities_helper() %}
-          <li role="presentation"><a role="menuitem" tabindex="-1" href="/community/{{community.name}}">{{community.name}}</a></li>
+        {% for location in h.locations_helper() %}
+          <li role="presentation"><a role="menuitem" tabindex="-1" href="/location/{{location.name}}">{{location.name}}</a></li>
         {% endfor %}
       </ul>
   </div>

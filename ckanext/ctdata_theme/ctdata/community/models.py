@@ -46,31 +46,6 @@ class Town(Base):
     def __repr__(self):
         return "Town %s (%d)" % (self.name, self.fips)
 
-
-#Error:
-#   sqlalchemy.exc.NoReferencedTableError:
-#       Foreign key associated with column 'ctdata_group_indicators.group_id' could not find table 'group'
-#       with which to generate a foreign key to target column 'id'
-
-# class GroupIndicator(Base):
-#     __tablename__ = 'ctdata_group_indicators'
-
-#     id           = Column(Integer, primary_key=True)
-#     indicator_id = Column(String, ForeignKey("ctdata_profile_indicators.id"), nullable = False)
-#     group_id     = Column(Text, ForeignKey('group.id'), nullable = False)
-
-#     indicator = relationship("ProfileIndicator", backref=backref("groups", cascade="save-update, merge, "
-#                                                                                         "delete, delete-orphan"))
-#     group     = relationship("UserInfo", backref="indicators")
-
-#     def __init__(self, indicator_id, group_id):
-#         self.indicator_id = indicator_id
-#         self.group_id = group_id
-
-#     def __repr__(self):
-#         return "Group Indicator %s (%d)" % (self.indicator_id, self.group_id)
-
-
 class ProfileIndicator(Base):
     __tablename__ = 'ctdata_profile_indicators'
 
