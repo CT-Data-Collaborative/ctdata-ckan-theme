@@ -526,3 +526,7 @@ margin: 0;
   width: 100%;
 }
 
+.user-name{
+  padding-left: 20px;
+  font-size: 18px;
+}
