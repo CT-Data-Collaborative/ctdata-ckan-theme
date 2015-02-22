@@ -27,8 +27,13 @@
         {% endif %}
         <div class="controls">
           {% if user %}
+            User:
+            <span class="user-name">
+            {{ h.linked_gravatar(user.email_hash, 20) }}
+             <b>  {{ user.display_name }} </b>
+             </span>
             <input type="hidden" name="username" value="{{ user.name }}" />
-            <input id="username" name="username" type="text" value="{{ user.name }}"
+            <input class="hidden" id="username" name="username" type="text" value="{{ user.name }}"
             disabled="True" class="control-medium">
           {% else %}
             <input id="username" type="text" name="username" placeholder="Username"
