@@ -525,3 +525,8 @@ margin: 0;
 .members-table{
   width: 100%;
 }
+
+.user-name{
+  padding-left: 20px;
+  font-size: 18px;
+}
