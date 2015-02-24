@@ -34,9 +34,6 @@ class Location(Base):
     name   = Column(String)
     public = Column(Boolean, default=False)
 
-    # profiles  = relationship('ctdata_profiles', secondary='ctdata_locations_profiles',
-    #               backref=backref('locations', lazy='dynamic'))
-
     def __init__(self, name, fips):
         self.fips   = fips
         self.name   = name
@@ -57,6 +54,7 @@ class CtdataProfile(Base):
 
     locations      = relationship(Location, secondary='ctdata_locations_profiles',
                       backref=backref('profiles', lazy='dynamic'))
+
     # indicators     = relationship('ctdata_profile_indicators',
     #                   backref=backref('profile', lazy='joined'), lazy='dynamic')
 

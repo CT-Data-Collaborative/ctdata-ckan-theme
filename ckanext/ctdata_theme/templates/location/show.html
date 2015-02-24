@@ -1,9 +1,24 @@
 {% extends "page.html" %}
 
-{% block page_name %}Data by Location - <span id="location">{{location.name}}</span>{% endblock %}
-{% block page_description %}{% endblock %}
+{% block page_name %}Data by Location{% endblock %}
+{% block page_description %}<span id="location">{{location.name}}</span>{% endblock %}
 {% block main_content %}
 
+<div class="wrapper">
+
 <h2> {{ location.name }} </h2>
+
+
+{% for profile in profiles %}
+  {{ profile.name }}
+{% endfor %}
+
+<a href="/location/{{location.name}}/new_profile" class="btn"> Create Community Profile </a>
+
+
+</div>
+
+
+
 
 {% endblock %}

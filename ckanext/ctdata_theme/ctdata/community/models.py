@@ -65,16 +65,16 @@ class ProfileIndicator(Base):
     visualization_type = Column(String)
     description        = Column(Text)
 
-    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, temp, ind_type, visualization_type, permission, description, group_ids):
+    def __init__(self, name, filters, dataset_id, data_type, year, variable, ind_type, visualization_type, permission, description, group_ids):
         self.name       = name
         self.filters    = filters
         self.dataset_id = dataset_id
-        self.is_global  = is_global
+        # self.is_global  = is_global
         self.data_type  = data_type
         self.year       = year
         self.variable   = variable
         self.ind_type   = ind_type
-        self.temp       = temp
+        # self.temp       = temp
         self.permission = permission
         self.group_ids  = group_ids
         self.visualization_type  = visualization_type
