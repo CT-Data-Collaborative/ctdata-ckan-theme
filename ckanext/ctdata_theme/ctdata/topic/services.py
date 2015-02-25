@@ -64,7 +64,7 @@ class TopicSerivce(object):
       domains.sort(key=lambda x: x['title'])
       all_indicators.sort(key=lambda x: x['created_at'], reverse=True)
 
-      domains = domains + [{'title': 'the Most Recently Created', 'indicators': all_indicators[0:10], 'id': 'most_recent'}]
+      domains = domains + [{'title': 'Recently Created', 'indicators': all_indicators[0:10], 'id': 'most_recent'}]
 
       return domains
 
