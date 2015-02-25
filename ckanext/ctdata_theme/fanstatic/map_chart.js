@@ -133,14 +133,10 @@ else
 if (asterisks_counter > 0) dataClasses.push({name: 'Suppressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
 
 for(i = 0; i < numClasses; i++){
-  to   = Math.floor(min+(step*(i+1)))
-  from = Math.floor(min+(step*i))
+  to   = Math.round((min+(step*(i+1)))*10000)/10000
+  from = Math.round((min+(step*i))*10000)/10000
 
-  if (!cur_mt_is_percent ){
-    if (to > 100  && i != 7)  to = Math.round(to/10)*10;
-    if (i == 7) to = max;
-    if (from > 100) from = Math.round(from/10)*10;
-  }
+  if (i == 7) to = max;
 
   if (to > 100 && cur_mt_is_percent)
     to = 100
