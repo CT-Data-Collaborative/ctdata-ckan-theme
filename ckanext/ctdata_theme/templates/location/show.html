@@ -1,39 +1,67 @@
 {% extends "page.html" %}
 
-{% block page_name %}Data by Location{% endblock %}
-{% block page_description %}<span id="location">{{location.name}}</span>{% endblock %}
+{% block styles %}
+{{ super() }}
+<link href='/common/css/visualization.css' rel='stylesheet' type='text/css'>
+{% endblock %}
+
+{% block page_name %}Data by Location - <span id="location">{{location.name}}</span>{% endblock %}
+{% block page_description %}{% endblock %}
 {% block main_content %}
 
+<span class="hidden" id="locations_list">{{towns_names}}</span>
 <div class="wrapper">
+  <div class="span12 pull-right">
+    <section class="locationdata ">
+      <ul class="opt_btn">
+        <li class="btn_blue"><a href="javascript:void(0)" id="add_towns">Edit Towns</a></li>
+        <li class="btn_blue"><a href="/location/{{location.name}}/new_profile" class=""> Create Community Profile </a></li>
+      </ul>
+    </section>
 
-<div class="span12">
+  </div>
 
-  <h2> {{ location.name }} </h2>
+  <div class="span12">
+    <span id="default_profile_id" class="hidden">{{default_profile_id}}</span>
+    <div class="table-div"></div>
+  </div>
+</div>
 
+<!-- <div class="blue-line"> </div>
+<br>
+<div>
+  <h2>See Other Community Profiles Related to {{location.name}}</h2>
   <ul>
   {% for profile in profiles %}
-    <li>
-      {{ profile.id }}: {{ profile.name }}
-      <br>
-      {% for indicator in profile.indicators %}
-        {{ indicator.dataset_name() }}: {{ indicator.variable }}
+    {% if default_profile_id != profile %}
+      <li>
+        <b>{{ profile.id }}: {{ profile.name }}</b>
         <br>
-      {% endfor %}
-
-    </li>
+        {% for indicator in profile.indicators %}
+          {{ indicator.dataset_name() }}: {{ indicator.variable }}
+          <br>
+        {% endfor %}
+      </li>
+    {% endif %}
   {% endfor %}
   </ul>
-
-
 </div>
 
-<div class="span3">
-  <a href="/location/{{location.name}}/new_profile" class="btn"> Create Community Profile </a>
-</div>
+ -->
 
-</div>
+{% snippet 'communities/snippets/towns_popup.html', towns=towns, community=location, displayed_towns=towns_names.split(',') %}
 
 
+{% block scripts %}
+  {{ super() }}
+  {% resource 'ctdata_theme/locations.js' %}
+
+  <script>
+    var location_names = []
+    location_names = '{{towns_names | safe}}'
+  </script>
+
+{% endblock %}
 
 
 {% endblock %}

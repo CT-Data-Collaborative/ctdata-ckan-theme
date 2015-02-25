@@ -1,11 +1,12 @@
 var create_popup    = $("#create_profile_popup"),
-        ids_to_remove   = [],
-        community_name  = $("input#community_name").val(),
-        towns           = $("input#displayed_towns").val(),
-        current_towns   = [],
-        location_name   = $("#location").text(),
-        indicators      = [],
-        current_dataset ;
+    ids_to_remove   = [],
+    community_name  = $("input#community_name").val(),
+    towns           = $("input#displayed_towns").val(),
+    current_towns   = [],
+    location_name   = $("#location").text(),
+    indicators      = [],
+    locations       = location_names,
+    current_dataset ;
 
     function load_topics(){
         if ($('#loaded_topics').html() == ""){
@@ -66,6 +67,7 @@ var create_popup    = $("#create_profile_popup"),
     }
 
     function draw_table(indicators_data, towns){
+
         table = "<table class='table my_table'>\
                     <thead>\
                         <th>Dataset</th>\
@@ -78,16 +80,16 @@ var create_popup    = $("#create_profile_popup"),
         $(indicators_data).each(function(i){
             ind = indicators_data[i]
             id  = ind.id[0]
+            ind.filters = JSON.parse(ind.filters)
 
             tr  = "<tr class='table_data'>\
                     <td class='column_1 for_csv'>\
                         <span class='indicator_id hidden'>" + id + " </span>"
-            if (ind.temp)
-                tr  = tr + "<span class='text-warning temp'>*</span>"
+
             tr  = tr + "<a href=" + ind.link_to + ">" + ind.dataset + ", " + ind.variable + " </a><span>"
             $(ind.filters).each(function(i){
                 filter = ind.filters[i]
-                tr = tr + filter.field + ': ' + filter.value + ' '
+                tr = tr + filter.field + ': ' + filter.values[0]+ ' '
             });
             tr = tr + "</span>  <span class='for_csv hidden'>" + ind.dataset + ', ' + ind.variable + ', '
             $(ind.filters).each(function(i){
@@ -132,12 +134,27 @@ var create_popup    = $("#create_profile_popup"),
         });
     }
 
+    function load_profile_indicators(){
+        $.ajax({type: "POST",
+            url: "/load_profile_indicators/" + $('#default_profile_id').text(),
+            data: JSON.stringify({locations: locations}),
+            contentType: 'application/json; charset=utf-8'
+        }).done(function(data) {
+            indicators_data = data.ind_data
+            current_towns   = data.towns
+            $('locations_list').text(data.towns)
+            if (indicators_data.length > 0)
+                draw_table(indicators_data, current_towns);
+            else
+                $(".table-div").html("There're no indicators for this community yet.")
+        });
+    }
+
     function load_indicator_data(data){
       draw_raw(data.indicator);
     }
 
     function draw_raw(indicators_data){
-      // debugger
       tr = "<tr><td><a href='" + indicators_data.link_to + "'>" + indicators_data.dataset + "</a> " + indicators_data.variable + "</td><td>" + indicators_data.data_type + "</td><td>" + indicators_data.year+ "</td><td>" + indicators_data.values+ "</td>"
       $('tbody', $('#profile_indicators')).append(tr)
     }
@@ -240,9 +257,9 @@ $(function(){
     });
 
     $('#save_towns').click(function() {
-        towns = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
-        towns = towns.join(',');
-        load_indicators_data()
+        locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+        locations = locations.join(',');
+        load_profile_indicators();
         $('div.modal').modal('hide');
     });
 
@@ -272,24 +289,22 @@ $(function(){
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     data = JSON.parse(data)
-                    // if (data.success == true){
-                    //     $('div.modal').modal('hide');
-                    //     $('span.temp').addClass('hidden')
-                    //     $('#message').html("<h3>New profile has been successfully saved.</h3>\
-                    //                       <br>  <a href='"+ data.redirect_link +"'> Click here </a> to check it.")
-                    //     $("#message_popup").modal('show');
-                    // }
+                    if (data.success == true){
+                        // $('div.modal').modal('hide');
+                        // $('span.temp').addClass('hidden')
+                        // $('#message').html("<h3>New profile has been successfully saved.</h3>\
+                        //                   <br>  <a href='"+ data.redirect_link +"'> Click here </a> to check it.")
+                        // $("#message_popup").modal('show');
+                        window.location = '/location/' + location_name
+                    }
                 }
             });
         }
     });
 
 
-    $(window).bind('beforeunload', function() {
-      return remove_temp_indicators();
-    });
-
     // load_indicators_data();
+    load_profile_indicators();
     load_topics();
 
     $("#profile_name").keyup(function(event){

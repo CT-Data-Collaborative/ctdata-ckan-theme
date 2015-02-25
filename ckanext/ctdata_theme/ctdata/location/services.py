@@ -43,6 +43,16 @@ class LocationService(object):
         self.session.add(location)
         self.session.commit()
 
+    def find_location_profile(self, location_id, profile_id):
+        return self.session.query(LocationProfile).filter(and_(LocationProfile.location_id == location_id, LocationProfile.profile_id == profile_id)).first()
+
+    def remove_location_profile(self, location_id, profile_id):
+        location_profile = self.find_location_profile(location_id, profile_id)
+        if location_profile:
+            self.session.delete(location_profile)
+
+        self.session.commit()
+
     ################ Profiles   ############################################
 
 
@@ -63,11 +73,14 @@ class LocationService(object):
         self.session.commit()
         return profile
 
+    def get_profile(self, profile_id):
+        profile = self.session.query(CtdataProfile).filter(CtdataProfile.id == profile_id).first()
 
+        return profile
 
     ################ Indicators ############################################
 
-    def load_indicator_value_for_location(self, filters, dataset_id, location_name):
+    def load_indicator_value_for_location(self, filters, dataset_id, location_names):
         db   = Database()
         conn = db.connect()
         curs = conn.cursor()
@@ -78,15 +91,17 @@ class LocationService(object):
         geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
 
         filters = json.loads(filters)
+        arr     = []
+        for location_name in location_names:
+            query = '''
+                        SELECT "Value" FROM "%s" WHERE "%s"='%s' AND %s
+                    ''' % (dataset.table_name, geography_param, location_name,  " AND ".join(''' "%s" = '%s' ''' % (f['field'], f['values'][0]) for f in filters))
 
-        query = '''
-                    SELECT "Value" FROM "%s" WHERE "%s"='%s' AND %s
-                ''' % (dataset.table_name, geography_param, location_name,  " AND ".join(''' "%s" = '%s' ''' % (f['field'], f['values'][0]) for f in filters))
+            curs.execute(query, (dataset.table_name,))
+            value = curs.fetchall()
+            arr.append(str(value[0][0]) if value else None)
 
-        curs.execute(query, (dataset.table_name,))
-        value = curs.fetchall()
-
-        return str(value[0][0]) if value else None
+        return arr
 
 
     def new_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, profile_id = None, permission = 'public', description = '', group_ids = ''):

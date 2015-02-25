@@ -35,6 +35,12 @@ class Location(Base):
         return "Location %s %s %s" % (self.id, self.name, self.fips)
 
 
+    def default_profile(self):
+        profile = model.Session.query(CtdataProfile).filter(CtdataProfile.global_default == True).first()
+
+        return profile
+
+
 class CtdataProfile(Base):
     __tablename__ = 'ctdata_profiles'
 

@@ -10,7 +10,7 @@ import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 from ckan.common import response as http_response, request as http_request
 import ckan.lib.helpers as h
-
+from models import Location, CtdataProfile, LocationProfile
 
 from ..database import Database
 from ..users.services import UserService
@@ -35,8 +35,12 @@ class LocationsController(base.BaseController):
     def show(self, location_name):
         location = self.location_service.get_location(location_name)
         profiles = location.profiles.all()
+        default_profile = location.default_profile()
 
-        return base.render('location/show.html', extra_vars={'location': location, 'profiles': profiles})
+        towns       = self.location_service.get_all_locations()
+        # embed()
+        towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
+        return base.render('location/show.html', extra_vars={'location': location, 'towns': towns, 'towns_names': towns_names, 'profiles': profiles, 'default_profile_id': default_profile.id})
 
     def data_by_location(self):
         locations = self.location_service.get_all_locations()
@@ -92,7 +96,7 @@ class LocationsController(base.BaseController):
 
             try:
                 indicator =  self.location_service.new_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, description, group_ids)
-                value     =  self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, location_name)
+                values     =  self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, [location_name])
 
                 ind_data = {
                          'id': indicator.id,
@@ -102,7 +106,7 @@ class LocationsController(base.BaseController):
                     'link_to': indicator.link_to_visualization(),
                     'dataset': indicator.dataset_name(),
                    'variable': indicator.variable,
-                   'values'  : value
+                   'values'  : values[0]
                 }
 
                 return json.dumps({'success': True, 'indicator': ind_data })
@@ -133,13 +137,52 @@ class LocationsController(base.BaseController):
 
             profile    = self.location_service.create_profile(user, name, indicators, locations, global_default, location)
 
-            # value     =  self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, location_name)
-
-            # 'indicator': ind_data
-            return json.dumps({'success': True })
-
+            return json.dumps({'success': True,  })
 
         return json.dumps({'success': False, 'error': str('Profile cannot be saved')})
+
+    def load_profile_indicators(self, profile_id):
+        http_response.headers['Content-type'] = 'application/json'
+
+        json_body      = json.loads(http_request.body, encoding=http_request.charset)
+        location_names = json_body.get('locations')
+        location_names = location_names.split(',')
+        profile        = self.location_service.get_profile(profile_id)
+        locations      = []
+
+        for profile_location in profile.locations:
+            if profile_location.name not in location_names:
+                self.location_service.remove_location_profile(profile_location.id, profile.id)
+                profile.locations.remove(profile_location)
+
+        for location_name in location_names:
+            location = self.location_service.get_location(location_name)
+            locations.append( location )
+            if location not in profile.locations:
+                profile.locations.append(location)
+                location_profile = LocationProfile(location.id, profile.id)
+                self.session.add(location_profile)
+
+        self.session.commit()
+
+        ind_data = []
+        for indicator in profile.indicators:
+            values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, map(lambda t: t.name, profile.locations))
+
+            data  = {}
+            data  = {
+                     'id': indicator.id,
+                'filters': indicator.filters,
+              'data_type': indicator.data_type,
+                   'year': indicator.year,
+                'link_to': indicator.link_to_visualization(),
+                'dataset': indicator.dataset_name(),
+               'variable': indicator.variable,
+               'values'  : values
+            }
+
+            ind_data.append(data)
+        return json.dumps({'success': True, 'ind_data': ind_data, 'towns':  map(lambda t: t.name, profile.locations)})
 
 
     # def community_profile(self, community_name):
