@@ -120,7 +120,7 @@ if (!cur_mt_is_percent){
       step = parseFloat(range)/numClasses;
       round = Math.abs(Math.floor(Math.log10(step)))+1;
       step = parseFloat((Math.floor(step*Math.pow(10, round)))/Math.pow(10,round);
-  else{
+  } else{
       step = Math.floor((range-1)/(numClasses-1));
       round = Math.floor(Math.log10(step))-1;
       if (round > 0) step = (Math.floor(step/Math.pow(10,round)))*Math.pow(10,round);
