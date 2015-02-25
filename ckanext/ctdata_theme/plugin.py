@@ -53,7 +53,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         db.set_connection_string(config['ckan.datastore.write_url'])
 
         db.init_sa(config['sqlalchemy.url'])
-        # db.init_community_data(config['ctdata.communities_source'])
+        db.init_community_data(config['ctdata.communities_source'])
 
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
@@ -119,6 +119,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('load_indicator_location', '/location/{location_name}/load_indicator', action='load_indicator')
             m.connect('create_location_profile', '/location/{location_name}/create-profile', action='create_location_profile')
             m.connect('load_profile_indicators', '/load_profile_indicators/{profile_id}', action='load_profile_indicators')
+            m.connect('save_local_default', '/save_local_default/{profile_id}', action='save_local_default')
 
         return route_map
 

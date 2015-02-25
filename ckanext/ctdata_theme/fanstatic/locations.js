@@ -6,6 +6,7 @@ var create_popup    = $("#create_profile_popup"),
     location_name   = $("#location").text(),
     indicators      = [],
     locations       = location_names,
+    default_profile_id = $('#default_profile_id').text(),
     current_dataset ;
 
     function load_topics(){
@@ -78,6 +79,9 @@ var create_popup    = $("#create_profile_popup"),
         table = table + "</thead><tbody>"
 
         $(indicators_data).each(function(i){
+            indicators.push({ dataset_id: indicators_data['dataset_id'], name: "", ind_type: 'common',
+                          permission: 'public', filters: indicators_data['filters'], description: ''})
+
             ind = indicators_data[i]
             id  = ind.id[0]
             ind.filters = JSON.parse(ind.filters)
@@ -117,36 +121,23 @@ var create_popup    = $("#create_profile_popup"),
         table = table +  "</tbody></table>"
 
         $(".table-div").html(table)
+        debugger
     }
 
-    function load_indicators_data(){
-        $.ajax({type: "POST",
-            url: "/indicators_data/"+community_name,
-            data: JSON.stringify({towns: towns}),
-            contentType: 'application/json; charset=utf-8'
-        }).done(function(data) {
-            indicators_data = data.indicators
-            current_towns   = data.towns
-            if (indicators_data.length > 0)
-                draw_table(indicators_data, current_towns);
-            else
-                $(".table-div").html("There're no indicators for this community yet.")
-        });
-    }
 
     function load_profile_indicators(){
         $.ajax({type: "POST",
-            url: "/load_profile_indicators/" + $('#default_profile_id').text(),
+            url: "/load_profile_indicators/" + default_profile_id,
             data: JSON.stringify({locations: locations}),
             contentType: 'application/json; charset=utf-8'
         }).done(function(data) {
             indicators_data = data.ind_data
             current_towns   = data.towns
             $('locations_list').text(data.towns)
-            if (indicators_data.length > 0)
+            // if (indicators_data.length > 0)
                 draw_table(indicators_data, current_towns);
-            else
-                $(".table-div").html("There're no indicators for this community yet.")
+            // else
+            //     $(".table-div").html("There're no indicators for this community yet.")
         });
     }
 
@@ -155,8 +146,11 @@ var create_popup    = $("#create_profile_popup"),
     }
 
     function draw_raw(indicators_data){
-      tr = "<tr><td><a href='" + indicators_data.link_to + "'>" + indicators_data.dataset + "</a> " + indicators_data.variable + "</td><td>" + indicators_data.data_type + "</td><td>" + indicators_data.year+ "</td><td>" + indicators_data.values+ "</td>"
-      $('tbody', $('#profile_indicators')).append(tr)
+        tr = "<tr><td><a href='" + indicators_data.link_to + "'>" + indicators_data.dataset + "</a> " + indicators_data.variable + "</td><td>" + indicators_data.data_type + "</td><td>" + indicators_data.year+ "</td>"
+        $(indicators_data.values).each(function(i){
+            tr = tr + "<td>" + indicators_data.values[i] + "</td>"
+        });
+        $('tbody').append(tr)
     }
 
 
@@ -236,7 +230,7 @@ $(function(){
         $.ajax({type: "POST",
             url: "/location/" + location_name + "/load_indicator",
             data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
-                                   permission: 'public', filters: get_filters(), description: '', locations: locations}),
+                                   permission: 'public', filters: get_filters(), description: '', locations: location_names}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 if (data.success == true){
@@ -264,10 +258,9 @@ $(function(){
     });
 
     $('#save_profile_as_default').click(function() {
-        ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
         $.ajax({type: "POST",
-            url: "/community/save_as_default",
-            data: JSON.stringify({indicator_ids: ids}),
+            url: "/save_local_default/" + default_profile_id,
+            data: JSON.stringify({indicators: indicators}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 $('span.temp').addClass('hidden')
@@ -303,7 +296,6 @@ $(function(){
     });
 
 
-    // load_indicators_data();
     load_profile_indicators();
     load_topics();
 

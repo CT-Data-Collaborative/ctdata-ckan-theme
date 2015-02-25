@@ -36,7 +36,7 @@ class Location(Base):
 
 
     def default_profile(self):
-        profile = model.Session.query(CtdataProfile).filter(CtdataProfile.global_default == True).first()
+        profile = model.Session.query(CtdataProfile).filter(CtdataProfile.name == self.name).first()
 
         return profile
 
