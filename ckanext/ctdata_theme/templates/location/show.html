@@ -8,15 +8,27 @@
 
 <div class="span12">
 
-<h2> {{ location.name }} </h2>
+  <h2> {{ location.name }} </h2>
 
-{% for profile in profiles %}
-  {{ profile.name }}
-{% endfor %}
+  <ul>
+  {% for profile in profiles %}
+    <li>
+      {{ profile.id }}: {{ profile.name }}
+      <br>
+      {% for indicator in profile.indicators %}
+        {{ indicator.dataset_name() }}: {{ indicator.variable }}
+        <br>
+      {% endfor %}
+
+    </li>
+  {% endfor %}
+  </ul>
+
+
 </div>
 
 <div class="span3">
-<a href="/location/{{location.name}}/new_profile" class="btn"> Create Community Profile </a>
+  <a href="/location/{{location.name}}/new_profile" class="btn"> Create Community Profile </a>
 </div>
 
 </div>

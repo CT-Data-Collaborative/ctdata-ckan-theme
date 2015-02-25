@@ -70,9 +70,9 @@ class ProfileIndicator(Base):
     # user       = relationship(UserInfo, backref="user_indicators")
 
     profile_id = Column(String, ForeignKey('ctdata_profiles.id'))
-    # profile    = relationship(CtdataProfile, backref="profile_indicators")
+    # profile    = relationship('ctdata_profiles', backref="profile_indicators")
 
-    def __init__(self, name, filters, dataset_id, data_type, year, variable, ind_type, visualization_type, permission, description, group_ids):
+    def __init__(self, name, filters, dataset_id, data_type, year, variable, ind_type, visualization_type, profile_id, permission, description, group_ids):
         self.name       = name
         self.filters    = filters
         self.dataset_id = dataset_id
@@ -83,6 +83,7 @@ class ProfileIndicator(Base):
         self.ind_type   = ind_type
         # self.temp       = temp
         self.permission = permission
+        self.profile_id = profile_id
         self.group_ids  = group_ids
         self.visualization_type  = visualization_type
         self.description  = description

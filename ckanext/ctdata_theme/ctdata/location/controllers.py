@@ -132,12 +132,11 @@ class LocationsController(base.BaseController):
             global_default  = json_body.get('global_default')
 
             profile    = self.location_service.create_profile(user, name, indicators, locations, global_default, location)
-            embed()
-            # indicator =  self.location_service.new_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, description, group_ids)
+
             # value     =  self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, location_name)
 
-
-            return json.dumps({'success': True, 'indicator': ind_data })
+            # 'indicator': ind_data
+            return json.dumps({'success': True })
 
 
         return json.dumps({'success': False, 'error': str('Profile cannot be saved')})

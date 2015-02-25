@@ -47,24 +47,20 @@ class LocationService(object):
 
 
     def create_profile(self, user, name, indicators, locations, global_default, main_location):
-        # embed()
         profile = CtdataProfile(name, global_default, user.ckan_user_id)
         self.session.add(profile)
-        # self.session.commit()
 
         for location_name in locations:
             profile.locations.append(self.get_location(location_name))
 
         location_profile = LocationProfile(main_location.id, profile.id)
         self.session.add(location_profile)
-        # self.session.commit()
 
         for indicator in indicators:
-           indicator  = self.create_indicator(indicator['name'], indicator['filters'], indicator['dataset_id'], user, indicator['ind_type'], 'table')
+           indicator  = self.create_indicator(indicator['name'], indicator['filters'], indicator['dataset_id'], user, indicator['ind_type'], 'table', profile.id)
            profile.indicators.append(indicator)
 
-        embed()
-        # self.session.commit()
+        self.session.commit()
         return profile
 
 
@@ -90,10 +86,10 @@ class LocationService(object):
         curs.execute(query, (dataset.table_name,))
         value = curs.fetchall()
 
-        return str(value[0][0])
+        return str(value[0][0]) if value else None
 
 
-    def new_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, permission = 'public', description = '', group_ids = ''):
+    def new_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, profile_id = None, permission = 'public', description = '', group_ids = ''):
         dataset = DatasetService.get_dataset(dataset_id)
 
         try:
@@ -118,12 +114,12 @@ class LocationService(object):
                                              "or have '%Y-%m-%d %H:%M:%S' format")
 
         indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], data_type, int(years),
-                                     variable, ind_type, visualization_type, permission, description, group_ids)
+                                     variable, ind_type, visualization_type, profile_id, permission, description, group_ids)
 
         return indicator
 
-    def create_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, permission = 'public', description = '', group_ids = ''):
-        indicator = self.new_indicator(name, filters, dataset_id, owner, ind_type, visualization_type, permission, description, group_ids)
+    def create_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, profile_id = None, permission = 'public', description = '', group_ids = ''):
+        indicator = self.new_indicator(name, filters, dataset_id, owner, ind_type, visualization_type, profile_id, permission, description, group_ids)
 
         self.session.add(indicator)
         self.session.commit()
