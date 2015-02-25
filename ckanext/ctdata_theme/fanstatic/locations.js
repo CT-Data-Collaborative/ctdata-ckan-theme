@@ -79,7 +79,7 @@ var create_popup    = $("#create_profile_popup"),
         table = table + "</thead><tbody>"
 
         $(indicators_data).each(function(i){
-            indicators.push({ dataset_id: indicators_data['dataset_id'], name: "", ind_type: 'common',
+            indicators.push({ id: indicators_data['id'], dataset_id: indicators_data['dataset_id'], name: "", ind_type: 'common',
                           permission: 'public', filters: indicators_data['filters'], description: ''})
 
             ind = indicators_data[i]
@@ -121,7 +121,6 @@ var create_popup    = $("#create_profile_popup"),
         table = table +  "</tbody></table>"
 
         $(".table-div").html(table)
-        debugger
     }
 
 
@@ -166,16 +165,11 @@ $(function(){
 
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
-        debugger
-
         $("#locations_list").append('<li>' + data.location_name + '</li>')
-
       }
     });
 
   })
-
-
 
   /////////////////////
 
@@ -223,10 +217,10 @@ $(function(){
         $("#indicator_adding_error").animate({opacity: 0}, 300);
         locations = $('#profile_location').val()
 
-        indicators.push({ dataset_id: current_dataset, name: "", ind_type: 'common',
+        indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common',
                           permission: 'public', filters: get_filters(), description: ''})
 
-
+        // debugger
         $.ajax({type: "POST",
             url: "/location/" + location_name + "/load_indicator",
             data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
@@ -258,14 +252,19 @@ $(function(){
     });
 
     $('#save_profile_as_default').click(function() {
+        locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+        locations = locations.join(',');
+
         $.ajax({type: "POST",
             url: "/save_local_default/" + default_profile_id,
-            data: JSON.stringify({indicators: indicators}),
+            data: JSON.stringify({indicators: indicators, locations: locations}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                $('span.temp').addClass('hidden')
-                $('#message').html("<h3> Default indicators are successfully saved.</h3>")
-                $("#message_popup").modal('show');
+                load_profile_indicators();
+                // $('span.temp').addClass('hidden')
+                // $('#message').html("<h3> Default indicators are successfully saved.</h3>")
+                // $("#message_popup").modal('show');
+
             }
         });
     });

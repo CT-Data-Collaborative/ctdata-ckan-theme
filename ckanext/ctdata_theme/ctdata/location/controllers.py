@@ -197,34 +197,20 @@ class LocationsController(base.BaseController):
 
     def save_local_default(self, profile_id):
         http_response.headers['Content-type'] = 'application/json'
-
+        session_id = session.id
+        user_name  = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
+        user       = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
         json_body  = json.loads(http_request.body, encoding=http_request.charset)
         locations  = json_body.get('locations').split(',')
         indicators = json_body.get('indicators')
+        profile    = self.location_service.get_profile(profile_id)
 
         #save new indicators
+        for indicator in indicators:
+            if not indicator['id']:
+                indicator  = self.location_service.create_indicator(indicator['name'], indicator['filters'], indicator['dataset_id'], user, indicator['ind_type'], 'table', profile.id)
+                profile.indicators.append(indicator)
+
         #remove deleted indicators
-        return json.dumps({'success': True )})
+        return json.dumps({'success': True })
 
-    # def community_profile(self, community_name):
-    #     location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
-    #     profile_to_load = http_request.GET.get('p')
-
-    #     if profile_to_load:
-    #         community = self.community_profile_service.get_community_profile_by_id(profile_to_load)
-    #     else:
-    #         community = self.community_profile_service.get_community_profile(community_name)
-
-    #     self.session.commit()
-    #     anti_csrf_token = str(uuid.uuid4())
-    #     session['anti_csrf'] = anti_csrf_token
-    #     session.save()
-
-    #     default_url = '/community/' + location
-    #     return base.render('communities/community_profile.html', extra_vars={'location': location,
-    #                                                              'community': community,
-    #                                                              'displayed_towns': towns_names,
-    #                                                              'towns_raw': towns_raw,
-    #                                                              'towns': towns,
-    #                                                              'anti_csrf_token': anti_csrf_token,
-    #                                                              'default_url': default_url})
