@@ -13,7 +13,6 @@
 
 <section class="locationdata ">
 <form role="role" id="new_location" class="span9">
-  <h2> Create Comuunity Profile </h2>
   <div class="control-group">
 
     <label class="control-label"> Community Profile Name </label>
@@ -26,9 +25,12 @@
       <input type="text" name="profile_locations" id="profile_location" value="{{location.name}}">
     </div>
 
-    <label class="control-label"> Global Default </label>
+
     <div class="controls">
+
       <input type="checkbox" name="profile_global_default" id="profile_global_default">
+      <!-- <label class="control-label"> Global Default </label> -->
+      Global Default
     </div>
     </br>
     <label class="control-label"> Indicators </label>
@@ -45,7 +47,7 @@
       </table>
     </div>
 
-    <a href="javascript:void(0);" class="btn btn-default" id="save_location" > Save </a>
+    <a href="javascript:void(0);" class="btn btn-default" id="create_profile" > Save </a>
 
   </div>
 </form>

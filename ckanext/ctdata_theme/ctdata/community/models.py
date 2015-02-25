@@ -9,6 +9,7 @@ from IPython import embed
 import json
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
+# from ..location.models import CtdataProfile
 
 get_action = logic.get_action
 
@@ -64,6 +65,12 @@ class ProfileIndicator(Base):
     created_at = Column(DateTime)
     visualization_type = Column(String)
     description        = Column(Text)
+
+    # user_id    = Column(String, ForeignKey('ctdata_user_info.ckan_user_id'))
+    # user       = relationship(UserInfo, backref="user_indicators")
+
+    profile_id = Column(String, ForeignKey('ctdata_profiles.id'))
+    # profile    = relationship(CtdataProfile, backref="profile_indicators")
 
     def __init__(self, name, filters, dataset_id, data_type, year, variable, ind_type, visualization_type, permission, description, group_ids):
         self.name       = name
@@ -166,8 +173,9 @@ class UserInfo(Base):
     __tablename__ = 'ctdata_user_info'
 
     ckan_user_id = Column(String, primary_key=True)
-    is_admin = Column(Boolean)
+    is_admin     = Column(Boolean)
 
+    # profiles   = association_proxy("user_profiles", "profile")
     indicators = association_proxy("indicators_links", "indicator")
 
     def __init__(self, ckan_user_id, is_admin=False):

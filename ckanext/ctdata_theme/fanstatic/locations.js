@@ -4,6 +4,7 @@ var create_popup    = $("#create_profile_popup"),
         towns           = $("input#displayed_towns").val(),
         current_towns   = [],
         location_name   = $("#location").text(),
+        indicators      = [],
         current_dataset ;
 
     function load_topics(){
@@ -210,6 +211,11 @@ $(function(){
     $('#save_indicator').live('click', function() {
         $("#indicator_adding_error").animate({opacity: 0}, 300);
         locations = $('#profile_location').val()
+
+        indicators.push({ dataset_id: current_dataset, name: "", ind_type: 'common',
+                          permission: 'public', filters: get_filters(), description: ''})
+
+
         $.ajax({type: "POST",
             url: "/location/" + location_name + "/load_indicator",
             data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
@@ -227,36 +233,6 @@ $(function(){
             }
         });
     });
-
-
-    // $('#save_indicator').live('click', function() {
-    //     debugger
-    //     $("#indicator_adding_error").animate({opacity: 0}, 300);
-    //     $('tbody', $('#profile_indicators')).append("<tr>\
-    //         <td class='dataset_id hidden'>" + current_dataset + "</td>\
-    //         <td class='dataset_name'>" + current_dataset_name + "</td>\
-    //         <td class='filters'>" + get_filters() + "</td>\
-    //         <td class='name hidden'></td>\
-    //         <td class='description hidden'></td>\
-    //         <td class='permission hidden'>public</td>\
-    //       </tr>")
-    //     // $.ajax({type: "POST",
-    //     //     url: "/community/add_indicator",
-    //     //     data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
-    //     //                            permission: 'public', filters: get_filters(), description: ''}),
-    //     //     contentType: 'application/json; charset=utf-8',
-    //     //     success: function (data) {
-    //     //         if (data.success == true){
-    //     //             load_indicators_data()
-    //     //             $('div.modal').modal('hide');
-    //     //         }
-    //     //         else {
-    //     //             $("#error").html(data.error);
-    //     //             $("#error").animate({opacity: 1}, 300);
-    //     //         }
-    //     //     }
-    //     // });
-    // });
 
 
     $('#add_indicator').click(function() {
@@ -285,22 +261,24 @@ $(function(){
     });
 
     $('#create_profile').click(function() {
-        ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
-        name = $('input#profile_name').val()
+        name           = $('input#profile_name').val()
+        locations      = $('#profile_location').val()
+        global_default = $('#profile_global_default').is(":checked")
+
         if (name != ''){
             $.ajax({type: "POST",
-                url: "/community/add_profile",
-                data: JSON.stringify({indicator_ids: ids, location: $('#location').text(), name: name}),
+                url: "/location/" + location_name + "/create-profile",
+                data: JSON.stringify({indicators: indicators, locations: locations, name: name, global_default: global_default}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     data = JSON.parse(data)
-                    if (data.success == true){
-                        $('div.modal').modal('hide');
-                        $('span.temp').addClass('hidden')
-                        $('#message').html("<h3>New profile has been successfully saved.</h3>\
-                                          <br>  <a href='"+ data.redirect_link +"'> Click here </a> to check it.")
-                        $("#message_popup").modal('show');
-                    }
+                    // if (data.success == true){
+                    //     $('div.modal').modal('hide');
+                    //     $('span.temp').addClass('hidden')
+                    //     $('#message').html("<h3>New profile has been successfully saved.</h3>\
+                    //                       <br>  <a href='"+ data.redirect_link +"'> Click here </a> to check it.")
+                    //     $("#message_popup").modal('show');
+                    // }
                 }
             });
         }

@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 import ckan.plugins.toolkit as toolkit
 
-from models import Location, CtdataProfile
+from models import Location, CtdataProfile, LocationProfile
 from ..community.models import CommunityProfile, ProfileIndicator, ProfileIndicatorValue, Town, UserIndicatorLink
 from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
@@ -42,6 +42,32 @@ class LocationService(object):
 
         self.session.add(location)
         self.session.commit()
+
+    ################ Profiles   ############################################
+
+
+    def create_profile(self, user, name, indicators, locations, global_default, main_location):
+        # embed()
+        profile = CtdataProfile(name, global_default, user.ckan_user_id)
+        self.session.add(profile)
+        # self.session.commit()
+
+        for location_name in locations:
+            profile.locations.append(self.get_location(location_name))
+
+        location_profile = LocationProfile(main_location.id, profile.id)
+        self.session.add(location_profile)
+        # self.session.commit()
+
+        for indicator in indicators:
+           indicator  = self.create_indicator(indicator['name'], indicator['filters'], indicator['dataset_id'], user, indicator['ind_type'], 'table')
+           profile.indicators.append(indicator)
+
+        embed()
+        # self.session.commit()
+        return profile
+
+
 
     ################ Indicators ############################################
 
@@ -94,5 +120,16 @@ class LocationService(object):
         indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], data_type, int(years),
                                      variable, ind_type, visualization_type, permission, description, group_ids)
 
+        return indicator
+
+    def create_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, permission = 'public', description = '', group_ids = ''):
+        indicator = self.new_indicator(name, filters, dataset_id, owner, ind_type, visualization_type, permission, description, group_ids)
+
+        self.session.add(indicator)
+        self.session.commit()
 
         return indicator
+
+
+
+

@@ -6,15 +6,18 @@
 
 <div class="wrapper">
 
-<h2> {{ location.name }} </h2>
+<div class="span12">
 
+<h2> {{ location.name }} </h2>
 
 {% for profile in profiles %}
   {{ profile.name }}
 {% endfor %}
+</div>
 
+<div class="span3">
 <a href="/location/{{location.name}}/new_profile" class="btn"> Create Community Profile </a>
-
+</div>
 
 </div>
 

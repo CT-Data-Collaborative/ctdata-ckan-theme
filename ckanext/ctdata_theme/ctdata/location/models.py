@@ -1,19 +1,10 @@
-# from sqlalchemy.ext.declarative import declarative_base
-# from sqlalchemy.ext.associationproxy import association_proxy
-# from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Boolean, Table, DateTime
-# from sqlalchemy.orm import relationship, backref
-# import datetime
-
-# import ckan.model as model
-# from IPython import embed
-
-# Base = declarative_base()
-
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Boolean, Table, DateTime
 from sqlalchemy.orm import relationship, backref
 import datetime
+
+from ..community.models import UserInfo, ProfileIndicator
 
 import ckan.model as model
 from IPython import embed
@@ -23,7 +14,8 @@ import ckan.plugins.toolkit as toolkit
 
 get_action = logic.get_action
 
-Base = declarative_base()
+# Base = declarative_base()
+from ..community.models import Base
 
 
 class Location(Base):
@@ -52,18 +44,20 @@ class CtdataProfile(Base):
 
     user_id        = Column(String, ForeignKey('ctdata_user_info.ckan_user_id'))
 
+    user           = relationship(UserInfo, backref="user_profiles")
     locations      = relationship(Location, secondary='ctdata_locations_profiles',
                       backref=backref('profiles', lazy='dynamic'))
 
-    # indicators     = relationship('ctdata_profile_indicators',
-    #                   backref=backref('profile', lazy='joined'), lazy='dynamic')
+    indicators     = relationship(ProfileIndicator, #'ctdata_profile_indicators',
+                      # backref=backref('profile', lazy='joined'), lazy='dynamic')
 
-    def __init__(self, name, user_id):
+    def __init__(self, name, global_default, user_id):
         self.name = name
         self.user_id = user_id
+        self.global_default = global_default
 
     def __repr__(self):
-        return "Profile %s %s" % (self.name, self.user_id)
+        return "Profile %s %s %s" % (self.name, self.user_id, self.global_default)
 
 
 

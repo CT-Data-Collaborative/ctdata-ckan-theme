@@ -102,7 +102,7 @@ class LocationsController(base.BaseController):
                     'link_to': indicator.link_to_visualization(),
                     'dataset': indicator.dataset_name(),
                    'variable': indicator.variable,
-                   'values'  : float(value)
+                   'values'  : value
                 }
 
                 return json.dumps({'success': True, 'indicator': ind_data })
@@ -114,6 +114,33 @@ class LocationsController(base.BaseController):
         return json.dumps({'success': False, 'error': str('Indicator cannot be saved')})
 
         return base.render('location/new_profile.html', extra_vars={'location': location})
+
+
+    def create_location_profile(self, location_name):
+        location   = self.location_service.get_location(location_name)
+        session_id = session.id
+        user_name  = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
+
+        if http_request.method == 'POST':
+            http_response.headers['Content-type'] = 'application/json'
+
+            user       = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
+            json_body  = json.loads(http_request.body, encoding=http_request.charset)
+            locations  = json_body.get('locations').split(',')
+            indicators = json_body.get('indicators')
+            name       = json_body.get('name')
+            global_default  = json_body.get('global_default')
+
+            profile    = self.location_service.create_profile(user, name, indicators, locations, global_default, location)
+            embed()
+            # indicator =  self.location_service.new_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, description, group_ids)
+            # value     =  self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, location_name)
+
+
+            return json.dumps({'success': True, 'indicator': ind_data })
+
+
+        return json.dumps({'success': False, 'error': str('Profile cannot be saved')})
 
 
     # def community_profile(self, community_name):

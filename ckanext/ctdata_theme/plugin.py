@@ -117,6 +117,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('create_location',  '/create_location',  action='create_location')
             m.connect('new_profile_location', '/location/{location_name}/new_profile', action='new_profile')
             m.connect('load_indicator_location', '/location/{location_name}/load_indicator', action='load_indicator')
+            m.connect('create_location_profile', '/location/{location_name}/create-profile', action='create_location_profile')
 
         return route_map
 
