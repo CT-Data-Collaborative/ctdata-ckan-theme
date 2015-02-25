@@ -117,7 +117,7 @@ var cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number" || cur_mt == 
 
 if (!cur_mt_is_percent){
   if (max < 80 )
-    step = Math.floor(range/numClasses)
+    step = Math.floor(range/7)
   else {
     step = Math.ceil(range/numClasses)
 
