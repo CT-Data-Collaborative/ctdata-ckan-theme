@@ -115,10 +115,16 @@ var cur_mt_is_number  = (cur_mt == "number"  || cur_mt == "Number" || cur_mt == 
     colors            = ['rgb(239,239,255)', 'rgb(171,187,216)', 'rgb(137,161,196)', 'rgb(102,134,176)',
                          'rgb(68,108,156)', 'rgb(34,82,137)', 'rgb(0,56,117)', 'rgb(1, 35, 73)'];
 
-if (!cur_mt_is_percent)
-  step = Math.ceil(range/numClasses)
-  if (step > 10 )
-    step = ( Math.round( step/10) )*10
+if (!cur_mt_is_percent){
+  if (max < 80 )
+    step = Math.floor(range/numClasses)
+  else {
+    step = Math.ceil(range/numClasses)
+
+    if (step > 10)
+      step = ( Math.round( step/10) )*10
+  }
+}
 else
   step = Math.ceil(range/numClasses)
 
