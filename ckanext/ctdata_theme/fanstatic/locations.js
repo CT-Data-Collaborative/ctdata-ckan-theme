@@ -233,25 +233,38 @@ $(function(){
         $("#indicator_adding_error").animate({opacity: 0}, 300);
         locations = locations
 
-        new_indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common',
-                          permission: 'public', filters: get_filters(), description: ''})
-
-        $.ajax({type: "POST",
-            url: "/location/" + location_name + "/load_indicator",
-            data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
-                                   permission: 'public', filters: get_filters(), description: '', locations: locations}),
-            contentType: 'application/json; charset=utf-8',
-            success: function (data) {
-                if (data.success == true){
-                    draw_raw(data.indicator);
-                    $('div.modal').modal('hide');
-                }
-                else {
-                    $("#error").html(data.error);
-                    $("#error").animate({opacity: 1}, 300);
-                }
-            }
+        inds = indicators.concat(new_indicators)
+        all_filters = []
+        $(inds).each(function(i) {
+            all_filters.push(inds[i]['filters'].split(', ').join(',').split(': ').join(':'))
         });
+
+        if ( all_filters.indexOf( JSON.stringify(get_filters()) ) == -1){
+            new_indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common',
+                              permission: 'public', filters: JSON.stringify(get_filters()), description: ''})
+
+            $.ajax({type: "POST",
+                url: "/location/" + location_name + "/load_indicator",
+                data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
+                                       permission: 'public', filters: get_filters(), description: '', locations: locations}),
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    if (data.success == true){
+                        draw_raw(data.indicator);
+                        $('div.modal').modal('hide');
+                    }
+                    else {
+                        $("#error").html(data.error);
+                        $("#error").animate({opacity: 1}, 300);
+                    }
+                }
+            });
+        }
+        else{
+            $('div.modal').modal('hide');
+            $('#message').html("Such indicator is already exists.")
+            $("#message_popup").modal('show');
+        }
     });
 
 
@@ -278,7 +291,6 @@ $(function(){
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 load_profile_indicators();
-                $('span.temp').addClass('hidden')
                 $('#message').html("<h3> Default indicators are successfully saved.</h3>")
                 $("#message_popup").modal('show');
             }
