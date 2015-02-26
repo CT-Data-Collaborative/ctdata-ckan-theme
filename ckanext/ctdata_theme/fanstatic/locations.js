@@ -84,39 +84,7 @@ var create_popup    = $("#create_profile_popup"),
             indicators.push({ id: indicators_data[i]['id'], dataset_id: indicators_data[i]['dataset_id'], name: "", ind_type: 'common',
                           permission: 'public', filters: indicators_data[i]['filters'], description: ''})
 
-            ind = indicators_data[i]
-            id  = ind.id[0]
-            ind.filters = JSON.parse(ind.filters)
-
-            tr  = "<tr class='table_data'>\
-                    <td class='column_1 for_csv'>\
-                        <span class='indicator_id hidden'>" + id + " </span>"
-
-            tr  = tr + "<a href=" + ind.link_to + ">" + ind.dataset + ", " + ind.variable + " </a><span>"
-            $(ind.filters).each(function(i){
-                filter = ind.filters[i]
-                tr = tr + filter.field + ': ' + filter.values[0]+ ' '
-            });
-            tr = tr + "</span>  <span class='for_csv hidden'>" + ind.dataset + ', ' + ind.variable + ', '
-            $(ind.filters).each(function(i){
-                filter = ind.filters[i]
-                tr = tr + filter.field + ': ' + filter.values[0] + ' ' + ','
-            });
-            tr = tr + "</span>"
-            tr = tr + "</td>\
-                    <td class='for_csv'><span class='for_csv'>" + ind.data_type + "</span></td>\
-                    <td class='for_csv'><span class='for_csv'>" + ind.year  + "</span></td>"
-
-            $(ind.values).each(function(i){
-                value = ind.values[i] || '-'
-                tr = tr + "<td class='for_csv'><span class='for_csv'>" + value + "</span></td>"
-            });
-            tr = tr + "<td class='no-border'>\
-                            <a href='javascript:void(0)' id=" + id + " class='remove_indicator'>\
-                                <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/close_pic.png'>\
-                            </a>\
-                        </td>\
-                    </tr>"
+            build_tr_from_data(indicators_data[i])
 
             table = table + tr
         });
@@ -144,7 +112,7 @@ var create_popup    = $("#create_profile_popup"),
         });
     }
 
-    function draw_raw(indicators_data){
+    function build_tr_from_data(indicators_data){
         ind = indicators_data
         id  = ind.id
         ind.filters = JSON.parse(ind.filters)
@@ -178,12 +146,31 @@ var create_popup    = $("#create_profile_popup"),
                         </a>\
                     </td>\
                 </tr>"
+    }
+
+    function draw_raw(indicators_data){
+        build_tr_from_data(indicators_data);
         $('tbody').append(tr)
+    }
+
+    function reload_data_for_new_indicators(){
+        $(new_indicators).each(function(i){
+            ind = new_indicators[i]
+            $.ajax({type: "POST",
+                url: "/location/" + location_name + "/load_indicator",
+                data: JSON.stringify({ dataset_id: ind['dataset_id'], name: "", ind_type: 'common',
+                                       permission: 'public', filters: JSON.stringify(ind['filters']), description: '', locations: locations}),
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    draw_raw(data.indicator);
+                }
+            });
+
+        });
     }
 
 
 $(function(){
-
   var form      = $('form#new_location')
 
   $('#save_location').on('click', function(){
@@ -276,6 +263,7 @@ $(function(){
         locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         locations = locations.join(',');
         load_profile_indicators();
+        reload_data_for_new_indicators();
         $('div.modal').modal('hide');
     });
 
@@ -329,11 +317,10 @@ $(function(){
     load_profile_indicators();
     load_topics();
 
-    $("#profile_name").keyup(function(event){
-        if(event.keyCode == 13){
-            $("#create_profile").click();
+    $("#profile_name").keypress(function(e){
+        if (e.which === 13){
+            return false;
         }
     });
-
 
 });

@@ -106,7 +106,7 @@ class LocationsController(base.BaseController):
 
             try:
                 indicator =  self.location_service.new_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, description, group_ids)
-                values     =  self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations)
+                values    =  self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations)
 
                 ind_data = {
                          'id': indicator.id,
