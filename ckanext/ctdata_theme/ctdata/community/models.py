@@ -65,7 +65,7 @@ class ProfileIndicator(Base):
     visualization_type = Column(String)
     description        = Column(Text)
 
-    profile_id = Column(String, ForeignKey('ctdata_profiles.id'))
+    profile_id = Column(BigInteger, ForeignKey('ctdata_profiles.id'))
 
     def __init__(self, name, filters, dataset_id, data_type, year, variable, ind_type, visualization_type, profile_id, permission, description, group_ids):
         self.name       = name
