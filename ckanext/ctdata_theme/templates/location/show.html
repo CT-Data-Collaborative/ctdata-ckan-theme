@@ -16,7 +16,7 @@
       <ul class="opt_btn">
         <li class="btn_blue"><a href="javascript:void(0)" id="add_towns">Edit Towns</a></li>
         <li class="btn_blue"><a href="javascript:void(0)" id="add_indicator">Add Indicator</a></li>
-        <li class="btn_blue"><a href="/location/{{location.name}}/new_profile" class=""> Create Community Profile </a></li>
+        <!-- <li class="btn_blue"><a href="/location/{{location.name}}/new_profile" class=""> Create Community Profile </a></li> -->
       </ul>
     </section>
 
@@ -28,8 +28,10 @@
   </div>
 </div>
 
+<div class="spinner small"> <img src="/common/images/loading.gif"/> </div>
 <section class="locationdata ">
   <ul class="opt_btn">
+    <li><a href="javascript:void(0)" id="create_profile_button"  class='blue_button'>Save to new profile</a></li>
     {% if c.userobj.sysadmin %}
       <li><a href="javascript:void(0)" id="save_profile_as_default" class='blue_button'>Save as local defualt</a></li>
     {% endif %}
@@ -40,6 +42,22 @@
 <div id="loaded_topics"></div>
 {% snippet 'communities/snippets/towns_popup.html', towns=towns, community=location, displayed_towns=towns_names.split(',') %}
 
+<div id="message_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content.text-center">
+            <div class="modal-body disable-scroll" id="message">
+
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button class="btn close_popup">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% snippet 'location/snippets/create_profile_popup.html' %}
 
 {% block scripts %}
   {{ super() }}

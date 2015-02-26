@@ -107,12 +107,13 @@ class LocationService(object):
     def new_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, profile_id = None, permission = 'public', description = '', group_ids = ''):
         dataset = DatasetService.get_dataset(dataset_id)
 
+        if type(filters) is not list:
+            filters = json.loads(filters)
         try:
             data_type = dict_with_key_value("field", "Measure Type", filters)['values'][0]
             years     = dict_with_key_value("field", "Year", filters)['values'][0]
         except (TypeError, AttributeError, IndexError):
             raise toolkit.ObjectNotFound("There must be values for the 'Measure Type' and 'Year' filters")
-
 
         variable_fltr = dict_with_key_value("field", "Variable", filters)
         variable = ''
@@ -127,6 +128,7 @@ class LocationService(object):
             except ValueError:
                 raise toolkit.ObjectNotFound("'Year' filter value must be an integer "
                                              "or have '%Y-%m-%d %H:%M:%S' format")
+
 
         indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], data_type, int(years),
                                      variable, ind_type, visualization_type, profile_id, permission, description, group_ids)

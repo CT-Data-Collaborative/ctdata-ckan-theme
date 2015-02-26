@@ -75,10 +75,11 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('community_update_profile_indicators', '/community/update_profile_indicators', action='update_profile_indicators')
             m.connect('community_remove_temp_indicators', '/community/remove_temp_indicators', action='remove_temp_indicators')
             m.connect('community_save_as_default', '/community/save_as_default', action='save_as_default')
+            m.connect('community_save_as_default', '/community/save_as_default', action='save_as_default')
             m.connect('community_remove_indicator',
                       '/community/remove_indicator/{indicator_id}',
                       action='remove_indicator')
-            m.connect('community_profiles', '/community/{community_name}', action='community_profile')
+            # m.connect('community_profiles', '/community/{community_name}', action='community_profile')
             m.connect('get_indicators_data', '/indicators_data/{community_name}', action='get_indicators_data')
 
         with routes.mapper.SubMapper(
@@ -120,6 +121,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('create_location_profile', '/location/{location_name}/create-profile', action='create_location_profile')
             m.connect('load_profile_indicators', '/load_profile_indicators/{profile_id}', action='load_profile_indicators')
             m.connect('save_local_default', '/save_local_default/{profile_id}', action='save_local_default')
+            m.connect('community_profiles', '/community/{profile_id}', action='community_profile')
 
         return route_map
 

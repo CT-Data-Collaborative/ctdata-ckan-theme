@@ -41,8 +41,6 @@ class LocationsController(base.BaseController):
         if default_profile.locations:
             towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
         else:
-            # embed()
-            # default_profile.locations.append(location)
             location_profile = LocationProfile(location.id, default_profile.id)
             self.session.add(location_profile)
 
@@ -128,13 +126,12 @@ class LocationsController(base.BaseController):
 
 
     def create_location_profile(self, location_name):
+        http_response.headers['Content-type'] = 'application/json'
         location   = self.location_service.get_location(location_name)
         session_id = session.id
         user_name  = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
 
         if http_request.method == 'POST':
-            http_response.headers['Content-type'] = 'application/json'
-
             user       = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
             json_body  = json.loads(http_request.body, encoding=http_request.charset)
             locations  = json_body.get('locations').split(',')
@@ -144,9 +141,17 @@ class LocationsController(base.BaseController):
 
             profile    = self.location_service.create_profile(user, name, indicators, locations, global_default, location)
 
-            return json.dumps({'success': True,  })
+            redirect_link = '/community/' + str(profile.id)
+            return json.dumps({'success': True,  'redirect_link': redirect_link})
 
         return json.dumps({'success': False, 'error': str('Profile cannot be saved')})
+
+    def community_profile(self, profile_id):
+        default_profile = self.location_service.get_profile(profile_id)
+        towns           = self.location_service.get_all_locations()
+        towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
+
+        return base.render('location/show.html', extra_vars={'location': default_profile.locations[0], 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id})
 
     def load_profile_indicators(self, profile_id):
         http_response.headers['Content-type'] = 'application/json'
