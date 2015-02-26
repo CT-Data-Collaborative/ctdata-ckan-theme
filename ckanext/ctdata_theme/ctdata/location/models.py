@@ -14,7 +14,6 @@ import ckan.plugins.toolkit as toolkit
 
 get_action = logic.get_action
 
-# Base = declarative_base()
 from ..community.models import Base
 
 

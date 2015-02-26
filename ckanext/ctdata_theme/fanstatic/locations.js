@@ -4,6 +4,7 @@ var create_popup    = $("#create_profile_popup"),
     towns           = $("input#displayed_towns").val(),
     current_towns   = [],
     location_name   = $("#location").text(),
+    new_indicators  = [],
     indicators      = [],
     locations       = location_names,
     default_profile_id = $('#default_profile_id').text(),
@@ -78,6 +79,7 @@ var create_popup    = $("#create_profile_popup"),
         $(towns).each(function(i){ table = table + '<th>' +towns[i] + '</th>' });
         table = table + "</thead><tbody>"
 
+        indicators = []
         $(indicators_data).each(function(i){
             indicators.push({ id: indicators_data[i]['id'], dataset_id: indicators_data[i]['dataset_id'], name: "", ind_type: 'common',
                           permission: 'public', filters: indicators_data[i]['filters'], description: ''})
@@ -98,7 +100,7 @@ var create_popup    = $("#create_profile_popup"),
             tr = tr + "</span>  <span class='for_csv hidden'>" + ind.dataset + ', ' + ind.variable + ', '
             $(ind.filters).each(function(i){
                 filter = ind.filters[i]
-                tr = tr + filter.field + ': ' + filter.value + ' ' + ','
+                tr = tr + filter.field + ': ' + filter.values[0] + ' ' + ','
             });
             tr = tr + "</span>"
             tr = tr + "</td>\
@@ -142,19 +144,7 @@ var create_popup    = $("#create_profile_popup"),
         });
     }
 
-    function load_indicator_data(data){
-      draw_raw(data.indicator);
-    }
-
     function draw_raw(indicators_data){
-        // tr = "<tr><td><a href='" + indicators_data.link_to + "'>" + indicators_data.dataset + "</a> " + indicators_data.variable + "</td><td>" + indicators_data.data_type + "</td><td>" + indicators_data.year+ "</td>"
-        // $(indicators_data.values).each(function(i){
-        //     if (indicators_data.values[i])
-        //         tr = tr + "<td>" + indicators_data.values[i] + "</td>"
-        //     else
-        //         tr = tr + "<td> - </td>"
-        // });
-
         ind = indicators_data
         id  = ind.id
         ind.filters = JSON.parse(ind.filters)
@@ -171,7 +161,7 @@ var create_popup    = $("#create_profile_popup"),
         tr = tr + "</span>  <span class='for_csv hidden'>" + ind.dataset + ', ' + ind.variable + ', '
         $(ind.filters).each(function(i){
             filter = ind.filters[i]
-            tr = tr + filter.field + ': ' + filter.value + ' ' + ','
+            tr = tr + filter.field + ': ' + filter.values[0] + ' ' + ','
         });
         tr = tr + "</span>"
         tr = tr + "</td>\
@@ -256,7 +246,7 @@ $(function(){
         $("#indicator_adding_error").animate({opacity: 0}, 300);
         locations = locations
 
-        indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common',
+        new_indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common',
                           permission: 'public', filters: get_filters(), description: ''})
 
         $.ajax({type: "POST",
@@ -266,7 +256,7 @@ $(function(){
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 if (data.success == true){
-                    load_indicator_data(data)
+                    draw_raw(data.indicator);
                     $('div.modal').modal('hide');
                 }
                 else {
@@ -292,10 +282,11 @@ $(function(){
     $('#save_profile_as_default').click(function() {
         locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         locations = locations.join(',');
+        inds =  indicators.concat(new_indicators)
 
         $.ajax({type: "POST",
             url: "/save_local_default/" + default_profile_id,
-            data: JSON.stringify({indicators: indicators, locations: locations}),
+            data: JSON.stringify({indicators: inds, locations: locations}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 load_profile_indicators();
@@ -311,11 +302,12 @@ $(function(){
         locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         locations = locations.join(',');
         global_default = false ;
+        inds =  indicators.concat(new_indicators);
 
         if (name != ''){
             $.ajax({type: "POST",
                 url: "/location/" + location_name + "/create-profile",
-                data: JSON.stringify({indicators: indicators, locations: locations, name: name, global_default: global_default}),
+                data: JSON.stringify({indicators: inds, locations: locations, name: name, global_default: global_default}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     if (data.success == true){
