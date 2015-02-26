@@ -8,7 +8,7 @@ from pylons import session, url
 import ckan.lib.base as base
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
-from ckan.common import response as http_response, request as http_request
+from ckan.common import response as http_response, c, request as http_request
 import ckan.lib.helpers as h
 from models import Location, CtdataProfile, LocationProfile
 
@@ -237,3 +237,14 @@ class LocationsController(base.BaseController):
         #remove deleted indicators
         return json.dumps({'success': True })
     #end
+
+    def remove_location_profile(self, profile_id):
+        http_response.headers['Content-type'] = 'application/json'
+        if http_request.method == 'POST':
+            self.location_service.remove_profile(profile_id, c.userobj.id)
+
+        return json.dumps({'success': True })
+
+
+
+

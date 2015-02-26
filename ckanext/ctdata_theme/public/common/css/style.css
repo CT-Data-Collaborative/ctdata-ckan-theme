@@ -531,12 +531,11 @@ margin: 0;
   font-size: 18px;
 }
 
-
-
-
 .blue-line{
   height: 10px;
   background-color: #00adef;
 }
 
-
+a.underlined{
+  text-decoration: underline;
+}

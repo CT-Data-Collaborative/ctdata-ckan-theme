@@ -85,7 +85,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         with routes.mapper.SubMapper(
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
-            m.connect('user_community_profiles', '/user/{user_id}/my_community_profiles', action='community_profiles')
+            m.connect('user_community_profiles', '/user/{user_id}/community_profiles', action='community_profiles')
             m.connect('my_gallery', '/user/{user_id}/my_gallery', action='my_gallery')
             m.connect('user_gallery', '/user/{user_id}/gallery', action='user_gallery')
             m.connect('remove_gallery_indicators', '/user/remove_gallery_indicators', action='remove_gallery_indicators')
@@ -122,6 +122,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('load_profile_indicators', '/load_profile_indicators/{profile_id}', action='load_profile_indicators')
             m.connect('save_local_default', '/save_local_default/{profile_id}', action='save_local_default')
             m.connect('community_profiles', '/community/{profile_id}', action='community_profile')
+            m.connect('remove_location_profile', '/remove_location_profile/{profile_id}', action='remove_location_profile')
 
         return route_map
 

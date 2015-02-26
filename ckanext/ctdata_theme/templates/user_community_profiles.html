@@ -19,28 +19,60 @@
 
 <div class="ctdata-wrapper">
 </br></br></br>
-<a href="javascript:void(0)" id="update_user_communities" class="btn pull-right disabled"> Save your Edits </a>
-<span class="help pull-right "> * Click Profile Name to Edit </span>
+<!-- <a href="javascript:void(0)" id="update_user_communities" class="btn pull-right disabled"> Save your Edits </a> -->
+<!-- <span class="help pull-right "> * Click Profile Name to Edit </span> -->
 
-<table role="table" class="table">
+<!-- table role="table" class="table">
   <thead>
-  <th> Default Url</th>
   <th> Name </th>
+  <th> Indicators Count </th>
   <th></th>
   </thead>
   <tbody>
     {% for profile in community_profiles%}
       <tr>
-        <td><a href="{{profile.default_url}}">{{profile.default_url}}</a></td>
+        <td><a href="/community/{{profile.id}}">{{profile.name}}</a></td>
         <td>
           <input type="text" class="edit_profile_name hidden" id="{{profile.id}}" value="{{profile.name}}"></input>
-          <a href="javascript:void(0)" class="edit_name"> {{profile.name}} </a>
+          <a href="javascript:void(0)" class="edit_name"> {{profile.indicators | count}} </a>
         </td>
         <td><a href="javascript:void(0)" class="remove_profile" id="{{profile.id}}"><i class='fa fa-times text-error'></i></a></td>
       </tr>
     {% endfor %}
   </tbody>
-</table>
+</table> -->
+<br>
+<div class="span13">
+{% if profiles %}
+
+    <ul>
+        {% for profile in profiles %}
+          <li>
+            <h2><a href="/community/{{profile.id}}" class="underlined">{{profile.name}}</a>
+            {% if profile.user_id == c.userobj.id %}
+              <a href="javascript:void(0)" class="remove_profile pull-right btn btn-default btn-mini" id="{{profile.id}}">x</i></a>
+            {% endif %}
+            </h2>
+            <br>
+            {% for indicator in profile.indicators %}
+              <span class="span5">
+              <a href="{{indicator.link_to_visualization()}}" class="underlined"> {{ indicator.dataset_name() }} </a>
+              </span>
+            {% endfor %}
+
+          <br class="clear">
+          <hr>
+          </li>
+        {% endfor %}
+      </ul>
+
+    <br/>
+    <br/>
+{% else %}
+    There're no indicators for this gallery yet.
+{% endif %}
+
+</div>
 
 </div>
 </div>
