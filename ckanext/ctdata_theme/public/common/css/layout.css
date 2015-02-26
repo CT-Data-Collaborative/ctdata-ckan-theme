@@ -466,6 +466,6 @@ a.disabled {
   cursor: default;
 }
 
-a.remove_indicator:hover img{
+td:hover a.hide_indicator img{
 	opacity: 1.0 !important;
 }

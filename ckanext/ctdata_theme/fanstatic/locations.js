@@ -122,6 +122,7 @@ var create_popup    = $("#create_profile_popup"),
                         <span class='indicator_id hidden'>" + id + " </span>"
 
         tr  = tr + "<a href=" + ind.link_to + ">" + ind.dataset + ", " + ind.variable + " </a><span>"
+        tr  = tr + "<span class='hidden' id='filters_json'>" + JSON.stringify(ind.filters) + "</span>"
         $(ind.filters).each(function(i){
             filter = ind.filters[i]
             tr = tr + filter.field + ': ' + filter.values[0]+ ' '
@@ -135,13 +136,13 @@ var create_popup    = $("#create_profile_popup"),
         tr = tr + "</td>\
                 <td class='for_csv'><span class='for_csv'>" + ind.data_type + "</span></td>\
                 <td class='for_csv'><span class='for_csv'>" + ind.year  + "</span></td>"
-        // debugger
+
         $(ind.values).each(function(i){
             value = ind.values[i] || '-'
             tr = tr + "<td class='for_csv'><span class='for_csv'>" + value + "</span></td>"
         });
         tr = tr + "<td class='no-border'>\
-                        <a href='javascript:void(0)' id=" + id + " class='remove_indicator'>\
+                        <a href='javascript:void(0)' id=" + id + " class='hide_indicator' style='height: inherit;'>\
                             <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/close_pic.png'>\
                         </a>\
                     </td>\
@@ -202,16 +203,54 @@ $(function(){
         $("#towns_popup").modal('show');
     })
 
-    $('.remove_indicator').live('click', function(){
-        ids_to_remove.push( $(this).attr('id'));
+    // $('.remove_indicator').live('click', function(){
+    //     ids_to_remove.push( $(this).attr('id'));
 
-        $(this).closest('tr').hide();
-        $.ajax({type: "POST",
-          url: "/community/update_profile_indicators",
-          data: JSON.stringify({ indicators_to_remove: ids_to_remove}),
-          contentType: 'application/json; charset=utf-8',
-          success: function (data) {}
-        });
+    //     $(this).closest('tr').hide();
+    //     $.ajax({type: "POST",
+    //       url: "/community/update_profile_indicators",
+    //       data: JSON.stringify({ indicators_to_remove: ids_to_remove}),
+    //       contentType: 'application/json; charset=utf-8',
+    //       success: function (data) {}
+    //     });
+    // });
+
+    $('.hide_indicator').live('click', function(){
+        id = $(this).attr('id')
+        // filters_string = $(this).closest('tr').find("#filters_json").text().split(', ').join(',').split(': ').join(':')
+
+        // $(this).closest('tr').hide();
+
+        // found = false
+        // $(indicators).each(function(i) {
+        //     if (found)
+        //         return false
+        //     if (!found && id == indicators[i].id ){
+        //         // delete indicators[i]
+        //         indicators.splice(i, 1)
+        //     }
+        // });
+
+        // if (!found){
+        //     all_filters = []
+        //     $(new_indicators).each(function(i) {
+        //         all_filters.push($(new_indicators)[i].filters.split(', ').join(',').split(': ').join(':'))
+        //     });
+
+        //     $(all_filters).each(function(i) {
+        //         if (found)
+        //             return false
+        //         if (!found && filters_string == $(all_filters)[i]){
+        //             found = true
+        //             // $(new_indicators).splice(i, 1)
+        //              // delete new_indicators[i]
+        //              new_indicators.splice(i, 1)
+        //         }
+        //     });
+        // }
+
+        // debugger
+
     });
 
 
