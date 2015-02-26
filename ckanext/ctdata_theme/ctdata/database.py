@@ -66,23 +66,6 @@ class Database(object):
     def init_community_data(self, table_name):
         session = self.session_factory()
 
-        # if session.query(CommunityProfile).count() == 0:
-        #     conn = self.connect()
-        #     curr = conn.cursor()
-
-        #     curr.execute('''SELECT DISTINCT "Town","FIPS" FROM "public"."%s"''' % table_name)
-
-        #     towns = curr.fetchall()
-
-        #     for town in towns:
-        #         comm_prof = CommunityProfile(town[0], None)
-        #         new_town = Town(town[1], town[0])
-        #         session.add_all([comm_prof, new_town])
-
-        #     curs.close()
-        #     del curs
-        #     conn.close()
-
         if session.query(CtdataProfile).filter(CtdataProfile.global_default == True).count() == 0:
             conn = self.connect()
             curr = conn.cursor()
@@ -92,11 +75,6 @@ class Database(object):
             for location in locations:
                 profile = CtdataProfile(str(location.name), True, None)
                 session.add(profile)
-
-                # profile.locations.append(location.name)
-                # location_profile = LocationProfile(location.id, profile.id)
-
-                # session.add(location_profile)
 
 
             curr.close()

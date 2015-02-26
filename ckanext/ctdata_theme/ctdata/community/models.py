@@ -9,7 +9,6 @@ from IPython import embed
 import json
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
-# from ..location.models import CtdataProfile
 
 get_action = logic.get_action
 
@@ -66,11 +65,7 @@ class ProfileIndicator(Base):
     visualization_type = Column(String)
     description        = Column(Text)
 
-    # user_id    = Column(String, ForeignKey('ctdata_user_info.ckan_user_id'))
-    # user       = relationship(UserInfo, backref="user_indicators")
-
     profile_id = Column(String, ForeignKey('ctdata_profiles.id'))
-    # profile    = relationship('ctdata_profiles', backref="profile_indicators")
 
     def __init__(self, name, filters, dataset_id, data_type, year, variable, ind_type, visualization_type, profile_id, permission, description, group_ids):
         self.name       = name
@@ -116,6 +111,27 @@ class ProfileIndicator(Base):
 
         dataset = get_action('package_show')(data_dict={'id': self.dataset_id})['title']
         dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
+
+        link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
+        link         = "/visualization/" + str(dataset_url) + link_params
+
+        return link
+
+    def link_to_visualization_with_locations(self, locations_names):
+        view = self.visualization_type or 'table'
+        location = ''
+        dataset         = get_action('package_show')(data_dict={'id': self.dataset_id})
+        geography       = filter(lambda x: x['key'] == 'Geography', dataset['extras'])
+        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
+        filters_hash = {}
+        filters_hash[geography_param] = locations_names
+
+        filters = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}),
+                                     json.loads(self.filters))
+
+
+        dataset_url  = dataset['title'].replace(' ', '-').replace("'", '').lower()
 
         link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
         link         = "/visualization/" + str(dataset_url) + link_params

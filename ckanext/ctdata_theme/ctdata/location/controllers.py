@@ -66,7 +66,9 @@ class LocationsController(base.BaseController):
             name      = json_body.get('name')
             fips      = json_body.get('fips')
 
-            location  = self.location_service.create(name, fips)
+            location = self.location_service.create(name, fips)
+            profile  = CtdataProfile(str(location.name), True, None)
+            session.add(profile)
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps({'location_name': location.name, 'location_fips': location.fips})
@@ -101,6 +103,7 @@ class LocationsController(base.BaseController):
             http_response.headers['Content-type'] = 'application/json'
 
             locations = locations.split(',') if locations else [location]
+            locations_names = map(lambda t: t.name, locations)
             if not filters or not dataset_id:
                 abort(400)
 
@@ -113,7 +116,7 @@ class LocationsController(base.BaseController):
                     'filters': indicator.filters,
                   'data_type': indicator.data_type,
                        'year': indicator.year,
-                    'link_to': indicator.link_to_visualization(),
+                    'link_to': indicator.link_to_visualization_with_locations(locations_names),
                     'dataset': indicator.dataset_name(),
                  'dataset_id': indicator.dataset_id,
                    'variable': indicator.variable,
@@ -206,7 +209,7 @@ class LocationsController(base.BaseController):
                 'filters': indicator.filters,
               'data_type': indicator.data_type,
                    'year': indicator.year,
-                'link_to': indicator.link_to_visualization(),
+                'link_to': indicator.link_to_visualization_with_locations(locations_names),
                 'dataset': indicator.dataset_name(),
              'dataset_id': indicator.dataset_id,
                'variable': indicator.variable,

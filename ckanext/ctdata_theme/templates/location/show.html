@@ -9,12 +9,12 @@
 {% block page_description %}{% endblock %}
 {% block main_content %}
 
+<div class="spinner small"> <img src="/common/images/loading.gif"/> </div>
 <span class="hidden" id="locations_list">{{towns_names}}</span>
 <div class="wrapper">
   <div class="span12 pull-right">
     <section class="locationdata ">
       <ul class="opt_btn">
-        <div class="spinner small"> <img src="/common/images/loading.gif"/> </div>
         <li class="btn_blue"><a href="javascript:void(0)" id="add_towns">Edit Towns</a></li>
         <li class="btn_blue"><a href="javascript:void(0)" id="add_indicator">Add Indicator</a></li>
         <!-- <li class="btn_blue"><a href="/location/{{location.name}}/new_profile" class=""> Create Community Profile </a></li> -->
@@ -23,7 +23,6 @@
     </section>
 
   </div>
-
   <div class="span12">
     <span id="default_profile_id" class="hidden">{{default_profile_id}}</span>
     <div class="table-div"></div>

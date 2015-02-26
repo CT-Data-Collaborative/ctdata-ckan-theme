@@ -120,8 +120,7 @@ var create_popup    = $("#create_profile_popup"),
         tr  = "<tr class='table_data'>\
                     <td class='column_1 for_csv'>\
                         <span class='indicator_id hidden'>" + id + " </span>"
-
-        tr  = tr + "<a href=" + ind.link_to + ">" + ind.dataset + ", " + ind.variable + " </a><span>"
+        tr  = tr + "<a href='" + ind.link_to + "'>" + ind.dataset + ", " + ind.variable + " </a><span>"
         tr  = tr + "<span class='hidden' id='filters_json'>" + JSON.stringify(ind.filters) + "</span>"
         $(ind.filters).each(function(i){
             filter = ind.filters[i]
