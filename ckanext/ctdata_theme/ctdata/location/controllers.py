@@ -45,7 +45,7 @@ class LocationsController(base.BaseController):
             location_profile = LocationProfile(location.id, default_profile.id)
             self.session.add(location_profile)
 
-        return base.render('location/show.html', extra_vars={'location': location, 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id})
+        return base.render('location/show.html', extra_vars={'location': location, 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id, 'default_profile': default_profile})
     #end
 
     def data_by_location(self):
@@ -158,7 +158,7 @@ class LocationsController(base.BaseController):
         towns           = self.location_service.get_all_locations()
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
 
-        return base.render('location/show.html', extra_vars={'location': default_profile.locations[0], 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id})
+        return base.render('location/show.html', extra_vars={'location': default_profile.locations[0], 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id, 'default_profile': default_profile})
     #end
 
     def load_profile_indicators(self, profile_id):
@@ -228,13 +228,19 @@ class LocationsController(base.BaseController):
         indicators = json_body.get('indicators')
         profile    = self.location_service.get_profile(profile_id)
 
+        #remove deleted indicators
+        for indicator in profile.indicators:
+            if not indicator.id in map(lambda i: i['id'], indicators):
+                self.session.delete(indicator)
+                self.session.commit()
+
         #save new indicators
         for indicator in indicators:
             if not indicator['id']:
                 indicator  = self.location_service.create_indicator(indicator['name'], indicator['filters'], indicator['dataset_id'], user, indicator['ind_type'], 'table', profile.id)
                 profile.indicators.append(indicator)
 
-        #remove deleted indicators
+
         return json.dumps({'success': True })
     #end
 

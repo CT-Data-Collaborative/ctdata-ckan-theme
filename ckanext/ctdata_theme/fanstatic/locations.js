@@ -217,39 +217,39 @@ $(function(){
 
     $('.hide_indicator').live('click', function(){
         id = $(this).attr('id')
-        // filters_string = $(this).closest('tr').find("#filters_json").text().split(', ').join(',').split(': ').join(':')
+        filters_string = $(this).closest('tr').find("#filters_json").text().split(', ').join(',').split(': ').join(':')
 
-        // $(this).closest('tr').hide();
+        $(this).closest('tr').hide();
 
-        // found = false
-        // $(indicators).each(function(i) {
-        //     if (found)
-        //         return false
-        //     if (!found && id == indicators[i].id ){
-        //         // delete indicators[i]
-        //         indicators.splice(i, 1)
-        //     }
-        // });
+        found = false;
+        index = undefined;
+        $(indicators).each(function(i) {
+            if (!found && id == $(indicators)[i].id ) {
+                index = i;
+                found=true
+            };
+        });
 
-        // if (!found){
-        //     all_filters = []
-        //     $(new_indicators).each(function(i) {
-        //         all_filters.push($(new_indicators)[i].filters.split(', ').join(',').split(': ').join(':'))
-        //     });
+        if (index != undefined) {
+            indicators.splice(index, 1);
+            index = undefined
+        };
 
-        //     $(all_filters).each(function(i) {
-        //         if (found)
-        //             return false
-        //         if (!found && filters_string == $(all_filters)[i]){
-        //             found = true
-        //             // $(new_indicators).splice(i, 1)
-        //              // delete new_indicators[i]
-        //              new_indicators.splice(i, 1)
-        //         }
-        //     });
-        // }
+        if (!found){
+            all_filters = []
+            $(new_indicators).each(function(i) {
+                all_filters.push($(new_indicators)[i].filters.split(', ').join(',').split(': ').join(':'))
+            });
 
-        // debugger
+            $(all_filters).each(function(i) {
+                if (!found && filters_string == $(all_filters)[i]){
+                    index = i;
+                    found=true;
+                }
+            });
+        }
+
+        if (index != undefined) new_indicators.splice(index, 1);
 
     });
 
