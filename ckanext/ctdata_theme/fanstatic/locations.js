@@ -258,6 +258,7 @@ $(function(){
 
 
     $('.dataset_chooser').live('click',function() {
+        $("#save_indicator").addClass('hidden')
         $('li', $('ul.indicator-sub-topics')).removeClass('active')
         current_dataset = $(this).attr('id');
         current_dataset_name = $(this).text();
@@ -267,6 +268,7 @@ $(function(){
             url: "/community/get_filters/" + current_dataset,
             success: function (data) {
                 $('#filters_content').html(build_filters(data['result']));
+                $("#save_indicator").removeClass('hidden')
             }
         });
     });
@@ -315,8 +317,8 @@ $(function(){
     });
 
     $('#save_towns').click(function() {
-        locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
-        locations = locations.join(',');
+        // locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+        // locations = locations.join(',');
         load_profile_indicators();
         reload_data_for_new_indicators();
         $('div.modal').modal('hide');
