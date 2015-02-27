@@ -96,6 +96,8 @@ var create_popup    = $("#create_profile_popup"),
 
     function load_profile_indicators(){
         $('.spinner').show();
+        var deferred = $.Deferred();
+
         $.ajax({type: "POST",
             url: "/load_profile_indicators/" + default_profile_id,
             data: JSON.stringify({locations: locations}),
@@ -324,15 +326,32 @@ $(function(){
         $('div.modal').modal('hide');
         locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         locations = locations.join(',');
-        load_profile_indicators()
-        reload_data_for_new_indicators()
+        // load_profile_indicators();
+
+        $('.spinner').show();
+        var deferred = $.Deferred();
+
+        $.ajax({type: "POST",
+            url: "/load_profile_indicators/" + default_profile_id,
+            data: JSON.stringify({locations: locations}),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                indicators_data = data.ind_data;
+                current_towns   = data.towns;
+                $('locations_list').text(data.towns);
+                draw_table(indicators_data, current_towns);
+                reload_data_for_new_indicators();
+                $('.spinner').hide();
+            }
+        });
+
 
     });
 
     $('#save_profile_as_default').click(function() {
         locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         locations = locations.join(',');
-        inds =  indicators.concat(new_indicators)
+        inds      = indicators.concat(new_indicators)
 
         $.ajax({type: "POST",
             url: "/save_local_default/" + default_profile_id,
