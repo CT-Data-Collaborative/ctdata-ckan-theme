@@ -326,10 +326,8 @@ $(function(){
         $('div.modal').modal('hide');
         locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         locations = locations.join(',');
-        // load_profile_indicators();
 
         $('.spinner').show();
-        var deferred = $.Deferred();
 
         $.ajax({type: "POST",
             url: "/load_profile_indicators/" + default_profile_id,
