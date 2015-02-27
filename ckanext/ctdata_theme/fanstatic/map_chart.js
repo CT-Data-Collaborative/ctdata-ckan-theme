@@ -75,8 +75,9 @@ $.each(data.data, function(i){
   else
     id = data.data[i]['code']
 
-  if (value_counters[id] != undefined)
+  if (value_counters[id] != undefined){
     value_counters[id] += 1
+  }
 
 
   if (data.data[i]['code'] == "Connecticut"){
@@ -171,9 +172,10 @@ sortedDataClasses = dataClasses
 var keys = Object.keys(value_counters);
 var error = false
 $.each(keys, function(i){
-  if (value_counters[keys[i]] > 1)
-  error = true
-  return  display_error('Please select more filters.')
+  if (value_counters[keys[i]] > 1){
+    error = true
+    return  display_error('Please select more filters.')
+  }
 });
 
 // sort DataClasses to show in normal order
