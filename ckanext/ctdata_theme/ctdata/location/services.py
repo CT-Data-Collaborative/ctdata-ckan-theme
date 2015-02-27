@@ -116,13 +116,13 @@ class LocationService(object):
                 arr.append(str(value[0][0]) if value else None)
 
         except psycopg2.ProgrammingError:
-            del curs
-            conn.close()
+            # del curs
+            # conn.close()
             for location_name in location_names:
                 arr.append(None)
 
-        del curs
-        conn.close()
+        # del curs
+        # conn.close()
         return arr
 
 
