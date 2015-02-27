@@ -282,7 +282,7 @@ chart = new Highcharts.Chart({
              this.point.code + '<br>' +
              'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
       }else{
-        return this.point.code + '<br>' + 'Value: <b>' + unit_for_value('No Value', cur_mt) + '</b>';
+        return this.point.code + '<br>' + 'Value: <b>' + 'No Value' + '</b>';
       }
     }
   },

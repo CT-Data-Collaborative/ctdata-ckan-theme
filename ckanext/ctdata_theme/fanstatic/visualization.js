@@ -545,6 +545,8 @@ function draw_table(){
                 cur_value = parseInt(text).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
               type = data['data'][row_index]['dims']['Measure Type']
+              if (type == undefined)
+                type = $('input:checked', $('#collapseMeasureType'))[0].value
               if (type != undefined)
                 cur_value = unit_for_value(cur_value, type)
 
@@ -560,6 +562,9 @@ function draw_table(){
 
 
             type = data['data'][row_index]['dims']['Measure Type']
+            if (type == undefined)
+              type = $('input:checked', $('#collapseMeasureType'))[0].value
+
             if (type != undefined)
               cur_value = unit_for_value(cur_value, type)
 
@@ -711,10 +716,20 @@ function draw_chart(){
             },
             plotOptions: {
               line: {
-                  dataLabels: { enabled: true}
+                  dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                      return unit_for_value(this.y, type)
+                    }
+                  }
               },
               column: {
-                  dataLabels: { enabled: true}
+                  dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                      return unit_for_value(this.y, type)
+                    }
+                  }
               }
             },
             legend: {
