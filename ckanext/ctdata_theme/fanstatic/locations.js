@@ -357,7 +357,10 @@ $(function(){
             success: function (data) {
                 load_profile_indicators();
                 new_indicators = []
-                $('#message').html("<h3> Default indicators are successfully saved.</h3>")
+                if (window.location.pathname.indexOf('/community/') > -1)
+                    $('#message').html("<h3> Indicators saved successfully.</h3>")
+                else
+                    $('#message').html("<h3> Default indicators are successfully saved.</h3>")
                 $("#message_popup").modal('show');
             }
         });

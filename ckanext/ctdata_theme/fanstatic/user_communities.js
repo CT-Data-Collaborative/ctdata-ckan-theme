@@ -33,17 +33,21 @@ $(function(){
   // })
 
   $('.remove_profile').on('click', function(){
-    // ids_to_remove.push( $(this).attr('id'));
-
+    id = $(this).attr('id')
     $(this).closest('li').hide();
-    $.ajax({type: "POST",
-      url: "/remove_location_profile/" + $(this).attr('id'),
-      data: JSON.stringify({ }),
-      contentType: 'application/json; charset=utf-8',
-      success: function (data) {
-        // window.location.reload();
-      }
+    bootbox.confirm("Are you sure you want to delete this profile?", function(r){
+        if (r) {
+          $.ajax({type: "POST",
+            url: "/remove_location_profile/" + id,
+            data: JSON.stringify({ }),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+              // window.location.reload();
+            }
+          });
+        }
     });
+
   });
 
 });
