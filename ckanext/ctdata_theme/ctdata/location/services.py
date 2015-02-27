@@ -93,7 +93,7 @@ class LocationService(object):
     def load_indicator_value_for_location(self, filters, dataset_id, location_names):
         db   = Database()
         conn = db.connect()
-        curs = conn.cursor()
+
 
         dataset = DatasetService.get_dataset(dataset_id)
         dataset_meta    = DatasetService.get_dataset_meta(dataset_id)
@@ -104,19 +104,23 @@ class LocationService(object):
         filters = json.loads(filters)
         arr     = []
 
-        for location_name in location_names:
-            try:
+        try:
+            for location_name in location_names:
+
                 query = '''
                             SELECT "Value" FROM "%s" WHERE "%s"='%s' AND %s
                         ''' % (dataset.table_name, geography_param, location_name,  " AND ".join(''' "%s" = '%s' ''' % (f['field'], f['values'][0]) for f in filters))
-
+                curs = conn.cursor()
                 curs.execute(query, (dataset.table_name,))
                 value = curs.fetchall()
                 arr.append(str(value[0][0]) if value else None)
-            except psycopg2.ProgrammingError:
-                 arr.append( None)
 
+            del curr
+        except psycopg2.ProgrammingError:
+            for location_name in location_names:
+                arr.append(None)
 
+        conn.close()
         return arr
 
 
