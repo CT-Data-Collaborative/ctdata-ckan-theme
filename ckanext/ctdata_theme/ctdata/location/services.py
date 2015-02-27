@@ -122,7 +122,7 @@ class LocationService(object):
                 arr.append(None)
 
         # del curs
-        # conn.close()
+        conn.close()
         return arr
 
 
