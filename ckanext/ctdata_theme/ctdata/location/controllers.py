@@ -164,9 +164,14 @@ class LocationsController(base.BaseController):
     #end
 
     def community_profile(self, profile_id):
+
         default_profile = self.location_service.get_profile(profile_id)
+
+        if not default_profile:
+            abort(404)
         towns           = self.location_service.get_all_locations()
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
+
 
         return base.render('location/show.html', extra_vars={'location': default_profile.locations[0], 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id, 'default_profile': default_profile})
     #end
