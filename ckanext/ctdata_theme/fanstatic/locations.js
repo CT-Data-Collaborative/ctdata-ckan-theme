@@ -88,27 +88,25 @@ var create_popup    = $("#create_profile_popup"),
 
             table = table + tr
         });
-        table = table +  "</tbody></table>"
+        table = table +  "</tbody></table>";
 
-        $(".table-div").html(table)
+        $(".table-div").html(table);
     }
 
 
     function load_profile_indicators(){
-        $('.spinner').show()
+        $('.spinner').show();
         $.ajax({type: "POST",
             url: "/load_profile_indicators/" + default_profile_id,
             data: JSON.stringify({locations: locations}),
-            contentType: 'application/json; charset=utf-8'
-        }).done(function(data) {
-            indicators_data = data.ind_data
-            current_towns   = data.towns
-            $('locations_list').text(data.towns)
-            // if (indicators_data.length > 0)
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                indicators_data = data.ind_data;
+                current_towns   = data.towns;
+                $('locations_list').text(data.towns);
                 draw_table(indicators_data, current_towns);
-            // else
-            //     $(".table-div").html("There're no indicators for this community yet.")
-            $('.spinner').hide()
+                $('.spinner').hide();
+            }
         });
     }
 
@@ -155,7 +153,8 @@ var create_popup    = $("#create_profile_popup"),
     }
 
     function reload_data_for_new_indicators(){
-
+        locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+        locations = locations.join(',');
         $(new_indicators).each(function(i){
             ind = new_indicators[i]
             $.ajax({type: "POST",
@@ -167,12 +166,17 @@ var create_popup    = $("#create_profile_popup"),
                     draw_raw(data.indicator);
                 }
             });
-
         });
     }
 
 
 $(function(){
+    if (window.location.pathname != "/manage-locations"){
+        console.log("window.location.pathname != '/manage-locations'")
+        load_profile_indicators();
+        load_topics();
+    }
+
   var form      = $('form#new_location')
 
   $('#save_location').on('click', function(){
@@ -317,11 +321,12 @@ $(function(){
     });
 
     $('#save_towns').click(function() {
+        $('div.modal').modal('hide');
         // locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         // locations = locations.join(',');
-        load_profile_indicators();
-        reload_data_for_new_indicators();
-        $('div.modal').modal('hide');
+        load_profile_indicators()
+        reload_data_for_new_indicators()
+
     });
 
     $('#save_profile_as_default').click(function() {
@@ -370,10 +375,6 @@ $(function(){
         }
     });
 
-    if (window.location.pathname != "/manage-locations"){
-        load_profile_indicators();
-        load_topics();
-    }
     $("#profile_name").keypress(function(e){
         if (e.which === 13){
             return false;
