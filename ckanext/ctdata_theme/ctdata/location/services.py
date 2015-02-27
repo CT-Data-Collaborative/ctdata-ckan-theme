@@ -16,7 +16,7 @@ from ..database import Database
 
 from IPython import embed
 import ckan.model as model
-
+import psycopg2
 
 class LocationService(object):
 
@@ -100,16 +100,22 @@ class LocationService(object):
         geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
         geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
 
+
         filters = json.loads(filters)
         arr     = []
-        for location_name in location_names:
-            query = '''
-                        SELECT "Value" FROM "%s" WHERE "%s"='%s' AND %s
-                    ''' % (dataset.table_name, geography_param, location_name,  " AND ".join(''' "%s" = '%s' ''' % (f['field'], f['values'][0]) for f in filters))
 
-            curs.execute(query, (dataset.table_name,))
-            value = curs.fetchall()
-            arr.append(str(value[0][0]) if value else None)
+        for location_name in location_names:
+            try:
+                query = '''
+                            SELECT "Value" FROM "%s" WHERE "%s"='%s' AND %s
+                        ''' % (dataset.table_name, geography_param, location_name,  " AND ".join(''' "%s" = '%s' ''' % (f['field'], f['values'][0]) for f in filters))
+
+                curs.execute(query, (dataset.table_name,))
+                value = curs.fetchall()
+                arr.append(str(value[0][0]) if value else None)
+            except psycopg2.ProgrammingError:
+                 arr.append( None)
+
 
         return arr
 

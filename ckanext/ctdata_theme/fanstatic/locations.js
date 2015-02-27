@@ -174,7 +174,6 @@ var create_popup    = $("#create_profile_popup"),
 
 $(function(){
     if (window.location.pathname != "/manage-locations"){
-        console.log("window.location.pathname != '/manage-locations'")
         load_profile_indicators();
         load_topics();
     }
