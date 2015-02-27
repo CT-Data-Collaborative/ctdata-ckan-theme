@@ -213,7 +213,7 @@ class LocationsController(base.BaseController):
 
         ind_data = []
         for indicator in profile.indicators:
-            values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_names)
+            values = [] #self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_names)
 
             data  = {}
             data  = {
