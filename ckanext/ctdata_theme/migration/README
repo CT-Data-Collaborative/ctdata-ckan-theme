@@ -19,7 +19,7 @@ python ckanext/ctdata_theme/migration/manage.py db_version
 python ckanext/ctdata_theme/migration/manage.py script 'add type column to indicators'
 
 ### Upgrade to version
-python ckanext/ctdata_theme/migration/manage.py upgrade 4
+python ckanext/ctdata_theme/migration/manage.py upgrade 6
 
 ### Upgrade to version
 python ckanext/ctdata_theme/migration/manage.py downgrade 1

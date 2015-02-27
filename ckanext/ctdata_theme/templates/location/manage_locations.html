@@ -1,0 +1,66 @@
+{% extends "page.html" %}
+
+{% block page_name %} Manage Locations {% endblock %}
+{% block page_description %}{% endblock %}
+{% block main_content %}
+
+
+{% if c.userobg.sysadmin %}
+<form role="role" id="new_location" class="span4">
+  <h2> Create Location </h2>
+  <div class="control-group">
+
+    <label class="control-label"> Location Name </label>
+    <div class="controls">
+      <input type="text" name="location_name" id="location_name"> </input>
+    </div>
+
+    <label class="control-label"> Location FIPS </label>
+    <div class="controls">
+      <input type="text" name="location_fips" id="location_fips"> </input>
+    </div>
+
+    <a href="javascript:void(0);" class="btn btn-default" id="save_location" > Save </a>
+
+  </div>
+</form>
+
+{% endif %}
+
+<ul id="locations_list" class="span10">
+  {% for location in locations %}
+  <li class="span4">
+    <span class="pull-left"><b> {{ location.name }} </b> </span> :
+    <span class="pull-right"> {{ location.fips }} </span>
+  </li>
+  {% endfor %}
+</ul>
+
+<div id="message_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content.text-center">
+            <div class="modal-body disable-scroll" id="message">
+
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button class="btn close_popup">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+{{ super() }}
+  <link rel="stylesheet" type="text/css" href="/common/css/data_gallery.css">
+  {% resource 'ctdata_theme/locations.js' %}
+
+  <script>
+    var location_names = []
+  </script>
+{% endblock %}
+
+
+
+{% endblock %}

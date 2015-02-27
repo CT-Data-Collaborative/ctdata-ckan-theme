@@ -20,21 +20,21 @@ from ctdata.visualization.views import ViewFactory
 from ctdata.community.services import CommunityProfileService
 from ctdata.topic.services import TopicSerivce
 from ctdata.users.services import UserService
+from ctdata.location.services import LocationService
 
 from IPython import embed
 
 get_action = logic.get_action
 
-def communities():
-    db = Database()
+def locations():
+    db   = Database()
     sess = db.session_factory()
 
-    srvc = CommunityProfileService(sess)
-    communities = srvc.get_profiles_for_data_by_location()
+    location_service = LocationService(sess)
+    locations = location_service.get_all_locations()
 
-    sess.commit()
     sess.close()
-    return communities
+    return locations
 
 
 class CTDataThemePlugin(plugins.SingletonPlugin):
@@ -75,15 +75,17 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('community_update_profile_indicators', '/community/update_profile_indicators', action='update_profile_indicators')
             m.connect('community_remove_temp_indicators', '/community/remove_temp_indicators', action='remove_temp_indicators')
             m.connect('community_save_as_default', '/community/save_as_default', action='save_as_default')
+            m.connect('community_save_as_default', '/community/save_as_default', action='save_as_default')
             m.connect('community_remove_indicator',
                       '/community/remove_indicator/{indicator_id}',
                       action='remove_indicator')
             # m.connect('community_profiles', '/community/{community_name}', action='community_profile')
+            m.connect('get_indicators_data', '/indicators_data/{community_name}', action='get_indicators_data')
 
         with routes.mapper.SubMapper(
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
-            # m.connect('user_community_profiles', '/user/{user_id}/my_community_profiles', action='community_profiles')
+            m.connect('user_community_profiles', '/user/{user_id}/community_profiles', action='community_profiles')
             m.connect('my_gallery', '/user/{user_id}/my_gallery', action='my_gallery')
             m.connect('user_gallery', '/user/{user_id}/gallery', action='user_gallery')
             m.connect('remove_gallery_indicators', '/user/remove_gallery_indicators', action='remove_gallery_indicators')
@@ -107,13 +109,28 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('group_user_autocomplete', '/group/user_autocomplete', action = 'user_autocomplete')
             m.connect('update_group_indicators', '/group/update_group_indicators', action='update_group_indicators')
 
+        with routes.mapper.SubMapper(
+                route_map,
+                controller='ckanext.ctdata_theme.ctdata.location.controllers:LocationsController') as m:
+            m.connect('location', '/location/{location_name}', action='show')
+            m.connect('data_by_location', '/data-by-location', action='data_by_location')
+            m.connect('manage_locations', '/manage-locations', action='manage_locations')
+            m.connect('create_location',  '/create_location',  action='create_location')
+            m.connect('new_profile_location', '/location/{location_name}/new_profile', action='new_profile')
+            m.connect('load_indicator_location', '/location/{location_name}/load_indicator', action='load_indicator')
+            m.connect('create_location_profile', '/location/{location_name}/create-profile', action='create_location_profile')
+            m.connect('load_profile_indicators', '/load_profile_indicators/{profile_id}', action='load_profile_indicators')
+            m.connect('save_local_default', '/save_local_default/{profile_id}', action='save_local_default')
+            m.connect('community_profiles', '/community/{profile_id}', action='community_profile')
+            m.connect('remove_location_profile', '/remove_location_profile/{profile_id}', action='remove_location_profile')
+
         return route_map
 
     def after_map(self, route_map):
         return route_map
 
     def get_helpers(self):
-        return {'communities_helper': communities,
+        return {'locations_helper': locations,
                 'link_to_dataset_with_filters': _link_to_dataset_with_filters}
 
 

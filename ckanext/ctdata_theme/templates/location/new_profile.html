@@ -1,0 +1,71 @@
+{% extends "page.html" %}
+
+{% block styles %}
+{{ super() }}
+<link href='/common/css/visualization.css' rel='stylesheet' type='text/css'>
+{% endblock %}
+
+{% block page_name %}Create new profile{% endblock %}
+{% block page_description %}<span id="location">{{location.name}}</span>{% endblock %}
+{% block main_content %}
+
+<div class="wrapper">
+
+<section class="locationdata ">
+<form role="role" id="new_location" class="span9">
+  <div class="control-group">
+
+    <label class="control-label"> Community Profile Name </label>
+    <div class="controls">
+      <input type="text" name="profile_name" id="profile_name"> </input>
+    </div>
+
+    <label class="control-label"> Locations </label>
+    <div class="controls">
+      <input type="text" name="profile_locations" id="profile_location" value="{{location.name}}">
+    </div>
+
+
+    <div class="controls">
+
+      <input type="checkbox" name="profile_global_default" id="profile_global_default">
+      <!-- <label class="control-label"> Global Default </label> -->
+      Global Default
+    </div>
+    </br>
+    <label class="control-label"> Indicators </label>
+    <div>
+      <table class='table my_table' id="profile_indicators">
+        <thead>
+          <th>Dataset</th>
+          <th>Data Type</th>
+          <th>Year</th>
+          <th>{{location.name}}</th>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+    <a href="javascript:void(0);" class="btn btn-default" id="create_profile" > Save </a>
+
+  </div>
+</form>
+
+<ul class="opt_btn span3">
+  <li class="btn_blue"><a href="javascript:void(0)" id="add_indicator">Add Indicator</a></li>
+</ul>
+</section>
+
+</div>
+
+<div id="loaded_topics"></div>
+
+{% block scripts %}
+    {{ super() }}
+    {% resource 'ctdata_theme/locations.js' %}
+    {% resource 'ctdata_theme/html2csv.js' %}
+{% endblock %}
+
+
+{% endblock %}
