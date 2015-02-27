@@ -84,7 +84,7 @@ var create_popup    = $("#create_profile_popup"),
             indicators.push({ id: indicators_data[i]['id'], dataset_id: indicators_data[i]['dataset_id'], name: "", ind_type: 'common',
                           permission: 'public', filters: indicators_data[i]['filters'], description: ''})
 
-            build_tr_from_data(indicators_data[i])
+            tr = build_tr_from_data(indicators_data[i])
 
             table = table + tr
         });
@@ -114,7 +114,7 @@ var create_popup    = $("#create_profile_popup"),
 
     function build_tr_from_data(indicators_data){
         ind = indicators_data
-        id  = ind.id
+        id = ind.id
         ind.filters = JSON.parse(ind.filters)
 
         tr  = "<tr class='table_data'>\
@@ -145,21 +145,23 @@ var create_popup    = $("#create_profile_popup"),
                             <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/close_pic.png'>\
                         </a>\
                     </td>\
-                </tr>"
+                </tr>";
+        return tr
     }
 
     function draw_raw(indicators_data){
-        build_tr_from_data(indicators_data);
-        $('tbody').append(tr)
+        tr = build_tr_from_data(indicators_data)
+        $('tbody').append( tr )
     }
 
     function reload_data_for_new_indicators(){
+
         $(new_indicators).each(function(i){
             ind = new_indicators[i]
             $.ajax({type: "POST",
                 url: "/location/" + location_name + "/load_indicator",
                 data: JSON.stringify({ dataset_id: ind['dataset_id'], name: "", ind_type: 'common',
-                                       permission: 'public', filters: JSON.stringify(ind['filters']), description: '', locations: locations}),
+                                       permission: 'public', filters: ind['filters'], description: '', locations: locations}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     draw_raw(data.indicator);
@@ -181,7 +183,9 @@ $(function(){
 
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
-        $("#locations_list").append('<li>' + data.location_name + '</li>')
+        $("#locations_list").append("<li class='span3'><span class='pull-left'><b>" + data.location_name +  "</b> </span> : <span class='pull-right'>" + data.location_fips + "</span></li>")
+        $('#message').html("New location is saved.")
+        $("#message_popup").modal('show');
       }
     });
 
@@ -329,6 +333,7 @@ $(function(){
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 load_profile_indicators();
+                new_indicators = []
                 $('#message').html("<h3> Default indicators are successfully saved.</h3>")
                 $("#message_popup").modal('show');
             }
@@ -363,10 +368,10 @@ $(function(){
         }
     });
 
-
-    load_profile_indicators();
-    load_topics();
-
+    if (window.location.pathname != "/manage-locations"){
+        load_profile_indicators();
+        load_topics();
+    }
     $("#profile_name").keypress(function(e){
         if (e.which === 13){
             return false;

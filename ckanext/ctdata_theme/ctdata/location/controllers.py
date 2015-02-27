@@ -68,7 +68,8 @@ class LocationsController(base.BaseController):
 
             location = self.location_service.create(name, fips)
             profile  = CtdataProfile(str(location.name), True, None)
-            session.add(profile)
+            self.session.add(profile)
+            self.session.commit()
 
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps({'location_name': location.name, 'location_fips': location.fips})
@@ -102,8 +103,14 @@ class LocationsController(base.BaseController):
 
             http_response.headers['Content-type'] = 'application/json'
 
-            locations = locations.split(',') if locations else [location]
-            locations_names = map(lambda t: t.name, locations)
+            if locations:
+                locations = locations.split(',')
+                locations_names = locations
+            else:
+                locations = [location]
+                locations_names = map(lambda t: t.name, locations)
+                locations = locations_names
+
             if not filters or not dataset_id:
                 abort(400)
 

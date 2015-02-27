@@ -39,9 +39,9 @@ class LocationService(object):
 
     def create(self, name, fips):
         location = Location(name, fips)
-
         self.session.add(location)
-        self.session.commit()
+
+        return location
 
     def find_location_profile(self, location_id, profile_id):
         return self.session.query(LocationProfile).filter(and_(LocationProfile.location_id == location_id, LocationProfile.profile_id == profile_id)).first()

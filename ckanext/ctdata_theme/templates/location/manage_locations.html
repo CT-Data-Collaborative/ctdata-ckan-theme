@@ -27,19 +27,36 @@
 
 <ul id="locations_list" class="span10">
   {% for location in locations %}
-  <li class="span3">
+  <li class="span4">
     <span class="pull-left"><b> {{ location.name }} </b> </span> :
     <span class="pull-right"> {{ location.fips }} </span>
   </li>
   {% endfor %}
 </ul>
 
+<div id="message_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content.text-center">
+            <div class="modal-body disable-scroll" id="message">
+
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button class="btn close_popup">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% block scripts %}
 {{ super() }}
   <link rel="stylesheet" type="text/css" href="/common/css/data_gallery.css">
   {% resource 'ctdata_theme/locations.js' %}
 
+  <script>
+    var location_names = []
+  </script>
 {% endblock %}
 
 
