@@ -96,7 +96,7 @@ $.each(data.data, function(i){
 
 if (geography_param != 'Town'){
   $.each(geo_ids, function(i){
-    data.data.push({code: geo_names[geo_ids[i]], fips: geo_ids[i], value: 'No value'})
+    data.data.push({code: geo_names[geo_ids[i]], fips: geo_ids[i], value: -8888})
   });
 }
 
@@ -188,8 +188,10 @@ if (sortedDataClasses.length == 8){
   swap(sortedDataClasses,5,7)
 }
 if (geography_param != 'Town'){
-  sortedDataClasses.push({name: 'No value', color: '#D8D8D8', to: 'No value', showInLegend: false});
+  sortedDataClasses.push({name: 'No value', color: '#D8D8D8', to: -8888 , showInLegend: false});
 }
+
+
 // Initiate the chart
 
 var join_by = ['NAME', 'code'];
@@ -275,12 +277,12 @@ chart = new Highcharts.Chart({
       if (this.point.value == '*'){
         value = 'Suppressed'
       }
-      if (value != 'No value'){
+      if (value != -8888 ){
         return '<b>' + this.series.name + '</b><br>' +
              this.point.code + '<br>' +
              'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
       }else{
-        return this.point.code + '<br>' + 'Value: <b>' + unit_for_value(value, cur_mt) + '</b>';
+        return this.point.code + '<br>' + 'Value: <b>' + unit_for_value('No Value', cur_mt) + '</b>';
       }
     }
   },
