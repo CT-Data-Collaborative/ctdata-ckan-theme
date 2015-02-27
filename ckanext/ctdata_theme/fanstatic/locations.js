@@ -322,8 +322,8 @@ $(function(){
 
     $('#save_towns').click(function() {
         $('div.modal').modal('hide');
-        // locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
-        // locations = locations.join(',');
+        locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+        locations = locations.join(',');
         load_profile_indicators()
         reload_data_for_new_indicators()
 
