@@ -31,34 +31,16 @@
 </ul>
 
 <div class="locaton_table">
-{% if indicators %}
-    <table class='table my_table'>
-        <thead>
-            <th>Dataset</th>
-            <th>Data Type</th>
-            <th>Year</th>
-            {% for town_name in displayed_towns %}
-                <th>{{town_name}}</th>
-            {% endfor %}
-        </thead>
-        <tbody>
-            {% for indicator in indicators %}
-                {% snippet 'communities/snippets/indicators_table_tr.html', indicator=indicator, location=location %}
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    There're no indicators for this community yet.
-{% endif %}
+    <div class='table-div'>
+        <div class="not_hidden_spinner"> <img src="/common/images/loading.gif"/> </div>
+    </div>
     <form style="display: none">
         <input type="hidden" id="community_name" value="{{community.name}}">
+        <input type="hidden" id="displayed_towns" value="{{towns_raw}}">
     </form>
-
 
     <ul class= 'opt_btn'>
     {% if location == community.name %}
-    <li><a href="javascript:void(0)" id="update_profile_indicators" class='blue_button pull-left'> Remove indicators</a></li>
-    <li><a href="javascript:void(0)" id="remove_temp_indicators" class='gray_button'>Remove Temp Indicators</a></li>
     <li><a href="javascript:void(0)" id="create_profile_button"  class='blue_button'>Save to new profile</a></li>
     {% endif %}
     {% if c.userobj.sysadmin %}
@@ -73,6 +55,21 @@
 <div id="loaded_topics"></div>
 
 {% snippet 'communities/snippets/create_profile_popup.html' %}
+
+<div id="message_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content.text-center">
+            <div class="modal-body disable-scroll" id="message">
+
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button class="btn close_popup">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 </section>

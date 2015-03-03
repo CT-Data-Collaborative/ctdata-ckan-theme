@@ -4,11 +4,6 @@
 @import url("buttons.css");
 @import url("layout.css");
 
-.user-name{
-  padding-left: 20px;
-  font-size: 18px;
-}
-
 * { margin:0px; box-sizing:border-box; }/* max-width:100%;  padding:0px; border:none; */
 input, textarea { outline:none; border-radius: 0; resize:none;}*/
 img { border:none; outline:none; max-width:100%; height:auto;}
@@ -529,5 +524,19 @@ margin: 0;
 
 .members-table{
   width: 100%;
+}
+
+.user-name{
+  padding-left: 20px;
+  font-size: 18px;
+}
+
+.blue-line{
+  height: 10px;
+  background-color: #00adef;
+}
+
+a.underlined{
+  text-decoration: underline;
 }
 

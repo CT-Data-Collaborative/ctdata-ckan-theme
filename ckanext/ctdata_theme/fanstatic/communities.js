@@ -1,31 +1,165 @@
-var create_popup    = $("#create_profile_popup"),
-    ids_to_remove   = [];
 
-$('.close_popup').click(function() {
-  $(this).closest('div.modal').modal('hide');
-});
+    /////////////////  VARS
 
-$('#create_profile_button').click(function() {
-  create_popup.modal('show');
-});
+    var create_popup    = $("#create_profile_popup"),
+        ids_to_remove   = [],
+        community_name  = $("input#community_name").val(),
+        towns           = $("input#displayed_towns").val(),
+        current_towns   = [],
+        current_dataset ;
 
-$('#add_towns').click(function() {
-    $("#towns_popup").modal('show');
-})
+    function load_topics(){
+        if ($('#loaded_topics').html() == ""){
+            $('#add_indicator').addClass('disabled')
+            $('#create_profile_button').addClass('disabled')
+            $('#save_profile_as_default').addClass('disabled')
+            $.ajax({type: "GET",
+                url: "/community/get_topics/",
+                success: function (data) {
+                    $('#loaded_topics').append($(data.html));
+                    $('#add_indicator').removeClass('disabled')
+                    $('#create_profile_button').removeClass('disabled')
+                    $('#save_profile_as_default').removeClass('disabled')
+                }
+            });
+        }
+    }
 
-$('.remove_indicator').on('click', function(){
-    ids_to_remove.push( $(this).attr('id'));
+    function build_filters(filter_data) {
+        var filters_html = '<ul>';
+        $.each(filter_data, function(i, fltr) {
+            filters_html += '<li>';
+            filters_html += '<h3 class="indicator-filter-name">' + fltr.name + '</h3>';
+            filters_html += '<ul>';
+            $.each(fltr.values, function(j, val) {
+                filters_html += '<li class="indicator-filter">';
+                filters_html += '<span class="indicator-filter-value">' + val + '</span>';
+                filters_html += '<input type="radio" class="indicator-filter-radio" name="' + fltr.name + '" value="' + val + '"';
+                if (j == 0)
+                    filters_html += ' checked';
+                filters_html += '>';
+                filters_html += '</li>';
+            });
+            filters_html += '</ul>';
+            filters_html += '</li>';
+        });
+        filters_html += '</ul>';
 
-    $(this).closest('tr').hide();
-    $('#update_profile_indicators').show();
-});
+        return filters_html;
+    }
 
-function load_functions_for_indicators(){
-    $('.close_popup').click(function() {
-      $(this).closest('div.modal').modal('hide');
+    function get_filters() {
+        return $('#filters').find('input:checked').map(function(i, e) {
+            return {field: $(e).attr('name'), values: [$(e).val()]}
+        }).get();
+    }
+
+    function remove_temp_indicators(){
+        if ($('.temp').size() != 0) {
+            ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
+            $.ajax({type: "POST",
+                async: false,
+                url: "/community/remove_temp_indicators",
+                data: JSON.stringify({indicator_ids: ids}),
+                contentType: 'application/json; charset=utf-8'
+            });
+        }
+    }
+
+    function draw_table(indicators_data, towns){
+        table = "<table class='table my_table'>\
+                    <thead>\
+                        <th>Dataset</th>\
+                        <th>Data Type</th>\
+                        <th>Year</th>"
+
+        $(towns).each(function(i){ table = table + '<th>' +towns[i] + '</th>' });
+        table = table + "</thead><tbody>"
+
+        $(indicators_data).each(function(i){
+            ind = indicators_data[i]
+            id  = ind.id[0]
+
+            tr  = "<tr class='table_data'>\
+                    <td class='column_1 for_csv'>\
+                        <span class='indicator_id hidden'>" + id + " </span>"
+            if (ind.temp)
+                tr  = tr + "<span class='text-warning temp'>*</span>"
+            tr  = tr + "<a href=" + ind.link_to + ">" + ind.dataset + ", " + ind.variable + " </a><span>"
+            $(ind.filters).each(function(i){
+                filter = ind.filters[i]
+                tr = tr + filter.field + ': ' + filter.value + ' '
+            });
+            tr = tr + "</span>  <span class='for_csv hidden'>" + ind.dataset + ', ' + ind.variable + ', '
+            $(ind.filters).each(function(i){
+                filter = ind.filters[i]
+                tr = tr + filter.field + ': ' + filter.value + ' ' + ','
+            });
+            tr = tr + "</span>"
+            tr = tr + "</td>\
+                    <td class='for_csv'><span class='for_csv'>" + ind.data_type + "</span></td>\
+                    <td class='for_csv'><span class='for_csv'>" + ind.year  + "</span></td>"
+
+            $(ind.values).each(function(i){
+                value = ind.values[i] || '-'
+                tr = tr + "<td class='for_csv'><span class='for_csv'>" + value + "</span></td>"
+            });
+            tr = tr + "<td class='no-border'>\
+                            <a href='javascript:void(0)' id=" + id + " class='remove_indicator'>\
+                                <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/close_pic.png'>\
+                            </a>\
+                        </td>\
+                    </tr>"
+
+            table = table + tr
+        });
+        table = table +  "</tbody></table>"
+
+        $(".table-div").html(table)
+    }
+
+    function load_indicators_data(){
+        $.ajax({type: "POST",
+            url: "/indicators_data/"+community_name,
+            data: JSON.stringify({towns: towns}),
+            contentType: 'application/json; charset=utf-8'
+        }).done(function(data) {
+            indicators_data = data.indicators
+            current_towns   = data.towns
+            if (indicators_data.length > 0)
+                draw_table(indicators_data, current_towns);
+            else
+                $(".table-div").html("There're no indicators for this community yet.")
+        });
+    }
+
+$(function () {
+    $('.close_popup').live('click', function() {
+        $(this).closest('div.modal').modal('hide');
     });
 
-    $('.dataset_chooser').on('click',function() {
+    $('#create_profile_button').live('click', function() {
+        create_popup.modal('show');
+    });
+
+    $('#add_towns').live('click', function() {
+        $("#towns_popup").modal('show');
+    })
+
+    $('.remove_indicator').live('click', function(){
+        ids_to_remove.push( $(this).attr('id'));
+
+        $(this).closest('tr').hide();
+        $.ajax({type: "POST",
+          url: "/community/update_profile_indicators",
+          data: JSON.stringify({ indicators_to_remove: ids_to_remove}),
+          contentType: 'application/json; charset=utf-8',
+          success: function (data) {}
+        });
+    });
+
+
+    $('.dataset_chooser').live('click',function() {
         $('li', $('ul.indicator-sub-topics')).removeClass('active')
         current_dataset = $(this).attr('id');
         $(this).closest('li').addClass('active');
@@ -37,7 +171,7 @@ function load_functions_for_indicators(){
         });
     });
 
-    $('#save_indicator').click(function() {
+    $('#save_indicator').live('click', function() {
         $("#indicator_adding_error").animate({opacity: 0}, 300);
         $.ajax({type: "POST",
             url: "/community/add_indicator",
@@ -45,8 +179,10 @@ function load_functions_for_indicators(){
                                    permission: 'public', filters: get_filters(), description: ''}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                if (data.success == true)
-                    window.location.reload();
+                if (data.success == true){
+                    load_indicators_data()
+                    $('div.modal').modal('hide');
+                }
                 else {
                     $("#error").html(data.error);
                     $("#error").animate({opacity: 1}, 300);
@@ -55,98 +191,15 @@ function load_functions_for_indicators(){
         });
     });
 
-
-    $('#update_profile_indicators').on('click', function(){
-        $.ajax({type: "POST",
-          url: "/community/update_profile_indicators",
-          data: JSON.stringify({ indicators_to_remove: ids_to_remove}),
-          contentType: 'application/json; charset=utf-8',
-          success: function (data) {
-            window.location.reload();
-          }
-        });
-
-    })
-}
-function load_topics(){
-    if ($('#loaded_topics').html() == ""){
-        $('#add_indicator').addClass('disabled')
-        $('#remove_temp_indicators').addClass('disabled')
-        $('#update_profile_indicators').addClass('disabled')
-        $('#create_profile_button').addClass('disabled')
-        $('#save_profile_as_default').addClass('disabled')
-        $.ajax({type: "GET",
-            url: "/community/get_topics/",
-            success: function (data) {
-                $('#loaded_topics').append($(data.html));
-                load_functions_for_indicators();
-                $('#add_indicator').removeClass('disabled')
-                $('#remove_temp_indicators').removeClass('disabled')
-                $('#update_profile_indicators').removeClass('disabled')
-                $('#create_profile_button').removeClass('disabled')
-                $('#save_profile_as_default').removeClass('disabled')
-            }
-        });
-    }
-}
-
-$('#add_indicator').click(function() {
-    $("#indicator_popup").modal('show');
-});
-
-function build_filters(filter_data) {
-    var filters_html = '<ul>';
-    $.each(filter_data, function(i, fltr) {
-        filters_html += '<li>';
-        filters_html += '<h3 class="indicator-filter-name">' + fltr.name + '</h3>';
-        filters_html += '<ul>';
-        $.each(fltr.values, function(j, val) {
-            filters_html += '<li class="indicator-filter">';
-            filters_html += '<span class="indicator-filter-value">' + val + '</span>';
-            filters_html += '<input type="radio" class="indicator-filter-radio" name="' + fltr.name + '" value="' + val + '"';
-            if (j == 0)
-                filters_html += ' checked';
-            filters_html += '>';
-            filters_html += '</li>';
-        });
-        filters_html += '</ul>';
-        filters_html += '</li>';
+    $('#add_indicator').click(function() {
+        $("#indicator_popup").modal('show');
     });
-    filters_html += '</ul>';
-
-    return filters_html;
-}
-
-function get_filters() {
-    return $('#filters').find('input:checked').map(function(i, e) {
-        return {field: $(e).attr('name'), values: [$(e).val()]}
-    }).get();
-}
-
-function remove_temp_indicators(){
-    if ($('.temp').size() != 0) {
-        ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
-        $.ajax({type: "POST",
-            url: "/community/remove_temp_indicators",
-            data: JSON.stringify({indicator_ids: ids}),
-            contentType: 'application/json; charset=utf-8'
-        });
-    }
-}
-
-$('#remove_temp_indicators').on( 'click', function(){
-    remove_temp_indicators();
-
-    $(this).hide();
-    $('.temp').closest('tr').hide();
-});
-
-$(function(){
-    var current_dataset;
 
     $('#save_towns').click(function() {
-        var towns = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
-        window.location.search = 'towns=' + towns.join();
+        towns = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+        towns = towns.join(',');
+        load_indicators_data()
+        $('div.modal').modal('hide');
     });
 
     $('#save_profile_as_default').click(function() {
@@ -156,7 +209,9 @@ $(function(){
             data: JSON.stringify({indicator_ids: ids}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                window.location.reload();
+                $('span.temp').addClass('hidden')
+                $('#message').html("<h3> Default indicators are successfully saved.</h3>")
+                $("#message_popup").modal('show');
             }
         });
     });
@@ -172,29 +227,29 @@ $(function(){
                 success: function (data) {
                     data = JSON.parse(data)
                     if (data.success == true){
-                        window.location = data.redirect_link
+                        $('div.modal').modal('hide');
+                        $('span.temp').addClass('hidden')
+                        $('#message').html("<h3>New profile has been successfully saved.</h3>\
+                                          <br>  <a href='"+ data.redirect_link +"'> Click here </a> to check it.")
+                        $("#message_popup").modal('show');
                     }
                 }
             });
         }
     });
 
-    $('.table_data').hover(function() {
-        $(this).find('.close_pic').animate({opacity: 1.0}, 300);
-    }, function () {
-        $(this).find('.close_pic').animate({opacity: 0.0}, 300);
+
+    $(window).bind('beforeunload', function() {
+      return remove_temp_indicators();
     });
 
+    load_indicators_data();
     load_topics();
-    $('#update_profile_indicators').hide();
-    if ($('.temp').size() == 0) $('#remove_temp_indicators').hide()
 
     $("#profile_name").keyup(function(event){
         if(event.keyCode == 13){
             $("#create_profile").click();
         }
     });
-    // $(window).bind('beforeunload', function(){
-    //     remove_temp_indicators()
-    // });
+
 });

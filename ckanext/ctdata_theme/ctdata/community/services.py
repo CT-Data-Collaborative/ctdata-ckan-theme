@@ -38,7 +38,6 @@ class CommunityProfileService(object):
     def get_all_towns(self):
         return self.session.query(Town).order_by(Town.name).all()
 
-
     def get_towns_by_names(self, towns_names):
         return self.session.query(Town).filter(Town.name.in_(set(towns_names))).all()
 
@@ -129,6 +128,7 @@ class CommunityProfileService(object):
 
         self.session.commit()
 
+
     def create_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, permission = 'public', description = '', group_ids = ''):
 
         dataset = DatasetService.get_dataset(dataset_id)
@@ -169,11 +169,13 @@ class CommunityProfileService(object):
 
         is_global = False
         temp      = False if ind_type == 'headline' or ind_type == 'gallery' else True
-        indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], is_global, data_type, int(years),
-                                     variable, temp, ind_type, visualization_type, permission, description, group_ids)
+        indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], data_type, int(years),
+                                     variable, ind_type, visualization_type, permission, description, group_ids)
         owner.indicators.append(indicator)
 
         self.session.add(indicator)
+
+        return indicator
 
     def remove_indicator_id_from_profiles(self, indicator_id):
         community_profiles = self.get_all_profiles()

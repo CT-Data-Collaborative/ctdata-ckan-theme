@@ -46,31 +46,6 @@ class Town(Base):
     def __repr__(self):
         return "Town %s (%d)" % (self.name, self.fips)
 
-
-#Error:
-#   sqlalchemy.exc.NoReferencedTableError:
-#       Foreign key associated with column 'ctdata_group_indicators.group_id' could not find table 'group'
-#       with which to generate a foreign key to target column 'id'
-
-# class GroupIndicator(Base):
-#     __tablename__ = 'ctdata_group_indicators'
-
-#     id           = Column(Integer, primary_key=True)
-#     indicator_id = Column(String, ForeignKey("ctdata_profile_indicators.id"), nullable = False)
-#     group_id     = Column(Text, ForeignKey('group.id'), nullable = False)
-
-#     indicator = relationship("ProfileIndicator", backref=backref("groups", cascade="save-update, merge, "
-#                                                                                         "delete, delete-orphan"))
-#     group     = relationship("UserInfo", backref="indicators")
-
-#     def __init__(self, indicator_id, group_id):
-#         self.indicator_id = indicator_id
-#         self.group_id = group_id
-
-#     def __repr__(self):
-#         return "Group Indicator %s (%d)" % (self.indicator_id, self.group_id)
-
-
 class ProfileIndicator(Base):
     __tablename__ = 'ctdata_profile_indicators'
 
@@ -90,17 +65,20 @@ class ProfileIndicator(Base):
     visualization_type = Column(String)
     description        = Column(Text)
 
-    def __init__(self, name, filters, dataset_id, is_global, data_type, year, variable, temp, ind_type, visualization_type, permission, description, group_ids):
+    profile_id = Column(BigInteger, ForeignKey('ctdata_profiles.id'))
+
+    def __init__(self, name, filters, dataset_id, data_type, year, variable, ind_type, visualization_type, profile_id, permission, description, group_ids):
         self.name       = name
         self.filters    = filters
         self.dataset_id = dataset_id
-        self.is_global  = is_global
+        # self.is_global  = is_global
         self.data_type  = data_type
         self.year       = year
         self.variable   = variable
         self.ind_type   = ind_type
-        self.temp       = temp
+        # self.temp       = temp
         self.permission = permission
+        self.profile_id = profile_id
         self.group_ids  = group_ids
         self.visualization_type  = visualization_type
         self.description  = description
@@ -124,7 +102,7 @@ class ProfileIndicator(Base):
         return get_action('package_show')(data_dict={'id': self.dataset_id})['title']
 
     def link_to_visualization(self):
-        view = self.visualization_type
+        view = self.visualization_type or 'table'
         location = ''
         filters_hash = {}
 
@@ -133,6 +111,27 @@ class ProfileIndicator(Base):
 
         dataset = get_action('package_show')(data_dict={'id': self.dataset_id})['title']
         dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
+
+        link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
+        link         = "/visualization/" + str(dataset_url) + link_params
+
+        return link
+
+    def link_to_visualization_with_locations(self, locations_names):
+        view = self.visualization_type or 'table'
+        location = ''
+        dataset         = get_action('package_show')(data_dict={'id': self.dataset_id})
+        geography       = filter(lambda x: x['key'] == 'Geography', dataset['extras'])
+        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
+        filters_hash = {}
+        filters_hash[geography_param] = locations_names
+
+        filters = map(lambda fl: filters_hash.update( {fl['field']: (fl['values'][0] if len(fl['values']) == 1 else fl['values'])}),
+                                     json.loads(self.filters))
+
+
+        dataset_url  = dataset['title'].replace(' ', '-').replace("'", '').lower()
 
         link_params  =  "?v=" + view + "&f=" + json.dumps(filters_hash)
         link         = "/visualization/" + str(dataset_url) + link_params
@@ -191,8 +190,9 @@ class UserInfo(Base):
     __tablename__ = 'ctdata_user_info'
 
     ckan_user_id = Column(String, primary_key=True)
-    is_admin = Column(Boolean)
+    is_admin     = Column(Boolean)
 
+    # profiles   = association_proxy("user_profiles", "profile")
     indicators = association_proxy("indicators_links", "indicator")
 
     def __init__(self, ckan_user_id, is_admin=False):

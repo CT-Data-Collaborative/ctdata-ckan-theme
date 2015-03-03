@@ -15,6 +15,7 @@ from ..users.services import UserService
 from ..visualization.services import DatasetService
 from ..community.services import CommunityProfileService
 from ..topic.services import TopicSerivce
+from ..location.services import LocationService
 from ckan.controllers.user import UserController
 from IPython import embed
 
@@ -26,6 +27,7 @@ class UserController(UserController):
         self.session = Database().session_factory()
         self.community_profile_service = CommunityProfileService(self.session)
         self.user_service = UserService(self.session)
+        self.location_service = LocationService(self.session)
 
     def community_profiles(self):
         user_name = http_request.environ.get("REMOTE_USER")
@@ -34,10 +36,9 @@ class UserController(UserController):
             abort(404)
 
         user = self.user_service.get_or_create_user(user_name) if user_name else None
-        community_profiles = self.community_profile_service.get_user_profiles(user.ckan_user_id)
+        profiles = self.location_service.get_user_profiles(user.ckan_user_id)
 
-        self.session.close()
-        return base.render('user_community_profiles.html', extra_vars={'community_profiles': community_profiles})
+        return base.render('user_community_profiles.html', extra_vars={'profiles': profiles})
 
     def my_gallery(self):
         indicators, requested_user_name = self._prepare_for_user_gallery(http_request)
@@ -109,11 +110,11 @@ class UserController(UserController):
             names_hash  = json_body.get('names_hash')
             profiles_to_remove  = json_body.get('profiles_to_remove')
 
-            for community_id, name in names_hash.iteritems():
-                self.community_profile_service.update_community_profile_name(int(community_id), name, user.ckan_user_id)
+            # for community_id, name in names_hash.iteritems():
+            #     self.community_profile_service.update_community_profile_name(int(community_id), name, user.ckan_user_id)
 
-            for community_id in profiles_to_remove:
-                self.community_profile_service.remove_community_profile(int(community_id), user.ckan_user_id)
+            for profile_id in profiles_to_remove:
+                self.location_service.remove_profile(int(profile_id), user.ckan_user_id)
 
         http_response.headers['Content-type'] = 'application/json'
         self.session.close()

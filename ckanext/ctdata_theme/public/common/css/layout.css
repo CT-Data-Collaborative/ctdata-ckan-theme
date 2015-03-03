@@ -465,3 +465,7 @@ a.disabled {
   pointer-events: none;
   cursor: default;
 }
+
+td:hover a.hide_indicator img{
+	opacity: 1.0 !important;
+}
