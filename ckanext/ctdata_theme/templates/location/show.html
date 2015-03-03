@@ -8,6 +8,11 @@
 {% block page_name %}Data by Location - {{default_profile.name}}</span>{% endblock %}
 {% block page_description %}{% endblock %}
 {% block main_content %}
+<div class="flash-messages">
+  <div class="alert fade in alert-info text-center">
+      Still under development - Education data currently unavailable for this view as we move to district level data only. Data will be available in this view by the end of March.
+  </div>
+</div>
 
 <span id="location" class="hidden">{{location.name}}</span>
 <div class="spinner small"> <img src="/common/images/loading.gif"/> </div>
