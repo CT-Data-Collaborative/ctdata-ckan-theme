@@ -7,6 +7,19 @@
 
 {% block page_name %}Data by Location - <span id="location">{{location}}</span>{% endblock %}
 {% block page_description %}Create a Profile for Your Community{% endblock %}
+{% block flash %}
+        {% set flash_messages = h.flash.pop_messages() | list %}
+        <div class="flash-messages">
+          {% for message in flash_messages %}
+            <div class="alert fade in {{ message.category }} text-center">
+              {{ h.literal(message) }}
+            </div>
+          {% endfor %}
+            <div class="alert fade in alert-info text-center">
+                Still under development - Education data currently unavailable for this view as we move to district level data only. Data will be available in this view by the end of March.
+            </div>
+        </div>
+{% endblock %}
 {% block main_content %}
 
 {% if location != community.name %}
