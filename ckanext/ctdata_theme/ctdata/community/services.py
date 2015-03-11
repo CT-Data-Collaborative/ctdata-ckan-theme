@@ -170,7 +170,7 @@ class CommunityProfileService(object):
         is_global = False
         temp      = False if ind_type == 'headline' or ind_type == 'gallery' else True
         indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], data_type, int(years),
-                                     variable, ind_type, visualization_type, permission, description, group_ids)
+                                     variable, ind_type, visualization_type, None, permission, description, group_ids)
         owner.indicators.append(indicator)
 
         self.session.add(indicator)
