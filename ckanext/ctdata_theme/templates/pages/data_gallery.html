@@ -68,10 +68,10 @@
                       {{indicator.name}}
                     </a>
                 </td>
-                <td><a href="/dataset/{{indicator['dataset_name']}}">  {{indicator['dataset_name']}} </a> </span></td>
+                <td>{{indicator['dataset_name']}}</td>
                 <td><p>{{indicator['description']}}</p></td>
                 <td> <span>{{indicator['created_at']}}</span></td>
-                <td><a href="/user/{{indicator['user']}}"> {{indicator['user']}} </a></td>
+                <td>{{indicator['user']}}</td>
                 </tr>
               {% endfor %}
             </tbody>
