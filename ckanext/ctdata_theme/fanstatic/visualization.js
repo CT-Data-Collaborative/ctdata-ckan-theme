@@ -302,19 +302,31 @@ function set_map_checkbox(){
 
   //Check most recent year
   values = []
-  if ($("input.Year").length > 1){
 
-    $("input:checked.Year").map(function(){
-      values.push(parseInt($(this).val()))
+  years_inputs = []
+  if ($("input:checked.Year").length > 0)
+    years_inputs = $("input:checked.Year")
+  else
+    years_inputs = $("input.Year")
+
+  if (years_inputs.length > 1){
+    $(years_inputs).map(function(){
+      value = $(this).val()
+      if (value.indexOf('-') == -1)
+        values.push(parseInt( value ))
+      else
+        values.push(parseInt( value.split('-')[1] ))
     });
-    max_year = Math.max.apply(null, values).toString()
+    max_year = Math.max.apply(null, values)
+    i = values.indexOf(max_year) || 0
 
     $("input:checked.Year").prop('checked', false);
-    $("input:#"+ max_year +"Check.Year").prop('checked', true);
+    $("input:#"+ years_inputs[i].value +"Check.Year").prop('checked', true);
   }
   else{
-    $("input.Year").prop('checked', true);
+    years_inputs.prop('checked', true);
   }
+
   choose_measure_type_for_charts();
 }
 
@@ -610,7 +622,10 @@ function unit_for_value(value, type){
       return '$' + value.toString()
     }
     else{
-      return value.toString() + units[type]
+      if (value)
+        return value.toString() + units[type]
+      else
+        return value
     }
   }
   else{
