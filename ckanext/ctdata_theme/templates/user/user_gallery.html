@@ -8,6 +8,7 @@
 
   {{ h.build_nav_icon('user_datasets', _('Datasets'), id=c.userobj.name) }}
   {{ h.build_nav_icon('user_activity_stream', _('Activity Stream'), id=c.userobj.name) }}
+  {{ h.build_nav_icon('user_community_profiles', _('My Community Profiles'), user_id=c.userobj.name) }}
   {{ h.build_nav_icon('user_gallery', _('My Gallery'), user_id=c.userobj.name) }}
 
 {% endblock %}
