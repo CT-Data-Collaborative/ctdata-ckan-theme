@@ -27,10 +27,11 @@ from termcolor import colored
 
 class LocationsController(base.BaseController):
     def __init__(self):
-        self.session = Database().session_factory()
+        self.session = Database().session_factory(expire_on_commit=False)
         self.community_profile_service = CommunityProfileService(self.session)
         self.user_service     = UserService(self.session)
         self.location_service = LocationService(self.session)
+
     #end
 
     def show(self, location_name):
@@ -45,18 +46,21 @@ class LocationsController(base.BaseController):
             location_profile = LocationProfile(location.id, default_profile.id)
             self.session.add(location_profile)
 
+        self.session.close()
         return base.render('location/show.html', extra_vars={'location': location, 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id, 'default_profile': default_profile})
     #end
 
     def data_by_location(self):
         locations = self.location_service.get_all_locations()
 
+        self.session.close()
         return base.render('location/data_by_location.html', extra_vars={'locations': locations})
     #end
 
     def manage_locations(self):
         locations = self.location_service.get_all_locations()
 
+        self.session.close()
         return base.render('location/manage_locations.html', extra_vars={'locations': locations})
     #end
 
@@ -71,6 +75,7 @@ class LocationsController(base.BaseController):
             self.session.add(profile)
             self.session.commit()
 
+        self.session.close()
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps({'location_name': location.name, 'location_fips': location.fips})
     #end
@@ -78,6 +83,7 @@ class LocationsController(base.BaseController):
     def new_profile(self, location_name):
         location = self.location_service.get_location(location_name)
 
+        self.session.close()
         return base.render('location/new_profile.html', extra_vars={'location': location})
     #end
 
@@ -130,15 +136,17 @@ class LocationsController(base.BaseController):
                    'values'  : values
                 }
 
+                self.session.close()
                 return json.dumps({'success': True, 'indicator': ind_data })
             except toolkit.ObjectNotFound, e:
+                self.session.close()
                 return json.dumps({'success': False, 'error': str(e)})
             except ProfileAlreadyExists, e:
+                self.session.close()
                 return json.dumps({'success': False, 'error': str(e)})
 
+        self.session.close()
         return json.dumps({'success': False, 'error': str('Indicator cannot be saved')})
-
-        return base.render('location/new_profile.html', extra_vars={'location': location})
     #end
 
     def create_location_profile(self, location_name):
@@ -160,6 +168,7 @@ class LocationsController(base.BaseController):
             redirect_link = '/community/' + str(profile.id)
             return json.dumps({'success': True,  'redirect_link': redirect_link})
 
+        self.session.close()
         return json.dumps({'success': False, 'error': str('Profile cannot be saved')})
     #end
 
@@ -172,7 +181,7 @@ class LocationsController(base.BaseController):
         towns           = self.location_service.get_all_locations()
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
 
-
+        self.session.close()
         return base.render('location/show.html', extra_vars={'location': default_profile.locations[0], 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id, 'default_profile': default_profile})
     #end
 
@@ -230,6 +239,7 @@ class LocationsController(base.BaseController):
 
             ind_data.append(data)
 
+        self.session.close()
         return json.dumps({'success': True, 'ind_data': ind_data, 'towns':  locations_names})
     #end
 
@@ -255,7 +265,7 @@ class LocationsController(base.BaseController):
                 indicator  = self.location_service.create_indicator(indicator['name'], indicator['filters'], indicator['dataset_id'], user, indicator['ind_type'], 'table', profile.id)
                 profile.indicators.append(indicator)
 
-
+        self.session.close()
         return json.dumps({'success': True })
     #end
 
@@ -264,6 +274,7 @@ class LocationsController(base.BaseController):
         if http_request.method == 'POST':
             self.location_service.remove_profile(profile_id, c.userobj.id)
 
+        self.session.close()
         return json.dumps({'success': True })
 
 
