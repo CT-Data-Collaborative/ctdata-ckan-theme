@@ -34,7 +34,7 @@ class LocationsController(base.BaseController):
 
     #end
 
-    def show(self, location_name):
+    def location_show(self, location_name):
         location = self.location_service.get_location(location_name)
         default_profile = location.default_profile()
         towns           = self.location_service.get_all_locations()

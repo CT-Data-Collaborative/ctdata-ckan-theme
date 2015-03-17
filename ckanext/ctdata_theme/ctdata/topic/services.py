@@ -27,8 +27,7 @@ class TopicSerivce(object):
 
 
           try:
-            hidden_list = []
-            hidden_list.append( yaml.load(hidden_meta[0]['value']))
+            hidden_list = yaml.load(hidden_meta[0]['value']).split(',')
           except IndexError:
             hidden_list = []
 
@@ -86,8 +85,7 @@ class TopicSerivce(object):
             hidden_meta = filter(lambda x: x['key'] == 'hidden_in', metadata)
 
             try:
-              hidden_list = []
-              hidden_list.append( yaml.load(hidden_meta[0]['value']))
+              hidden_list = yaml.load(hidden_meta[0]['value']).split(',')
             except IndexError:
               hidden_list = []
 
