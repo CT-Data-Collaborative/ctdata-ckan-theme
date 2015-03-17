@@ -224,10 +224,9 @@ class CTDataController(base.BaseController):
         except IndexError:
           defaults = []
 
-        disabled_metadata = filter(lambda x: x['key'] == "disabled_views", metadata)
-        print disabled_metadata
+        disabled_metadata = filter(lambda x: x['key'] == "Disabled Views", metadata)
         try:
-          disabled = yaml.load(disabled_metadata[0]['value'])
+          disabled = yaml.load(disabled_metadata[0]['value']).split(',')
         except IndexError:
           disabled = []
 
