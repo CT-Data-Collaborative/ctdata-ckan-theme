@@ -355,8 +355,9 @@ function display_data(){
       new_type = display_type
     }
 
-    if(disabled.indexOf(new_type) != -1){
-      display_error("This visualization is disabled for this dataset")
+    if(disabled.indexOf(new_type) > -1){
+      display_error("This visualization is disabled for this dataset");
+      hide_spinner();
       return 0;
     }
 

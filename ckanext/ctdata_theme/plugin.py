@@ -112,7 +112,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         with routes.mapper.SubMapper(
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.location.controllers:LocationsController') as m:
-            m.connect('location', '/location/{location_name}', action='show')
+            m.connect('location', '/location/{location_name}', action='location_show')
             m.connect('data_by_location', '/data-by-location', action='data_by_location')
             m.connect('manage_locations', '/manage-locations', action='manage_locations')
             m.connect('create_location',  '/create_location',  action='create_location')
@@ -224,10 +224,9 @@ class CTDataController(base.BaseController):
         except IndexError:
           defaults = []
 
-        disabled_metadata = filter(lambda x: x['key'] == "disabled_views", metadata)
-        print disabled_metadata
+        disabled_metadata = filter(lambda x: x['key'] == "Disabled Views", metadata)
         try:
-          disabled = yaml.load(disabled_metadata[0]['value'])
+          disabled = yaml.load(disabled_metadata[0]['value']).split(',')
         except IndexError:
           disabled = []
 
