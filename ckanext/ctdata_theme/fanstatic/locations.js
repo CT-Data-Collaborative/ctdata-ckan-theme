@@ -381,7 +381,7 @@ $(function(){
                 success: function (data) {
                     if (data.success == true){
                         $('div.modal').modal('hide');
-                        $('#message').html("<h3>New profile has been successfully saved.</h3><br>  <a href='"+ data.redirect_link +"'> Click here </a> to check it.")
+                        $('#message').html("<h3>New profile has been successfully saved.</h3><br>  <a href='"+ data.redirect_link +"'> Click here </a> to view it.")
                         $("#message_popup").modal('show');
                     }
                     else{
