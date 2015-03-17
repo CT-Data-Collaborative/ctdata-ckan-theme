@@ -12,6 +12,7 @@ from ckan.common import response as http_response, c, request as http_request
 import ckan.lib.helpers as h
 from models import Location, CtdataProfile, LocationProfile
 
+from ..utils import dict_with_key_value
 from ..database import Database
 from ..users.services import UserService
 from ..visualization.services import DatasetService
@@ -21,6 +22,7 @@ from ..visualization.views import ViewFactory
 from ..community.services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
 
 from services import LocationService
+
 
 from IPython import embed
 from termcolor import colored
@@ -128,7 +130,7 @@ class LocationsController(base.BaseController):
                          'id': indicator.id,
                     'filters': indicator.filters,
                   'data_type': indicator.data_type,
-                       'year': indicator.year,
+                       'year': dict_with_key_value("field", "Year", json.loads(indicator.filters))['values'][0],
                     'link_to': indicator.link_to_visualization_with_locations(locations_names),
                     'dataset': indicator.dataset_name(),
                  'dataset_id': indicator.dataset_id,
@@ -229,7 +231,7 @@ class LocationsController(base.BaseController):
                      'id': indicator.id,
                 'filters': indicator.filters,
               'data_type': indicator.data_type,
-                   'year': indicator.year,
+                   'year': dict_with_key_value("field", "Year", json.loads(indicator.filters))['values'][0],
                 'link_to': indicator.link_to_visualization_with_locations(locations_names),
                 'dataset': indicator.dataset_name(),
              'dataset_id': indicator.dataset_id,
