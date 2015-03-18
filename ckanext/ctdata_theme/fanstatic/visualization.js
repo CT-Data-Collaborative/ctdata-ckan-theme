@@ -227,9 +227,11 @@ function set_display_type(new_type){
   set_filters(new_type);
 
   $.each($('option'), function(i){
-    $('option')[i].value = $('option')[i].value.replace('v=' + display_type, 'v='+ new_type);
+    $('option')[i].value = $('option')[i].value.replace('v=map',   'v='+ new_type);
+    $('option')[i].value = $('option')[i].value.replace('v=table', 'v='+ new_type);
+    $('option')[i].value = $('option')[i].value.replace('v=column','v='+ new_type);
+    $('option')[i].value = $('option')[i].value.replace('v=line',  'v='+ new_type);
   })
-
 
   display_type = new_type;
 
