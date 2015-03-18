@@ -114,7 +114,9 @@
           <li>
             <h2><a href="/community/{{profile.id}}" class="underlined">{{profile.name}}</a>
             {% if profile.user_id == c.userobj.id %}
-              <a href="javascript:void(0)" class="remove_profile pull-right btn btn-default btn-mini" id="{{profile.id}}">x</i></a>
+            <a href="javascript:void(0)" class="remove_profile pull-right btn btn-default btn-mini" id="{{profile.id}}">
+              <span class="text-error"> x </span>
+            </a>
             {% endif %}
             </h2>
             <br>
