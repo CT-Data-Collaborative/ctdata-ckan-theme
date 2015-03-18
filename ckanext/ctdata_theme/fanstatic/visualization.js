@@ -225,7 +225,14 @@ function set_display_type(new_type){
   set_icon(new_type);
   save_filters(display_type);
   set_filters(new_type);
+
+  $.each($('option'), function(i){
+    $('option')[i].value = $('option')[i].value.replace('v=' + display_type, 'v='+ new_type);
+  })
+
+
   display_type = new_type;
+
   if (display_type == 'map'){
       set_map_checkbox();
     }else if (display_type == 'column' || display_type == 'line'){
