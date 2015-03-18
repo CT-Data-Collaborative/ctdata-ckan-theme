@@ -85,8 +85,13 @@ $.each(data.data, function(i){
     return "Skip data for all of connecticut"
   }
   if (data.data[i]['value'] == SUPPRESSED_VALUE){
-    data.data[i]['value'] = '*'
-    asterisks_counter++;
+    if (geography_param != 'Town'){
+
+      if (data.data[i]['fips'] != '0None'){
+        data.data[i]['value'] = '*'
+        asterisks_counter++;
+      }
+    }
     return "Skip supressed data"
   }
   if(data.data[i]['value'] > max)
