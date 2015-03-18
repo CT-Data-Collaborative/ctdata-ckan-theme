@@ -314,6 +314,7 @@ function change_color(){
 }
 setTimeout(change_color(),1000)
 hide_spinner();
+$('#collapse' + geography_param).find('input').attr("disabled", true);
 //add gray map background
 $(".highcharts-container").css({
       backgroundImage: "url('/common/images/graymap.png')",

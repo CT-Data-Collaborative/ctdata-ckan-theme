@@ -41,11 +41,14 @@ class UserController(UserController):
         return base.render('user_community_profiles.html', extra_vars={'profiles': profiles})
 
     def my_gallery(self):
-        indicators, requested_user_name = self._prepare_for_user_gallery(http_request)
+        indicators, requested_user_name, user = self._prepare_for_user_gallery(http_request)
         return base.render('user/my_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': requested_user_name})
 
-    def user_gallery(self):
-        indicators, requested_user_name = self._prepare_for_user_gallery(http_request)
+    def user_gallery(self, user_id):
+        indicators, requested_user_name, user = self._prepare_for_user_gallery(http_request)
+        c.user    = user_id
+        c.userobj = model.User.by_name(c.user)
+        c.user_dict = {'id': c.user}
         return base.render('user/user_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': requested_user_name})
 
     def _prepare_for_user_gallery(self, http_request):
@@ -63,7 +66,7 @@ class UserController(UserController):
         c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
 
         self.session.close()
-        return indicators, requested_user_name
+        return indicators, requested_user_name, user
 
     def update_gallery_indicator(self):
         user_name    = http_request.environ.get("REMOTE_USER")
