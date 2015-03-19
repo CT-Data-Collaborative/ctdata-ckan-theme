@@ -94,9 +94,9 @@ $.each(data.data, function(i){
     }
     return "Skip supressed data"
   }
-  if(data.data[i]['value'] > max)
+  if(data.data[i]['value'] > max && data.data[i]['fips'] != '0None')
     max = data.data[i]['value'];
-  if(data.data[i]['value'] < min)
+  if(data.data[i]['value'] < min && data.data[i]['fips'] != '0None')
     min = data.data[i]['value'];
 });
 
@@ -132,8 +132,12 @@ if (!cur_mt_is_percent){
       if (round > 0) step = (Math.floor(step/Math.pow(10,round)))*Math.pow(10,round);
   }
 }
-else
+else{
   step = Math.ceil(range/numClasses)
+  if (step*numClasses > range + 1)
+    step = Math.floor(range/numClasses)
+}
+
 
 // Data Class for Supressed data
 if (asterisks_counter > 0) dataClasses.push({name: 'Suppressed', color: 'rgba(222, 134, 9, 1)', to: '*'});
