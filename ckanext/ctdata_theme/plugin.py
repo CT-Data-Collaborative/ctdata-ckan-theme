@@ -215,6 +215,16 @@ class CTDataController(base.BaseController):
             abort(404)
 
         metadata = dataset_meta['extras']
+
+        disable_visualizations_data = filter(lambda x: x['key'] == 'Disable Visualizations', metadata)
+        try:
+          disable_visualizations = yaml.load(disable_visualizations_data[0]['value'])
+        except IndexError:
+          disable_visualizations = False
+
+        if disable_visualizations:
+            abort(404)
+
         default_metadata = filter(lambda x: x['key'] == 'Default', metadata)
 
         try:
