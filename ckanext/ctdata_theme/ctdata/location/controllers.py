@@ -201,6 +201,9 @@ class LocationsController(base.BaseController):
         json_body      = json.loads(http_request.body, encoding=http_request.charset)
         location_names = json_body.get('locations')
         location_names = location_names.split(',')
+        if 'No Location' in location_names:
+            location_names.remove('No Location')
+
         profile        = self.location_service.get_profile(profile_id)
         user           = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
         locations      = []
