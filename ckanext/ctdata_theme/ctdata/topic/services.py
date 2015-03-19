@@ -23,7 +23,7 @@ class TopicSerivce(object):
       for dataset_name in dataset_names:
           dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
           metadata = DatasetService.get_dataset_meta(dataset_name)['extras']
-          hidden_meta = filter(lambda x: x['key'] == 'hidden_in', metadata)
+          hidden_meta = filter(lambda x: x['key'] == 'Hidden In', metadata)
 
 
           try:
@@ -82,7 +82,7 @@ class TopicSerivce(object):
         for dataset_name in dataset_names:
             dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
             metadata = DatasetService.get_dataset_meta(dataset_name)['extras']
-            hidden_meta = filter(lambda x: x['key'] == 'hidden_in', metadata)
+            hidden_meta = filter(lambda x: x['key'] == 'Hidden In', metadata)
 
             try:
               hidden_list = yaml.load(hidden_meta[0]['value']).split(',')
