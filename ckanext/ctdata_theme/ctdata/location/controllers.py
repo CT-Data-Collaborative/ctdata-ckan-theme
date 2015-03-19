@@ -37,7 +37,11 @@ class LocationsController(base.BaseController):
     #end
 
     def location_show(self, location_name):
-        location = self.location_service.get_location(location_name)
+        try:
+            location = self.location_service.get_location(location_name)
+        except toolkit.ObjectNotFound:
+            abort(404)
+
         default_profile = location.default_profile()
         towns           = self.location_service.get_all_locations()
         towns_names     = ','.join( l for l in  [location.name])
