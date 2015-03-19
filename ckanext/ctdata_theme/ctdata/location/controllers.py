@@ -185,7 +185,7 @@ class LocationsController(base.BaseController):
 
         self.session.close()
 
-        try
+        try:
             location_name = towns_names[0]
         except IndexError:
             location_name = 'No Location'
