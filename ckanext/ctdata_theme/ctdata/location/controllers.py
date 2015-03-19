@@ -184,7 +184,13 @@ class LocationsController(base.BaseController):
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
 
         self.session.close()
-        return base.render('location/show.html', extra_vars={'location': default_profile.locations[0], 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id, 'default_profile': default_profile})
+
+        try
+            location_name = towns_names[0]
+        except IndexError:
+            location_name = 'No Location'
+
+        return base.render('location/show.html', extra_vars={'location': location_name, 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id, 'default_profile': default_profile})
     #end
 
     def load_profile_indicators(self, profile_id):
