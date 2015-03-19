@@ -201,8 +201,6 @@ class LocationsController(base.BaseController):
         json_body      = json.loads(http_request.body, encoding=http_request.charset)
         location_names = json_body.get('locations')
         location_names = location_names.split(',')
-        if 'No Location' in location_names:
-            location_names.remove('No Location')
 
         profile        = self.location_service.get_profile(profile_id)
         user           = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
@@ -216,12 +214,18 @@ class LocationsController(base.BaseController):
                     profile.locations.remove(profile_location)
 
             for location_name in location_names:
-                location = self.location_service.get_location(location_name)
-                locations.append( location )
-                if location not in profile.locations:
-                    profile.locations.append(location)
-                    location_profile = LocationProfile(location.id, profile.id)
-                    self.session.add(location_profile)
+                try:
+                    location = self.location_service.get_location(location_name)
+                    locations.append( location )
+
+                    if location not in profile.locations:
+                        profile.locations.append(location)
+                        location_profile = LocationProfile(location.id, profile.id)
+                        self.session.add(location_profile)
+
+                except NotFound:
+                    pass
+
 
             self.session.commit()
             locations_names = map(lambda t: t.name, profile.locations)
