@@ -223,7 +223,7 @@ class LocationsController(base.BaseController):
                         location_profile = LocationProfile(location.id, profile.id)
                         self.session.add(location_profile)
 
-                except NotFound:
+                except toolkit.ObjectNotFound:
                     pass
 
 
