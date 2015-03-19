@@ -202,7 +202,12 @@ class LocationsController(base.BaseController):
 
         session_id     = session.id
         user_name      = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
-        json_body      = json.loads(http_request.body, encoding=http_request.charset)
+        try:
+            json_body      = json.loads(http_request.body, encoding=http_request.charset)
+        except ValueError:
+            self.session.close()
+            return json.dumps({'success': True, 'ind_data': [], 'towns':  []})
+
         location_names = json_body.get('locations')
         location_names = location_names.split(',')
 
