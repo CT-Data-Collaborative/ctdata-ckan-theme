@@ -632,7 +632,7 @@ function unit_for_value(value, type){
       return '$' + value.toString()
     }
     else{
-      if (value)
+      if (value || value == 0)
         return value.toString() + units[type]
       else
         return value
