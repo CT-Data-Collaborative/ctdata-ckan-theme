@@ -5,8 +5,10 @@
 {% set vars = {'hidden': False} %}
 
 {% for item in pkg['extras'] %}
-  {% if item['key'] == 'Disable Visualizations' %}
-    {% if vars.update({'hidden': item['value']}) %} {% endif %}
+  {% if item['key'] == 'Hidden In' %}
+    {% if 'visualization' in item['value'] %}
+      {% if vars.update({'hidden': True}) %} {% endif %}
+    {% endif %}
   {% endif %}
 {% endfor %}
 
