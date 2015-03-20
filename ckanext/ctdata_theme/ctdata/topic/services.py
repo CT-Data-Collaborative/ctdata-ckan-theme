@@ -24,14 +24,11 @@ class TopicSerivce(object):
           dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
           metadata = DatasetService.get_dataset_meta(dataset_name)['extras']
           hidden_meta = filter(lambda x: x['key'] == 'Hidden In', metadata)
-<<<<<<< HEAD
+
           try:
             hidden_list = yaml.load(hidden_meta[0]['value']).replace(', ', ',').split(',')
           except IndexError:
             hidden_list = []
-=======
->>>>>>> develop
-
 
           disable_visualizations_data = filter(lambda x: x['key'] == 'Disable Visualizations', metadata)
           try:
