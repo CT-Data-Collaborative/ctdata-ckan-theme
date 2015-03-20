@@ -75,6 +75,7 @@ jQuery.fn.table2CSV = function(options) {
         // var csvContent = "data:text/csv;charset=utf-8,";
         //     csvContent += data
 
+       community_name = $('#default_profile_name').text()
        if (navigator.appName == "Microsoft Internet Explorer") {
             var oWin = window.open();
             oWin.document.write('sep=,\r\n' + data);
@@ -84,7 +85,6 @@ jQuery.fn.table2CSV = function(options) {
         }
 
         download = document.getElementById('download');
-        community_name = $('#community_name').val()
         download.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(data));
         download.setAttribute('download', community_name + '.csv');
         return true;
