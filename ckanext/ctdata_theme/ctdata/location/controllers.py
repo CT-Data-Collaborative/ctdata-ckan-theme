@@ -37,7 +37,11 @@ class LocationsController(base.BaseController):
     #end
 
     def location_show(self, location_name):
-        location = self.location_service.get_location(location_name)
+        try:
+            location = self.location_service.get_location(location_name)
+        except toolkit.ObjectNotFound:
+            abort(404)
+
         default_profile = location.default_profile()
         towns           = self.location_service.get_all_locations()
         towns_names     = ','.join( l for l in  [location.name])
@@ -184,7 +188,13 @@ class LocationsController(base.BaseController):
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
 
         self.session.close()
-        return base.render('location/show.html', extra_vars={'location': default_profile.locations[0], 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id, 'default_profile': default_profile})
+
+        try:
+            location_name = towns_names[0]
+        except IndexError:
+            location_name = 'No Location'
+
+        return base.render('location/show.html', extra_vars={'location': location_name, 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id, 'default_profile': default_profile})
     #end
 
     def load_profile_indicators(self, profile_id):
@@ -192,9 +202,15 @@ class LocationsController(base.BaseController):
 
         session_id     = session.id
         user_name      = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
-        json_body      = json.loads(http_request.body, encoding=http_request.charset)
+        try:
+            json_body      = json.loads(http_request.body, encoding=http_request.charset)
+        except ValueError:
+            self.session.close()
+            return json.dumps({'success': True, 'ind_data': [], 'towns':  []})
+
         location_names = json_body.get('locations')
         location_names = location_names.split(',')
+
         profile        = self.location_service.get_profile(profile_id)
         user           = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
         locations      = []
@@ -207,12 +223,18 @@ class LocationsController(base.BaseController):
                     profile.locations.remove(profile_location)
 
             for location_name in location_names:
-                location = self.location_service.get_location(location_name)
-                locations.append( location )
-                if location not in profile.locations:
-                    profile.locations.append(location)
-                    location_profile = LocationProfile(location.id, profile.id)
-                    self.session.add(location_profile)
+                try:
+                    location = self.location_service.get_location(location_name)
+                    locations.append( location )
+
+                    if location not in profile.locations:
+                        profile.locations.append(location)
+                        location_profile = LocationProfile(location.id, profile.id)
+                        self.session.add(location_profile)
+
+                except toolkit.ObjectNotFound:
+                    pass
+
 
             self.session.commit()
             locations_names = map(lambda t: t.name, profile.locations)
