@@ -2,11 +2,23 @@
 {% set url_action = 'resource_edit' if url_is_edit and can_edit else 'resource_read' %}
 {% set url = h.url_for(controller='package', action=url_action, id=pkg.name, resource_id=res.id) %}
 
+{% set vars = {'hidden': False} %}
+
+{% for item in pkg['extras'] %}
+  {% if item['key'] == 'Hidden In' %}
+    {% if 'visualization' in item['value'] %}
+      {% if vars.update({'hidden': True}) %} {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
 <li data-id="{{ res.id }}">
     <span class="format-label" property="dc:format" data-format="{{ res.format.lower() or 'data' }}">{{ res.format }}</span>
     <span><a href="{{ url }}">{{ h.resource_display_name(res) | truncate(50) }}</a></span>
     <div class="buttons">
-        <a href="/visualization/{{ pkg.name }}" class="blue_btn">PREVIEW</a>
+        {% if not vars.hidden %}
+          <a href="/visualization/{{ pkg.name }}" class="blue_btn">PREVIEW</a>
+        {% endif %}
         <a href="{{ res.url }}" class="grey_btn">DOWNLOAD</a>
     </div>
 </li>

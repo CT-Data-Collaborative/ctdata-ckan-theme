@@ -25,11 +25,16 @@ class TopicSerivce(object):
           metadata = DatasetService.get_dataset_meta(dataset_name)['extras']
           hidden_meta = filter(lambda x: x['key'] == 'Hidden In', metadata)
 
-
           try:
-            hidden_list = yaml.load(hidden_meta[0]['value']).split(',')
+            hidden_list = yaml.load(hidden_meta[0]['value']).replace(', ', ',').split(',')
           except IndexError:
             hidden_list = []
+
+          disable_visualizations_data = filter(lambda x: x['key'] == 'Disable Visualizations', metadata)
+          try:
+            disable_visualizations = yaml.load(disable_visualizations_data[0]['value'])
+          except IndexError:
+            disable_visualizations = False
 
           if len(dataset['extras']) > 0:
               domain = None
@@ -38,7 +43,7 @@ class TopicSerivce(object):
                   if extra['key'].lower() == 'domain':
                       domain = extra['value']
 
-              if domain and action not in hidden_list:
+              if domain and action not in hidden_list and 'visualization' not in hidden_list:
                   dataset_indicators = CommunityProfileService.get_gallery_indicators_for_dataset(dataset['id'])
 
                   for indicator in dataset_indicators:
@@ -85,7 +90,7 @@ class TopicSerivce(object):
             hidden_meta = filter(lambda x: x['key'] == 'Hidden In', metadata)
 
             try:
-              hidden_list = yaml.load(hidden_meta[0]['value']).split(',')
+              hidden_list = yaml.load(hidden_meta[0]['value']).replace(', ', ',').split(',')
             except IndexError:
               hidden_list = []
 
@@ -97,7 +102,7 @@ class TopicSerivce(object):
                     if extra['key'].lower() == 'subdomain':
                         subdomain = extra['value']
 
-                if domain and subdomain and action not in hidden_list:
+                if domain and subdomain and action not in hidden_list and 'visualization' not in hidden_list:
 
                     dataset_obj = {'name': dataset['name'], 'title': dataset['title'],
                                    'id': dataset['id']}

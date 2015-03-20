@@ -12,6 +12,7 @@ import ckan.lib.base as base
 from ckan.common import response as http_response, c, request as http_request
 import ckan.model as model
 import ckan.logic as logic
+import ckan.lib.helpers as h
 
 from ctdata.database import Database
 from ctdata.visualization.services import DatasetService
@@ -216,6 +217,16 @@ class CTDataController(base.BaseController):
             abort(404)
 
         metadata = dataset_meta['extras']
+
+        hidden_in_data = filter(lambda x: x['key'] == 'Hidden In', metadata)
+        try:
+            disable_visualizations = 'visualization' in yaml.load(hidden_in_data[0]['value'])
+        except IndexError:
+            disable_visualizations = False
+
+        if disable_visualizations:
+           h.redirect_to(controller='package', action='read', id=dataset_name)
+
         default_metadata = filter(lambda x: x['key'] == 'Default', metadata)
 
         try:
@@ -227,7 +238,7 @@ class CTDataController(base.BaseController):
 
         disabled_metadata = filter(lambda x: x['key'] == "Disabled Views", metadata)
         try:
-          disabled = yaml.load(disabled_metadata[0]['value']).split(',')
+          disabled = yaml.load(disabled_metadata[0]['value']).replace(', ', ',').split(',')
         except IndexError:
           disabled = []
 
@@ -242,11 +253,11 @@ class CTDataController(base.BaseController):
                 default_filters = ind_filters
 
         # metadata fileds for visualization page
-        visible_metadata_fields = filter(lambda x: x['key'] == 'visible_metadata', metadata)
+        visible_metadata_fields = filter(lambda x: x['key'] == 'Visible Metadata', metadata)
 
         try:
             metadata_fields = yaml.load(visible_metadata_fields[0]['value'])
-            metadata_fields.split(',')
+            metadata_fields.replace(', ', ',').split(',')
         except IndexError:
             metadata_fields = ['Description', 'Full Description', 'Suppression' ,'Source', 'Contributor']
 
