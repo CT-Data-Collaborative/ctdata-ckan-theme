@@ -75,8 +75,20 @@ jQuery.fn.table2CSV = function(options) {
         // var csvContent = "data:text/csv;charset=utf-8,";
         //     csvContent += data
 
-       community_name = $('#default_profile_name').text()
-       if (navigator.appName == "Microsoft Internet Explorer") {
+        community_name = $('#default_profile_name').text()
+
+
+        // var iev=0;
+        // var ieold = (/MSIE (\d+\.\d+);/.test(navigator.userAgent));
+        // var trident = !!navigator.userAgent.match(/Trident\/7.0/);
+        // var rv=navigator.userAgent.indexOf("rv:11.0");
+
+        // if (ieold) iev=new Number(RegExp.$1);
+        // if (navigator.appVersion.indexOf("MSIE 10") != -1) iev=10;
+        // if (trident&&rv!=-1) iev=11;
+
+
+       if (navigator.appName == "Microsoft Internet Explorer" || "Netscape") {
             var oWin = window.open();
             oWin.document.write('sep=,\r\n' + data);
             oWin.document.close();
