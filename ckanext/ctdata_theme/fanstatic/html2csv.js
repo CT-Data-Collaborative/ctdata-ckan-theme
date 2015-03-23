@@ -63,30 +63,7 @@ jQuery.fn.table2CSV = function(options) {
         return '"' + output + '"';
     }
     function popup(data) {
-        // var generator = window.open('', 'csv', 'height=400,width=600');
-        // generator.document.write('<html><head><title>CSV</title>');
-        // generator.document.write('</head><body >');
-        // generator.document.write('<textArea cols=70 rows=15 wrap="off" >');
-        // generator.document.write(data);
-        // generator.document.write('</textArea>');
-        // generator.document.write('</body></html>');
-        // generator.document.close();
-
-        // var csvContent = "data:text/csv;charset=utf-8,";
-        //     csvContent += data
-
         community_name = $('#default_profile_name').text()
-
-
-        // var iev=0;
-        // var ieold = (/MSIE (\d+\.\d+);/.test(navigator.userAgent));
-        // var trident = !!navigator.userAgent.match(/Trident\/7.0/);
-        // var rv=navigator.userAgent.indexOf("rv:11.0");
-
-        // if (ieold) iev=new Number(RegExp.$1);
-        // if (navigator.appVersion.indexOf("MSIE 10") != -1) iev=10;
-        // if (trident&&rv!=-1) iev=11;
-
 
        if (navigator.appName == "Microsoft Internet Explorer" || "Netscape") {
             var oWin = window.open();
