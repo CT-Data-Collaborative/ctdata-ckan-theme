@@ -63,20 +63,9 @@ jQuery.fn.table2CSV = function(options) {
         return '"' + output + '"';
     }
     function popup(data) {
-        // var generator = window.open('', 'csv', 'height=400,width=600');
-        // generator.document.write('<html><head><title>CSV</title>');
-        // generator.document.write('</head><body >');
-        // generator.document.write('<textArea cols=70 rows=15 wrap="off" >');
-        // generator.document.write(data);
-        // generator.document.write('</textArea>');
-        // generator.document.write('</body></html>');
-        // generator.document.close();
+        community_name = $('#default_profile_name').text()
 
-        // var csvContent = "data:text/csv;charset=utf-8,";
-        //     csvContent += data
-
-       community_name = $('#default_profile_name').text()
-       if (navigator.appName == "Microsoft Internet Explorer") {
+       if (navigator.appName == "Microsoft Internet Explorer" || "Netscape") {
             var oWin = window.open();
             oWin.document.write('sep=,\r\n' + data);
             oWin.document.close();
