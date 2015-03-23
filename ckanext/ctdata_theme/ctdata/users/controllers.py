@@ -89,7 +89,11 @@ class UserController(UserController):
         logged_user_name    = http_request.environ.get("REMOTE_USER")
         requested_user_name = http_request.environ.get('wsgiorg.routing_args')[1]['user_id']
         permission = 'public' if logged_user_name != requested_user_name else 'all'
-        user       = self.user_service.get_or_create_user(requested_user_name) if requested_user_name else None
+        try:
+            user = self.user_service.get_or_create_user(requested_user_name) if requested_user_name else None
+        except toolkit.ObjectNotFound:
+            abort(404)
+
         indicators = self.community_profile_service.get_gallery_indicators_for_user(user.ckan_user_id, permission)
 
         # Get list of groups
