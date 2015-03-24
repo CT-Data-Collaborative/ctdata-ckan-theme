@@ -184,11 +184,12 @@ $(function(){
     $.ajax({type: "POST",
       url: "/create_location",
       data: JSON.stringify({ name: $("#location_name").val(),
-                             fips: $('#location_fips').val() }),
+                             fips: $('#location_fips').val(),
+                             geography_type: $('#location_geography_type').val() }),
 
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
-        $("#locations_list").append("<li class='span3'><span class='pull-left'><b>" + data.location_name +  "</b> </span> : <span class='pull-right'>" + data.location_fips + "</span></li>")
+        $("#locations_list").append("<li class='span3'><span class='pull-left span2'><b>" + data.location_name +  "</b> </span> <span class='span1'>" + data.location_fips + "</span> <span class='pull-right span1'>" + data.location_geography_type + "</span> </li>")
         $('#message').html("New location is saved.")
         $("#message_popup").modal('show');
       }
@@ -210,18 +211,6 @@ $(function(){
     $('#add_towns').live('click', function() {
         $("#towns_popup").modal('show');
     })
-
-    // $('.remove_indicator').live('click', function(){
-    //     ids_to_remove.push( $(this).attr('id'));
-
-    //     $(this).closest('tr').hide();
-    //     $.ajax({type: "POST",
-    //       url: "/community/update_profile_indicators",
-    //       data: JSON.stringify({ indicators_to_remove: ids_to_remove}),
-    //       contentType: 'application/json; charset=utf-8',
-    //       success: function (data) {}
-    //     });
-    // });
 
     $('.hide_indicator').live('click', function(){
         id = $(this).attr('id')

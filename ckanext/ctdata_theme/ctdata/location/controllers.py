@@ -36,6 +36,10 @@ class LocationsController(base.BaseController):
 
     #end
 
+    def locations_index(self):
+        return base.render('location/index.html', extra_vars={})
+    #end
+
     def location_show(self, location_name):
         try:
             location = self.location_service.get_location(location_name)
@@ -75,15 +79,16 @@ class LocationsController(base.BaseController):
             json_body = json.loads(http_request.body, encoding=http_request.charset)
             name      = json_body.get('name')
             fips      = json_body.get('fips')
+            geography_type = json_body.get('geography_type')
 
-            location = self.location_service.create(name, fips)
+            location = self.location_service.create(name, fips, geography_type)
             profile  = CtdataProfile(str(location.name), True, None)
             self.session.add(profile)
             self.session.commit()
 
         self.session.close()
         http_response.headers['Content-type'] = 'application/json'
-        return json.dumps({'location_name': location.name, 'location_fips': location.fips})
+        return json.dumps({'location_name': location.name, 'location_fips': location.fips, 'location_geography_type': location.geography_type})
     #end
 
     def new_profile(self, location_name):

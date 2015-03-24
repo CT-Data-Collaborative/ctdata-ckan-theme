@@ -114,6 +114,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         with routes.mapper.SubMapper(
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.location.controllers:LocationsController') as m:
+            m.connect('locations', '/location', action='locations_index')
             m.connect('location', '/location/{location_name}', action='location_show')
             m.connect('data_by_location', '/data-by-location', action='data_by_location')
             m.connect('manage_locations', '/manage-locations', action='manage_locations')
@@ -132,8 +133,9 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         return route_map
 
     def get_helpers(self):
-        return {'locations_helper': locations,
-                'link_to_dataset_with_filters': _link_to_dataset_with_filters}
+        return { 'locations_helper': locations,
+                 'geography_types': _geography_types,
+                 'link_to_dataset_with_filters': _link_to_dataset_with_filters}
 
 
 
@@ -153,6 +155,16 @@ def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = '
     link         = "/visualization/" + str(dataset_url) + link_params
 
     return link
+
+def _geography_types():
+    db   = Database()
+    sess = db.session_factory()
+
+    location_service = LocationService(sess)
+    geography_types  = location_service.location_geography_types()
+
+    sess.close()
+    return geography_types
 
 ####### Main Controller ##########
 

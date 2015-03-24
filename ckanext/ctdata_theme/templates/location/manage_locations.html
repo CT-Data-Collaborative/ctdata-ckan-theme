@@ -10,14 +10,19 @@
   <h2> Create Location </h2>
   <div class="control-group">
 
-    <label class="control-label"> Location Name </label>
+    <label class="control-label"> Name </label>
     <div class="controls">
       <input type="text" name="location_name" id="location_name"> </input>
     </div>
 
-    <label class="control-label"> Location FIPS </label>
+    <label class="control-label"> FIPS </label>
     <div class="controls">
       <input type="text" name="location_fips" id="location_fips"> </input>
+    </div>
+
+    <label class="control-label"> Type </label>
+    <div class="controls">
+      <input type="text" name="location_geography_type" id="location_geography_type"> </input>
     </div>
 
     <a href="javascript:void(0);" class="btn btn-default" id="save_location" > Save </a>
@@ -27,11 +32,12 @@
 
 {% endif %}
 
-<ul id="locations_list" class="span10">
+<ul id="locations_list" class="span12">
   {% for location in locations %}
-  <li class="span4">
-    <span class="pull-left"><b> {{ location.name }} </b> </span> :
-    <span class="pull-right"> {{ location.fips }} </span>
+  <li class="span5">
+    <span class="pull-left span2"><b> {{ location.name }} </b> </span>
+    <span class="span1"> {{ location.fips }} </span>
+    <span class="pull-right span1"> {{ location.geography_type }} </span>
   </li>
   {% endfor %}
 </ul>

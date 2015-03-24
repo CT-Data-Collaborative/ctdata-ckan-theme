@@ -25,6 +25,9 @@ class LocationService(object):
 
     ################ TOWNS ############################################
 
+    def location_geography_types(self):
+        return self.session.query(Location.geography_type).distinct().all()
+
     def get_location(self, location_name):
         location = self.session.query(Location).filter(Location.name == location_name).first()
         if not location:
@@ -37,8 +40,8 @@ class LocationService(object):
     def get_locations_by_names(self, locations_names):
         return self.session.query(Town).filter(Town.name.in_(set(locations_names))).all()
 
-    def create(self, name, fips):
-        location = Location(name, fips)
+    def create(self, name, fips, geography_type):
+        location = Location(name, fips, geography_type)
         self.session.add(location)
 
         return location
