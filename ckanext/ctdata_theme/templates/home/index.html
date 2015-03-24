@@ -43,19 +43,7 @@
 <div id="databylocation" class="location">
 <div class="spacing">
   <a name="data-by-location" class="data_by_location"><h2>Explore Data by Location</h2></a>
-  <div align="center" style="margin-left:auto;margin-right:auto;">
-  <div class="dropdown">
-      <button class="bbtn dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
-        -- Select Location --
-        <span class="caretbox"><span class="caret"></span></span>
-      </button>
-      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-        {% for location in h.locations_helper() %}
-          <li role="presentation"><a role="menuitem" tabindex="-1" href="/location/{{location.name}}">{{location.name}}</a></li>
-        {% endfor %}
-      </ul>
-  </div>
-  </div>
+  <a href="/location"> <button class="button-warning button-get-started button-xlarge pure-button"> Get Started </button></a>
   <br clear="all" />
 </div>
 </div>
