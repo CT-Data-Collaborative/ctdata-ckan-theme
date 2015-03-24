@@ -29,7 +29,22 @@ class UserController(UserController):
         self.user_service = UserService(self.session)
         self.location_service = LocationService(self.session)
 
-    def community_profiles(self):
+    def community_profiles(self, user_id):
+        user_name = http_request.environ.get("REMOTE_USER")
+
+        user    = self.user_service.get_or_create_user(user_name) if user_name else None
+        c.user  = user_id
+        context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
+        try:
+            c.user_dict = get_action('user_show')(context, {'id': user_id})
+        except toolkit.ObjectNotFound:
+            abort(404)
+
+        profiles = self.location_service.get_user_profiles(c.user_dict['id'])
+
+        return base.render('user_community_profiles.html', extra_vars={'profiles': profiles, 'user_name': user_name, 'requested_user_name': c.user_dict['name']})
+
+    def my_community_profiles(self):
         user_name = http_request.environ.get("REMOTE_USER")
 
         if not user_name:
@@ -38,24 +53,47 @@ class UserController(UserController):
         user = self.user_service.get_or_create_user(user_name) if user_name else None
         profiles = self.location_service.get_user_profiles(user.ckan_user_id)
 
-        return base.render('user_community_profiles.html', extra_vars={'profiles': profiles})
+        return base.render('user/my_community_profiles.html', extra_vars={'profiles': profiles})
 
     def my_gallery(self):
-        indicators, requested_user_name, user = self._prepare_for_user_gallery(http_request)
-        return base.render('user/my_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': requested_user_name})
+        permission = 'all'
+        user_name = http_request.environ.get("REMOTE_USER")
+        if not user_name:
+            abort(404)
+
+        indicators = self.community_profile_service.get_gallery_indicators_for_user(c.userobj.id, permission)
+
+        # Get list of groups
+        context   = {'model': model, 'session': model.Session, 'user': c.user or c.author, 'for_view': True,
+                   'auth_user_obj': c.userobj, 'use_cache': False}
+        data_dict = {'am_member': True}
+        users_groups     = get_action('group_list_authz')(context, data_dict)
+        c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
+
+        self.session.close()
+        return base.render('user/my_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': user_name})
 
     def user_gallery(self, user_id):
-        indicators, requested_user_name, user = self._prepare_for_user_gallery(http_request)
+        user_name = http_request.environ.get("REMOTE_USER")
+        indicators, requested_user_name = self._prepare_for_user_gallery(http_request)
         c.user    = user_id
-        c.userobj = model.User.by_name(c.user)
-        c.user_dict = {'id': c.user}
-        return base.render('user/user_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': requested_user_name})
+        context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
+
+        try:
+            c.user_dict = get_action('user_show')(context, {'id': user_id})
+        except toolkit.ObjectNotFound:
+            abort(404)
+        return base.render('user/user_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': user_name, 'requested_user_name': requested_user_name})
 
     def _prepare_for_user_gallery(self, http_request):
         logged_user_name    = http_request.environ.get("REMOTE_USER")
         requested_user_name = http_request.environ.get('wsgiorg.routing_args')[1]['user_id']
-        permission = 'public' if logged_user_name != requested_user_name else'all'
-        user       = self.user_service.get_or_create_user(requested_user_name) if requested_user_name else None
+        permission = 'public' if logged_user_name != requested_user_name else 'all'
+        try:
+            user = self.user_service.get_or_create_user(requested_user_name) if requested_user_name else None
+        except toolkit.ObjectNotFound:
+            abort(404)
+
         indicators = self.community_profile_service.get_gallery_indicators_for_user(user.ckan_user_id, permission)
 
         # Get list of groups
@@ -66,7 +104,7 @@ class UserController(UserController):
         c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
 
         self.session.close()
-        return indicators, requested_user_name, user
+        return indicators, requested_user_name
 
     def update_gallery_indicator(self):
         user_name    = http_request.environ.get("REMOTE_USER")

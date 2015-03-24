@@ -21,7 +21,7 @@ $(function(){
 
   $('.remove_indicator').on('click', function(){
     id = $(this).attr('id')
-    ids_to_remove.push( id);
+    ids_to_remove.push(id);
 
     var r = confirm("Are you sure you want to delete this indicator?");
     if (r == true) {

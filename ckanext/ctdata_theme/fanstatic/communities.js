@@ -230,7 +230,7 @@ $(function () {
                         $('div.modal').modal('hide');
                         $('span.temp').addClass('hidden')
                         $('#message').html("<h3>New profile has been successfully saved.</h3>\
-                                          <br>  <a href='"+ data.redirect_link +"'> Click here </a> to check it.")
+                                          <br>  <a href='"+ data.redirect_link +"'> Click here </a> to view it.")
                         $("#message_popup").modal('show');
                     }
                 }

@@ -12,6 +12,7 @@ import ckan.lib.base as base
 from ckan.common import response as http_response, c, request as http_request
 import ckan.model as model
 import ckan.logic as logic
+import ckan.lib.helpers as h
 
 from ctdata.database import Database
 from ctdata.visualization.services import DatasetService
@@ -86,7 +87,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
             m.connect('user_community_profiles', '/user/{user_id}/community_profiles', action='community_profiles')
-            m.connect('my_gallery', '/user/{user_id}/my_gallery', action='my_gallery')
+            m.connect('my_gallery', '/dashboard/gallery', action='my_gallery')
+            m.connect('my_community_profiles', '/dashboard/community-profiles', action='my_community_profiles')
             m.connect('user_gallery', '/user/{user_id}/gallery', action='user_gallery')
             m.connect('remove_gallery_indicators', '/user/remove_gallery_indicators', action='remove_gallery_indicators')
             m.connect('update_gallery_indicator',  '/user/update_gallery_indicator', action='update_gallery_indicator')
@@ -112,7 +114,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         with routes.mapper.SubMapper(
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.location.controllers:LocationsController') as m:
-            m.connect('location', '/location/{location_name}', action='show')
+            m.connect('location', '/location/{location_name}', action='location_show')
             m.connect('data_by_location', '/data-by-location', action='data_by_location')
             m.connect('manage_locations', '/manage-locations', action='manage_locations')
             m.connect('create_location',  '/create_location',  action='create_location')
@@ -215,6 +217,16 @@ class CTDataController(base.BaseController):
             abort(404)
 
         metadata = dataset_meta['extras']
+
+        hidden_in_data = filter(lambda x: x['key'] == 'Hidden In', metadata)
+        try:
+            disable_visualizations = 'visualization' in yaml.load(hidden_in_data[0]['value'])
+        except IndexError:
+            disable_visualizations = False
+
+        if disable_visualizations:
+           h.redirect_to(controller='package', action='read', id=dataset_name)
+
         default_metadata = filter(lambda x: x['key'] == 'Default', metadata)
 
         try:
@@ -224,10 +236,9 @@ class CTDataController(base.BaseController):
         except IndexError:
           defaults = []
 
-        disabled_metadata = filter(lambda x: x['key'] == "disabled_views", metadata)
-        print disabled_metadata
+        disabled_metadata = filter(lambda x: x['key'] == "Disabled Views", metadata)
         try:
-          disabled = yaml.load(disabled_metadata[0]['value'])
+          disabled = yaml.load(disabled_metadata[0]['value']).replace(', ', ',').split(',')
         except IndexError:
           disabled = []
 
@@ -242,11 +253,11 @@ class CTDataController(base.BaseController):
                 default_filters = ind_filters
 
         # metadata fileds for visualization page
-        visible_metadata_fields = filter(lambda x: x['key'] == 'visible_metadata', metadata)
+        visible_metadata_fields = filter(lambda x: x['key'] == 'Visible Metadata', metadata)
 
         try:
             metadata_fields = yaml.load(visible_metadata_fields[0]['value'])
-            metadata_fields.split(',')
+            metadata_fields.replace(', ', ',').split(',')
         except IndexError:
             metadata_fields = ['Description', 'Full Description', 'Suppression' ,'Source', 'Contributor']
 

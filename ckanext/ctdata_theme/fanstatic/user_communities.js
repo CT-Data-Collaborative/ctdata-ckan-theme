@@ -34,19 +34,20 @@ $(function(){
 
   $('.remove_profile').on('click', function(){
     id = $(this).attr('id')
-    $(this).closest('li').hide();
-    bootbox.confirm("Are you sure you want to delete this profile?", function(r){
-        if (r) {
-          $.ajax({type: "POST",
-            url: "/remove_location_profile/" + id,
-            data: JSON.stringify({ }),
-            contentType: 'application/json; charset=utf-8',
-            success: function (data) {
-              // window.location.reload();
-            }
-          });
+    item = $(this)
+
+    var r = confirm("Are you sure you want to delete this profile?");
+
+    if (r) {
+      $.ajax({type: "POST",
+        url: "/remove_location_profile/" + id,
+        data: JSON.stringify({ }),
+        contentType: 'application/json; charset=utf-8',
+        success: function (data) {
+          item.closest('li').hide();
         }
-    });
+      });
+    }
 
   });
 

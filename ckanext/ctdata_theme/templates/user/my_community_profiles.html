@@ -1,20 +1,12 @@
-{% extends "user/read.html" %}
-
+{% extends "user/dashboard.html" %}
 
 {% block title %}CTData User Community Profiles {% endblock %}
 {% block page_name %} Community Profiles {% endblock %}
-{% block page_description %}Created by {{user.name}}{% endblock %}
+{% block page_description %}Created by {{c.userobj.name}}{% endblock %}
 
-{% block content_primary_nav %}
-
-  {{ h.build_nav_icon('user_datasets', _('Datasets'), id=user.name) }}
-  {{ h.build_nav_icon('user_activity_stream', _('Activity Stream'), id=user.name) }}
-  {{ h.build_nav_icon('user_community_profiles', _('Community Profiles'), user_id=user.name) }}
-  {{ h.build_nav_icon('user_gallery', _('Gallery'), user_id=user.name) }}
-
-{% endblock %}
 
 {% block  primary_content_inner %}
+
 </br></br></br>
 <!-- <a href="javascript:void(0)" id="update_user_communities" class="btn pull-right disabled"> Save your Edits </a> -->
 <!-- <span class="help pull-right "> * Click Profile Name to Edit </span> -->
@@ -39,14 +31,14 @@
   </tbody>
 </table> -->
 <br>
-<div class="span12">
+<div class="span13">
 {% if profiles %}
 
     <ul>
         {% for profile in profiles %}
           <li>
             <h2><a href="/community/{{profile.id}}" class="underlined">{{profile.name}}</a>
-            {% if user_name == requested_user_name %}
+            {% if profile.user_id == c.userobj.id %}
             <a href="javascript:void(0)" class="remove_profile pull-right btn btn-default btn-mini" id="{{profile.id}}">
               <i class='fa fa-times text-error'></i>
             </a>

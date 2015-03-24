@@ -225,7 +225,16 @@ function set_display_type(new_type){
   set_icon(new_type);
   save_filters(display_type);
   set_filters(new_type);
+
+  $.each($('option'), function(i){
+    $('option')[i].value = $('option')[i].value.replace('v=map',   'v='+ new_type);
+    $('option')[i].value = $('option')[i].value.replace('v=table', 'v='+ new_type);
+    $('option')[i].value = $('option')[i].value.replace('v=column','v='+ new_type);
+    $('option')[i].value = $('option')[i].value.replace('v=line',  'v='+ new_type);
+  })
+
   display_type = new_type;
+
   if (display_type == 'map'){
       set_map_checkbox();
     }else if (display_type == 'column' || display_type == 'line'){
@@ -355,8 +364,9 @@ function display_data(){
       new_type = display_type
     }
 
-    if(disabled.indexOf(new_type) != -1){
-      display_error("This visualization is disabled for this dataset")
+    if(disabled.indexOf(new_type) > -1){
+      display_error("This visualization is disabled for this dataset");
+      hide_spinner();
       return 0;
     }
 
@@ -622,7 +632,7 @@ function unit_for_value(value, type){
       return '$' + value.toString()
     }
     else{
-      if (value)
+      if (value || value == 0)
         return value.toString() + units[type]
       else
         return value
