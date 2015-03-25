@@ -51,13 +51,13 @@ body {
 .carousel .item {
   /*max-height:457px;*/
   min-height:350px;
-  background-color:#000;
+  background-color: red;
 }
 .carousel-inner > .item > img {
   position: absolute;
   top: 0;
   left: 0;
-  min-width: 100%;
+  min-width: 105%;
   height:350px;
   /*height: auto;*/
 }
