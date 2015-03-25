@@ -5,7 +5,7 @@
 {% block content %}
 {% block maintag %}{{ super() }}{% endblock %}
 
-<div id="gallery">
+<!-- <div id="gallery">
   <div class="spacing">
     <div class="gallerytitle">
       <h2>Changing the way Connecticut uses data</h2>
@@ -16,6 +16,76 @@
       </div>
     <img src="common/images/ctdata-receivedmap.jpg" alt="CT Data Collaborative" border="0" />
   </div>
+</div> -->
+
+<link   rel="stylesheet" type="text/css" href="/common/css/carousel.css">
+<link   rel="stylesheet" type="text/css" href="/common/css/pygments-manni.css">
+<link   rel="stylesheet" type="text/css" href="/common/css/docs.css">
+<link   rel="stylesheet" type="text/css" href="/common/css/bootstrap.css">
+<link   rel="stylesheet" type="text/css" href="/common/css/bootstrap.css.map">
+
+
+<div id="myCarousel" class="carousel slide" data-ride="carousel">
+
+<ol class="carousel-indicators-new">
+<li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+<li data-target="#myCarousel" data-slide-to="1"></li>
+<li data-target="#myCarousel" data-slide-to="2"></li>
+<li data-target="#myCarousel" data-slide-to="3"></li>
+</ol>
+<div class="carousel-inner">
+
+<div class="item active" style="background: url('common/images/ctcapitol.jpg') !important; ">
+<img src="common/images/ctcapitol.jpg" alt="First slide">
+<div class="container">
+<div class="carousel-caption-new">
+<h1>Changing the way <br />Connecticut uses data</h1>
+<p>CTDC is a public-private partnership working to increase the quality and availability of data for effective planning and policy.</p>
+<p><a class="learn-more-button" href="#" role="button">Learn More &raquo;</a></p>
+</div>
+</div>
+</div>
+
+<div class="item" style="background: url('common/images/ct-college.jpg') !important; ">
+<img src="common/images/ct-college.jpg" alt="Second slide">
+<div class="container">
+<div class="carousel-caption-new">
+<h1>Advocacy</h1>
+<p>Advocating for the public availability of all state data to inform public debate and to drive planning, policy, budgeting and decision making in state government.</p>
+<p><a class="btn btn-lg btn-primary" href="#" role="button">Learn more &raquo;</a></p>
+</div>
+</div>
+</div>
+
+<div class="item" style="background: url('common/images/ct-aerial.jpg') !important; ">
+<img src="common/images/ct-aerial.jpg" alt="Third slide">
+<div class="container">
+<div class="carousel-caption-new">
+<h1>Building Capacity</h1>
+<p>Create a learning community of data users to engage, analyze and understand data by utilizing consumer friendly interactive visualization tools that help tell the data story.</p>
+<p><a class="btn btn-lg btn-primary" href="#" role="button">Learn More &raquo;</a></p>
+</div>
+</div>
+</div>
+
+<div class="item" style="background: url('common/images/ct-college.jpg') !important; ">
+<img src="common/images/ctlegislative.jpg" alt="Fourth slide">
+<div class="container">
+<div class="carousel-caption-new">
+<h1>Access</h1>
+<p>Meeting demands for public access to data through the Collaborative's data portal, CTData.org, and the associated Connecticut Nonprofit Strategy Platform.</p>
+<p><a class="btn btn-lg btn-primary" href="#" role="button">Learn More &raquo;</a></p>
+</div>
+</div>
+</div>
+
+</div>
+<a class="left carousel-control-new" href="#myCarousel" role="button" data-slide="prev"><span class="">
+  <img src="common/images/aleft.png" border="0" ></span>
+</a>
+<a class="right carousel-control-new" href="#myCarousel" role="button" data-slide="next">
+  <span class=""><img src="common/images/aright.png" border="0" ></span>
+</a>
 </div>
 
 <div align="center">
@@ -65,34 +135,39 @@
 
     <div class="newsbox">
       <img src="common/images/census_data_wide.png" alt="" border="0" />
-      <a href="/visualization/public-libraries">
-        <h2>Data on Libraries in CT</h2>
+      <a href="/visualization/4-year-cohort-high-school-graduation-rates">
+        <h2>New Data</h2>
       </a>
-      See data on libraries in CT that the CT State Library collects annually. Data are from 1996 to 2014.
+      Check out recently released 2013-2014 4-year Cohort Graduation Rates.
       <br />
-      <a href="/visualization/public-libraries">
-        Learn More <i class="fa fa-arrow-circle-right"></i>
+      <a href="/visualization/4-year-cohort-high-school-graduation-rate">
+        Visualize it <i class="fa fa-arrow-circle-right"></i>
       </a>
     </div>
 
     <div class="newsbox">
       <img src="common/images/ctdata-wavechart.jpg" alt="" border="0" />
       <a href="">
-        <h2>Coming Soon...</h2>
+        <h2>Upcoming Webinars</h2>
       </a>
-      Within the next two weeks, the Collaborative will display all education data at the district level
+        <!-- Register to learn about how to use the site: <a href="http://bit.ly/1Ilzk1y"> http://bit.ly/1Ilzk1y </a>
+        Register here to learn about how to create, save and share your work: <a href="http://bit.ly/1Bb2GL9"> http://bit.ly/1Bb2GL9 </a> -->
+
+        Register <a href="http://bit.ly/1Ilzk1y"> here </a> to learn about how to use the site.
+        <br>
+        Register <a href="http://bit.ly/1Ilzk1y"> here </a> to learn about how to create, save and share your work
       <br />
 
     </div>
 
     <div class="newsbox">
       <img src="common/images/ctdata-emotional.jpg" alt="" border="0" />
-      <a href="http://edi.ctdata.org/">
+      <a href="http://ctrp3.ctdata.org/">
         <h2>New Special Project</h2>
       </a>
-      The Hartford Foundation for Public Giving piloted in Hartford and West Hartford the use of a kindergarten assessment tool, the Early Development Instrument (EDI). See the data through a set of interactive visualizations.
+      The Racial Profiling Prohibition Project has been updated with interactive data tables containing one year of traffic stop data.
       <br />
-      <a href="http://edi.ctdata.org/">
+      <a href="http://ctrp3.ctdata.org/">
         Learn More
         <i class="fa fa-arrow-circle-right"></i>
       </a>
@@ -104,7 +179,14 @@
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="/common/js/docs.min.js"></script>
+  <script src="/common/js/bootstrap.min.js"></script>
 
-    {% resource 'ctdata_theme/scripts.js' %}
+  <script src="/common/js/ie-emulation-modes-warning.js"></script>
+  <script src="/common/js/ie8-responsive-file-warning.js"></script>
+  <script src="/common/js/ie10-viewport-bug-workaround.js"></script>
+  <script src="/common/js/ZeroClipboard.min.js"></script>
+  <script src="/common/js/index_page.js"></script>
 {% endblock %}
+<!-- -->
