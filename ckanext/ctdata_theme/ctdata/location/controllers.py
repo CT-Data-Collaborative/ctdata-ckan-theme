@@ -40,26 +40,6 @@ class LocationsController(base.BaseController):
         return base.render('location/index.html', extra_vars={})
     #end
 
-    def location_show(self, location_name):
-        try:
-            location = self.location_service.get_location(location_name)
-        except toolkit.ObjectNotFound:
-            abort(404)
-
-        default_profile = location.default_profile()
-        towns           = self.location_service.get_all_locations()
-        towns_names     = ','.join( l for l in  [location.name])
-
-        if default_profile.locations:
-            towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
-        else:
-            location_profile = LocationProfile(location.id, default_profile.id)
-            self.session.add(location_profile)
-
-        self.session.close()
-        return base.render('location/show.html', extra_vars={'location': location, 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id, 'default_profile': default_profile})
-    #end
-
     def data_by_location(self):
         locations = self.location_service.get_all_locations()
 
