@@ -37,6 +37,16 @@ class LocationsController(base.BaseController):
     #end
 
     def locations_index(self):
+        geography_types = self.location_service.location_geography_types()
+        locations_hash  = {}
+
+        for type in geography_types:
+            locations_hash[type] = self.location_service.get_locations_by_type(type)
+
+        towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
+
+        self.session.close()
+
         return base.render('location/index.html', extra_vars={})
     #end
 

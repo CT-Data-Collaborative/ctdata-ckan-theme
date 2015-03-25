@@ -7,6 +7,7 @@ var create_popup    = $("#create_profile_popup"),
     new_indicators  = [],
     indicators      = [],
     locations       = location_names,
+    selected_geography_type = 'Town',
     default_profile_id = $('#default_profile_id').text(),
     current_dataset ;
 
@@ -171,14 +172,13 @@ var create_popup    = $("#create_profile_popup"),
         });
     }
 
-
 $(function(){
     if (window.location.pathname != "/manage-locations"){
         load_profile_indicators();
         load_topics();
     }
 
-  var form      = $('form#new_location')
+  var form = $('form#new_location');
 
   $('#save_location').on('click', function(){
     $.ajax({type: "POST",
@@ -308,6 +308,12 @@ $(function(){
 
     $('#add_indicator').click(function() {
         $("#indicator_popup").modal('show');
+        $('#select_geography_type').on('change', function(){
+            $('#filters_content').html('<div id="filters_content">Choose a dataset from the leftside menu.</div>');
+            value = $(this).val()
+            $('li.dataset-name[class !=' + value + ']').addClass('hidden')
+            $('li.dataset-name.' + value).removeClass('hidden')
+        });
     });
 
     $('#save_towns').click(function() {

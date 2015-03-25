@@ -18,6 +18,7 @@ from ..topic.services import TopicSerivce
 from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
 from services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
+from ..location.services import LocationService
 
 from IPython import embed
 from termcolor import colored
@@ -26,7 +27,8 @@ class CommunityProfilesController(base.BaseController):
     def __init__(self):
         self.session = Database().session_factory()
         self.community_profile_service = CommunityProfileService(self.session)
-        self.user_service = UserService(self.session)
+        self.user_service     = UserService(self.session)
+        self.location_service = LocationService(self.session)
 
     def add_indicator(self):
         session_id = session.id
@@ -170,9 +172,11 @@ class CommunityProfilesController(base.BaseController):
 
     def get_topics(self):
         http_response.headers['Content-type'] = 'application/json'
-        topics  = TopicSerivce.get_topics('community_profile')
+        geography_types = self.location_service.location_geography_types()
+        topics          = TopicSerivce.get_topics('community_profile')
 
-        html  = base.render('communities/snippets/indicator_popup.html', extra_vars={'topics': topics})
+
+        html  = base.render('communities/snippets/indicator_popup.html', extra_vars={'topics': topics, 'geography_types': geography_types})
 
         return json.dumps({'success': True, 'html': html})
 

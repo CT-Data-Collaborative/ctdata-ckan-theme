@@ -26,7 +26,13 @@ class LocationService(object):
     ################ TOWNS ############################################
 
     def location_geography_types(self):
-        return self.session.query(Location.geography_type).distinct().all()
+        sql_result = self.session.query(Location.geography_type).distinct().all()
+        types = map(lambda x: x[0], sql_result)
+
+        return types
+
+    def get_locations_by_type(self, type):
+        return self.session.query(Location).filter(Location.geography_type == type ).all()
 
     def get_location(self, location_name):
         location = self.session.query(Location).filter(Location.name == location_name).first()

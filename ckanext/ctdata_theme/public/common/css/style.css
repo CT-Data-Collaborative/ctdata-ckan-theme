@@ -540,3 +540,6 @@ a.underlined{
   text-decoration: underline;
 }
 
+.modal {
+  width: 700px;
+}

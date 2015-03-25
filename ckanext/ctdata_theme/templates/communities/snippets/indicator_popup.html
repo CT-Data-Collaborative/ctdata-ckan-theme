@@ -1,20 +1,39 @@
 <div id="indicator_popup" class="modal fade" style="display: none">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+            <div class="text-center">
+                <br>
+                Geography Type:
+                <select id="select_geography_type">
+                    {% for type in geography_types %}
+                        {% if type == 'Town' %}
+                            <option selected>{{type}}</option>
+                        {% else %}
+                            <option>{{type}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <hr>
             <div class="modal-body disable-scroll">
+
                 <div id="indicators" class="indicator-topics">
                     <ul class="indicator-main-topics">
                     {% for topic in topics %}
                         <li>
                         <h3>{{ topic['title'] }}</h3>
-                        <ul>
+                        <ul class="indicator-sub-topics">
                             {% for subtopic in topic['subdomains'] %}
                             <li>
                                 <div>
                                     <h3 style="color: #000000">{{ subtopic['title'] }}</h3>
                                     <ul class="indicator-sub-topics">
                                         {% for dataset in subtopic['datasets'] %}
-                                        <li>
+                                        {% if dataset['geography_type'] == 'Town' %}
+                                            <li class="dataset-name {{dataset['geography_type']}}">
+                                        {% else %}
+                                            <li class="dataset-name {{dataset['geography_type']}} hidden">
+                                        {% endif %}
                                             <a href="javascript:void(0)" id="{{dataset['id']}}" class="dataset_chooser">
                                                 {{ dataset['title'] }}
                                             </a>
