@@ -63,6 +63,14 @@ class LocationService(object):
         self.session.commit()
 
     ################ Profiles   ############################################
+    def get_default_location_profile(self):
+        profile = self.session.query(CtdataProfile).filter(CtdataProfile.name == 'Location Defauilt Profile').first()
+        if not profile:
+           profile = CtdataProfile('Location Defauilt Profile', True, None)
+           self.session.add(profile)
+           self.session.commit()
+
+        return profile
 
     def get_user_profiles(self, user_id):
         profiles = self.session.query(CtdataProfile).filter(CtdataProfile.user_id == user_id).all()
@@ -71,7 +79,7 @@ class LocationService(object):
 
     def create_profile(self, user, name, indicators, locations, global_default, main_location):
         profile = CtdataProfile(name, global_default, user.ckan_user_id)
-        self.session.add(profile)
+
 
         for location_name in locations:
             profile.locations.append(self.get_location(location_name))
@@ -94,7 +102,6 @@ class LocationService(object):
 
     def get_profile(self, profile_id):
         profile = self.session.query(CtdataProfile).filter(CtdataProfile.id == profile_id).first()
-
         return profile
 
     ################ Indicators ############################################

@@ -37,17 +37,36 @@ class LocationsController(base.BaseController):
     #end
 
     def locations_index(self):
-        geography_types = self.location_service.location_geography_types()
-        locations_hash  = {}
 
-        for type in geography_types:
-            locations_hash[type] = self.location_service.get_locations_by_type(type)
+        default_profile = self.location_service.get_default_location_profile()
 
+        if not default_profile:
+            abort(404)
+        locations   = self.location_service.get_all_locations()
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
+        geo_types   =  self.location_service.location_geography_types()
+
+        locations_hash = {}
+        all_current_locations = []
+        for type in geo_types:
+            locations_to_put = filter(lambda t: t.geography_type == type, default_profile.locations)
+            locations_hash[type]  = map(lambda t: t.name, locations_to_put)
+            all_current_locations += locations_hash[type]
+
+        try:
+            location_name = towns_names[0]
+        except IndexError:
+            location_name = 'No Location'
 
         self.session.close()
-
-        return base.render('location/index.html', extra_vars={})
+        return base.render('location/show.html', extra_vars={'location': location_name,
+                                                             'locations': locations,
+                                                             'all_current_locations': all_current_locations,
+                                                             'towns_names': towns_names,
+                                                             'default_profile_id': default_profile.id,
+                                                             'default_profile': default_profile,
+                                                             'geo_types': json.dumps(geo_types) ,
+                                                             'geo_types_array': geo_types})
     #end
 
     def data_by_location(self):
@@ -234,13 +253,14 @@ class LocationsController(base.BaseController):
         location_names = location_names.split(',')
 
         profile        = self.location_service.get_profile(profile_id)
+        # embed()
         user           = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
         locations      = []
         geo_types      = self.location_service.location_geography_types()
         locations_hash = {}
         all_current_locations = []
 
-        if profile.user == user:
+        if profile.user and profile.user == user:
             ######### save new locations
             for profile_location in profile.locations:
                 if profile_location.name not in location_names:
