@@ -179,10 +179,17 @@ class LocationsController(base.BaseController):
 
         if not default_profile:
             abort(404)
-        towns           = self.location_service.get_all_locations()
+        locations   = self.location_service.get_all_locations()
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
-        geo_types  =self.location_service.location_geography_types()
+        geo_types   =  self.location_service.location_geography_types()
         self.session.close()
+
+        locations_hash = {}
+        all_current_locations = []
+        for type in geo_types:
+            locations_to_put = filter(lambda t: t.geography_type == type, default_profile.locations)
+            locations_hash[type]  = map(lambda t: t.name, locations_to_put)
+            all_current_locations += locations_hash[type]
 
         try:
             location_name = towns_names[0]
@@ -190,7 +197,8 @@ class LocationsController(base.BaseController):
             location_name = 'No Location'
 
         return base.render('location/show.html', extra_vars={'location': location_name,
-                                                             'towns': towns,
+                                                             'locations': locations,
+                                                             'all_current_locations': all_current_locations,
                                                              'towns_names': towns_names,
                                                              'default_profile_id': default_profile.id,
                                                              'default_profile': default_profile,
@@ -204,10 +212,10 @@ class LocationsController(base.BaseController):
         session_id     = session.id
         user_name      = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
         try:
-            json_body      = json.loads(http_request.body, encoding=http_request.charset)
+            json_body  = json.loads(http_request.body, encoding=http_request.charset)
         except ValueError:
             self.session.close()
-            return json.dumps({'success': True, 'ind_data': [], 'towns':  []})
+            return json.dumps({'success': True, 'ind_data': {}, 'towns':  []})
 
         location_names = json_body.get('locations')
         location_names = location_names.split(',')
@@ -215,9 +223,12 @@ class LocationsController(base.BaseController):
         profile        = self.location_service.get_profile(profile_id)
         user           = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
         locations      = []
+        geo_types      = self.location_service.location_geography_types()
+        locations_hash = {}
+        all_current_locations = []
 
-        if (not profile.user and user.is_admin) or profile.user == user:
-            ######### save new towns
+        if profile.user == user:
+            ######### save new locations
             for profile_location in profile.locations:
                 if profile_location.name not in location_names:
                     self.location_service.remove_location_profile(profile_location.id, profile.id)
@@ -236,22 +247,31 @@ class LocationsController(base.BaseController):
                 except toolkit.ObjectNotFound:
                     pass
 
-
             self.session.commit()
-            locations_names = map(lambda t: t.name, profile.locations)
+
+            for type in geo_types:
+                locations_to_put      = filter(lambda t: t.geography_type == type, profile.locations)
+                locations_hash[type]  = map(lambda t: t.name, locations_to_put)
+                all_current_locations += locations_hash[type]
         else:
-            locations_names = location_names
+            locations_records = self.location_service.get_all_locations()
+
+            for type in geo_types:
+                locations_to_put      = filter(lambda t: t.geography_type == type and t.name in location_names, locations_records)
+                locations_hash[type]  = map(lambda t: t.name, locations_to_put)
+                all_current_locations += locations_hash[type]
 
 
         ######### load indicators data
 
         ind_data = {}
-        for geo_type in self.location_service.location_geography_types():
+        for geo_type in geo_types:
             ind_data[geo_type] = []
 
         for indicator in profile.indicators:
-            values    = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_names)
+            ######### load indicators values only for locations with corresponding dataset
             geo_type  = indicator.dataset_geography_type()
+            values    = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
 
             data  = {}
             data  = {
@@ -259,7 +279,7 @@ class LocationsController(base.BaseController):
                 'filters': indicator.filters,
               'data_type': indicator.data_type,
                    'year': dict_with_key_value("field", "Year", json.loads(indicator.filters))['values'][0],
-                'link_to': indicator.link_to_visualization_with_locations(locations_names),
+                'link_to': indicator.link_to_visualization_with_locations(locations_hash[geo_type]),
                 'dataset': indicator.dataset_name(),
              'dataset_id': indicator.dataset_id,
                'variable': indicator.variable,
@@ -270,7 +290,7 @@ class LocationsController(base.BaseController):
             ind_data[geo_type].append(data)
 
         self.session.close()
-        return json.dumps({'success': True, 'ind_data': ind_data, 'towns':  locations_names})
+        return json.dumps({'success': True, 'ind_data': ind_data, 'all_current_locations':  all_current_locations, 'locations_hash': locations_hash})
     #end
 
     def save_local_default(self, profile_id):

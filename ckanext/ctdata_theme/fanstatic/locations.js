@@ -84,7 +84,7 @@ var create_popup    = $("#create_profile_popup"),
         indicators = []
         $(indicators_data).each(function(i){
             indicators.push({ id: indicators_data[i]['id'], dataset_id: indicators_data[i]['dataset_id'], name: "", ind_type: 'common',
-                          permission: 'public', filters: indicators_data[i]['filters'], description: ''})
+                          permission: 'public', filters: indicators_data[i]['filters'], description: '', geo_type: indicators_data[i]['geo_type'] })
 
             tr = build_tr_from_data(indicators_data[i])
 
@@ -106,12 +106,11 @@ var create_popup    = $("#create_profile_popup"),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 indicators_data = data.ind_data;
-                current_towns   = data.towns;
-                $('locations_list').text(data.towns);
-                // debugger
+                $('locations_list').text(data.all_current_locations);
+
                 $(geo_types).each(function(i){
                     type = geo_types[i]
-                    draw_table(type, indicators_data[type], current_towns);
+                    draw_table(type, indicators_data[type], data.locations_hash[type]);
                 });
 
                 $('.spinner').hide();
@@ -214,7 +213,12 @@ $(function(){
         create_popup.modal('show');
     });
 
-    $('#add_towns').live('click', function() {
+    $('.edit_locations').live('click', function() {
+        type = $(this).attr('id')
+
+        $('.location-checkbox').addClass('hidden')
+        $('.location-checkbox.' + type).removeClass('hidden')
+
         $("#towns_popup").modal('show');
     })
 
@@ -335,10 +339,13 @@ $(function(){
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 indicators_data = data.ind_data;
-                current_towns   = data.towns;
-                $('locations_list').text(data.towns);
-                draw_table(indicators_data, current_towns);
-                reload_data_for_new_indicators();
+                $('locations_list').text(data.all_current_locations);
+
+                $(geo_types).each(function(i){
+                    type = geo_types[i]
+                    draw_table(type, indicators_data[type], data.locations_hash[type]);
+                });
+
                 $('.spinner').hide();
             }
         });
