@@ -4,29 +4,13 @@
 
 {% block content %}
 {% block maintag %}{{ super() }}{% endblock %}
-
-<!-- <div id="gallery">
-  <div class="spacing">
-    <div class="gallerytitle">
-      <h2>Changing the way Connecticut uses data</h2>
-      CTDC is a public-private partnership working to increase the quality and availability of data for effective planning and policy.
-      <br /><br />
-      <a href="/pages/about"><button class="button-warning pure-button">Learn More</button></a>
-      <br /><br />
-      </div>
-    <img src="common/images/ctdata-receivedmap.jpg" alt="CT Data Collaborative" border="0" />
-  </div>
-</div> -->
-
 <link   rel="stylesheet" type="text/css" href="/common/css/carousel.css">
 <link   rel="stylesheet" type="text/css" href="/common/css/pygments-manni.css">
 <link   rel="stylesheet" type="text/css" href="/common/css/docs.css">
 <link   rel="stylesheet" type="text/css" href="/common/css/bootstrap.css">
 <link   rel="stylesheet" type="text/css" href="/common/css/bootstrap.css.map">
 
-
 <div id="myCarousel" class="carousel slide" data-ride="carousel">
-
 <ol class="carousel-indicators-new">
 <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
 <li data-target="#myCarousel" data-slide-to="1"></li>
@@ -35,7 +19,8 @@
 </ol>
 <div class="carousel-inner">
 
-<div class="item active" style="background: url('common/images/ctcapitol.jpg') !important; ">
+
+<div class="item active">
 <img src="common/images/ctcapitol.jpg" alt="First slide">
 <div class="container">
 <div class="carousel-caption-new">
@@ -46,7 +31,7 @@
 </div>
 </div>
 
-<div class="item" style="background: url('common/images/ct-college.jpg') !important; ">
+<div class="item">
 <img src="common/images/ct-college.jpg" alt="Second slide">
 <div class="container">
 <div class="carousel-caption-new">
@@ -57,7 +42,7 @@
 </div>
 </div>
 
-<div class="item" style="background: url('common/images/ct-aerial.jpg') !important; ">
+<div class="item">
 <img src="common/images/ct-aerial.jpg" alt="Third slide">
 <div class="container">
 <div class="carousel-caption-new">
@@ -68,7 +53,7 @@
 </div>
 </div>
 
-<div class="item" style="background: url('common/images/ct-college.jpg') !important; ">
+<div class="item">
 <img src="common/images/ctlegislative.jpg" alt="Fourth slide">
 <div class="container">
 <div class="carousel-caption-new">
@@ -181,12 +166,12 @@
 {% block scripts %}
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
   <script src="/common/js/docs.min.js"></script>
-  <script src="/common/js/bootstrap.min.js"></script>
+  <script src="/common/js/bootstrap.js"></script>
 
   <script src="/common/js/ie-emulation-modes-warning.js"></script>
   <script src="/common/js/ie8-responsive-file-warning.js"></script>
   <script src="/common/js/ie10-viewport-bug-workaround.js"></script>
-  <script src="/common/js/ZeroClipboard.min.js"></script>
+  <script src="/common/js/ZeroClipboard.js"></script>
   <script src="/common/js/index_page.js"></script>
 {% endblock %}
 <!-- -->
