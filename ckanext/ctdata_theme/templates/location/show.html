@@ -32,7 +32,12 @@
   </div>
   <div class="span12">
     <span id="default_profile_id" class="hidden">{{default_profile_id}}</span>
-    <div class="table-div"></div>
+    {% for type in geo_types_array %}
+      <h2> {{ type }} </h3>
+      <div class="table-div-{{type}}"></div>
+      <br>
+      <br>
+    {% endfor %}
   </div>
 </div>
 
@@ -74,7 +79,10 @@
 
   <script>
     var location_names = []
+    var geo_types      = []
+
     location_names = '{{towns_names | safe}}'
+    geo_types      = '{{geo_types | safe}}'
   </script>
 
 {% endblock %}

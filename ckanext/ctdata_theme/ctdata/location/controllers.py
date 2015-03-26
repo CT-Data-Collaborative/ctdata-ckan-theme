@@ -181,7 +181,7 @@ class LocationsController(base.BaseController):
             abort(404)
         towns           = self.location_service.get_all_locations()
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
-
+        geo_types  =self.location_service.location_geography_types()
         self.session.close()
 
         try:
@@ -189,7 +189,13 @@ class LocationsController(base.BaseController):
         except IndexError:
             location_name = 'No Location'
 
-        return base.render('location/show.html', extra_vars={'location': location_name, 'towns': towns, 'towns_names': towns_names, 'default_profile_id': default_profile.id, 'default_profile': default_profile})
+        return base.render('location/show.html', extra_vars={'location': location_name,
+                                                             'towns': towns,
+                                                             'towns_names': towns_names,
+                                                             'default_profile_id': default_profile.id,
+                                                             'default_profile': default_profile,
+                                                             'geo_types': json.dumps(geo_types) ,
+                                                             'geo_types_array': geo_types})
     #end
 
     def load_profile_indicators(self, profile_id):
@@ -239,9 +245,13 @@ class LocationsController(base.BaseController):
 
         ######### load indicators data
 
-        ind_data = []
+        ind_data = {}
+        for geo_type in self.location_service.location_geography_types():
+            ind_data[geo_type] = []
+
         for indicator in profile.indicators:
-            values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_names)
+            values    = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_names)
+            geo_type  = indicator.dataset_geography_type()
 
             data  = {}
             data  = {
@@ -253,10 +263,11 @@ class LocationsController(base.BaseController):
                 'dataset': indicator.dataset_name(),
              'dataset_id': indicator.dataset_id,
                'variable': indicator.variable,
+               'geo_type': geo_type,
                'values'  : values
             }
 
-            ind_data.append(data)
+            ind_data[geo_type].append(data)
 
         self.session.close()
         return json.dumps({'success': True, 'ind_data': ind_data, 'towns':  locations_names})

@@ -9,6 +9,7 @@ var create_popup    = $("#create_profile_popup"),
     locations       = location_names,
     selected_geography_type = 'Town',
     default_profile_id = $('#default_profile_id').text(),
+    geo_types       = JSON.parse(geo_types),
     current_dataset ;
 
     function load_topics(){
@@ -69,7 +70,7 @@ var create_popup    = $("#create_profile_popup"),
         }
     }
 
-    function draw_table(indicators_data, towns){
+    function draw_table(type, indicators_data, towns){
 
         table = "<table class='table my_table'>\
                     <thead>\
@@ -91,7 +92,7 @@ var create_popup    = $("#create_profile_popup"),
         });
         table = table +  "</tbody></table>";
 
-        $(".table-div").html(table);
+        $(".table-div-" + type).html(table);
     }
 
 
@@ -107,7 +108,12 @@ var create_popup    = $("#create_profile_popup"),
                 indicators_data = data.ind_data;
                 current_towns   = data.towns;
                 $('locations_list').text(data.towns);
-                draw_table(indicators_data, current_towns);
+                // debugger
+                $(geo_types).each(function(i){
+                    type = geo_types[i]
+                    draw_table(type, indicators_data[type], current_towns);
+                });
+
                 $('.spinner').hide();
             }
         });
