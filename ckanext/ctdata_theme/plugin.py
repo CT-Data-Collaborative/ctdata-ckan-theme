@@ -119,7 +119,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('manage_locations', '/manage-locations', action='manage_locations')
             m.connect('create_location',  '/create_location',  action='create_location')
             m.connect('new_profile_location', '/location/{location_name}/new_profile', action='new_profile')
-            m.connect('load_indicator_location', '/location/{location_name}/load_indicator', action='load_indicator')
+            m.connect('load_indicator_location', '/location/load_indicator', action='load_indicator')
             m.connect('create_location_profile', '/location/{location_name}/create-profile', action='create_location_profile')
             m.connect('load_profile_indicators', '/load_profile_indicators/{profile_id}', action='load_profile_indicators')
             m.connect('save_local_default', '/save_local_default/{profile_id}', action='save_local_default')

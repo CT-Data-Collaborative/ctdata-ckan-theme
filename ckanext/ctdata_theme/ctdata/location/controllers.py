@@ -88,11 +88,12 @@ class LocationsController(base.BaseController):
         return base.render('location/new_profile.html', extra_vars={'location': location})
     #end
 
-    def load_indicator(self, location_name):
-        location = self.location_service.get_location(location_name)
+    def load_indicator(self):
+        # location   = self.location_service.get_location(location_name)
         session_id = session.id
         user_name  = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
-
+        geo_types  = self.location_service.location_geography_types()
+        locations_records = self.location_service.get_all_locations()
 
         if http_request.method == 'POST':
             user = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
@@ -109,31 +110,43 @@ class LocationsController(base.BaseController):
             visualization_type   = json_body.get('visualization_type') or 'table'
 
             http_response.headers['Content-type'] = 'application/json'
+            locations_hash = {}
+            all_current_locations=[]
 
             if locations:
-                locations = locations.split(',')
-                locations_names = locations
+                for type in geo_types:
+                    locations_to_put      = filter(lambda t: t.geography_type == type and t.name in locations.split(','), locations_records)
+                    locations_hash[type]  = map(lambda t: t.name, locations_to_put)
+                    all_current_locations += locations_hash[type]
             else:
-                locations = [location]
-                locations_names = map(lambda t: t.name, locations)
-                locations = locations_names
+                locations = []
+                for type in geo_types:
+                    locations_hash[type]  = map(lambda t: t.name, locations)
+                    all_current_locations += locations_hash[type]
 
+            ######### load indicators data
+
+            ind_data = {}
+            for geo_type in geo_types:
+                ind_data[geo_type] = []
             if not filters or not dataset_id:
                 abort(400)
 
             try:
                 indicator =  self.location_service.new_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, description, group_ids)
-                values    =  self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations)
+                geo_type  = indicator.dataset_geography_type()
+                values    =  self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
 
                 ind_data = {
                          'id': indicator.id,
                     'filters': indicator.filters,
                   'data_type': indicator.data_type,
                        'year': dict_with_key_value("field", "Year", json.loads(indicator.filters))['values'][0],
-                    'link_to': indicator.link_to_visualization_with_locations(locations_names),
+                    'link_to': indicator.link_to_visualization_with_locations(locations_hash[type]),
                     'dataset': indicator.dataset_name(),
                  'dataset_id': indicator.dataset_id,
                    'variable': indicator.variable,
+                   'geo_type': geo_type,
                    'values'  : values
                 }
 
@@ -182,7 +195,6 @@ class LocationsController(base.BaseController):
         locations   = self.location_service.get_all_locations()
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
         geo_types   =  self.location_service.location_geography_types()
-        self.session.close()
 
         locations_hash = {}
         all_current_locations = []
@@ -196,6 +208,7 @@ class LocationsController(base.BaseController):
         except IndexError:
             location_name = 'No Location'
 
+        self.session.close()
         return base.render('location/show.html', extra_vars={'location': location_name,
                                                              'locations': locations,
                                                              'all_current_locations': all_current_locations,

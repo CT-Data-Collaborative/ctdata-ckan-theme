@@ -157,7 +157,8 @@ var create_popup    = $("#create_profile_popup"),
 
     function draw_raw(indicators_data){
         tr = build_tr_from_data(indicators_data)
-        $('tbody').append( tr )
+        geo_type = indicators_data['geo_type']
+        $('.table-div-' + geo_type).find('tbody').append( tr )
     }
 
     function reload_data_for_new_indicators(){
@@ -166,7 +167,7 @@ var create_popup    = $("#create_profile_popup"),
         $(new_indicators).each(function(i){
             ind = new_indicators[i]
             $.ajax({type: "POST",
-                url: "/location/" + location_name + "/load_indicator",
+                url: "/location/load_indicator",
                 data: JSON.stringify({ dataset_id: ind['dataset_id'], name: "", ind_type: 'common',
                                        permission: 'public', filters: ind['filters'], description: '', locations: locations}),
                 contentType: 'application/json; charset=utf-8',
@@ -292,7 +293,7 @@ $(function(){
                               permission: 'public', filters: JSON.stringify(get_filters()), description: ''})
 
             $.ajax({type: "POST",
-                url: "/location/" + location_name + "/load_indicator",
+                url: "/location/load_indicator",
                 data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
                                        permission: 'public', filters: get_filters(), description: '', locations: locations}),
                 contentType: 'application/json; charset=utf-8',
@@ -345,7 +346,7 @@ $(function(){
                     type = geo_types[i]
                     draw_table(type, indicators_data[type], data.locations_hash[type]);
                 });
-
+                reload_data_for_new_indicators();
                 $('.spinner').hide();
             }
         });
