@@ -111,8 +111,17 @@ var create_popup    = $("#create_profile_popup"),
                 $(geo_types).each(function(i){
                     type = geo_types[i]
                     draw_table(type, indicators_data[type], data.locations_hash[type]);
-                });
 
+                    if (indicators_data[type].length == 0){
+                        $('.edit_locations#' + type).addClass('hidden');
+                        $('.table-div-' + type).addClass('hidden');
+                    }
+                    else{
+                        $('.edit_locations#' + type).removeClass('hidden');
+                        $('.table-div-' + type).removeClass('hidden');
+                    }
+                });
+                enable_options_for_profile();
                 $('.spinner').hide();
             }
         });
@@ -165,6 +174,7 @@ var create_popup    = $("#create_profile_popup"),
         locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         locations = locations.join(',');
         $(new_indicators).each(function(i){
+            $('.spinner').show();
             ind = new_indicators[i]
             $.ajax({type: "POST",
                 url: "/location/load_indicator",
@@ -173,9 +183,29 @@ var create_popup    = $("#create_profile_popup"),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     draw_raw(data.indicator);
+                    $('.edit_locations#' + data.indicator['geo_type']).removeClass('hidden');
+                    $('.table-div-' + data.indicator['geo_type']).removeClass('hidden');
+                    $('.spinner').hide();
                 }
             });
         });
+
+    }
+
+    function enable_options_for_profile(){
+        if (indicators.length > 0 || new_indicators.length > 0){
+            $('#create_profile_button').removeClass('hidden');
+            $('.download_btn').removeClass('hidden');
+            $('#add_indicator').closest('li').closest('ul').removeClass('add_indicator_button_in_center')
+
+        }
+        else{
+            $('#create_profile_button').addClass('hidden');
+            $('.download_btn').addClass('hidden');
+            $('#add_indicator').closest('ul').closest('ul').addClass('add_indicator_button_in_center')
+        }
+
+        $('#add_indicator').closest('li').closest('ul').removeClass('hidden')
     }
 
 $(function(){
@@ -280,7 +310,8 @@ $(function(){
 
     $('#save_indicator').live('click', function() {
         $("#indicator_adding_error").animate({opacity: 0}, 300);
-        locations = locations
+        geo_type_locations = $('#towns').find('.location-checkbox').not('[class*="hidden"]').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+
 
         inds = indicators.concat(new_indicators)
         all_filters = []
@@ -292,6 +323,9 @@ $(function(){
             new_indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common',
                               permission: 'public', filters: JSON.stringify(get_filters()), description: ''})
 
+            locations =  $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+            locations = locations.join(',');
+
             $.ajax({type: "POST",
                 url: "/location/load_indicator",
                 data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
@@ -299,8 +333,22 @@ $(function(){
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     if (data.success == true){
-                        draw_raw(data.indicator);
-                        $('div.modal').modal('hide');
+                        if (geo_type_locations.length > 0){
+
+                            enable_options_for_profile();
+                            draw_raw(data.indicator);
+                            $('.edit_locations#' + data.indicator['geo_type']).removeClass('hidden');
+                            $('.table-div-' + data.indicator['geo_type']).removeClass('hidden');
+                            $('div.modal').modal('hide');
+                            $('create_profile_button').removeClass('hidden');
+
+                        }
+                        else{
+                            enable_options_for_profile();
+                            current_geo_type =$('#select_geography_type').val()
+                            $('div.modal').modal('hide');
+                            $('.edit_locations#' + current_geo_type).click()
+                        }
                     }
                     else {
                         $("#error").html(data.error);
@@ -308,6 +356,7 @@ $(function(){
                     }
                 }
             });
+
         }
         else{
             $('div.modal').modal('hide');
@@ -324,6 +373,9 @@ $(function(){
             value = $(this).val()
             $('li.dataset-name[class !=' + value + ']').addClass('hidden')
             $('li.dataset-name.' + value).removeClass('hidden')
+
+            $('.location-checkbox').addClass('hidden')
+            $('.location-checkbox.' + value).removeClass('hidden')
         });
     });
 
@@ -346,12 +398,22 @@ $(function(){
                 $(geo_types).each(function(i){
                     type = geo_types[i]
                     draw_table(type, indicators_data[type], data.locations_hash[type]);
-                });
-                reload_data_for_new_indicators();
-                $('.spinner').hide();
-            }
-        });
+                    if (indicators_data[type].length == 0){
+                        $('.edit_locations#' + type).addClass('hidden');
+                        $('.table-div-' + type).addClass('hidden');
+                    }
+                    else{
+                        $('.edit_locations#' + type).removeClass('hidden');
+                        $('.table-div-' + type).removeClass('hidden');
+                    }
+                    enable_options_for_profile();
 
+                });
+                $('.spinner').hide();
+                reload_data_for_new_indicators();
+            }
+
+        });
 
     });
 

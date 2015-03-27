@@ -20,12 +20,12 @@
 <span class="hidden" id="locations_list">{{towns_names}}</span>
 <div class="wrapper">
   <div class="span12 pull-right">
-    <section class="locationdata ">
-      <ul class="opt_btn">
+    <section class="locationdata">
+      <ul class="opt_btn add_indicator_button_in_center hidden">
         <!-- <li class="btn_blue"><a href="javascript:void(0)" id="add_towns">Edit Towns</a></li> -->
         <li class="btn_blue"><a href="javascript:void(0)" id="add_indicator">Add Indicator</a></li>
         <!-- <li class="btn_blue"><a href="/location/{{location.name}}/new_profile" class=""> Create Community Profile </a></li> -->
-        <li class="download_btn"><a href="#" onclick="$('.table').table2CSV({})"  id="download">Download Profile</a></li>
+        <li class="download_btn hidden"><a href="#" onclick="$('.table').table2CSV({})"  id="download">Download Profile</a></li>
       </ul>
     </section>
 
@@ -33,7 +33,7 @@
   <div class="span12">
     <span id="default_profile_id" class="hidden">{{default_profile_id}}</span>
     {% for type in geo_types_array %}
-      <a href="javascript:void(0)" id="{{type}}" class="edit_locations btn btn-default"> Edit {{ type}}s </a>
+      <a href="javascript:void(0)" id="{{type}}" class="edit_locations btn btn-default hidden"> Edit {{ type}}s </a>
       <div class="table-div-{{type}}"></div>
       <br>
       <br>
@@ -44,7 +44,7 @@
 {% if c.userobj %}
 <section class="locationdata ">
   <ul class="opt_btn">
-    <li><a href="javascript:void(0)" id="create_profile_button"  class='blue_button'>Save to new profile</a></li>
+    <li><a href="javascript:void(0)" id="create_profile_button"  class='blue_button hidden'>Save to new profile</a></li>
     {% if default_profile.user_id == c.userobj.id %}
       <li><a href="javascript:void(0)" id="save_profile_as_default" class='blue_button'>Save Edits</a></li>
     {% endif %}
