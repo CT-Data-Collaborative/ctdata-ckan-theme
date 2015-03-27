@@ -25,6 +25,15 @@ class LocationService(object):
 
     ################ TOWNS ############################################
 
+    def location_geography_types(self):
+        sql_result = self.session.query(Location.geography_type).distinct().all()
+        types = map(lambda x: x[0], sql_result)
+
+        return types
+
+    def get_locations_by_type(self, type):
+        return self.session.query(Location).filter(Location.geography_type == type ).all()
+
     def get_location(self, location_name):
         location = self.session.query(Location).filter(Location.name == location_name).first()
         if not location:
@@ -37,8 +46,8 @@ class LocationService(object):
     def get_locations_by_names(self, locations_names):
         return self.session.query(Town).filter(Town.name.in_(set(locations_names))).all()
 
-    def create(self, name, fips):
-        location = Location(name, fips)
+    def create(self, name, fips, geography_type):
+        location = Location(name, fips, geography_type)
         self.session.add(location)
 
         return location
@@ -54,21 +63,25 @@ class LocationService(object):
         self.session.commit()
 
     ################ Profiles   ############################################
+    def get_default_location_profile(self):
+        profile = self.session.query(CtdataProfile).filter(CtdataProfile.name == 'Location Defauilt Profile').first()
+        if not profile:
+           profile = CtdataProfile('Location Defauilt Profile', True, None)
+           self.session.add(profile)
+           self.session.commit()
+
+        return profile
 
     def get_user_profiles(self, user_id):
         profiles = self.session.query(CtdataProfile).filter(CtdataProfile.user_id == user_id).all()
 
         return profiles
 
-    def create_profile(self, user, name, indicators, locations, global_default, main_location):
+    def create_profile(self, user, name, indicators, locations, global_default):
         profile = CtdataProfile(name, global_default, user.ckan_user_id)
-        self.session.add(profile)
 
         for location_name in locations:
             profile.locations.append(self.get_location(location_name))
-
-        location_profile = LocationProfile(main_location.id, profile.id)
-        self.session.add(location_profile)
 
         for indicator in indicators:
            indicator  = self.create_indicator(indicator['name'], indicator['filters'], indicator['dataset_id'], user, indicator['ind_type'], 'table', profile.id)
@@ -85,7 +98,6 @@ class LocationService(object):
 
     def get_profile(self, profile_id):
         profile = self.session.query(CtdataProfile).filter(CtdataProfile.id == profile_id).first()
-
         return profile
 
     ################ Indicators ############################################

@@ -21,20 +21,16 @@ class TopicSerivce(object):
                  {'title': 'Safety',         'id': 'safety',         'indicators': []}]
 
       for dataset_name in dataset_names:
-          dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
-          metadata = DatasetService.get_dataset_meta(dataset_name)['extras']
+          dataset     = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+          metadata    = DatasetService.get_dataset_meta(dataset_name)['extras']
           hidden_meta = filter(lambda x: x['key'] == 'Hidden In', metadata)
+          geography       = filter(lambda x: x['key'] == 'Geography', metadata)
+          geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
 
           try:
             hidden_list = yaml.load(hidden_meta[0]['value']).replace(', ', ',').split(',')
           except IndexError:
             hidden_list = []
-
-          disable_visualizations_data = filter(lambda x: x['key'] == 'Disable Visualizations', metadata)
-          try:
-            disable_visualizations = yaml.load(disable_visualizations_data[0]['value'])
-          except IndexError:
-            disable_visualizations = False
 
           if len(dataset['extras']) > 0:
               domain = None
@@ -47,11 +43,14 @@ class TopicSerivce(object):
                   dataset_indicators = CommunityProfileService.get_gallery_indicators_for_dataset(dataset['id'])
 
                   for indicator in dataset_indicators:
-                    domain_indicators.append({'id': indicator.id, 'description': indicator.description,
-                                              'name': indicator.name, 'viz_type': indicator.visualization_type,
-                                              'created_at': str(indicator.created_at.strftime("%B %d, %Y")),
-                                              'user': indicator.user_name(),
-                                              'dataset_name': indicator.dataset_name(),
+                    domain_indicators.append({'id':          indicator.id,
+                                              'description': indicator.description,
+                                              'name':        indicator.name,
+                                              'viz_type':    indicator.visualization_type,
+                                              'created_at':  str(indicator.created_at.strftime("%B %d, %Y")),
+                                              'user':        indicator.user_name(),
+                                              'dataset_name':   indicator.dataset_name(),
+                                              'geography_type': geography_param,
                                               'link_to_visualization': indicator.link_to_visualization()})
 
 
@@ -85,9 +84,11 @@ class TopicSerivce(object):
                    {'title': 'Safety', 'subdomains': [], 'id': 'safety'}]
 
         for dataset_name in dataset_names:
-            dataset = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
-            metadata = DatasetService.get_dataset_meta(dataset_name)['extras']
+            dataset     = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+            metadata    = DatasetService.get_dataset_meta(dataset_name)['extras']
             hidden_meta = filter(lambda x: x['key'] == 'Hidden In', metadata)
+            geography       = filter(lambda x: x['key'] == 'Geography', metadata)
+            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
 
             try:
               hidden_list = yaml.load(hidden_meta[0]['value']).replace(', ', ',').split(',')
@@ -105,7 +106,7 @@ class TopicSerivce(object):
                 if domain and subdomain and action not in hidden_list and 'visualization' not in hidden_list:
 
                     dataset_obj = {'name': dataset['name'], 'title': dataset['title'],
-                                   'id': dataset['id']}
+                                   'id': dataset['id'], 'geography_type': geography_param}
                     dmn = dict_with_key_value('title', domain, domains)
                     if dmn:
                         subdmn = dict_with_key_value('title', subdomain, dmn['subdomains'])

@@ -68,10 +68,11 @@ span.checkLabel {
     top: 0 !important;
     margin-top: 3px !important;
     margin-right: 5px !important;
+    margin-left: 1px !important;
 }
 
 .indicator-topics {
-    width: 230px;
+    width: 260px;
     border-right: 1px solid;
     float: left;
     overflow: scroll !important;
@@ -83,7 +84,7 @@ span.checkLabel {
 }
 
 .indicator-filters {
-  margin-left: 240px;
+  margin-left: 270px;
   overflow: scroll !important;
   height: 370px;
 }
@@ -359,4 +360,8 @@ label.disabled{
 .main_body_content{
   webkit-box-shadow: none !important;
   box-shadow: none !important;
+}
+
+ul.indicator-sub-topics{
+  margin-left: 5px;
 }

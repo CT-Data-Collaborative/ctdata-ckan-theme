@@ -101,6 +101,13 @@ class ProfileIndicator(Base):
     def dataset_name(self):
         return get_action('package_show')(data_dict={'id': self.dataset_id})['title']
 
+    def dataset_geography_type(self):
+        metadata = get_action('package_show')(data_dict={'id': self.dataset_id})['extras']
+
+        geography       = filter(lambda x: x['key'] == 'Geography', metadata)
+        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+        return geography_param
+
     def link_to_visualization(self):
         view = self.visualization_type or 'table'
         location = ''

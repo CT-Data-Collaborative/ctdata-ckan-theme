@@ -24,11 +24,13 @@ class Location(Base):
     fips   = Column(BigInteger)
     name   = Column(String)
     public = Column(Boolean, default=False)
+    geography_type = Column(String, default='Town')
 
-    def __init__(self, name, fips):
+    def __init__(self, name, fips, geography_type):
         self.fips   = fips
         self.name   = name
         self.public = True
+        self.geography_type = geography_type
 
     def __repr__(self):
         return "Location %s %s %s" % (self.id, self.name, self.fips)
@@ -38,6 +40,7 @@ class Location(Base):
         profile = model.Session.query(CtdataProfile).filter(CtdataProfile.name == self.name).first()
 
         return profile
+
 
 
 class CtdataProfile(Base):

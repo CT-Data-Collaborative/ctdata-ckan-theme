@@ -1,0 +1,20 @@
+{% for type in geo_types_array %}
+  <h2> {{ type}}s </h3>
+  <div class="table-div-{{type}}">
+
+  </div>
+  <table class='table my_table'>
+    <thead>
+      <th>Dataset</th>
+      <th>Data Type</th>
+      <th>Year</th>
+
+      {% for location_name in locations_hash[type] %}
+        <th>{{location_name}}</th>
+      {% endfor %}
+    </thead>
+    <tbody>
+
+    </tbody>
+  <br>
+{% endfor %}

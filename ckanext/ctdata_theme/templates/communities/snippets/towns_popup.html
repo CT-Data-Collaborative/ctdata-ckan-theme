@@ -7,10 +7,10 @@
         <div class="modal-body">
           <div id="towns">
             <ul style="">
-              {% for town in towns %}
-                <li>
-                  <input type="checkbox" value="{{town.name}}" {% if town.name in displayed_towns %}checked{% endif %} {% if town.name == community.name %}disabled{% endif %}>
-                  <span class="checkLabel">{{town.name}}</span>
+              {% for location in locations %}
+                <li class="location-checkbox {{location.geography_type}}">
+                  <input type="checkbox" value="{{location.name}}" {% if location.name in displayed_locations %}checked{% endif %}>
+                  <span class="checkLabel">{{location.name}}</span>
                 </li>
               {% endfor %}
             </ul>
