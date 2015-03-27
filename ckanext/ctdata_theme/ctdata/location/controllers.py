@@ -100,13 +100,6 @@ class LocationsController(base.BaseController):
         return json.dumps({'location_name': location.name, 'location_fips': location.fips, 'location_geography_type': location.geography_type})
     #end
 
-    def new_profile(self, location_name):
-        location = self.location_service.get_location(location_name)
-
-        self.session.close()
-        return base.render('location/new_profile.html', extra_vars={'location': location})
-    #end
-
     def load_indicator(self):
         # location   = self.location_service.get_location(location_name)
         session_id = session.id
@@ -182,9 +175,8 @@ class LocationsController(base.BaseController):
         return json.dumps({'success': False, 'error': str('Indicator cannot be saved')})
     #end
 
-    def create_location_profile(self, location_name):
+    def create_location_profile(self):
         http_response.headers['Content-type'] = 'application/json'
-        location   = self.location_service.get_location(location_name)
         session_id = session.id
         user_name  = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
 
@@ -196,7 +188,7 @@ class LocationsController(base.BaseController):
             name       = json_body.get('name')
             global_default  = json_body.get('global_default')
 
-            profile    = self.location_service.create_profile(user, name, indicators, locations, global_default, location)
+            profile    = self.location_service.create_profile(user, name, indicators, locations, global_default)
 
             redirect_link = '/community/' + str(profile.id)
             return json.dumps({'success': True,  'redirect_link': redirect_link})
@@ -253,7 +245,6 @@ class LocationsController(base.BaseController):
         location_names = location_names.split(',')
 
         profile        = self.location_service.get_profile(profile_id)
-        # embed()
         user           = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
         locations      = []
         geo_types      = self.location_service.location_geography_types()

@@ -81,7 +81,6 @@ var create_popup    = $("#create_profile_popup"),
         $(towns).each(function(i){ table = table + '<th>' +towns[i] + '</th>' });
         table = table + "</thead><tbody>"
 
-        indicators = []
         $(indicators_data).each(function(i){
             indicators.push({ id: indicators_data[i]['id'], dataset_id: indicators_data[i]['dataset_id'], name: "", ind_type: 'common',
                           permission: 'public', filters: indicators_data[i]['filters'], description: '', geo_type: indicators_data[i]['geo_type'] })
@@ -106,6 +105,7 @@ var create_popup    = $("#create_profile_popup"),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 indicators_data = data.ind_data;
+                indicators      = []
                 $('locations_list').text(data.all_current_locations);
 
                 $(geo_types).each(function(i){
@@ -340,6 +340,7 @@ $(function(){
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 indicators_data = data.ind_data;
+                indicators      = []
                 $('locations_list').text(data.all_current_locations);
 
                 $(geo_types).each(function(i){
@@ -384,7 +385,7 @@ $(function(){
 
         if (name != ''){
             $.ajax({type: "POST",
-                url: "/location/" + location_name + "/create-profile",
+                url: "/location/create-profile",
                 data: JSON.stringify({indicators: inds, locations: locations, name: name, global_default: global_default}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {

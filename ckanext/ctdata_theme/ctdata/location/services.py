@@ -77,15 +77,11 @@ class LocationService(object):
 
         return profiles
 
-    def create_profile(self, user, name, indicators, locations, global_default, main_location):
+    def create_profile(self, user, name, indicators, locations, global_default):
         profile = CtdataProfile(name, global_default, user.ckan_user_id)
-
 
         for location_name in locations:
             profile.locations.append(self.get_location(location_name))
-
-        location_profile = LocationProfile(main_location.id, profile.id)
-        self.session.add(location_profile)
 
         for indicator in indicators:
            indicator  = self.create_indicator(indicator['name'], indicator['filters'], indicator['dataset_id'], user, indicator['ind_type'], 'table', profile.id)
