@@ -42,7 +42,11 @@ class GroupController(GroupController):
       id = http_request.environ.get('wsgiorg.routing_args')[1]['group_id']
       context = {'model': model, 'session': model.Session,
                  'user':  c.user or c.author, 'for_view': True}
-      group            = get_action('group_show')(context, {'id': id})
+      try:
+        group = get_action('group_show')(context, {'id': id})
+      except toolkit.ObjectNotFound:
+        abort(404)
+
       c.group_dict     = group
       user_name        = http_request.environ.get("REMOTE_USER")
       group_indicators = self.community_profile_service.get_group_indicators(group['id'])
