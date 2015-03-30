@@ -5,7 +5,13 @@
 <link href='/common/css/visualization.css' rel='stylesheet' type='text/css'>
 {% endblock %}
 
-{% block page_name %}Data by Location - {{default_profile.name}}</span>{% endblock %}
+
+{% block page_name %}Data by Location
+  {% if not default_profile.name == 'Location Defauilt Profile' %}
+    - {{default_profile.name}}
+  {% endif %}
+{% endblock %}
+
 {% block page_description %}{% endblock %}
 {% block main_content %}
 
