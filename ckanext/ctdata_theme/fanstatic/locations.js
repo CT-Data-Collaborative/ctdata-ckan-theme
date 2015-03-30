@@ -58,18 +58,6 @@ var create_popup    = $("#create_profile_popup"),
         }).get();
     }
 
-    function remove_temp_indicators(){
-        if ($('.temp').size() != 0) {
-            ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
-            $.ajax({type: "POST",
-                async: false,
-                url: "/community/remove_temp_indicators",
-                data: JSON.stringify({indicator_ids: ids}),
-                contentType: 'application/json; charset=utf-8'
-            });
-        }
-    }
-
     function draw_table(type, indicators_data, towns){
 
         table = "<table class='table my_table'>\

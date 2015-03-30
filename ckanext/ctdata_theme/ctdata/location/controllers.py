@@ -19,7 +19,7 @@ from ..visualization.services import DatasetService
 from ..topic.services import TopicSerivce
 from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
-from ..community.services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
+from ..community.services import ProfileAlreadyExists, CantDeletePrivateIndicator
 
 from services import LocationService
 
@@ -30,7 +30,6 @@ from termcolor import colored
 class LocationsController(base.BaseController):
     def __init__(self):
         self.session = Database().session_factory(expire_on_commit=False)
-        self.community_profile_service = CommunityProfileService(self.session)
         self.user_service     = UserService(self.session)
         self.location_service = LocationService(self.session)
 
