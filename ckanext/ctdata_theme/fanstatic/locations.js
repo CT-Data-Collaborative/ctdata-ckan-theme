@@ -60,7 +60,7 @@ var create_popup    = $("#create_profile_popup"),
 
     function draw_table(type, indicators_data, towns){
 
-        table = "<table class='table my_table'>\
+        table = "<table class='table my_table' id='table-" + type + "'>\
                     <thead>\
                         <th>Dataset</th>\
                         <th>Data Type</th>\

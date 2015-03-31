@@ -125,7 +125,12 @@ class LocationService(object):
                 curs = conn.cursor()
                 curs.execute(query, (dataset.table_name,))
                 value = curs.fetchall()
-                arr.append(str(value[0][0]) if value else None)
+
+                val = None
+                if value:
+                  val = str(value[0][0]) if str(value[0][0]) != '-9999' else '*'  # -9999 - indicator of suppresed value
+
+                arr.append(val)
 
         except psycopg2.ProgrammingError:
             # del curs
