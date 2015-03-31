@@ -1,4 +1,7 @@
 import urlparse
+import csv
+import os
+import sys
 
 import psycopg2
 import sqlalchemy
@@ -7,13 +10,15 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Boolean, Table
 
 from visualization.models import VisualizationOrmBase
-from location.models import CtdataProfile, Location, LocationProfile
+from location.models import CtdataProfile
+from location.models import Location, LocationProfile
 from .utils import Singleton
 from community.models import Base, CommunityProfile, Town
 
 from sqlalchemy.pool import NullPool
 from termcolor import colored
 from IPython import embed
+from sqlalchemy import and_
 
 class Database(object):
     __metaclass__ = Singleton
@@ -80,6 +85,35 @@ class Database(object):
             curr.close()
             del curr
             conn.close()
+
+        session.commit()
+        session.close()
+
+    def create_districts(self, table_name):
+        session = self.session_factory()
+
+        path_to_file = filter(lambda p: '/ctdata-svsg' in p, sys.path)[0]
+        path_to_file += '/ckanext/ctdata_theme/ctdata/districts.csv'
+
+        with open(path_to_file, 'rb') as csvfile:
+            reader = csv.reader(csvfile)
+
+            for row in reader:
+                name = row[0]
+                fips = row[1] if row[1] else None
+                geo_type = row[2]
+
+                if session.query(Location).filter(and_(Location.name == name, Location.geography_type == geo_type)).count() == 0:
+                    conn = self.connect()
+                    curr = conn.cursor()
+
+                    location = Location(name, fips, geo_type)
+                    session.add(location)
+
+
+                    curr.close()
+                    del curr
+                    conn.close()
 
         session.commit()
         session.close()
