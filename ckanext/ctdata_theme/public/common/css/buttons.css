@@ -115,7 +115,15 @@ a.pure-button-selected {
 }
 
 .button-warning {
-	background: rgb(223, 117, 20); /* this is an orange */
+    background: rgb(223, 117, 20); /* this is an orange */
+}
+
+.button-info {
+	background: #C1CFE1 /* this is an blue */
+}
+
+.button-get-started{
+    width: 20%;
 }
 
 .button-secondary {

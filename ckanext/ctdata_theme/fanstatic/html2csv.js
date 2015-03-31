@@ -9,32 +9,41 @@ jQuery.fn.table2CSV = function(options) {
     var csvData = [];
     var headerArr = [];
     var el = this;
-
     //header
-    var numCols = options.header.length;
-    var tmpRow = []; // construct header avalible array
 
-    if (numCols > 0) {
-        for (var i = 0; i < numCols; i++) {
-            tmpRow[tmpRow.length] = formatData(options.header[i]);
+    $(el).each(function(i){
+        var numCols = options.header.length;
+        var tmpRow = []; // construct header avalible array
+
+        table_id = $($(el)[i]).attr('id')
+
+        if (numCols > 0) {
+            for (var i = 0; i < numCols; i++) {
+                tmpRow[tmpRow.length] = formatData(options.header[i]);
+            }
+        } else {
+            // debugger
+            $('#' + table_id).filter(':visible').find('th').each(function() {
+                if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).html());
+            });
         }
-    } else {
-        $(el).filter(':visible').find('th').each(function() {
-            if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).html());
-        });
-    }
-
-    row2CSV(tmpRow);
-
-    // actual data
-    $(el).find('tr').each(function() {
-        var tmpRow = [];
-        $(this).filter(':visible').find('td.for_csv').each(function() {
-            if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).find('.for_csv').text());
-        });
 
         row2CSV(tmpRow);
-    });
+
+        // actual data
+        $('#' + table_id).find('tr').each(function() {
+            var tmpRow = [];
+            $(this).filter(':visible').find('td.for_csv').each(function() {
+                if ($(this).css('display') != 'none') tmpRow[tmpRow.length] = formatData($(this).find('.for_csv').text());
+            });
+
+            row2CSV(tmpRow);
+        });
+
+
+    })
+
+
     if (options.delivery == 'popup') {
         var mydata = csvData.join('\n');
         return popup(mydata);

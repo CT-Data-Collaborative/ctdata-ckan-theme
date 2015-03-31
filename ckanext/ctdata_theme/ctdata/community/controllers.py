@@ -18,6 +18,7 @@ from ..topic.services import TopicSerivce
 from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
 from services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
+from ..location.services import LocationService
 
 from IPython import embed
 from termcolor import colored
@@ -26,8 +27,10 @@ class CommunityProfilesController(base.BaseController):
     def __init__(self):
         self.session = Database().session_factory()
         self.community_profile_service = CommunityProfileService(self.session)
-        self.user_service = UserService(self.session)
+        self.user_service     = UserService(self.session)
+        self.location_service = LocationService(self.session)
 
+    #TODO refactor to use  locations controller
     def add_indicator(self):
         session_id = session.id
         user_name  = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
@@ -74,172 +77,16 @@ class CommunityProfilesController(base.BaseController):
 
         return json.dumps({'success': False, 'error': str('Indicator cannot be saved')})
 
-    def community_profile(self, community_name):
-        location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
-        profile_to_load = http_request.GET.get('p')
-        towns_raw       = http_request.GET.get('towns')
-        towns_names     = map(lambda x: x.strip(), towns_raw.split(','))  if towns_raw else []
-        towns           = self.community_profile_service.get_all_towns()
-
-        if profile_to_load:
-            community = self.community_profile_service.get_community_profile_by_id(profile_to_load)
-        else:
-            community = self.community_profile_service.get_community_profile(community_name)
-
-        self.session.commit()
-        anti_csrf_token = str(uuid.uuid4())
-        session['anti_csrf'] = anti_csrf_token
-        session.save()
-
-        default_url = '/community/' + location
-        return base.render('communities/community_profile.html', extra_vars={'location': location,
-                                                                 'community': community,
-                                                                 'displayed_towns': towns_names,
-                                                                 'towns_raw': towns_raw,
-                                                                 'towns': towns,
-                                                                 'anti_csrf_token': anti_csrf_token,
-                                                                 'default_url': default_url})
-
-    def get_indicators_data(self, community_name):
-        session_id      = session.id
-        user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
-        location        = http_request.environ.get("wsgiorg.routing_args")[1]['community_name']
-        profile_to_load = http_request.GET.get('p')
-        json_body       = json.loads(http_request.body, encoding=http_request.charset)
-        towns_raw       = json_body.get('towns')
-        user            = self.user_service.get_or_create_user_with_session_id(user_name, session_id)
-        towns_names     = map(lambda x: x.strip(), towns_raw.split(','))  if towns_raw else []
-        indicators, displayed_towns, displayed_towns_names = [],[],[]
-
-        if profile_to_load:
-            community = self.community_profile_service.get_community_profile_by_id(profile_to_load)
-        else:
-            community = self.community_profile_service.get_community_profile(community_name)
-
-        try:
-            indicators, displayed_towns = self.community_profile_service.get_indicators(community,
-                                                                                        towns_names,
-                                                                                        location,
-                                                                                        user)
-            displayed_towns_names = map(lambda t: t.name, displayed_towns)
-
-        except toolkit.ObjectNotFound as e:
-            abort(404, detail=str(e))
-
-
-        for ind in indicators:
-            ind_object = ind['indicator']
-            del ind['indicator']
-
-            ind['id']        = ind_object.id,
-            ind['link_to']   = ind_object.link_to_visualization()
-            ind['year']      = ind_object.year
-            ind['data_type'] = ind_object.data_type
-            ind['variable']  = ind_object.variable
-
-        http_response.headers['Content-type'] = 'application/json'
-        self.session.close()
-        return json.dumps({'indicators': indicators, 'towns': displayed_towns_names})
-
-    def update_profile_indicators(self):
-        http_response.headers['Content-type'] = 'application/json'
-
-        json_body             = json.loads(http_request.body, encoding=http_request.charset)
-        indicators_to_remove  = json_body.get('indicators_to_remove')
-        session_id      = session.id
-        user_name       = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
-
-        if user_name:
-            user = self.user_service.get_or_create_user_with_session_id(user_name,session_id)
-        else:
-            abort(401)
-
-        if user:
-            for indicator_id in indicators_to_remove:
-                try:
-                    self.community_profile_service.remove_indicator(user, indicator_id)
-                    self.session.commit()
-                except toolkit.ObjectNotFound:
-                    h.flash_error('Indicator not found.')
-                    return json.dumps({'success': True})
-                except CantDeletePrivateIndicator, e:
-                    h.flash_error(str(e))
-                    return json.dumps({'success': True})
-
-        return json.dumps({'success': True})
 
     def get_topics(self):
         http_response.headers['Content-type'] = 'application/json'
-        topics  = TopicSerivce.get_topics('community_profile')
+        geography_types = self.location_service.location_geography_types()
+        topics          = TopicSerivce.get_topics('community_profile')
 
-        html  = base.render('communities/snippets/indicator_popup.html', extra_vars={'topics': topics})
+
+        html  = base.render('communities/snippets/indicator_popup.html', extra_vars={'topics': topics, 'geography_types': geography_types})
 
         return json.dumps({'success': True, 'html': html})
-
-    def save_as_default(self):
-        user_name = http_request.environ.get("REMOTE_USER")
-        json_body = json.loads(http_request.body, encoding=http_request.charset)
-        ids       = json_body.get('indicator_ids').split(',')
-
-        new_indicators = self.community_profile_service.get_indicators_by_ids(ids)
-        old_indicators = self.community_profile_service.get_default_indicators()
-
-        if not user_name:
-            abort(401)
-        if http_request.method == 'POST':
-            user = self.user_service.get_or_create_user(user_name) if user_name else None
-            if user.is_admin and sorted(new_indicators) != sorted(old_indicators):
-                for old_indicator in old_indicators:
-                    old_indicator.is_global = False
-
-                for new_indicator in new_indicators:
-                    new_indicator.is_global = True
-                    new_indicator.temp = False
-
-                for old_indicator in old_indicators:
-                    # old_indicator.is_global = False
-                    # old_indicator.temp = False
-                    if not old_indicator.is_global:
-                        self.session.delete(old_indicator)
-                        self.community_profile_service.remove_indicator_id_from_profiles(old_indicator.id)
-
-                self.session.commit()
-
-        return json.dumps({'success': True})
-
-    def add_profile(self):
-        session_id = session.id
-        user_name = http_request.environ.get("REMOTE_USER") or  "guest_" + session_id
-        json_body = json.loads(http_request.body, encoding=http_request.charset)
-        ids       = json_body.get('indicator_ids')
-        name      = json_body.get('name')
-        location  = json_body.get('location')
-
-        if http_request.method == 'POST':
-            user        = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
-            user_id     = user.ckan_user_id if user else None
-            profile = self.community_profile_service.create_community_profile(name, ids, user_id, '/community/' + location)
-
-            if profile:
-                host = http_request.environ.get('HTTP_HOST')
-                # h.flash_notice('Profile ' + profile.name + ' has been saved. Url: ' + host + profile.default_url)
-                return json.dumps({'success': True, 'redirect_link': profile.default_url })
-        else:
-            h.flash_error('Profile cannot be saved.')
-            return json.dumps({'success': False})
-
-    def remove_temp_indicators(self):
-        json_body = json.loads(http_request.body, encoding=http_request.charset)
-        ids       = json_body.get('indicator_ids')
-
-        if http_request.method == 'POST':
-            self.community_profile_service.remove_temp_user_indicators(ids)
-
-            # h.flash_notice('Indicators successfully removed.')
-            return json.dumps({'success': True})
-        else:
-            # h.flash_error('Indicators cannot be removed.')
-            return json.dumps({'success': False})
 
 
     def get_filters(self, dataset_id):

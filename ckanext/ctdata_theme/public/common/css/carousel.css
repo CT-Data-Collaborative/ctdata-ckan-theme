@@ -1,0 +1,323 @@
+/* CT DATA FRONT PAGE GALLERY
+-------------------------------------------------- */
+
+body {
+  padding:0;
+  margin:0;
+  background:#fff;
+}
+
+/* CAROUSEL
+-------------------------------------------------- */
+
+/* Carousel base class */
+.carousel {
+  height: 350px;
+  margin: 0;
+  padding:0;
+}
+/* Since positioning the image, we need to help out the caption */
+.carousel-caption-new {
+  z-index: 10;
+  text-align:left;
+  margin:0;
+  padding:0;
+}
+
+
+.carousel-caption-new h1{
+  /*font-weight: 900 !important;
+  line-height: 1.42857143 !important;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;*/
+
+    box-sizing: border-box;
+  color: rgb(255, 255, 255);
+  display: block;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 48px;
+  font-weight: 500;
+  height: auto;
+  line-height: 52.7999992370606px;
+  margin-bottom: 10px;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 20px;
+  text-align: left;
+  text-shadow: rgba(0, 0, 0, 0.6) 0px 1px 2px;
+  width: auto;
+}
+
+/* Declare heights because of positioning of img element */
+.carousel .item {
+  /*max-height:457px;*/
+  min-height:350px;
+  background-color:#000;
+}
+.carousel-inner > .item > img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 125%;
+  height:350px;
+  /*height: auto;*/
+}
+
+.learn-more-button{
+  -webkit-background-clip: border-box;
+  -webkit-background-origin: padding-box;
+  -webkit-background-size: auto;
+  -webkit-user-select: none;
+  background-attachment: scroll;
+  background-clip: border-box;
+  background-color: rgb(58, 169, 229);
+  background-image: none;
+  background-origin: padding-box;
+  background-size: auto;
+  border-bottom-color: rgb(52, 155, 210);
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-image-outset: 0px;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+  border-left-color: rgb(52, 155, 210);
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: rgb(52, 155, 210);
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-top-color: rgb(52, 155, 210);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  box-sizing: border-box;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  display: inline-block;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  height: auto;
+  line-height: 20px;
+  margin-bottom: 0px;
+  padding-bottom: 10px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 10px;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: none;
+  text-transform: uppercase;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: auto;
+}
+/* RESPONSIVE CSS
+-------------------------------------------------- */
+
+@media (min-width: 768px) {
+
+  /* Bump up size of carousel content */
+  .carousel-caption-new p {
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.4;
+    width:500px;
+  }
+
+
+.carousel {
+  position: relative;
+}
+.carousel-inner {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.carousel-inner > .item {
+  position: relative;
+  display: none;
+  -webkit-transition: .6s ease-in-out left;
+       -o-transition: .6s ease-in-out left;
+          transition: .6s ease-in-out left;
+}
+.carousel-inner > .item > img,
+.carousel-inner > .item > a > img {
+  line-height: 1;
+}
+.carousel-inner > .active,
+.carousel-inner > .next,
+.carousel-inner > .prev {
+  display: block;
+}
+.carousel-inner > .active {
+  left: 0;
+}
+.carousel-inner > .next,
+.carousel-inner > .prev {
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.carousel-inner > .next {
+  left: 100%;
+}
+.carousel-inner > .prev {
+  left: -100%;
+}
+.carousel-inner > .next.left,
+.carousel-inner > .prev.right {
+  left: 0;
+}
+.carousel-inner > .active.left {
+  left: -100%;
+}
+.carousel-inner > .active.right {
+  left: 100%;
+}
+.carousel-control-new {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 15%;
+  font-size: 20px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
+  filter: alpha(opacity=50);
+  opacity: .5;
+  padding-top: 10%;
+}
+.carousel-control-new.left {
+  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);
+  background-image:      -o-linear-gradient(left, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);
+  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .5)), to(rgba(0, 0, 0, .0001)));
+  background-image:         linear-gradient(to right, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);
+  background-repeat: repeat-x;
+}
+.carousel-control-new.right {
+  right: 0;
+  left: auto;
+  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);
+  background-image:      -o-linear-gradient(left, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);
+  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .0001)), to(rgba(0, 0, 0, .5)));
+  background-image:         linear-gradient(to right, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);
+  background-repeat: repeat-x;
+}
+.carousel-control-new:hover,
+.carousel-control-new:focus {
+  color: #fff;
+  text-decoration: none;
+  filter: alpha(opacity=90);
+  outline: 0;
+  opacity: .9;
+}
+.carousel-control-new .icon-prev,
+.carousel-control-new .icon-next,
+.carousel-control-new .glyphicon-chevron-left,
+.carousel-control-new .glyphicon-chevron-right {
+  position: absolute;
+  top: 50%;
+  z-index: 5;
+  display: inline-block;
+}
+.carousel-control-new .icon-prev,
+.carousel-control-new .glyphicon-chevron-left {
+  left: 50%;
+  margin-left: -10px;
+}
+.carousel-control-new .icon-next,
+.carousel-control-new .glyphicon-chevron-right {
+  right: 50%;
+  margin-right: -10px;
+}
+.carousel-control-new .icon-prev,
+.carousel-control-new .icon-next {
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  font-family: serif;
+}
+.carousel-control-new .icon-prev:before {
+  content: '\2039';
+}
+.carousel-control-new .icon-next:before {
+  content: '\203a';
+}
+.carousel-indicators-new {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  z-index: 15;
+  width: 60%;
+  padding-left: 0;
+  margin-left: -30%;
+  text-align: center;
+  list-style: none;
+}
+.carousel-indicators-new li {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 1px;
+  text-indent: -999px;
+  cursor: pointer;
+  background-color: #000 \9;
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid #fff;
+  border-radius: 10px;
+}
+.carousel-indicators-new .active {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  background-color: #fff;
+}
+.carousel-caption-new {
+  position: absolute;
+  right: 15%;
+  bottom: 20px;
+  left: 15%;
+  z-index: 10;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  color: #fff;
+  /*text-align: center;*/
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
+}
+.carousel-caption-new .btn {
+  text-shadow: none;
+}
+@media screen and (min-width: 768px) {
+  .carousel-control-new .glyphicon-chevron-left,
+  .carousel-control-new .glyphicon-chevron-right,
+  .carousel-control-new .icon-prev,
+  .carousel-control-new .icon-next {
+    width: 30px;
+    height: 30px;
+    margin-top: -15px;
+    font-size: 30px;
+  }
+  .carousel-control-new .glyphicon-chevron-left,
+  .carousel-control-new .icon-prev {
+    margin-left: -15px;
+  }
+  .carousel-control-new .glyphicon-chevron-right,
+  .carousel-control-new .icon-next {
+    margin-right: -15px;
+  }
+  .carousel-caption-new {
+    right: 20%;
+    left: 20%;
+    padding-bottom: 30px;
+  }
+  .carousel-indicators-new {
+    bottom: 20px;
+  }

@@ -7,7 +7,9 @@ var create_popup    = $("#create_profile_popup"),
     new_indicators  = [],
     indicators      = [],
     locations       = location_names,
+    selected_geography_type = 'Town',
     default_profile_id = $('#default_profile_id').text(),
+    geo_types       = JSON.parse(geo_types),
     current_dataset ;
 
     function load_topics(){
@@ -56,21 +58,9 @@ var create_popup    = $("#create_profile_popup"),
         }).get();
     }
 
-    function remove_temp_indicators(){
-        if ($('.temp').size() != 0) {
-            ids  = $('.indicator_id').text().split(' ').filter(Boolean).join()
-            $.ajax({type: "POST",
-                async: false,
-                url: "/community/remove_temp_indicators",
-                data: JSON.stringify({indicator_ids: ids}),
-                contentType: 'application/json; charset=utf-8'
-            });
-        }
-    }
+    function draw_table(type, indicators_data, towns){
 
-    function draw_table(indicators_data, towns){
-
-        table = "<table class='table my_table'>\
+        table = "<table class='table my_table' id='table-" + type + "'>\
                     <thead>\
                         <th>Dataset</th>\
                         <th>Data Type</th>\
@@ -79,10 +69,9 @@ var create_popup    = $("#create_profile_popup"),
         $(towns).each(function(i){ table = table + '<th>' +towns[i] + '</th>' });
         table = table + "</thead><tbody>"
 
-        indicators = []
         $(indicators_data).each(function(i){
             indicators.push({ id: indicators_data[i]['id'], dataset_id: indicators_data[i]['dataset_id'], name: "", ind_type: 'common',
-                          permission: 'public', filters: indicators_data[i]['filters'], description: ''})
+                          permission: 'public', filters: indicators_data[i]['filters'], description: '', geo_type: indicators_data[i]['geo_type'] })
 
             tr = build_tr_from_data(indicators_data[i])
 
@@ -90,7 +79,7 @@ var create_popup    = $("#create_profile_popup"),
         });
         table = table +  "</tbody></table>";
 
-        $(".table-div").html(table);
+        $(".table-div-" + type).html(table);
     }
 
 
@@ -104,9 +93,23 @@ var create_popup    = $("#create_profile_popup"),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 indicators_data = data.ind_data;
-                current_towns   = data.towns;
-                $('locations_list').text(data.towns);
-                draw_table(indicators_data, current_towns);
+                indicators      = []
+                $('locations_list').text(data.all_current_locations);
+
+                $(geo_types).each(function(i){
+                    type = geo_types[i]
+                    draw_table(type, indicators_data[type], data.locations_hash[type]);
+
+                    if (indicators_data[type].length == 0){
+                        $('.edit_locations#' + type).addClass('hidden');
+                        $('.table-div-' + type).addClass('hidden');
+                    }
+                    else{
+                        $('.edit_locations#' + type).removeClass('hidden');
+                        $('.table-div-' + type).removeClass('hidden');
+                    }
+                });
+                enable_options_for_profile();
                 $('.spinner').hide();
             }
         });
@@ -151,26 +154,47 @@ var create_popup    = $("#create_profile_popup"),
 
     function draw_raw(indicators_data){
         tr = build_tr_from_data(indicators_data)
-        $('tbody').append( tr )
+        geo_type = indicators_data['geo_type']
+        $('.table-div-' + geo_type).find('tbody').append( tr )
     }
 
     function reload_data_for_new_indicators(){
         locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         locations = locations.join(',');
         $(new_indicators).each(function(i){
+            $('.spinner').show();
             ind = new_indicators[i]
             $.ajax({type: "POST",
-                url: "/location/" + location_name + "/load_indicator",
+                url: "/location/load_indicator",
                 data: JSON.stringify({ dataset_id: ind['dataset_id'], name: "", ind_type: 'common',
                                        permission: 'public', filters: ind['filters'], description: '', locations: locations}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     draw_raw(data.indicator);
+                    $('.edit_locations#' + data.indicator['geo_type']).removeClass('hidden');
+                    $('.table-div-' + data.indicator['geo_type']).removeClass('hidden');
+                    $('.spinner').hide();
                 }
             });
         });
+
     }
 
+    function enable_options_for_profile(){
+        if (indicators.length > 0 || new_indicators.length > 0){
+            $('#create_profile_button').removeClass('hidden');
+            $('.download_btn').removeClass('hidden');
+            $('#add_indicator').closest('li').closest('ul').removeClass('add_indicator_button_in_center')
+
+        }
+        else{
+            $('#create_profile_button').addClass('hidden');
+            $('.download_btn').addClass('hidden');
+            $('#add_indicator').closest('ul').closest('ul').addClass('add_indicator_button_in_center')
+        }
+
+        $('#add_indicator').closest('li').closest('ul').removeClass('hidden')
+    }
 
 $(function(){
     if (window.location.pathname != "/manage-locations"){
@@ -178,17 +202,18 @@ $(function(){
         load_topics();
     }
 
-  var form      = $('form#new_location')
+  var form = $('form#new_location');
 
   $('#save_location').on('click', function(){
     $.ajax({type: "POST",
       url: "/create_location",
       data: JSON.stringify({ name: $("#location_name").val(),
-                             fips: $('#location_fips').val() }),
+                             fips: $('#location_fips').val(),
+                             geography_type: $('#location_geography_type').val() }),
 
       contentType: 'application/json; charset=utf-8',
       success: function (data) {
-        $("#locations_list").append("<li class='span3'><span class='pull-left'><b>" + data.location_name +  "</b> </span> : <span class='pull-right'>" + data.location_fips + "</span></li>")
+        $("#locations_list").append("<li class='span3'><span class='pull-left span2'><b>" + data.location_name +  "</b> </span> <span class='span1'>" + data.location_fips + "</span> <span class='pull-right span1'>" + data.location_geography_type + "</span> </li>")
         $('#message').html("New location is saved.")
         $("#message_popup").modal('show');
       }
@@ -207,21 +232,14 @@ $(function(){
         create_popup.modal('show');
     });
 
-    $('#add_towns').live('click', function() {
+    $('.edit_locations').live('click', function() {
+        type = $(this).attr('id')
+
+        $('.location-checkbox').addClass('hidden')
+        $('.location-checkbox.' + type).removeClass('hidden')
+
         $("#towns_popup").modal('show');
     })
-
-    // $('.remove_indicator').live('click', function(){
-    //     ids_to_remove.push( $(this).attr('id'));
-
-    //     $(this).closest('tr').hide();
-    //     $.ajax({type: "POST",
-    //       url: "/community/update_profile_indicators",
-    //       data: JSON.stringify({ indicators_to_remove: ids_to_remove}),
-    //       contentType: 'application/json; charset=utf-8',
-    //       success: function (data) {}
-    //     });
-    // });
 
     $('.hide_indicator').live('click', function(){
         id = $(this).attr('id')
@@ -280,7 +298,8 @@ $(function(){
 
     $('#save_indicator').live('click', function() {
         $("#indicator_adding_error").animate({opacity: 0}, 300);
-        locations = locations
+        geo_type_locations = $('#towns').find('.location-checkbox').not('[class*="hidden"]').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+
 
         inds = indicators.concat(new_indicators)
         all_filters = []
@@ -292,15 +311,32 @@ $(function(){
             new_indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common',
                               permission: 'public', filters: JSON.stringify(get_filters()), description: ''})
 
+            locations =  $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+            locations = locations.join(',');
+
             $.ajax({type: "POST",
-                url: "/location/" + location_name + "/load_indicator",
+                url: "/location/load_indicator",
                 data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
                                        permission: 'public', filters: get_filters(), description: '', locations: locations}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     if (data.success == true){
-                        draw_raw(data.indicator);
-                        $('div.modal').modal('hide');
+                        if (geo_type_locations.length > 0){
+
+                            enable_options_for_profile();
+                            draw_raw(data.indicator);
+                            $('.edit_locations#' + data.indicator['geo_type']).removeClass('hidden');
+                            $('.table-div-' + data.indicator['geo_type']).removeClass('hidden');
+                            $('div.modal').modal('hide');
+                            $('create_profile_button').removeClass('hidden');
+
+                        }
+                        else{
+                            enable_options_for_profile();
+                            current_geo_type =$('#select_geography_type').val()
+                            $('div.modal').modal('hide');
+                            $('.edit_locations#' + current_geo_type).click()
+                        }
                     }
                     else {
                         $("#error").html(data.error);
@@ -308,6 +344,7 @@ $(function(){
                     }
                 }
             });
+
         }
         else{
             $('div.modal').modal('hide');
@@ -319,6 +356,15 @@ $(function(){
 
     $('#add_indicator').click(function() {
         $("#indicator_popup").modal('show');
+        $('#select_geography_type').on('change', function(){
+            $('#filters_content').html('<div id="filters_content">Choose a dataset from the leftside menu.</div>');
+            value = $(this).val()
+            $('li.dataset-name[class !=' + value + ']').addClass('hidden')
+            $('li.dataset-name.' + value).removeClass('hidden')
+
+            $('.location-checkbox').addClass('hidden')
+            $('.location-checkbox.' + value).removeClass('hidden')
+        });
     });
 
     $('#save_towns').click(function() {
@@ -334,14 +380,28 @@ $(function(){
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 indicators_data = data.ind_data;
-                current_towns   = data.towns;
-                $('locations_list').text(data.towns);
-                draw_table(indicators_data, current_towns);
-                reload_data_for_new_indicators();
-                $('.spinner').hide();
-            }
-        });
+                indicators      = []
+                $('locations_list').text(data.all_current_locations);
 
+                $(geo_types).each(function(i){
+                    type = geo_types[i]
+                    draw_table(type, indicators_data[type], data.locations_hash[type]);
+                    if (indicators_data[type].length == 0){
+                        $('.edit_locations#' + type).addClass('hidden');
+                        $('.table-div-' + type).addClass('hidden');
+                    }
+                    else{
+                        $('.edit_locations#' + type).removeClass('hidden');
+                        $('.table-div-' + type).removeClass('hidden');
+                    }
+                    enable_options_for_profile();
+
+                });
+                $('.spinner').hide();
+                reload_data_for_new_indicators();
+            }
+
+        });
 
     });
 
@@ -375,7 +435,7 @@ $(function(){
 
         if (name != ''){
             $.ajax({type: "POST",
-                url: "/location/" + location_name + "/create-profile",
+                url: "/location/create-profile",
                 data: JSON.stringify({indicators: inds, locations: locations, name: name, global_default: global_default}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {

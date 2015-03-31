@@ -261,6 +261,7 @@ margin-top:10px; width:35%;}
 
 .locaton_table { width:100%; float:left; padding-left:40px; margin-top:15px;}
 
+.add_indicator_button_in_center{margin-right: 65%;}
 
 [role=main] {
     position: static;
@@ -540,3 +541,6 @@ a.underlined{
   text-decoration: underline;
 }
 
+.modal {
+  width: 700px;
+}
