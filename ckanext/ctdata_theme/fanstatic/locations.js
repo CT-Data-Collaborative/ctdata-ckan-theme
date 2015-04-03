@@ -224,15 +224,15 @@ $(function(){
   /////////////////////
 
 
-    $('.close_popup').live('click', function() {
+    $(document).on('click', '.close_popup', function() {
         $(this).closest('div.modal').modal('hide');
     });
 
-    $('#create_profile_button').live('click', function() {
+    $(document).on('click', '#create_profile_button', function() {
         create_popup.modal('show');
     });
 
-    $('.edit_locations').live('click', function() {
+    $(document).on('click', '.edit_locations', function() {
         type = $(this).attr('id')
 
         $('.location-checkbox').addClass('hidden')
@@ -241,7 +241,7 @@ $(function(){
         $("#towns_popup").modal('show');
     })
 
-    $('.hide_indicator').live('click', function(){
+    $(document).on('click', '.hide_indicator', function(){
         id = $(this).attr('id')
         filters_string = $(this).closest('tr').find("#filters_json").text().split(', ').join(',').split(': ').join(':')
 
@@ -280,7 +280,7 @@ $(function(){
     });
 
 
-    $('.dataset_chooser').live('click',function() {
+    $(document).on('click', '.dataset_chooser', function() {
         $("#save_indicator").addClass('hidden')
         $('li', $('ul.indicator-sub-topics')).removeClass('active')
         current_dataset = $(this).attr('id');
@@ -296,7 +296,7 @@ $(function(){
         });
     });
 
-    $('#save_indicator').live('click', function() {
+    $(document).on('click', '#save_indicator', function() {
         $("#indicator_adding_error").animate({opacity: 0}, 300);
         geo_type_locations = $('#towns').find('.location-checkbox').not('[class*="hidden"]').find('input:checked').map(function(i, e) {return $(e).val()}).get();
 

@@ -173,11 +173,11 @@ function check_defaults(){
     if(defaults[i] instanceof Array){
       $.each(defaults[i], function(j){
 
-        $input = $("input[class*="+i.replace(/ /g, '')+"]"+'[value="'+defaults[i][j]+'"]');
+        $input = $("input[class*='"+i.replace(/ /g, '')+"']"+'[value="'+defaults[i][j]+'"]');
         $input.prop('checked', true);
       });
     } else {
-        $input = $("input[class*="+i.replace(/ /g, '')+"]"+'[value="'+defaults[i]+'"]');
+        $input = $("input[class*='"+i.replace(/ /g, '')+"']"+'[value="'+defaults[i]+'"]');
         $input.prop('checked', true);
     }
     });
@@ -330,7 +330,7 @@ function set_map_checkbox(){
     i = values.indexOf(max_year) || 0
 
     $("input:checked.Year").prop('checked', false);
-    $("input:#"+ years_inputs[i].value +"Check.Year").prop('checked', true);
+    $("input#"+ years_inputs[i].value +"Check.Year").prop('checked', true);
   }
   else{
     years_inputs.prop('checked', true);
@@ -626,6 +626,9 @@ function unit_for_value(value, type){
   isSuppressed = (value == '*' || value == -9999 || value == '-' || value == 'Suppressed')
   if (isSuppressed)
     return value
+
+  if (value == null)
+      return value
 
   if ( units[type] != undefined){
     if (units[type] == '$'){
@@ -943,7 +946,7 @@ $(function () {
     $('#Suppression').appendTo( $("li[id='Full Description']") )
     $('#Contributor').appendTo( $('#Contributor').closest('ul').find('li').last())
 
-    $('input.indicator_permission:').on('change', function(){
+    $('input.indicator_permission').on('change', function(){
       if ($('input.private_permission:checked').length > 0 ){
         $('input.indicator_group:checked').prop('checked', false);
         $('.groups_inputs').addClass('hidden')
