@@ -227,7 +227,7 @@ class CTDataController(base.BaseController):
         except IndexError:
             disable_visualizations = False
 
-        if disable_visualizations:
+        if disable_visualizations or dataset.ckan_meta['private']:
            h.redirect_to(controller='package', action='read', id=dataset_name)
 
         default_metadata = filter(lambda x: x['key'] == 'Default', metadata)
