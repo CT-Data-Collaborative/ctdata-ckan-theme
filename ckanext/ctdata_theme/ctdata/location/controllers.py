@@ -100,7 +100,6 @@ class LocationsController(base.BaseController):
     #end
 
     def load_indicator(self):
-        # location   = self.location_service.get_location(location_name)
         session_id = session.id
         user_name  = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
         geo_types  = self.location_service.location_geography_types()
@@ -250,39 +249,18 @@ class LocationsController(base.BaseController):
         locations_hash = {}
         all_current_locations = []
 
-        if profile.user and profile.user == user:
-            ######### save new locations
-            for profile_location in profile.locations:
-                if profile_location.name not in location_names:
-                    self.location_service.remove_location_profile(profile_location.id, profile.id)
-                    profile.locations.remove(profile_location)
+        #     for type in geo_types:
+        #         locations_to_put      = filter(lambda t: t.geography_type == type, profile.locations)
+        #         locations_hash[type]  = map(lambda t: t.name, locations_to_put)
+        #         all_current_locations += locations_hash[type]
+        # else:
 
-            for location_name in location_names:
-                try:
-                    location = self.location_service.get_location(location_name)
-                    locations.append( location )
+        locations_records = self.location_service.get_all_locations()
 
-                    if location not in profile.locations:
-                        profile.locations.append(location)
-                        location_profile = LocationProfile(location.id, profile.id)
-                        self.session.add(location_profile)
-
-                except toolkit.ObjectNotFound:
-                    pass
-
-            self.session.commit()
-
-            for type in geo_types:
-                locations_to_put      = filter(lambda t: t.geography_type == type, profile.locations)
-                locations_hash[type]  = map(lambda t: t.name, locations_to_put)
-                all_current_locations += locations_hash[type]
-        else:
-            locations_records = self.location_service.get_all_locations()
-
-            for type in geo_types:
-                locations_to_put      = filter(lambda t: t.geography_type == type and t.name in location_names, locations_records)
-                locations_hash[type]  = map(lambda t: t.name, locations_to_put)
-                all_current_locations += locations_hash[type]
+        for type in geo_types:
+            locations_to_put      = filter(lambda t: t.geography_type == type and t.name in location_names, locations_records)
+            locations_hash[type]  = map(lambda t: t.name, locations_to_put)
+            all_current_locations += locations_hash[type]
 
 
         ######### load indicators data
@@ -322,7 +300,8 @@ class LocationsController(base.BaseController):
         user_name  = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
         user       = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
         json_body  = json.loads(http_request.body, encoding=http_request.charset)
-        locations  = json_body.get('locations').split(',')
+        location_names  = json_body.get('locations').split(',')
+        locations  = []
         indicators = json_body.get('indicators')
         profile    = self.location_service.get_profile(profile_id)
 
@@ -337,6 +316,28 @@ class LocationsController(base.BaseController):
             if not indicator['id']:
                 indicator  = self.location_service.create_indicator(indicator['name'], indicator['filters'], indicator['dataset_id'], user, indicator['ind_type'], 'table', profile.id)
                 profile.indicators.append(indicator)
+
+        if profile.user and profile.user == user:
+            ######### save new locations
+            for profile_location in profile.locations:
+                if profile_location.name not in location_names:
+                    self.location_service.remove_location_profile(profile_location.id, profile.id)
+                    profile.locations.remove(profile_location)
+
+            for location_name in location_names:
+                try:
+                    location = self.location_service.get_location(location_name)
+                    locations.append( location )
+
+                    if location not in profile.locations:
+                        profile.locations.append(location)
+                        location_profile = LocationProfile(location.id, profile.id)
+                        self.session.add(location_profile)
+
+                except toolkit.ObjectNotFound:
+                    pass
+
+            self.session.commit()
 
         self.session.close()
         return json.dumps({'success': True })
