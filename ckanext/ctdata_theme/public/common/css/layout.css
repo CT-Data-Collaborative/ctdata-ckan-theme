@@ -469,3 +469,12 @@ a.disabled {
 td:hover a.hide_indicator img{
 	opacity: 1.0 !important;
 }
+
+td:hover a.edit_indicator img{
+	opacity: 1.0 !important;
+}
+
+a.edit_indicator img{
+	width:  20px;
+	height: 20px;
+}
