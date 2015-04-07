@@ -10,6 +10,7 @@ var create_popup    = $("#create_profile_popup"),
     selected_geography_type = 'Town',
     default_profile_id = $('#default_profile_id').text(),
     geo_types       = JSON.parse(geo_types),
+    current_indicator = undefined,
     current_dataset ;
 
     function load_topics(){
@@ -54,6 +55,12 @@ var create_popup    = $("#create_profile_popup"),
 
     function get_filters() {
         return $('#filters').find('input:checked').map(function(i, e) {
+            return {field: $(e).attr('name'), values: [$(e).val()]}
+        }).get();
+    }
+
+    function get_updated_filters() {
+        return $('#edit_indicator_filters').find('input:checked').map(function(i, e) {
             return {field: $(e).attr('name'), values: [$(e).val()]}
         }).get();
     }
@@ -144,6 +151,9 @@ var create_popup    = $("#create_profile_popup"),
             tr = tr + "<td class='for_csv'><span class='for_csv'>" + value + "</span></td>"
         });
         tr = tr + "<td class='no-border'>\
+                        <a href='javascript:void(0)' id=" + id + " dataset='" + ind.dataset_id + "' class='edit_indicator' style='height: inherit;'>\
+                            <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/pencil.png'>\
+                        </a>\
                         <a href='javascript:void(0)' id=" + id + " class='hide_indicator' style='height: inherit;'>\
                             <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/close_pic.png'>\
                         </a>\
@@ -224,15 +234,15 @@ $(function(){
   /////////////////////
 
 
-    $('.close_popup').live('click', function() {
+    $(document).on('click', '.close_popup',function() {
         $(this).closest('div.modal').modal('hide');
     });
 
-    $('#create_profile_button').live('click', function() {
+    $(document).on('click', '#create_profile_button', function() {
         create_popup.modal('show');
     });
 
-    $('.edit_locations').live('click', function() {
+    $(document).on('click', '.edit_locations', function() {
         type = $(this).attr('id')
 
         $('.location-checkbox').addClass('hidden')
@@ -241,7 +251,7 @@ $(function(){
         $("#towns_popup").modal('show');
     })
 
-    $('.hide_indicator').live('click', function(){
+    $(document).on('click', '.hide_indicator', function(){
         id = $(this).attr('id')
         filters_string = $(this).closest('tr').find("#filters_json").text().split(', ').join(',').split(': ').join(':')
 
@@ -280,7 +290,7 @@ $(function(){
     });
 
 
-    $('.dataset_chooser').live('click',function() {
+     $(document).on('click', '.dataset_chooser', function() {
         $("#save_indicator").addClass('hidden')
         $('li', $('ul.indicator-sub-topics')).removeClass('active')
         current_dataset = $(this).attr('id');
@@ -296,10 +306,35 @@ $(function(){
         });
     });
 
-    $('#save_indicator').live('click', function() {
+    $(document).on('click', '.edit_indicator', function() {
+        $("#update_indicator").addClass('hidden')
+        current_dataset = $(this).attr('dataset');
+        current_indicator = $(this).closest('tr');
+
+        $(this).closest('li').addClass('active');
+        $.ajax({type: "GET",
+            url: "/community/get_filters/" + current_dataset,
+            success: function (data) {
+                $('#edit_indicator_filters_content').html(build_filters(data['result']));
+                $("#update_indicator").removeClass('hidden')
+                $("#edit_popup").modal('show');
+            }
+        });
+    });
+
+    $(document).on('click', '#update_indicator', function() {
+        current_indicator.find('.hide_indicator').click()
+        $('#save_indicator').click()
+        current_indicator = undefined
+    });
+
+    $(document).on('click', '#save_indicator', function() {
         $("#indicator_adding_error").animate({opacity: 0}, 300);
         geo_type_locations = $('#towns').find('.location-checkbox').not('[class*="hidden"]').find('input:checked').map(function(i, e) {return $(e).val()}).get();
 
+        new_filters = get_filters()
+        if (current_indicator != undefined)
+            new_filters = get_updated_filters()
 
         inds = indicators.concat(new_indicators)
         all_filters = []
@@ -307,9 +342,9 @@ $(function(){
             all_filters.push(inds[i]['filters'].split(', ').join(',').split(': ').join(':'))
         });
 
-        if ( all_filters.indexOf( JSON.stringify(get_filters()) ) == -1){
+        if ( all_filters.indexOf( JSON.stringify(new_filters) ) == -1){
             new_indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common',
-                              permission: 'public', filters: JSON.stringify(get_filters()), description: ''})
+                              permission: 'public', filters: JSON.stringify(new_filters), description: ''})
 
             locations =  $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
             locations = locations.join(',');
@@ -317,7 +352,7 @@ $(function(){
             $.ajax({type: "POST",
                 url: "/location/load_indicator",
                 data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
-                                       permission: 'public', filters: get_filters(), description: '', locations: locations}),
+                                       permission: 'public', filters: new_filters, description: '', locations: locations}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     if (data.success == true){
