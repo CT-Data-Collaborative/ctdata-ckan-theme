@@ -30,8 +30,8 @@ from termcolor import colored
 class LocationsController(base.BaseController):
     def __init__(self):
         self.session = Database().session_factory(expire_on_commit=False)
-        self.user_service     = UserService(self.session)
-        self.location_service = LocationService(self.session)
+        self.user_service      = UserService(self.session)
+        self.location_service  = LocationService(self.session)
 
     #end
 
@@ -249,11 +249,6 @@ class LocationsController(base.BaseController):
         locations_hash = {}
         all_current_locations = []
 
-        #     for type in geo_types:
-        #         locations_to_put      = filter(lambda t: t.geography_type == type, profile.locations)
-        #         locations_hash[type]  = map(lambda t: t.name, locations_to_put)
-        #         all_current_locations += locations_hash[type]
-        # else:
 
         locations_records = self.location_service.get_all_locations()
 
@@ -300,14 +295,16 @@ class LocationsController(base.BaseController):
         user_name  = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
         user       = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
         json_body  = json.loads(http_request.body, encoding=http_request.charset)
-        location_names  = json_body.get('locations').split(',')
+        location_names = json_body.get('locations').split(',')
+        ids_to_remove  = json_body.get('ids_to_remove')
         locations  = []
         indicators = json_body.get('indicators')
         profile    = self.location_service.get_profile(profile_id)
 
         #remove deleted indicators
         for indicator in profile.indicators:
-            if not indicator.id in map(lambda i: i['id'], indicators):
+            # if not indicator.id in map(lambda i: i['id'], indicators):
+            if str(indicator.id) in ids_to_remove:
                 self.session.delete(indicator)
                 self.session.commit()
 
