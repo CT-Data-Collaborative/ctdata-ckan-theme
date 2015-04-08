@@ -11,6 +11,8 @@ var create_popup    = $("#create_profile_popup"),
     default_profile_id = $('#default_profile_id').text(),
     geo_types       = JSON.parse(geo_types),
     current_indicator = undefined,
+    remember_index  = undefined,
+    found_in  = undefined,
     current_dataset ;
 
     function load_topics(){
@@ -96,7 +98,7 @@ var create_popup    = $("#create_profile_popup"),
 
         $.ajax({type: "POST",
             url: "/load_profile_indicators/" + default_profile_id,
-            data: JSON.stringify({locations: locations}),
+            data: JSON.stringify({locations: locations, ids_to_remove: ids_to_remove}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 indicators_data = data.ind_data;
@@ -127,8 +129,12 @@ var create_popup    = $("#create_profile_popup"),
         id = ind.id
         ind.filters = JSON.parse(ind.filters)
 
-        tr  = "<tr class='table_data'>\
-                    <td class='column_1 for_csv'>\
+        if (id != null && ids_to_remove.indexOf(id.toString()) > -1)
+            tr  = "<tr class='table_data hidden'>"
+        else
+            tr  = "<tr class='table_data'>"
+
+        tr  = tr +  "<td class='column_1 for_csv'>\
                         <span class='indicator_id hidden'>" + id + " </span>"
         tr  = tr + "<a href='" + ind.link_to + "'>" + ind.dataset + ", " + ind.variable + " </a><span>"
         tr  = tr + "<span class='hidden' id='filters_json'>" + JSON.stringify(ind.filters) + "</span>"
@@ -162,10 +168,13 @@ var create_popup    = $("#create_profile_popup"),
         return tr
     }
 
-    function draw_raw(indicators_data){
+    function draw_raw(indicators_data, index){
         tr = build_tr_from_data(indicators_data)
         geo_type = indicators_data['geo_type']
-        $('.table-div-' + geo_type).find('tbody').append( tr )
+        if (index != null)
+            $($('.table-div-' + geo_type).find('tbody').find('tr')[index]).replaceWith(tr)
+        else
+            $('.table-div-' + geo_type).find('tbody').append( tr )
     }
 
     function reload_data_for_new_indicators(){
@@ -180,7 +189,7 @@ var create_popup    = $("#create_profile_popup"),
                                        permission: 'public', filters: ind['filters'], description: '', locations: locations}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
-                    draw_raw(data.indicator);
+                    draw_raw(data.indicator, null);
                     $('.edit_locations#' + data.indicator['geo_type']).removeClass('hidden');
                     $('.table-div-' + data.indicator['geo_type']).removeClass('hidden');
                     $('.spinner').hide();
@@ -268,7 +277,7 @@ $(function(){
 
         if (index != undefined) {
             indicators.splice(index, 1);
-            index = undefined
+            ids_to_remove.push(id)
         };
 
         if (!found){
@@ -286,7 +295,6 @@ $(function(){
         }
 
         if (index != undefined) new_indicators.splice(index, 1);
-
     });
 
 
@@ -311,11 +319,20 @@ $(function(){
         current_dataset = $(this).attr('dataset');
         current_indicator = $(this).closest('tr');
 
+        filters = JSON.parse(current_indicator.find("#filters_json").text())
         $(this).closest('li').addClass('active');
         $.ajax({type: "GET",
             url: "/community/get_filters/" + current_dataset,
             success: function (data) {
                 $('#edit_indicator_filters_content').html(build_filters(data['result']));
+                $(filters).each(function(i){
+                    inputs = $('#edit_indicator_filters_content').find('input[name="' + filters[i].field +'"]')
+                    inputs.prop('checked', false);
+                    value = filters[i].values[0]
+                    input = $('#edit_indicator_filters_content').find('input[name="' + filters[i].field +'"][value="'+value +'"]')
+                    input.prop('checked', true);
+                });
+
                 $("#update_indicator").removeClass('hidden')
                 $("#edit_popup").modal('show');
             }
@@ -323,7 +340,12 @@ $(function(){
     });
 
     $(document).on('click', '#update_indicator', function() {
-        current_indicator.find('.hide_indicator').click()
+        id = current_indicator.find('.hide_indicator').attr('id')
+
+        if (id != null)
+            ids_to_remove.push(id)
+
+        remember_index = current_indicator.closest('tbody').find('tr').index(current_indicator)
         $('#save_indicator').click()
         current_indicator = undefined
     });
@@ -343,8 +365,10 @@ $(function(){
         });
 
         if ( all_filters.indexOf( JSON.stringify(new_filters) ) == -1){
+
             new_indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common',
-                              permission: 'public', filters: JSON.stringify(new_filters), description: ''})
+                          permission: 'public', filters: JSON.stringify(new_filters), description: ''});
+
 
             locations =  $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
             locations = locations.join(',');
@@ -359,7 +383,7 @@ $(function(){
                         if (geo_type_locations.length > 0){
 
                             enable_options_for_profile();
-                            draw_raw(data.indicator);
+                            draw_raw(data.indicator, remember_index);
                             $('.edit_locations#' + data.indicator['geo_type']).removeClass('hidden');
                             $('.table-div-' + data.indicator['geo_type']).removeClass('hidden');
                             $('div.modal').modal('hide');
@@ -411,7 +435,7 @@ $(function(){
 
         $.ajax({type: "POST",
             url: "/load_profile_indicators/" + default_profile_id,
-            data: JSON.stringify({locations: locations}),
+            data: JSON.stringify({locations: locations, ids_to_remove: ids_to_remove}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 indicators_data = data.ind_data;
@@ -447,7 +471,7 @@ $(function(){
 
         $.ajax({type: "POST",
             url: "/save_local_default/" + default_profile_id,
-            data: JSON.stringify({indicators: inds, locations: locations}),
+            data: JSON.stringify({indicators: inds, locations: locations, ids_to_remove: ids_to_remove}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 load_profile_indicators();
