@@ -257,6 +257,12 @@ $(function(){
         $('.location-checkbox').addClass('hidden')
         $('.location-checkbox.' + type).removeClass('hidden')
 
+        checked_locations = $('#towns').find('.location-checkbox').not('[class*="hidden"]').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+        if (checked_locations.length > 0)
+            $("#towns_popup").find('button.close_popup').removeClass('hidden')
+        else
+            $("#towns_popup").find('button.close_popup').addClass('hidden')
+
         $("#towns_popup").modal('show');
     })
 
@@ -395,6 +401,7 @@ $(function(){
                             current_geo_type =$('#select_geography_type').val()
                             $('div.modal').modal('hide');
                             $('.edit_locations#' + current_geo_type).click()
+
                         }
                     }
                     else {
@@ -426,7 +433,7 @@ $(function(){
         });
     });
 
-    $('#save_towns').click(function() {
+    $('.save_towns').click(function() {
         $('div.modal').modal('hide');
         locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         locations = locations.join(',');
