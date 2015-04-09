@@ -365,3 +365,8 @@ label.disabled{
 ul.indicator-sub-topics{
   margin-left: 5px;
 }
+
+span.for_year{
+  float: right;
+  margin-right: 15px;
+}
