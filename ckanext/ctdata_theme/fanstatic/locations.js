@@ -215,6 +215,22 @@ var create_popup    = $("#create_profile_popup"),
         $('#add_indicator').closest('li').closest('ul').removeClass('hidden')
     }
 
+function draw_ind_if_towns_popup_closed(data){
+        $('#towns_popup').on('hidden', function () {
+            if (geo_type_locations.length == 0){
+
+                enable_options_for_profile();
+                draw_raw(data.indicator, remember_index);
+                $('.edit_locations#' + data.indicator['geo_type']).removeClass('hidden');
+                $('.table-div-' + data.indicator['geo_type']).removeClass('hidden');
+                $('div.modal').modal('hide');
+                $('create_profile_button').removeClass('hidden');
+
+            }
+        });
+    }
+
+
 $(function(){
     if (window.location.pathname != "/manage-locations"){
         load_profile_indicators();
@@ -240,6 +256,7 @@ $(function(){
 
   })
 
+
   /////////////////////
 
 
@@ -256,12 +273,6 @@ $(function(){
 
         $('.location-checkbox').addClass('hidden')
         $('.location-checkbox.' + type).removeClass('hidden')
-
-        checked_locations = $('#towns').find('.location-checkbox').not('[class*="hidden"]').find('input:checked').map(function(i, e) {return $(e).val()}).get();
-        if (checked_locations.length > 0)
-            $("#towns_popup").find('button.close_popup').removeClass('hidden')
-        else
-            $("#towns_popup").find('button.close_popup').addClass('hidden')
 
         $("#towns_popup").modal('show');
     })
@@ -403,6 +414,8 @@ $(function(){
                             $('.edit_locations#' + current_geo_type).click()
 
                         }
+
+                        draw_ind_if_towns_popup_closed(data);
                     }
                     else {
                         $("#error").html(data.error);
