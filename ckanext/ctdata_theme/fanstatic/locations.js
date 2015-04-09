@@ -359,9 +359,29 @@ $(function(){
     $(document).on('click', '#update_indicator', function() {
         id = current_indicator.find('.hide_indicator').attr('id')
 
+
+        old_filters = current_indicator.find("#filters_json").text().split(', ').join(',').split(': ').join(':')
+
+        inds = indicators.concat(new_indicators)
+        all_filters = []
+        $(inds).each(function(i) {
+            all_filters.push(inds[i]['filters'].split(', ').join(',').split(': ').join(':'))
+        });
+
+        index = all_filters.indexOf(old_filters)
+
+        if (current_indicator && index > -1){
+            if ( index > indicators.length -1){
+                i = index - indicators.length -1
+                new_indicators.splice(i, 1)
+            }
+            else{
+                indicators.splice(index, 1)
+            }
+        }
+
         if (id != null)
             ids_to_remove.push(id)
-
         remember_index = current_indicator.closest('tbody').find('tr').index(current_indicator)
         $('#save_indicator').click()
         current_indicator = undefined
@@ -381,7 +401,18 @@ $(function(){
             all_filters.push(inds[i]['filters'].split(', ').join(',').split(': ').join(':'))
         });
 
-        if ( all_filters.indexOf( JSON.stringify(new_filters) ) == -1){
+        index = all_filters.indexOf( JSON.stringify(new_filters) )
+        if (current_indicator && index > -1){
+            if ( index > indicators.length -1){
+                i = index - indicators.length -1
+                new_indicators.splice(i, 1)
+            }
+            else{
+                indicators.splice(index, 1)
+            }
+        }
+
+        if ( index == -1 || current_indicator){
 
             new_indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common',
                           permission: 'public', filters: JSON.stringify(new_filters), description: ''});
