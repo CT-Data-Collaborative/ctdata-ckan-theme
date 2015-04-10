@@ -469,3 +469,27 @@ a.disabled {
 td:hover a.hide_indicator img{
 	opacity: 1.0 !important;
 }
+
+h2.main_title{
+	font-size: 36px !important;
+  color: black !important;
+  margin-bottom: 18px;
+  font-family: 'Roboto Condensed', Helvetica, Arial, Sans-Serif !important;
+  line-height: 1.4em !important;
+}
+
+p.subtitle{
+	font-size: 18px !important;
+  color: #888888 !important;
+
+}
+
+td:hover a.edit_indicator img{
+	opacity: 1.0 !important;
+}
+
+a.edit_indicator img{
+	width:  20px;
+	height: 20px;
+}
+

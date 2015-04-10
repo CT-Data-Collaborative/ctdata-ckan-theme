@@ -71,6 +71,34 @@
     </div>
 </div>
 
+
+<div id="edit_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog">
+        <div class="modal-content.text-center">
+            <div class="modal-header text-center">
+              Edit Indicator Filters
+            </div>
+            <div class="modal-body " id="message">
+
+                <div id="edit_indicator_filters" class="">
+                    <div id="indicator_adding_error" class="error" style="opacity: 0">
+                    </div>
+                    <div id="edit_indicator_filters_content">
+                      Boo
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button id="update_indicator" class="btn btn-primary">Update Filters</button>
+                    <button class="btn close_popup">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% snippet 'location/snippets/create_profile_popup.html' %}
 
 {% block scripts %}
