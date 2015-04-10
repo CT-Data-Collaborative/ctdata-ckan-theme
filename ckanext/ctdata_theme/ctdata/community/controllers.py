@@ -91,7 +91,6 @@ class CommunityProfilesController(base.BaseController):
 
     def get_filters(self, dataset_id):
         http_response.headers['Content-type'] = 'application/json'
-
         try:
             dataset      = DatasetService.get_dataset(dataset_id)
             dataset_meta = DatasetService.get_dataset_meta(dataset_id)
@@ -103,17 +102,10 @@ class CommunityProfilesController(base.BaseController):
 
         result = []
         for dim in dataset.dimensions:
-
-            ordered_values = filter(lambda x: x['key'] == dim.name, dataset.ckan_meta['extras'])
-            correct_order  = ordered_values_data[0]['value'] if len(ordered_values_data) > 0 else None
-
             if dim.name not in [geography_param]:
                 if dim.name == 'Race':
                     dim.possible_values.append('all')
 
-                if correct_order:
-                    result.append({'name': dim.name, 'values': correct_order})
-                else:
-                    result.append({'name': dim.name, 'values': dim.possible_values})
+                result.append({'name': dim.name, 'values': dim.possible_values})
 
         return json.dumps({'success': True, 'result': result})
