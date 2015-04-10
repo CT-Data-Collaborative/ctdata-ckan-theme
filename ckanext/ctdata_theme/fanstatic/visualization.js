@@ -215,7 +215,7 @@ function set_filters(display_type){
     $.each(filters_to_update, function(i){
       column = filters_to_update[i]
       $.each(column['values'], function(value){
-        $("input[class*="+column['field']+"]"+"[value='"+column['values'][value]+"']").prop('checked', true);
+        $("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']").prop('checked', true);
       });
     });
   }
@@ -538,7 +538,7 @@ function draw_table(){
                    });
                  if (years !== undefined) {
                    $.each(years, function (i) {
-                       html = html + "<th>" + years[i] + "</th>";
+                       html = html + "<th> <span class='for_year'>" + years[i] + "</span></th>";
                    });
                  } else {
                    html = html + "<th>Value</th>";
@@ -625,6 +625,9 @@ function draw_table(){
 function unit_for_value(value, type){
   isSuppressed = (value == '*' || value == -9999 || value == '-' || value == 'Suppressed')
   if (isSuppressed)
+    return value
+
+  if (value == null)
     return value
 
   if ( units[type] != undefined){
