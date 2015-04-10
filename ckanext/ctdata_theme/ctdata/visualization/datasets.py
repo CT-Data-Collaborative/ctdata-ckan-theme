@@ -119,16 +119,6 @@ class Dataset(object):
                 curs.close()
                 del curs
                 conn.close()
-                # caching the metadata so we don't have to compute it for every request
-#                if cached:
-#                    # if a cached copy alredy exists, we update it
-#                    cached.has_incs = has_inc
-#                    cached.meta = json.dumps(meta_data)
-#                else:
-#                    sess.add(DatasetCache(self.table_name, has_inc, json.dumps(meta_data)))
-#                sess.commit()
-#
-#                conn.commit()
         sess.close()
 
 
