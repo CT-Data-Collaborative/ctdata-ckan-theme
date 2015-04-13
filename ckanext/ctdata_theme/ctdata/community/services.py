@@ -121,14 +121,6 @@ class CommunityProfileService(object):
 
     ################ PROFILE INDICATORS #################################
 
-    def remove_temp_user_indicators(self, indicator_ids):
-        temp_indicators = self.get_temp_user_indicators(map(int,indicator_ids.split(',')))
-        for indicator in temp_indicators:
-            self.session.delete(indicator)
-
-        self.session.commit()
-
-
     def create_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, permission = 'public', description = '', group_ids = ''):
 
         dataset = DatasetService.get_dataset(dataset_id)

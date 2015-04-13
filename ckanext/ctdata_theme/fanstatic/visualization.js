@@ -215,7 +215,7 @@ function set_filters(display_type){
     $.each(filters_to_update, function(i){
       column = filters_to_update[i]
       $.each(column['values'], function(value){
-        $("input[class*="+column['field']+"]"+"[value='"+column['values'][value]+"']").prop('checked', true);
+        $("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']").prop('checked', true);
       });
     });
   }
@@ -538,7 +538,7 @@ function draw_table(){
                    });
                  if (years !== undefined) {
                    $.each(years, function (i) {
-                       html = html + "<th>" + years[i] + "</th>";
+                       html = html + "<th> <span class='for_year'>" + years[i] + "</span></th>";
                    });
                  } else {
                    html = html + "<th>Value</th>";
@@ -567,8 +567,9 @@ function draw_table(){
                 cur_value = parseInt(text).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
               type = data['data'][row_index]['dims']['Measure Type']
-              if (type == undefined)
+              if (type == undefined && $('input:checked', $('#collapseMeasureType'))[0] != undefined)
                 type = $('input:checked', $('#collapseMeasureType'))[0].value
+
               if (type != undefined)
                 cur_value = unit_for_value(cur_value, type)
 
@@ -584,9 +585,10 @@ function draw_table(){
 
 
             type = data['data'][row_index]['dims']['Measure Type']
-            if (type == undefined)
-              type = $('input:checked', $('#collapseMeasureType'))[0].value
 
+            if ($('input:checked', $('#collapseMeasureType'))[0] != undefined){
+              type = $('input:checked', $('#collapseMeasureType'))[0].value
+            }
             if (type != undefined)
               cur_value = unit_for_value(cur_value, type)
 
@@ -628,7 +630,7 @@ function unit_for_value(value, type){
     return value
 
   if (value == null)
-      return value
+    return value
 
   if ( units[type] != undefined){
     if (units[type] == '$'){

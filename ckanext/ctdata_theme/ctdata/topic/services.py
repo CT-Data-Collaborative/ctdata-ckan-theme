@@ -39,7 +39,7 @@ class TopicSerivce(object):
                   if extra['key'].lower() == 'domain':
                       domain = extra['value']
 
-              if domain and action not in hidden_list and 'visualization' not in hidden_list:
+              if domain and action not in hidden_list and 'visualization' not in hidden_list and not dataset['private']:
                   dataset_indicators = CommunityProfileService.get_gallery_indicators_for_dataset(dataset['id'])
 
                   for indicator in dataset_indicators:
@@ -47,6 +47,7 @@ class TopicSerivce(object):
                                               'description': indicator.description,
                                               'name':        indicator.name,
                                               'viz_type':    indicator.visualization_type,
+                                              'created':     indicator.created_at,
                                               'created_at':  str(indicator.created_at.strftime("%B %d, %Y")),
                                               'user':        indicator.user_name(),
                                               'dataset_name':   indicator.dataset_name(),
@@ -65,7 +66,7 @@ class TopicSerivce(object):
                   all_indicators = all_indicators + domain_indicators
 
       domains.sort(key=lambda x: x['title'])
-      all_indicators.sort(key=lambda x: x['created_at'], reverse=True)
+      all_indicators = sorted(all_indicators, key=lambda x: x['created'], reverse=True)
 
       domains = domains + [{'title': 'Recently Created', 'indicators': all_indicators[0:10], 'id': 'most_recent'}]
 
@@ -103,7 +104,7 @@ class TopicSerivce(object):
                     if extra['key'].lower() == 'subdomain':
                         subdomain = extra['value']
 
-                if domain and subdomain and action not in hidden_list and 'visualization' not in hidden_list:
+                if domain and subdomain and action not in hidden_list and 'visualization' not in hidden_list and not dataset['private']:
 
                     dataset_obj = {'name': dataset['name'], 'title': dataset['title'],
                                    'id': dataset['id'], 'geography_type': geography_param}

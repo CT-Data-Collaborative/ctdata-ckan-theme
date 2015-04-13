@@ -5,6 +5,32 @@
  */
 
 /*! normalize.css v3.0.1 | MIT License | git.io/normalize */
+
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('../font/fontawesome-webfont.eot?v=3.2.1');
+  src: url('../font/fontawesome-webfont.eot?#iefix&v=3.2.1') format('embedded-opentype'), url('../font/fontawesome-webfont.woff?v=3.2.1') format('woff'), url('../font/fontawesome-webfont.ttf?v=3.2.1') format('truetype'), url('../font/fontawesome-webfont.svg#fontawesomeregular?v=3.2.1') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* FONT AWESOME CORE
+ * -------------------------- */
+[class^="icon-"],
+[class*=" icon-"] {
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+  *margin-right: .3em;
+}
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+  text-decoration: inherit;
+  display: inline-block;
+  speak: none;
+}
+
 html {
   font-family: sans-serif;
   -webkit-text-size-adjust: 100%;
@@ -6199,6 +6225,18 @@ button.close {
   .hidden-print {
     display: none !important;
   }
+}
+
+.icon-dashboard:before {
+  content: "\f0e4";
+}
+
+.icon-cog:before {
+  content: "\f013";
+}
+
+.icon-signout:before {
+  content: "\f08b";
 }
 /*# sourceMappingURL=bootstrap.css.map */
 */
