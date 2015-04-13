@@ -3,16 +3,17 @@
 {% block content %}
 
     {%- block underheader %}
-
-    <div id="about_block">
-        <div class="spacing text-center">
-            <h2 class="main_title">{% block page_name %}Page name{% endblock %}</h2>
-            <p id="pageDescription">{% block page_description %}Page description{% endblock %}</p>
+    <section>
+        <div id="about_block">
+            <div class="spacing text-center">
+                <h2 class="main_title">{% block page_name %}Page name{% endblock %}</h2>
+                <p id="pageDescription">{% block page_description %}Page description{% endblock %}</p>
+            </div>
         </div>
-    </div>
+    </section>
 
     {% endblock -%}
-    <section class="main_body_content_new">
+    <section class="main_body_content">
     {% block flash %}
         {% set flash_messages = h.flash.pop_messages() | list %}
         <div class="flash-messages">
@@ -25,4 +26,5 @@
     {% endblock %}
     {% block main_content %}{{ super() }}{% endblock %}
     </section>
+
 {% endblock %}
