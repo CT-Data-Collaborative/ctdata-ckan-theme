@@ -217,6 +217,7 @@ var create_popup    = $("#create_profile_popup"),
 
 function draw_ind_if_towns_popup_closed(data){
         $('#towns_popup').on('hidden', function () {
+            geo_type_locations = $('#towns').find('.location-checkbox').not('[class*="hidden"]').find('input:checked').map(function(i, e) {return $(e).val()}).get();
             if (geo_type_locations.length == 0){
 
                 enable_options_for_profile();
@@ -445,7 +446,6 @@ $(function(){
                             $('.edit_locations#' + current_geo_type).click()
 
                         }
-
                         draw_ind_if_towns_popup_closed(data);
                     }
                     else {
