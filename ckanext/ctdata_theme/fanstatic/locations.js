@@ -232,6 +232,30 @@ function draw_ind_if_towns_popup_closed(data){
     }
 
 
+function handle_incompatibles(){
+    $.ajax({type: "POST",
+      url: "/community/get_incompatibles/" + current_dataset,
+      data: JSON.stringify({view: 'table', filters: get_filters()}),
+      contentType: 'application/json; charset=utf-8'}).done(function(data) {
+        apply_incompatibles(data.compatibles)
+      });
+}
+
+function apply_incompatibles(compatibles){
+    all_inputs = $('.indicator-filter-radio')
+    $.each(all_inputs, function(i){
+        input = $(all_inputs[i])
+        if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
+            input.removeAttr("disabled");
+            input.parent().find("span").css("color", "black");
+        }else{
+            input.attr("disabled", true);
+            input.attr("checked",  false);
+            input.parent().find("span").css("color", "lightgray");
+        }
+    });
+}
+
 $(function(){
     if (window.location.pathname != "/manage-locations"){
         load_profile_indicators();
@@ -239,6 +263,10 @@ $(function(){
     }
 
   var form = $('form#new_location');
+
+  $(document).on('click', '.indicator-filter-radio', function (){
+    handle_incompatibles()
+  });
 
   $('#save_location').on('click', function(){
     $.ajax({type: "POST",
@@ -328,6 +356,7 @@ $(function(){
             success: function (data) {
                 $('#filters_content').html(build_filters(data['result']));
                 $("#save_indicator").removeClass('hidden')
+                handle_incompatibles();
             }
         });
     });
