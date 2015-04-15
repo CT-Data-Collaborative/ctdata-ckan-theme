@@ -493,3 +493,24 @@ a.edit_indicator img{
 	height: 20px;
 }
 
+.about_2{
+
+}
+#about_block{
+	background: #ececec;
+  width: 100%;
+  min-height: 120px;
+  clear: both;
+  padding: 20px;
+}
+#about_block h2 { text-transform:uppercase; color: #4670A7 !important; margin:0 0 25px 0; font-size:1.8em; }
+#about_block #pageDescription {   font-size: 18px !important;
+  color: #888888 !important; }
+
+.main_body_content_new{
+	box-shadow: none;
+	-webkit-box-shadow: none;
+}
+
+
+
