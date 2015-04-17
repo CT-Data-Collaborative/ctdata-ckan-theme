@@ -975,12 +975,6 @@ $(function () {
       i_plus.removeClass('fa-plus').addClass('fa-minus')
     })
 
-    // $('.paginate_button').on('click', function(){
-    //   setTimeout(function() {
-    //    add_scroll_to_table()
-    //   }, 100);
-    // })
-
   $('#only_chart_image').addClass('hidden')
   $('#chart_image').addClass('hidden')
 });
