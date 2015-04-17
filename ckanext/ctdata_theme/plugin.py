@@ -223,8 +223,13 @@ class CTDataController(base.BaseController):
         metadata = dataset_meta['extras']
 
         hidden_in_data = filter(lambda x: x['key'] == 'Hidden In', metadata)
+
         try:
             disable_visualizations = 'visualization' in yaml.load(hidden_in_data[0]['value'])
+            if disable_visualizations == '':
+                disable_visualizations = False
+        except TypeError:
+            disable_visualizations = False
         except IndexError:
             disable_visualizations = False
 

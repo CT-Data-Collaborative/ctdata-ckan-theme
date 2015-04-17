@@ -29,6 +29,10 @@ class TopicSerivce(object):
 
           try:
             hidden_list = yaml.load(hidden_meta[0]['value']).replace(', ', ',').split(',')
+          except TypeError:
+              hidden_list = []
+          except AttributeError:
+              hidden_list = []
           except IndexError:
             hidden_list = []
 
@@ -93,6 +97,10 @@ class TopicSerivce(object):
 
             try:
               hidden_list = yaml.load(hidden_meta[0]['value']).replace(', ', ',').split(',')
+            except TypeError:
+              hidden_list = []
+            except AttributeError:
+              hidden_list = []
             except IndexError:
               hidden_list = []
 
