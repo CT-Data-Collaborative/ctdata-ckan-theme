@@ -1,21 +1,20 @@
-// var chart;
+// function swap(array,i,j){
+//   temp = array[i]
+//   array[i] = array[j]
+//   array[j] = temp
+// }
 
-
-function swap(array,i,j){
-  temp = array[i]
-  array[i] = array[j]
-  array[j] = temp
-}
+var legend_items = [0, 10, 20, 50, 100, 200, 500, 1000];
 
 function getColor(d) {
-  return d > 1000  ?  'rgb(1,  35, 73)'  :
-         d > 500   ?  'rgb(0,  56, 117)' :
-         d > 200   ?  'rgb(34, 82, 137)' :
-         d > 100   ?  'rgb(102,134,176)' :
-         d > 50    ?  'rgb(102,134,176)' :
-         d > 20    ?  'rgb(137,161,196)' :
-         d > 10    ?  'rgb(171,187,216)' :
-         d > -1    ?  'rgb(239,239,255)' :
+  return d >  legend_items[7] ?  'rgb(1,  35, 73)'  :
+         d >  legend_items[6] ?  'rgb(0,  56, 117)' :
+         d >  legend_items[5] ?  'rgb(34, 82, 137)' :
+         d >  legend_items[4] ?  'rgb(102,134,176)' :
+         d >  legend_items[3] ?  'rgb(102,134,176)' :
+         d >  legend_items[2] ?  'rgb(137,161,196)' :
+         d >  legend_items[1] ?  'rgb(171,187,216)' :
+         d >  legend_items[0] ?  'rgb(239,239,255)' :
 
          d > -8889 ?  'rgb(216, 216, 216)' :
          d > -10000 ? 'rgb(222, 134, 9)':
@@ -40,6 +39,8 @@ function draw_map(){
       dataset_title = $("dataset_title").val(),
       cur_mt        = $(".MeasureType:checked").first().val(),
       town_index    = -1,  //Remove town filter, since for a map we want all of them
+      all_values    = [],
+      number_of_classes = 8,
       filters       = get_filters();
 
   if (cur_mt == undefined) choose_measure_type_for_charts();
@@ -96,7 +97,6 @@ function draw_map(){
           }
 
         $.each(data.data, function(i){
-
           if (geography_param != 'Town'){
             if (geo_ids.indexOf(data.data[i]['fips']) > -1){
               geo_ids.splice(geo_ids.indexOf(data.data[i]['fips']), 1)
@@ -116,6 +116,9 @@ function draw_map(){
             delete data.data[i];
             return "Skip data for all of connecticut"
           }
+
+          all_values.push(data.data[i]['value'])
+
           if (data.data[i]['value'] == SUPPRESSED_VALUE){
             if (geography_param != 'Town'){
 
@@ -155,8 +158,12 @@ function draw_map(){
           }
         });
 
-        var map = L.map('map').setView([41.571, -72.68], 1);
+        // get ranges
+        legend_items = ss.jenks(all_values, number_of_classes)
 
+        // legend_items = ss.quantile(all_values, [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
+
+        var map = L.map('map').setView([41.571, -72.68], 1);
 
         layer = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
           minZoom: 8,
@@ -207,7 +214,7 @@ function draw_map(){
                 weight: 5,
                 color: 'rgba(21, 107, 16, 0.75)',
                 dashArray: '',
-                fillOpacity: 0.7
+                fillOpacity: 0.8
             });
 
             if (!L.Browser.ie && !L.Browser.opera) {
@@ -231,19 +238,15 @@ function draw_map(){
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
             var div = L.DomUtil.create('div', 'info legend'),
-                grades = ['Suppressed', 'No value', 0, 10, 20, 50, 100, 200, 500, 1000],
+                grades = legend_items,
                 labels = [];
+            div.innerHTML += '<i style="background: rgb(222, 134, 9)"></i> Suppressed <br>';
+            div.innerHTML += '<i style="background: rgb(216, 216, 216)"></i> No value <br>';
             // loop through our density intervals and generate a label with a colored square for each interval
-            for (var i = 0; i < grades.length; i++) {
-                if (grades[i] != 'Suppressed' && grades[i] != 'No value'){
-                  div.innerHTML +=
-                    '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                    grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-                } else
-                    if (grades[i] == 'Suppressed')
-                      div.innerHTML += '<i style="background: rgb(222, 134, 9)"></i> ' + grades[i]  + '<br>';
-                    else
-                      div.innerHTML += '<i style="background: rgb(216, 216, 216)"></i> ' + grades[i]  + '<br>';
+            for (var i = 0; i < grades.length; i++){
+              div.innerHTML +=
+                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
             }
             return div;
         };
