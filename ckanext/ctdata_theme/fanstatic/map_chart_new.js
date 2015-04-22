@@ -4,13 +4,13 @@
 //   array[j] = temp
 // }
 
-var legend_items = [0, 10, 20, 50, 100, 200, 500, 1000];
+var legend_items = [0, 10, 20, 50, 100, 200, 500, 1000, 2000];
 
 function getColor(d) {
   return d >  legend_items[7] ?  'rgb(1,  35, 73)'  :
          d >  legend_items[6] ?  'rgb(0,  56, 117)' :
          d >  legend_items[5] ?  'rgb(34, 82, 137)' :
-         d >  legend_items[4] ?  'rgb(102,134,176)' :
+         d >  legend_items[4] ?  'rgb(68,108,156)' :
          d >  legend_items[3] ?  'rgb(102,134,176)' :
          d >  legend_items[2] ?  'rgb(137,161,196)' :
          d >  legend_items[1] ?  'rgb(171,187,216)' :
@@ -18,7 +18,7 @@ function getColor(d) {
 
          d > -8889 ?  'rgb(216, 216, 216)' :
          d > -10000 ? 'rgb(222, 134, 9)':
-                      'rgb(255, 255, 255)';
+                      '';
 }
 
 function style(feature) {
@@ -158,15 +158,20 @@ function draw_map(){
           }
         });
 
-        // get ranges
-        legend_items = ss.jenks(all_values, number_of_classes)
+        /**************************************** Draw Map *********************************************/
 
-        // legend_items = ss.quantile(all_values, [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
+        // get ranges
+        if (break_points_alg == 'Jenks')
+          legend_items = ss.jenks(all_values, number_of_classes)
+        else if (break_points_alg == 'Quantile')
+          legend_items = ss.quantile(all_values, break_points_array)
+        else if (break_points_alg == 'Array')
+          legend_items = break_points_array
 
         var map = L.map('map').setView([41.571, -72.68], 1);
 
         layer = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
-          minZoom: 8,
+          minZoom: 9,
           maxZoom: 11,
           attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -243,10 +248,10 @@ function draw_map(){
             div.innerHTML += '<i style="background: rgb(222, 134, 9)"></i> Suppressed <br>';
             div.innerHTML += '<i style="background: rgb(216, 216, 216)"></i> No value <br>';
             // loop through our density intervals and generate a label with a colored square for each interval
-            for (var i = 0; i < grades.length; i++){
+            for (var i = 0; i < grades.length -1 ; i++){
               div.innerHTML +=
                 '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                grades[i] + ' &ndash; ' + grades[i + 1] + '<br>';
             }
             return div;
         };
@@ -255,18 +260,8 @@ function draw_map(){
 
         geojs = L.geoJson(new_geojson, {style: style, onEachFeature: onEachFeature}).addTo(map);
         L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container); // fix zoom error
+
         hide_spinner();
-
       })
-
-
-
-
-
   });
-
-
-
 }
-
-

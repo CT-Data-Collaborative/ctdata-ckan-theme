@@ -230,8 +230,19 @@ class CTDataController(base.BaseController):
         if disable_visualizations or dataset.ckan_meta['private']:
            h.redirect_to(controller='package', action='read', id=dataset_name)
 
-        default_metadata = filter(lambda x: x['key'] == 'Default', metadata)
+        break_points_ar   = []
+        break_points_meta = filter(lambda x: x['key'] == 'Break Points', metadata)
+        try:
+            break_points_al = yaml.load(break_points_meta[0]['value'])
+        except IndexError:
+            break_points_al = "Jenks"
 
+        if  len(break_points_al.split(' - ')) > 1:
+            break_points_ar = json.loads(break_points_al.split(' - ')[1])
+            break_points_al = break_points_al.split(' - ')[0]
+
+
+        default_metadata = filter(lambda x: x['key'] == 'Default', metadata)
         try:
           defaults = yaml.load(default_metadata[0]['value'])
           if type(defaults) is list:
@@ -294,7 +305,9 @@ class CTDataController(base.BaseController):
                                                              'disabled': disabled,
                                                              'default_filters': default_filters,
                                                              'headline_indicators': headline_indicators,
-                                                             'geography_param': geography_param})
+                                                             'geography_param': geography_param,
+                                                             'break_points_al': break_points_al,
+                                                             'break_points_ar': break_points_ar })
 
     def update_visualization_link(self, dataset_name):
         json_body = json.loads(http_request.body, encoding=http_request.charset)

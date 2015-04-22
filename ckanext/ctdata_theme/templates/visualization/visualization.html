@@ -264,8 +264,14 @@
 var defaults = [];
 var disabled = [];
 var units = {};
-var geography_param = 'Town'
+var geography_param = 'Town';
+var break_points_alg = '';
+var break_points_array = [];
 
+{% if break_points_al %}
+  break_points_alg = '{{break_points_al}}'
+  break_points_array = {{break_points_ar}}
+{% endif %}
 {% if geography_param %}
 geography_param = '{{geography_param | safe}}'
 {% endif %}
