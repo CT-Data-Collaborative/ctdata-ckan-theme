@@ -8,14 +8,18 @@ function swap(array,i,j){
 }
 
 function getColor(d) {
-  return d > 1000 ? 'rgb(239,239,255)' :
-         d > 500  ? 'rgb(171,187,216)' :
-         d > 200  ? 'rgb(137,161,196)' :
-         d > 100  ? 'rgb(102,134,176)' :
-         d > 50   ? 'rgb(68, 108,156)' :
-         d > 20   ? 'rgb(34, 82, 137)' :
-         d > 10   ? 'rgb(0,  56, 117)' :
-                    'rgb(1,  35, 73)'  ;
+  return d > 1000  ?  'rgb(1,  35, 73)'  :
+         d > 500   ?  'rgb(0,  56, 117)' :
+         d > 200   ?  'rgb(34, 82, 137)' :
+         d > 100   ?  'rgb(102,134,176)' :
+         d > 50    ?  'rgb(102,134,176)' :
+         d > 20    ?  'rgb(137,161,196)' :
+         d > 10    ?  'rgb(171,187,216)' :
+         d > -1    ?  'rgb(239,239,255)' :
+
+         d > -8889 ?  'rgb(216, 216, 216)' :
+         d > -10000 ? 'rgb(222, 134, 9)':
+                      'rgb(255, 255, 255)';
 }
 
 function style(feature) {
@@ -32,11 +36,13 @@ function style(feature) {
 /********************************** MAIN *****************************/
 
 function draw_map(){
-  var dataset_id = $("#dataset_id").val(),
-      dataset_title = $("dataset_title").val();
+  var dataset_id    = $("#dataset_id").val(),
+      dataset_title = $("dataset_title").val(),
+      cur_mt        = $(".MeasureType:checked").first().val(),
+      town_index    = -1,  //Remove town filter, since for a map we want all of them
+      filters       = get_filters();
 
-  filters = get_filters();
-  var town_index = -1;        //Remove town filter, since for a map we want all of them
+  if (cur_mt == undefined) choose_measure_type_for_charts();
 
   $.each(filters, function(i){
     if(filters[i]['field'] == geography_param)
@@ -64,19 +70,6 @@ function draw_map(){
 
       handle_incompatibilities(data['compatibles']);
       $("#container").html('<div id="map"></div>');
-      // var map = L.map('map').setView([51.505, -0.09], 13);
-      var map = L.map('map').setView([41.571, -72.68], 9);
-
-      L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-          '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-          'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-        id: 'examples.map-20v6611k'
-      }).addTo(map);
-
-      L.Icon.Default.imagePath = '/common/images'
-
 
       var max = -Infinity;
       var min = 0;
@@ -137,8 +130,16 @@ function draw_map(){
             max = data.data[i]['value'];
           if(data.data[i]['value'] < min && data.data[i]['fips'] != '0None')
             min = data.data[i]['value'];
+        });
 
-          if (geography_param != 'Town'){
+        if (geography_param != 'Town'){
+          $.each(geo_ids, function(i){
+            data.data.push({code: geo_names[geo_ids[i]], fips: geo_ids[i], value: -8888})
+          });
+        }
+
+        $.each(data.data, function(i){
+           if (geography_param != 'Town'){
             $.each(new_geojson.features, function(j){
               if (new_geojson.features[j].properties['NAME'] == data.data[i]['code'])
                 new_geojson.features[j].properties['Value'] = data.data[i]['value']
@@ -147,20 +148,33 @@ function draw_map(){
           else{
             $.each(new_geojson.features, function(j){
               if (data.data[i] && new_geojson.features[j].properties['NAME'] == data.data[i]['code']){
-                new_geojson.features[j].properties['Value'] = data.data[i]['value']
-
+                value = data.data[i]['value']
+                new_geojson.features[j].properties['Value'] = value
               }
             })
-
           }
-
         });
 
-        if (geography_param != 'Town'){
-          $.each(geo_ids, function(i){
-            data.data.push({code: geo_names[geo_ids[i]], fips: geo_ids[i], value: -8888})
-          });
-        }
+        var map = L.map('map').setView([41.571, -72.68], 1);
+
+
+        layer = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+          minZoom: 8,
+          maxZoom: 11,
+          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+            'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+          id: 'examples.map-20v6611k'
+        })
+        layer.addTo(map);
+        map.fitBounds([
+        [42.050942,-73.491669],
+        [42.025033, -71.792908],
+        [41.318878,-71.848183],
+        [40.987213,-73.664703]
+        ]);
+
+        L.Icon.Default.imagePath = '/common/images'
 
         var info = L.control();
 
@@ -172,9 +186,14 @@ function draw_map(){
 
         // method that we will use to update the control based on feature properties passed
         info.update = function (props) {
-            this._div.innerHTML = '<h4></h4>' +  (props ?
-                '<b>' + props['NAME'] + '</b><br />' + props['Value'] + ''
-                : 'Hover over a сity');
+          if (props ){
+            var value = props['Value']
+            if (value == '-8888') value = 'No value';
+            if (value == '-9999') value = 'Suppressed';
+            value = unit_for_value(value, cur_mt)
+            this._div.innerHTML = '<h4>' + props['NAME'] + '</h4>' + value ;
+          } else
+          this._div.innerHTML = '<h4> Hover over a сity </h4>'
         };
 
         info.addTo(map);
@@ -212,13 +231,19 @@ function draw_map(){
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
             var div = L.DomUtil.create('div', 'info legend'),
-                grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+                grades = ['Suppressed', 'No value', 0, 10, 20, 50, 100, 200, 500, 1000],
                 labels = [];
             // loop through our density intervals and generate a label with a colored square for each interval
             for (var i = 0; i < grades.length; i++) {
-                div.innerHTML +=
+                if (grades[i] != 'Suppressed' && grades[i] != 'No value'){
+                  div.innerHTML +=
                     '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
                     grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                } else
+                    if (grades[i] == 'Suppressed')
+                      div.innerHTML += '<i style="background: rgb(222, 134, 9)"></i> ' + grades[i]  + '<br>';
+                    else
+                      div.innerHTML += '<i style="background: rgb(216, 216, 216)"></i> ' + grades[i]  + '<br>';
             }
             return div;
         };
@@ -226,6 +251,7 @@ function draw_map(){
         legend.addTo(map);
 
         geojs = L.geoJson(new_geojson, {style: style, onEachFeature: onEachFeature}).addTo(map);
+        L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container); // fix zoom error
         hide_spinner();
 
       })
