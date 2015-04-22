@@ -28,7 +28,7 @@ function style(feature) {
         opacity: 1,
         color: '#C4C4C4',
         dashArray: '3',
-        fillOpacity: 0.8
+        fillOpacity: 1
     };
 }
 
@@ -216,10 +216,11 @@ function draw_map(){
             var layer = e.target;
 
             layer.setStyle({
-                weight: 5,
+                weight: 1,
                 color: 'rgba(21, 107, 16, 0.75)',
                 dashArray: '',
-                fillOpacity: 0.8
+                fillColor: 'rgba(21, 107, 16, 0.75)',
+                fillOpacity: 1
             });
 
             if (!L.Browser.ie && !L.Browser.opera) {
