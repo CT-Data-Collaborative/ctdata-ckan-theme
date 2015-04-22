@@ -94,11 +94,10 @@ class CommunityProfilesController(base.BaseController):
 
         try:
             dataset = DatasetService.get_dataset(dataset_id)
-            dataset_meta    = DatasetService.get_dataset_meta(dataset_id)
-            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
-            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
         except toolkit.ObjectNotFound:
             return json.dumps({'success': False, 'error': 'No datasets with this id'})
+
+        geography_param = DatasetService.get_dataset_meta_geo_type(dataset_id)
 
         result = []
         for dim in dataset.dimensions:

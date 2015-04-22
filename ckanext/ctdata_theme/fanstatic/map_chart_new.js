@@ -7,14 +7,14 @@
 var legend_items = [0, 10, 20, 50, 100, 200, 500, 1000, 2000];
 
 function getColor(d) {
-  return d >  legend_items[7] ?  'rgb(1,  35, 73)'  :
-         d >  legend_items[6] ?  'rgb(0,  56, 117)' :
-         d >  legend_items[5] ?  'rgb(34, 82, 137)' :
-         d >  legend_items[4] ?  'rgb(68,108,156)' :
-         d >  legend_items[3] ?  'rgb(102,134,176)' :
-         d >  legend_items[2] ?  'rgb(137,161,196)' :
-         d >  legend_items[1] ?  'rgb(171,187,216)' :
-         d >  legend_items[0] ?  'rgb(239,239,255)' :
+  return d >=  legend_items[7] ?  'rgb(1,  35, 73)'  :
+         d >=  legend_items[6] ?  'rgb(0,  56, 117)' :
+         d >=  legend_items[5] ?  'rgb(34, 82, 137)' :
+         d >=  legend_items[4] ?  'rgb(68,108,156)' :
+         d >=  legend_items[3] ?  'rgb(102,134,176)' :
+         d >=  legend_items[2] ?  'rgb(137,161,196)' :
+         d >=  legend_items[1] ?  'rgb(171,187,216)' :
+         d >=  legend_items[0] ?  'rgb(239,239,255)' :
 
          d > -8889 ?  'rgb(216, 216, 216)' :
          d > -10000 ? 'rgb(222, 134, 9)':
@@ -26,9 +26,9 @@ function style(feature) {
         fillColor: getColor(feature.properties['Value']),
         weight: 1,
         opacity: 1,
-        color: '#C4C4C4',
+        color: '#767676',
         dashArray: '3',
-        fillOpacity: 1
+        fillOpacity: 0.9
     };
 }
 
