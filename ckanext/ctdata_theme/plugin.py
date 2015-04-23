@@ -224,11 +224,12 @@ class CTDataController(base.BaseController):
         metadata        = filter(lambda x: x['key'] in metadata_fields, dataset.ckan_meta['extras'])
         break_points_ar = []
         disable_visualizations = DatasetService.get_dataset_meta_hidden_in(dataset_name)
+        map_json_url    = DatasetService.get_dataset_map_json_url(dataset_name)
 
         if 'visualization' in disable_visualizations or dataset.ckan_meta['private']:
            h.redirect_to(controller='package', action='read', id=dataset_name)
 
-        if  len(break_points_al.split(' - ')) > 1:
+        if len(break_points_al.split(' - ')) > 1:
             break_points_ar = json.loads(break_points_al.split(' - ')[1])
             break_points_al = break_points_al.split(' - ')[0]
 
@@ -265,7 +266,8 @@ class CTDataController(base.BaseController):
                                                              'headline_indicators': headline_indicators,
                                                              'geography_param': geography_param,
                                                              'break_points_al': break_points_al,
-                                                             'break_points_ar': break_points_ar })
+                                                             'break_points_ar': break_points_ar,
+                                                             'map_json_url': map_json_url })
 
     def update_visualization_link(self, dataset_name):
         json_body = json.loads(http_request.body, encoding=http_request.charset)

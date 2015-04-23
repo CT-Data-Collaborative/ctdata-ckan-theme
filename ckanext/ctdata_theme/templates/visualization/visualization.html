@@ -266,12 +266,13 @@
 var defaults = [];
 var disabled = [];
 var units = {};
-var geography_param = 'Town';
-var break_points_alg = '';
+var geography_param    = 'Town';
+var break_points_alg   = '';
 var break_points_array = [];
+var map_json_url       = '';
 
 {% if break_points_al %}
-  break_points_alg = '{{break_points_al}}'
+  break_points_alg   = '{{break_points_al}}'
   break_points_array = {{break_points_ar}}
 {% endif %}
 {% if geography_param %}
@@ -281,6 +282,8 @@ geography_param = '{{geography_param | safe}}'
 {% if units %}
 units = {{units | safe}}
 {% endif %}
+
+map_json_url = '{{map_json_url}}'
 
 
 {% if default_filters %}

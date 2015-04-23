@@ -1,9 +1,3 @@
-// function swap(array,i,j){
-//   temp = array[i]
-//   array[i] = array[j]
-//   array[j] = temp
-// }
-
 var legend_items = [0, 10, 20, 50, 100, 200, 500, 1000, 2000];
 
 function getColor(d) {
@@ -79,7 +73,8 @@ function draw_map(){
       var geo_names  = {}
       var value_counters = {}
 
-      $.getJSON('/common/map.json', function (geojson) {
+      $.getJSON(map_json_url, function (geojson) {
+        debugger
         new_geojson = geojson
         if (geography_param != 'Town'){
             $.each(geojson['features'], function(i){
