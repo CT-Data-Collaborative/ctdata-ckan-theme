@@ -258,6 +258,8 @@ function draw_map(){
         };
 
         legend.addTo(map);
+        L.easyPrint().addTo(map)
+        $('.operations').hide();
 
         geojs = L.geoJson(new_geojson, {style: style, onEachFeature: onEachFeature}).addTo(map);
         L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container); // fix zoom error

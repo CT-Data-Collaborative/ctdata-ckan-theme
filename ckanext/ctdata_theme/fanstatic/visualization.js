@@ -352,7 +352,6 @@ function display_error(message){
 }
 
 function display_data(){
-
     display_filters();
     display_spinner();
     set_icon(display_type);
@@ -446,12 +445,14 @@ function display_data(){
       //Don't show the print and save icons
       needed_view_type = 'table'
       $(".operations").css("visibility","hidden");
+      $('.operations').show();
       draw_table();
       break;
     default:
       //Show the print and save icons
       needed_view_type = 'line_or_chart'
       $(".operations").css("visibility","visible");
+      $('.operations').show();
       draw_table();
       draw_chart();
   }
