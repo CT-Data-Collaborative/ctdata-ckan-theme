@@ -259,18 +259,18 @@ function draw_map(){
         geojs = L.geoJson(new_geojson, {style: style, onEachFeature: onEachFeature}).addTo(map);
         L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container); // fix zoom error
 
-        leafletImage(map, function(err, canvas) {
-            // now you have canvas
-            // example thing to do with that canvas:
-            var img = document.createElement('img');
-            var dimensions = map.getSize();
-            img.width = dimensions.x;
-            img.height = dimensions.y;
-            img.src = canvas.toDataURL();
-            img.id = 'images'
-            document.getElementById('images').innerHTML = '';
-            document.getElementById('images').appendChild(img);
-        });
+        // leafletImage(map, function(err, canvas) {
+        //     // now you have canvas
+        //     // example thing to do with that canvas:
+        //     var img = document.createElement('img');
+        //     var dimensions = map.getSize();
+        //     img.width = dimensions.x;
+        //     img.height = dimensions.y;
+        //     img.src = canvas.toDataURL();
+        //     img.id = 'images'
+        //     document.getElementById('images').innerHTML = '';
+        //     document.getElementById('images').appendChild(img);
+        // });
 
         hide_spinner();
       })
