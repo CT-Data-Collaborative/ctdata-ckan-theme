@@ -72,9 +72,9 @@ function draw_map(){
       var geo_ids    = []
       var geo_names  = {}
       var value_counters = {}
-
       $.getJSON(map_json_url, function (geojson) {
-        debugger
+        window.L_PREFER_CANVAS = true;
+
         new_geojson = geojson
         if (geography_param != 'Town'){
             $.each(geojson['features'], function(i){
@@ -258,6 +258,19 @@ function draw_map(){
 
         geojs = L.geoJson(new_geojson, {style: style, onEachFeature: onEachFeature}).addTo(map);
         L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container); // fix zoom error
+
+        leafletImage(map, function(err, canvas) {
+            // now you have canvas
+            // example thing to do with that canvas:
+            var img = document.createElement('img');
+            var dimensions = map.getSize();
+            img.width = dimensions.x;
+            img.height = dimensions.y;
+            img.src = canvas.toDataURL();
+            img.id = 'images'
+            document.getElementById('images').innerHTML = '';
+            document.getElementById('images').appendChild(img);
+        });
 
         hide_spinner();
       })

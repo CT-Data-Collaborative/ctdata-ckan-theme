@@ -210,6 +210,7 @@
 </div>
 </div>
 
+<div id="images"> </div>
 <!-- Create Headline Indicator Popup -->
 {% snippet 'visualization/snippets/create_headline_indicator.html' %}
 
@@ -237,6 +238,9 @@
 <script src="/common/js/jspdf.js"></script>
 <script src="/common/js/jspdf.plugin.addimage.js"></script>
 <script src="/common/js/jspdf.plugin.standard_fonts_metrics.js"></script>
+<script>
+    L_PREFER_CANVAS = true; // experimental
+  </script>
 
 {% resource 'ctdata_theme/highcharts_src.js' %}
 
@@ -259,6 +263,7 @@
 {% resource 'ctdata_theme/leaflet_print.js' %}
 {% resource 'ctdata_theme/jquery.print.js' %}
 {% resource 'ctdata_theme/simple_statistics.js' %}
+{% resource 'ctdata_theme/leaflet-imags.js' %}
 
 
 

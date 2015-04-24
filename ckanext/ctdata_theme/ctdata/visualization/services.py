@@ -60,7 +60,7 @@ class DatasetService(object):
     def get_dataset_map_json_url(dataset_id):
         meta = toolkit.get_action('package_show')(data_dict={'id': dataset_id})
         try:
-            resource = filter(lambda r: r['name'] == 'map json', meta['resources'])[0]
+            resource = filter(lambda r: r['format'] == 'GeoJSON', meta['resources'])[0]
             url  = resource['url']
         except IndexError:
             url = '/common/map.json'
