@@ -3,12 +3,15 @@
 {% block content %}
 
     {%- block underheader %}
-    <section class="about" style="padding-top: 20px; padding-bottom: 20px;">
-        <div class="ctdata-wrapper">
-            <h2>{% block page_name %}Page name{% endblock %}</h2>
-            <p id="pageDescription">{% block page_description %}Page description{% endblock %}</p>
+    <section>
+        <div id="about_block">
+            <div class="spacing text-center">
+                <h2 class="main_title">{% block page_name %}Page name{% endblock %}</h2>
+                <p id="pageDescription">{% block page_description %}Page description{% endblock %}</p>
+            </div>
         </div>
     </section>
+
     {% endblock -%}
     <section class="main_body_content">
     {% block flash %}
@@ -23,4 +26,5 @@
     {% endblock %}
     {% block main_content %}{{ super() }}{% endblock %}
     </section>
+
 {% endblock %}

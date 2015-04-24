@@ -49,6 +49,12 @@ class GroupController(GroupController):
 
       c.group_dict     = group
       user_name        = http_request.environ.get("REMOTE_USER")
+      if not c.userobj:
+        self.session.close()
+        return base.render('group/indicators.html', extra_vars={'group_indicators': [],
+                                                              'indicators_to_edit': [],
+                                                              'user_indicators': []})
+
       group_indicators = self.community_profile_service.get_group_indicators(group['id'])
       user_indicators  = self.community_profile_service.get_gallery_indicators_for_user(c.userobj.id)
       user_indicators  = filter(lambda ind: ind.permission != 'private', user_indicators)
