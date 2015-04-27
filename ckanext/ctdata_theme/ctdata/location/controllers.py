@@ -264,26 +264,29 @@ class LocationsController(base.BaseController):
         for geo_type in geo_types:
             ind_data[geo_type] = []
 
-        for indicator in profile.indicators:
-            ######### load indicators values only for locations with corresponding dataset
-            geo_type  = indicator.dataset_geography_type()
-            values    = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
+        if profile:
+            for indicator in profile.indicators:
+                ######### load indicators values only for locations with corresponding dataset
+                geo_type  = indicator.dataset_geography_type()
+                values    = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
 
-            data  = {}
-            data  = {
-                     'id': indicator.id,
-                'filters': indicator.filters,
-              'data_type': indicator.data_type,
-                   'year': dict_with_key_value("field", "Year", json.loads(indicator.filters))['values'][0],
-                'link_to': indicator.link_to_visualization_with_locations(locations_hash[geo_type]),
-                'dataset': indicator.dataset_name(),
-             'dataset_id': indicator.dataset_id,
-               'variable': indicator.variable,
-               'geo_type': geo_type,
-               'values'  : values
-            }
+                data  = {}
+                data  = {
+                         'id': indicator.id,
+                    'filters': indicator.filters,
+                  'data_type': indicator.data_type,
+                       'year': dict_with_key_value("field", "Year", json.loads(indicator.filters))['values'][0],
+                    'link_to': indicator.link_to_visualization_with_locations(locations_hash[geo_type]),
+                    'dataset': indicator.dataset_name(),
+                 'dataset_id': indicator.dataset_id,
+                   'variable': indicator.variable,
+                   'geo_type': geo_type,
+                   'values'  : values
+                }
 
-            ind_data[geo_type].append(data)
+                ind_data[geo_type].append(data)
+        else:
+           data  = {}
 
         self.session.close()
         return json.dumps({'success': True, 'ind_data': ind_data, 'all_current_locations':  all_current_locations, 'locations_hash': locations_hash})
