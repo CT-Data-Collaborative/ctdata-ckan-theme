@@ -356,7 +356,6 @@ $(function(){
             success: function (data) {
                 $('#filters_content').html(build_filters(data['result']));
                 $("#save_indicator").removeClass('hidden')
-                handle_incompatibles();
             }
         });
     });
