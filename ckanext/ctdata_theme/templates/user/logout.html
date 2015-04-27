@@ -2,11 +2,12 @@
 
 {% block subtitle %}{{ _('Logged Out') }}{% endblock %}
 {% block page_name %}Logged Out{% endblock %}
+{% block page_description %}{% endblock %}
 
-{% block primary_content %}
+{% block primary %}
   <section class="module">
     <div class="module-content">
-      <p class="offset2">{% trans %}You are now logged out.{% endtrans %}</p>
+      <p class="text-center">{% trans %}You are now logged out.{% endtrans %}</p>
     </div>
   </section>
 {% endblock %}

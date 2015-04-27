@@ -91,20 +91,46 @@ class CommunityProfilesController(base.BaseController):
 
     def get_filters(self, dataset_id):
         http_response.headers['Content-type'] = 'application/json'
-
         try:
-            dataset = DatasetService.get_dataset(dataset_id)
-            dataset_meta    = DatasetService.get_dataset_meta(dataset_id)
+            dataset      = DatasetService.get_dataset(dataset_id)
+            dataset_meta = DatasetService.get_dataset_meta(dataset_id)
             geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
             geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
         except toolkit.ObjectNotFound:
             return json.dumps({'success': False, 'error': 'No datasets with this id'})
+
+        geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
+        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
 
         result = []
         for dim in dataset.dimensions:
             if dim.name not in [geography_param]:
                 if dim.name == 'Race':
                     dim.possible_values.append('all')
+
                 result.append({'name': dim.name, 'values': dim.possible_values})
 
         return json.dumps({'success': True, 'result': result})
+
+    def get_incompatibles(self, dataset_id):
+        json_body       = json.loads(http_request.body, encoding=http_request.charset)
+        request_view    = 'chart'
+        request_filters = json_body.get('filters')
+        data            = {}
+
+        try:
+            dataset         = DatasetService.get_dataset(dataset_id)
+            dataset_meta    = DatasetService.get_dataset_meta(dataset_id)
+            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
+            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+        except toolkit.ObjectNotFound:
+            return json.dumps({'success': False, 'error': 'No datasets with this id'})
+
+        query_builder       = QueryBuilderFactory.get_query_builder(request_view, dataset)
+        view                = ViewFactory.get_view(request_view, query_builder)
+        data['compatibles'] = view.get_compatibles(request_filters)
+
+        http_response.headers['Content-type'] = 'application/json'
+        self.session.close()
+
+        return json.dumps(data)

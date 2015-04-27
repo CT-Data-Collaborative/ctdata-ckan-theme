@@ -379,7 +379,7 @@ class MapView(View):
             else:
                 fips = ''
 
-            value = '' if row['Value'] == None else float(row['Value'])
+            value = '' if row['Value'] in [None, 'NA'] else float(row['Value'])
 
             result['data'].append({'code': row[geography_param], 'value': value, 'fips': fips})
 
