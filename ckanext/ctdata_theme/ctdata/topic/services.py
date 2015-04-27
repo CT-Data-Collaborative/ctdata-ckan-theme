@@ -21,9 +21,20 @@ class TopicSerivce(object):
                  {'title': 'Safety',         'id': 'safety',         'indicators': []}]
 
       for dataset_name in dataset_names:
-          dataset         = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
-          geography_param = DatasetService.get_dataset_meta_geo_type(dataset_name)
-          hidden_list     = DatasetService.get_dataset_meta_hidden_in(dataset_name)
+          dataset     = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+          metadata    = DatasetService.get_dataset_meta(dataset_name)['extras']
+          hidden_meta = filter(lambda x: x['key'] == 'Hidden In', metadata)
+          geography       = filter(lambda x: x['key'] == 'Geography', metadata)
+          geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
+          try:
+            hidden_list = yaml.load(hidden_meta[0]['value']).replace(', ', ',').split(',')
+          except TypeError:
+              hidden_list = []
+          except AttributeError:
+              hidden_list = []
+          except IndexError:
+            hidden_list = []
 
           if len(dataset['extras']) > 0:
               domain = None
@@ -79,8 +90,19 @@ class TopicSerivce(object):
 
         for dataset_name in dataset_names:
             dataset     = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
-            geography_param = DatasetService.get_dataset_meta_geo_type(dataset_name)
-            hidden_list = DatasetService.get_dataset_meta_hidden_in(dataset_name)
+            metadata    = DatasetService.get_dataset_meta(dataset_name)['extras']
+            hidden_meta = filter(lambda x: x['key'] == 'Hidden In', metadata)
+            geography       = filter(lambda x: x['key'] == 'Geography', metadata)
+            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
+            try:
+              hidden_list = yaml.load(hidden_meta[0]['value']).replace(', ', ',').split(',')
+            except TypeError:
+              hidden_list = []
+            except AttributeError:
+              hidden_list = []
+            except IndexError:
+              hidden_list = []
 
             if len(dataset['extras']) > 0:
                 domain, subdomain = None, None

@@ -206,33 +206,50 @@ class CTDataController(base.BaseController):
 
         try:
             if ind_filters:
-                ind_filters = json.dumps(json.loads(ind_filters))
+                ind_filters =  json.dumps(json.loads(ind_filters))
         except ValueError:
             ind_filters = None
 
         try:
             dataset = DatasetService.get_dataset(dataset_name)
+            dataset_meta = DatasetService.get_dataset_meta(dataset_name)
+            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
+            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+            help_info = filter(lambda x: x['key'] == 'Help',  dataset.ckan_meta['extras'])
+            help_str  = help_info[0]['value'] if help_info else ''
         except toolkit.ObjectNotFound:
             abort(404)
 
-        help_str        = DatasetService.get_dataset_meta_help(dataset_name)
-        geography_param = DatasetService.get_dataset_meta_geo_type(dataset_name)
-        disabled        = DatasetService.get_dataset_meta_disabled_views(dataset_name)
-        metadata_fields = DatasetService.get_dataset_meta_visible_metadata(dataset_name)
-        metadata_units  = DatasetService.get_dataset_meta_units(dataset_name)
-        break_points_al = DatasetService.get_dataset_meta_break_points(dataset_name)
-        defaults        = DatasetService.get_dataset_meta_default_metadata(dataset_name)
-        metadata        = filter(lambda x: x['key'] in metadata_fields, dataset.ckan_meta['extras'])
-        break_points_ar = []
-        disable_visualizations = DatasetService.get_dataset_meta_hidden_in(dataset_name)
-        map_json_url    = DatasetService.get_dataset_map_json_url(dataset_name)
+        metadata = dataset_meta['extras']
 
-        if 'visualization' in disable_visualizations or dataset.ckan_meta['private']:
+        hidden_in_data = filter(lambda x: x['key'] == 'Hidden In', metadata)
+
+        try:
+            disable_visualizations = 'visualization' in yaml.load(hidden_in_data[0]['value'])
+            if disable_visualizations == '':
+                disable_visualizations = False
+        except TypeError:
+            disable_visualizations = False
+        except IndexError:
+            disable_visualizations = False
+
+        if disable_visualizations or dataset.ckan_meta['private']:
            h.redirect_to(controller='package', action='read', id=dataset_name)
 
-        if len(break_points_al.split(' - ')) > 1:
-            break_points_ar = json.loads(break_points_al.split(' - ')[1])
-            break_points_al = break_points_al.split(' - ')[0]
+        default_metadata = filter(lambda x: x['key'] == 'Default', metadata)
+
+        try:
+          defaults = yaml.load(default_metadata[0]['value'])
+          if type(defaults) is list:
+            defaults = defaults[0]
+        except IndexError:
+          defaults = []
+
+        disabled_metadata = filter(lambda x: x['key'] == "Disabled Views", metadata)
+        try:
+          disabled = yaml.load(disabled_metadata[0]['value']).replace(', ', ',').split(',')
+        except IndexError:
+          disabled = []
 
         if not ind_filters:
             default_filters = defaults
@@ -244,6 +261,24 @@ class CTDataController(base.BaseController):
             except TypeError:
                 default_filters = ind_filters
 
+        # metadata fileds for visualization page
+        visible_metadata_fields = filter(lambda x: x['key'] == 'Visible Metadata', metadata)
+
+        try:
+            metadata_fields = yaml.load(visible_metadata_fields[0]['value'])
+            metadata_fields.replace(', ', ',').split(',')
+        except IndexError:
+            metadata_fields = ['Description', 'Full Description', 'Suppression' ,'Source', 'Contributor']
+
+        # load units
+        visible_metadata_fields = filter(lambda x: x['key'] == 'Units', metadata)
+
+        try:
+            metadata_units = yaml.load(visible_metadata_fields[0]['value'])
+        except IndexError:
+            metadata_units = {"Number": " ", "Percent": " "}
+
+        metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
         headline_indicators = self.community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
 
@@ -265,25 +300,26 @@ class CTDataController(base.BaseController):
                                                              'disabled': disabled,
                                                              'default_filters': default_filters,
                                                              'headline_indicators': headline_indicators,
-                                                             'geography_param': geography_param,
-                                                             'break_points_al': break_points_al,
-                                                             'break_points_ar': break_points_ar,
-                                                             'map_json_url': map_json_url })
+                                                             'geography_param': geography_param})
 
     def update_visualization_link(self, dataset_name):
         json_body = json.loads(http_request.body, encoding=http_request.charset)
-        try:
-            dataset = DatasetService.get_dataset(dataset_name)
-        except toolkit.ObjectNotFound:
-            abort(404)
 
         view_param       = json_body.get('view')
         request_view     = 'chart' if view_param in ['table', 'column', 'line'] else view_param
         request_filters  = json_body.get('filters')
-        data             = {}
-        data['link']     = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
-        query_builder    = QueryBuilderFactory.get_query_builder(request_view, dataset)
-        view             = ViewFactory.get_view(request_view, query_builder)
+        data = {}
+        data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
+
+        try:
+            dataset = DatasetService.get_dataset(dataset_name)
+            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
+            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+        except toolkit.ObjectNotFound:
+            abort(404)
+
+        query_builder = QueryBuilderFactory.get_query_builder(request_view, dataset)
+        view = ViewFactory.get_view(request_view, query_builder)
         data['compatibles'] = view.get_compatibles(request_filters)
 
         http_response.headers['Content-type'] = 'application/json'
@@ -298,6 +334,7 @@ class CTDataController(base.BaseController):
 
         view_param         = json_body.get('view')
         request_view       = 'chart' if view_param in ['table', 'column', 'line'] else view_param
+
         request_filters    = json_body.get('filters')
         omit_single_values = json_body.get('omit_single_values')
 
@@ -309,16 +346,18 @@ class CTDataController(base.BaseController):
 
         try:
             dataset = DatasetService.get_dataset(dataset_name)
+            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
+            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
         except toolkit.ObjectNotFound:
             abort(404)
 
-        geography_param = DatasetService.get_dataset_meta_geo_type(dataset_name)
-        query_builder   = QueryBuilderFactory.get_query_builder(request_view, dataset)
-        view            = ViewFactory.get_view(request_view, query_builder)
-        data            = view.get_data(request_filters)
+        query_builder = QueryBuilderFactory.get_query_builder(request_view, dataset)
+        view = ViewFactory.get_view(request_view, query_builder)
 
+        data = view.get_data(request_filters)
         if omit_single_values:
             data = self._hide_dims_with_one_value(data, geography_param)
+
 
         data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
 
