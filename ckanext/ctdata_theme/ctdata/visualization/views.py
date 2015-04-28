@@ -7,6 +7,7 @@ from IPython import embed
 import psycopg2
 
 from termcolor import colored
+from IPython import embed
 
 class View(object):
     """
@@ -55,6 +56,13 @@ class View(object):
 
         except psycopg2.ProgrammingError:
             result['data'] = []
+
+        #collect Margins of Errors data
+        moes = filter( lambda d: d['dims']['Variable'] == 'Margins of Error', result['data'])
+        moes_data = []
+        map( lambda m: result['data'].remove(m), moes)
+        map( lambda m: moes_data.append({'location': m['dims']['Town'], 'values': m['data'], 'dims': m['dims']}) ,moes)
+        result['moes_data'] = moes_data
 
         return  result
 
