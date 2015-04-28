@@ -248,6 +248,7 @@ function draw_map(){
                 '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
                 grades[i] + ' &ndash; ' + grades[i + 1] + '<br>';
             }
+            div.innerHTML += '<br> Breaks type: ' + break_points_alg
             return div;
         };
 
