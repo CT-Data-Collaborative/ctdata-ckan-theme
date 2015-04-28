@@ -21,7 +21,6 @@ function style(feature) {
         weight: 1,
         opacity: 1,
         color: '#767676',
-        dashArray: '3',
         fillOpacity: 0.9
     };
 }
@@ -157,7 +156,7 @@ function draw_map(){
 
         // get ranges
         if (break_points_alg == 'Jenks')
-          legend_items = ss.jenks(all_values, number_of_classes)
+          legend_items = ss.jenks(all_values, 5)
         else if (break_points_alg == 'Quantile')
           legend_items = ss.quantile(all_values, break_points_array)
         else if (break_points_alg == 'Array')
