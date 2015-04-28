@@ -57,12 +57,27 @@ class View(object):
         except psycopg2.ProgrammingError:
             result['data'] = []
 
-        #collect Margins of Errors data
-        moes = filter( lambda d: d['dims']['Variable'] == 'Margins of Error', result['data'])
-        moes_data = []
-        map( lambda m: result['data'].remove(m), moes)
-        map( lambda m: moes_data.append({'location': m['dims']['Town'], 'values': m['data'], 'dims': m['dims']}) ,moes)
-        result['moes_data'] = moes_data
+        ##### collect Margins of Errors data
+
+        # moes = filter( lambda d: d['data'] != [None] and d['dims']['Variable'] == 'Margins of Error', result['data'])
+        # map( lambda m: result['data'].remove(m), moes)
+
+        # for data_item in result['data']:
+        #     temp_data_item = dict(data_item)
+        #     if temp_data_item['data'] != [None]:
+        #         try:
+        #             temp_data_item['dims'].pop('Variable')
+        #         except KeyError:
+        #             pass
+        #         for moes_item in moes:
+        #             temp_moes_item = dict(moes_item)
+        #             if temp_moes_item['data'] != [None]:
+        #                 try:
+        #                     temp_moes_item['dims'].pop('Variable')
+        #                 except KeyError:
+        #                     pass
+        #                 if temp_data_item['dims'] == temp_moes_item['dims']:
+        #                     data_item['moes'] = moes_item['data']
 
         return  result
 
@@ -245,6 +260,26 @@ class ChartView(View):
             result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(years_from_filters)})
             check_town += 1
         result['compatibles'] = self.get_compatibles(filters)
+
+        moes = filter( lambda d: d['data'] != [None] and d['dims']['Variable'] == 'Margins of Error', result['data'])
+        map( lambda m: result['data'].remove(m), moes)
+
+        for data_item in result['data']:
+            temp_data_item = dict(data_item)
+            if temp_data_item['data'] != [None]:
+                try:
+                    temp_data_item['dims'].pop('Variable')
+                except KeyError:
+                    pass
+                for moes_item in moes:
+                    temp_moes_item = dict(moes_item)
+                    if temp_moes_item['data'] != [None]:
+                        try:
+                            temp_moes_item['dims'].pop('Variable')
+                        except KeyError:
+                            pass
+                        if temp_data_item['dims'] == temp_moes_item['dims']:
+                            data_item['moes'] = moes_item['data']
         return result
 
 

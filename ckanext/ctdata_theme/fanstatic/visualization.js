@@ -574,6 +574,12 @@ function draw_table(){
               if (type != undefined)
                 cur_value = unit_for_value(cur_value, type)
 
+              if (data['data'][row_index]['moes'] != undefined){
+                moes_value = data['data'][row_index]['moes'][year_index]
+                cur_value += '<span class="moes"> ± ' + moes_value + '</span>'
+              }
+
+              // debugger
               html += "<td class='right_align'>" + cur_value + "</td>";
               col_num++;
             });
