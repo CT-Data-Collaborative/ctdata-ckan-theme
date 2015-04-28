@@ -132,7 +132,10 @@ class DatasetService(object):
         data    = filter(lambda x: x['key'] == field_name, meta)
 
         try:
-            value = yaml.load(data[0]['value']).replace(', ', ',')
+            if field_name not in ['Units', 'Default']:
+                value = yaml.load(data[0]['value']).replace(', ', ',')
+            else:
+                value = yaml.load(data[0]['value'])
         except TypeError:
             value = default
         except AttributeError:
