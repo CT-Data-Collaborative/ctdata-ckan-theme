@@ -129,7 +129,7 @@ function draw_map(){
         $.each(data.data, function(i){
            if (geography_param != 'Town'){
             $.each(new_geojson.features, function(j){
-              if (new_geojson.features[j].properties['NAME'] == data.data[i]['code'])
+              if (data.data[i] && new_geojson.features[j].properties['GEOID'] == data.data[i]['fips'])
                 new_geojson.features[j].properties['Value'] = data.data[i]['value']
             })
           }
