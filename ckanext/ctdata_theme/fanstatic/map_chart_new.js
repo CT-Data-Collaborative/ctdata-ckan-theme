@@ -15,17 +15,6 @@ function getColor(d) {
                       '';
 }
 
-// function style(feature) {
-//     return {
-//         // fillColor: getColor(feature.properties['Value']),
-//         weight: 1,
-//         opacity: 1,
-//         color: '#767676',
-//         fillOpacity: 0.9,
-//         fillPattern: stripes,
-//     };
-// }
-
 /********************************** MAIN *****************************/
 
 function draw_map(){
@@ -185,7 +174,7 @@ function draw_map(){
         [40.987213,-73.664703]
         ]);
 
-        var stripes = new L.StripePattern();
+        var stripes = new L.StripePattern({weight: 1});
         stripes.addTo(map);
         var mapCenter = new L.LatLng(42.050942,-73.491669);
         var circle = new L.Circle(mapCenter, 400.0, {
