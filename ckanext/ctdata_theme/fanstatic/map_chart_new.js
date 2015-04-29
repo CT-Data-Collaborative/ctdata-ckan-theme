@@ -8,22 +8,23 @@ function getColor(d) {
          d >=  legend_items[3] ?  'rgb(102,134,176)' :
          d >=  legend_items[2] ?  'rgb(137,161,196)' :
          d >=  legend_items[1] ?  'rgb(171,187,216)' :
-         d >=  legend_items[0] ?  'rgb(239,239,255)' :
+         d >=  legend_items[0] -1 ?  'rgb(239,239,255)' :
 
-         d > -8889 ?  'rgb(216, 216, 216)' :
-         d > -10000 ? 'rgb(222, 134, 9)':
+
+         d == -9999 ? 'rgb(222, 134, 9)':
                       '';
 }
 
-function style(feature) {
-    return {
-        fillColor: getColor(feature.properties['Value']),
-        weight: 1,
-        opacity: 1,
-        color: '#767676',
-        fillOpacity: 0.9
-    };
-}
+// function style(feature) {
+//     return {
+//         // fillColor: getColor(feature.properties['Value']),
+//         weight: 1,
+//         opacity: 1,
+//         color: '#767676',
+//         fillOpacity: 0.9,
+//         fillPattern: stripes,
+//     };
+// }
 
 /********************************** MAIN *****************************/
 
@@ -162,7 +163,7 @@ function draw_map(){
         else if (break_points_alg == 'Array')
           legend_items = break_points_array
 
-        var map = L.map('map').setView([41.571, -72.68], 1);
+
 
         layer = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
           minZoom: 9,
@@ -172,13 +173,27 @@ function draw_map(){
             'Imagery © <a href="http://mapbox.com">Mapbox</a>',
           id: 'examples.map-20v6611k'
         })
-        layer.addTo(map);
+
+        var map = L.map('map',{layers: [layer] }).setView([41.571, -72.68], 1);
+
+        // layer.addTo(map);
+
         map.fitBounds([
         [42.050942,-73.491669],
         [42.025033, -71.792908],
         [41.318878,-71.848183],
         [40.987213,-73.664703]
         ]);
+
+        var stripes = new L.StripePattern();
+        stripes.addTo(map);
+        var mapCenter = new L.LatLng(42.050942,-73.491669);
+        var circle = new L.Circle(mapCenter, 400.0, {
+            fillPattern: stripes,
+            stroke: false,
+            fillOpacity: 0.5
+        });
+        circle.addTo(map);
 
         L.Icon.Default.imagePath = '/common/images'
 
@@ -194,8 +209,9 @@ function draw_map(){
         info.update = function (props) {
           if (props ){
             var value = props['Value']
-            if (value == '-8888') value = 'No value';
+            if (value == '-8888' || value == "") value = 'No value';
             if (value == '-9999') value = 'Suppressed';
+
             value = unit_for_value(value, cur_mt)
             this._div.innerHTML = '<h4>' + props['NAME'] + '</h4>' + value ;
           } else
@@ -256,21 +272,28 @@ function draw_map(){
         L.easyPrint().addTo(map)
         $('.operations').hide();
 
+        function style(feature) {
+            if (feature.properties['Value'] == '-8888' || feature.properties['Value'] == "" || feature.properties['Value'] == 'No value'){
+              return {
+                  weight: 1,
+                  opacity: 1,
+                  color: '#767676',
+                  fillOpacity: 0.9,
+                  fillPattern: stripes,
+              }
+            } else {
+                return  { weight: 1,
+                  opacity: 1,
+                  color: '#767676',
+                  fillOpacity: 0.9,
+                  fillColor: getColor(feature.properties['Value']),
+                }
+              }
+        }
+
+
         geojs = L.geoJson(new_geojson, {style: style, onEachFeature: onEachFeature}).addTo(map);
         L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container); // fix zoom error
-
-        // leafletImage(map, function(err, canvas) {
-        //     // now you have canvas
-        //     // example thing to do with that canvas:
-        //     var img = document.createElement('img');
-        //     var dimensions = map.getSize();
-        //     img.width = dimensions.x;
-        //     img.height = dimensions.y;
-        //     img.src = canvas.toDataURL();
-        //     img.id = 'images'
-        //     document.getElementById('images').innerHTML = '';
-        //     document.getElementById('images').appendChild(img);
-        // });
 
         hide_spinner();
       })
