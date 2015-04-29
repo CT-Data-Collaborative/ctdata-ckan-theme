@@ -143,6 +143,15 @@ function draw_map(){
           }
         });
 
+        var keys = Object.keys(value_counters);
+        var error = false
+        $.each(keys, function(i){
+          if (value_counters[keys[i]] > 1){
+            error = true
+            return  display_error('Please select more filters.')
+          }
+        });
+
         /**************************************** Draw Map *********************************************/
 
         // get ranges
