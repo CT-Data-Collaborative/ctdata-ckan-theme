@@ -8,8 +8,7 @@ function getColor(d) {
          d >=  legend_items[3] ?  'rgb(102,134,176)' :
          d >=  legend_items[2] ?  'rgb(137,161,196)' :
          d >=  legend_items[1] ?  'rgb(171,187,216)' :
-         d >=  legend_items[0] -1 ?  'rgb(239,239,255)' :
-         d >   -1 ?  'rgb(216, 216, 216)' :
+         d >=  legend_items[0] ?  'rgb(239,239,255)' :
 
          d > -10000 ? 'rgb(222, 134, 9)':
                       '';
@@ -256,7 +255,6 @@ function draw_map(){
                 grades = legend_items,
                 labels = [];
             div.innerHTML += '<i style="background: rgb(222, 134, 9)"></i> Suppressed <br>';
-            div.innerHTML += '<i style="background: rgb(216, 216, 216)"></i> 0 <br>';
             // loop through our density intervals and generate a label with a colored square for each interval
             for (var i = 0; i < grades.length -1 ; i++){
               div.innerHTML +=
