@@ -3,11 +3,10 @@ import datetime
 from ckanext.ctdata_theme.ctdata.utils import dict_with_key_value
 from sets import Set
 from ckanext.ctdata_theme.ctdata.database import Database
-from IPython import embed
+# from IPython import embed
 import psycopg2
 
 from termcolor import colored
-from IPython import embed
 
 class View(object):
     """
@@ -56,29 +55,6 @@ class View(object):
 
         except psycopg2.ProgrammingError:
             result['data'] = []
-
-        ##### collect Margins of Errors data
-
-        # moes = filter( lambda d: d['data'] != [None] and d['dims']['Variable'] == 'Margins of Error', result['data'])
-        # map( lambda m: result['data'].remove(m), moes)
-
-        # for data_item in result['data']:
-        #     temp_data_item = dict(data_item)
-        #     if temp_data_item['data'] != [None]:
-        #         try:
-        #             temp_data_item['dims'].pop('Variable')
-        #         except KeyError:
-        #             pass
-        #         for moes_item in moes:
-        #             temp_moes_item = dict(moes_item)
-        #             if temp_moes_item['data'] != [None]:
-        #                 try:
-        #                     temp_moes_item['dims'].pop('Variable')
-        #                 except KeyError:
-        #                     pass
-        #                 if temp_data_item['dims'] == temp_moes_item['dims']:
-        #                     data_item['moes'] = moes_item['data']
-
         return  result
 
     def get_compatibles(self, filters):
@@ -199,10 +175,10 @@ class ChartView(View):
         geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
 
         towns_from_filters = dict_with_key_value('field', geography_param, filters)['values']
-        years_fltrs = dict_with_key_value('field', 'Year', filters)
+        years_fltrs        = dict_with_key_value('field', 'Year', filters)
         years_from_filters = years_fltrs.get('values') if years_fltrs else None
-        sorted_towns = sorted(towns_from_filters)
-        sorted_years = sorted(map(lambda y: str(y), years_from_filters)) if years_from_filters else []
+        sorted_towns       = sorted(towns_from_filters)
+        sorted_years       = sorted(map(lambda y: str(y), years_from_filters)) if years_from_filters else []
         if towns_from_filters[0].lower() == 'all':
             sorted_towns = []
             sorted_years = []
@@ -211,15 +187,33 @@ class ChartView(View):
         check_town, check_year = 0, 0
 
         last_row_dims = None
-        current_row = None
-        last_dims = None
+        current_row   = None
+        last_dims     = None
         next_row_dims = None
-        cur_year = None
-        current_town = None
+        cur_year      = None
+        current_town  = None
+
+        moes = filter( lambda d: d['Variable'] == 'Margins of Error', data)
+        map( lambda m: data.remove(m), moes)
+
         for row in data:
             next_row_dims = row
-            cur_year = next_row_dims.pop('Year', None)
-            cur_value = next_row_dims.pop('Value', None)
+            cur_value     = next_row_dims.pop('Value', None)
+            cur_moes      = None
+
+            #seach for margins of errors data data
+            temp_data_item = dict(row)
+            temp_data_item.pop('Variable')
+
+            for moes_item in moes:
+                temp_moes_item = dict(moes_item)
+                temp_moes_item.pop('Variable')
+                temp_moes_item.pop('Value')
+
+                if temp_data_item == temp_moes_item:
+                    cur_moes = moes_item['Value']
+
+            cur_year      = next_row_dims.pop('Year', None)
             if cmp(last_row_dims, next_row_dims) != 0:
                 if last_row_dims:
                     while check_year < len(sorted_years):
@@ -230,7 +224,7 @@ class ChartView(View):
                     result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(sorted_years)})
                     check_town += 1
                 current_town = {'dims': {k: str(v) for k, v in next_row_dims.items()},
-                                'data': []}
+                                'data': [], 'moes': []}
                 last_row_dims = next_row_dims
                 check_town += 1
                 check_year = 0
@@ -244,6 +238,8 @@ class ChartView(View):
 
             try:
                 current_town['data'].append(float(cur_value))
+                if cur_moes:
+                    current_town['moes'].append(float(cur_moes))
             except ValueError:
                 current_town['data'].append(None)
             except TypeError:
@@ -261,25 +257,6 @@ class ChartView(View):
             check_town += 1
         result['compatibles'] = self.get_compatibles(filters)
 
-        moes = filter( lambda d: d['data'] != [None] and d['dims']['Variable'] == 'Margins of Error', result['data'])
-        map( lambda m: result['data'].remove(m), moes)
-
-        for data_item in result['data']:
-            temp_data_item = dict(data_item)
-            if temp_data_item['data'] != [None]:
-                try:
-                    temp_data_item['dims'].pop('Variable')
-                except KeyError:
-                    pass
-                for moes_item in moes:
-                    temp_moes_item = dict(moes_item)
-                    if temp_moes_item['data'] != [None]:
-                        try:
-                            temp_moes_item['dims'].pop('Variable')
-                        except KeyError:
-                            pass
-                        if temp_data_item['dims'] == temp_moes_item['dims']:
-                            data_item['moes'] = moes_item['data']
         return result
 
 
