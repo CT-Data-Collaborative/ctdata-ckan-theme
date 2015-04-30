@@ -306,7 +306,7 @@ function set_map_checkbox(){
   //Uncheck all but the first checked for each filter
   filter_lists = $('.filter');
   $.each(filter_lists, function(i){
-    $(filter_lists[i]).find("input:checked:not(." + geography_param+ ", .Year)").slice(1).prop('checked', false);
+    $(filter_lists[i]).find("input:checked:not(." + geography_param+ ", .Year)[value != 'Margins of Error']").slice(1).prop('checked', false);
   });
 
   //Check most recent year
@@ -945,7 +945,7 @@ $(function () {
         is_checked = $(this).prop('checked')
         if (display_type == 'map'){
           $ul = $(this).closest('li').closest('ul')
-          $ul.find('input').prop('checked', false)
+          $ul.find('input[value != "Margins of Error"]').prop('checked', false)
           $(this).prop('checked', is_checked)
         }
         display_data();

@@ -131,6 +131,7 @@ function draw_map(){
             $.each(new_geojson.features, function(j){
               if (new_geojson.features[j].properties['NAME'] == data.data[i]['code'])
                 new_geojson.features[j].properties['Value'] = data.data[i]['value']
+                new_geojson.features[j].properties["MOEs"]  = data.data[i]['moes']
             })
           }
           else{
@@ -199,12 +200,14 @@ function draw_map(){
         // method that we will use to update the control based on feature properties passed
         info.update = function (props) {
           if (props ){
-            var value = props['Value']
+            var value = props['Value'];
+            var moes  = props["MOEs"];
             if (value == '-8888' || value == "") value = 'No value';
             if (value == '-9999') value = 'Suppressed';
 
             value = unit_for_value(value, cur_mt)
-            this._div.innerHTML = '<h4>' + props['NAME'] + '</h4>' + value ;
+            moes  = "<span class='moes'>  ± " + unit_for_value(value, moes) + "</span>"
+            this._div.innerHTML = '<h4><b>' + props['NAME'] + '</b><h4>' + value + ' ' + moes;
           } else
           this._div.innerHTML = '<h4> Hover over a сity </h4>'
         };

@@ -3,7 +3,7 @@ import datetime
 from ckanext.ctdata_theme.ctdata.utils import dict_with_key_value
 from sets import Set
 from ckanext.ctdata_theme.ctdata.database import Database
-# from IPython import embed
+from IPython import embed
 import psycopg2
 
 from termcolor import colored
@@ -392,6 +392,8 @@ class MapView(View):
         geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
 
 
+        moes = filter( lambda d: d['Variable'] == 'Margins of Error', data)
+        map( lambda m: data.remove(m), moes)
 
         for row in data:
             if 'FIPS' in list(row.keys()):
@@ -399,10 +401,24 @@ class MapView(View):
             else:
                 fips = ''
 
-            value = '' if row['Value'] in [None, 'NA'] else float(row['Value'])
+            cur_value  = row.pop('Value', None)
+            value      = '' if cur_value in [None, 'NA'] else float(cur_value)
+            cur_moes   = None
 
-            result['data'].append({'code': row[geography_param], 'value': value, 'fips': fips})
+            #seach for margins of errors data data
+            temp_data_item = dict(row)
+            temp_data_item.pop('Variable')
 
+            for moes_item in moes:
+                temp_moes_item = dict(moes_item)
+                temp_moes_item.pop('Variable')
+                temp_moes_item.pop('Value')
+                if temp_data_item == temp_moes_item:
+                    cur_moes = moes_item['Value']
+
+            moes_value = '' if cur_moes in [None, 'NA'] else float(cur_moes)
+
+            result['data'].append({'code': row[geography_param], 'value': value, 'fips': fips, 'moes': moes_value})
         result['compatibles'] = self.get_compatibles(filters)
         return result
 
