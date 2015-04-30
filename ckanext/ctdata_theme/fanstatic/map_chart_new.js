@@ -125,6 +125,7 @@ function draw_map(){
           });
         }
 
+
         $.each(data.data, function(i){
            if (geography_param != 'Town'){
             $.each(new_geojson.features, function(j){
@@ -134,7 +135,8 @@ function draw_map(){
           }
           else{
             $.each(new_geojson.features, function(j){
-              if (data.data[i] && new_geojson.features[j].properties['NAME'] == data.data[i]['code']){
+              name = new_geojson.features[j].properties['NAME']
+              if (data.data[i] && name == data.data[i]['code'] || name == data.data[i]['code'].substring(0, data.data[i]['code'].length - 1) ){
                 value = data.data[i]['value']
                 new_geojson.features[j].properties['Value'] = value
               }
