@@ -206,7 +206,8 @@ function draw_map(){
             if (value == '-9999') value = 'Suppressed';
 
             value = unit_for_value(value, cur_mt)
-            moes  = "<span class='moes'>  ± " + unit_for_value(value, moes) + "</span>"
+            if (moes != '')
+              moes  = "<span class='moes'>  ± " + unit_for_value(value, moes) + "</span>"
             this._div.innerHTML = '<h4><b>' + props['NAME'] + '</b><h4>' + value + ' ' + moes;
           } else
           this._div.innerHTML = '<h4> Hover over a сity </h4>'
