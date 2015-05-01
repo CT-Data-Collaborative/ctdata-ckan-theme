@@ -439,3 +439,9 @@ span.for_year{
     }
 
 }
+
+span.moes{
+  font-size: 10px;
+  color: gray;
+  padding-left: 5px;
+}

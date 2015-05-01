@@ -125,18 +125,25 @@ function draw_map(){
           });
         }
 
+
         $.each(data.data, function(i){
            if (geography_param != 'Town'){
             $.each(new_geojson.features, function(j){
-              if (data.data[i] && new_geojson.features[j].properties['GEOID'] == data.data[i]['fips'])
+              if (data.data[i] && new_geojson.features[j].properties['GEOID'] == data.data[i]['fips']){
                 new_geojson.features[j].properties['Value'] = data.data[i]['value']
+                new_geojson.features[j].properties["MOEs"]  = data.data[i]['moes']
+              }
             })
           }
           else{
             $.each(new_geojson.features, function(j){
-              if (data.data[i] && new_geojson.features[j].properties['NAME'] == data.data[i]['code']){
+              name = new_geojson.features[j].properties['NAME']
+              if (data.data[i] != undefined)
+                code = data.data[i]['code']
+              if (data.data[i] != undefined && name == code || name == code.substring(0, code.length - 1) ){
                 value = data.data[i]['value']
                 new_geojson.features[j].properties['Value'] = value
+                new_geojson.features[j].properties["MOEs"]  = data.data[i]['moes']
               }
             })
           }
@@ -206,12 +213,15 @@ function draw_map(){
         // method that we will use to update the control based on feature properties passed
         info.update = function (props) {
           if (props ){
-            var value = props['Value']
+            var value = props['Value'];
+            var moes  = props["MOEs"];
             if (value == '-8888' || value == "") value = 'No value';
             if (value == '-9999') value = 'Suppressed';
 
             value = unit_for_value(value, cur_mt)
-            this._div.innerHTML = '<h4>' + props['NAME'] + '</h4>' + value ;
+            if (moes != '')
+              moes  = "<span class='moes'>  ± " + unit_for_value(value, moes) + "</span>"
+            this._div.innerHTML = '<h4><b>' + props['NAME'] + '</b><h4>' + value + ' ' + moes;
           } else
           this._div.innerHTML = '<h4> Hover over a сity </h4>'
         };
