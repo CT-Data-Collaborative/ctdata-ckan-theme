@@ -356,5 +356,7 @@ class CTDataController(base.BaseController):
                             pass
         except KeyError:
             pass
+        except IndexError:
+            pass
 
         return data

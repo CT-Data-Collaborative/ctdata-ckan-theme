@@ -306,7 +306,7 @@ function set_map_checkbox(){
   //Uncheck all but the first checked for each filter
   filter_lists = $('.filter');
   $.each(filter_lists, function(i){
-    $(filter_lists[i]).find("input:checked:not(." + geography_param+ ", .Year)").slice(1).prop('checked', false);
+    $(filter_lists[i]).find("input:checked:not(." + geography_param+ ", .Year)[value != 'Margins of Error']").slice(1).prop('checked', false);
   });
 
   //Check most recent year
@@ -426,6 +426,24 @@ function display_data(){
       hide_spinner();
       error = "Please select a year";
     }
+
+    ch_variables = $("input.Variable:checked[value != 'Margins of Error']");
+    if(ch_variables.length == 0){
+      if (window.location.href.indexOf(geography_param) > -1) {
+          $.ajax({type: "POST",
+              url: "/update_visualization_link/"+dataset_id,
+              data: JSON.stringify({view: 'table', filters: get_filters()}),
+              contentType: 'application/json; charset=utf-8'}).done(function(data) {
+                change_page_url(data.link)
+
+                handle_incompatibilities(data.compatibles)
+              });
+      }
+
+      hide_spinner();
+      error = "Please select a Variable" ;
+    }
+
 
     if (error != ''){
         $("#container_2").html('');
@@ -574,6 +592,12 @@ function draw_table(){
               if (type != undefined)
                 cur_value = unit_for_value(cur_value, type)
 
+              if (data['data'][row_index]['moes'].length != 0){
+                moes_value = data['data'][row_index]['moes'][year_index]
+                if (type != undefined) moes_value = unit_for_value(moes_value, type);
+                cur_value += '<span class="moes"> ± ' + moes_value + '</span>'
+              }
+
               html += "<td class='right_align'>" + cur_value + "</td>";
               col_num++;
             });
@@ -592,6 +616,13 @@ function draw_table(){
             }
             if (type != undefined)
               cur_value = unit_for_value(cur_value, type)
+
+            if (data['data'][row_index]['moes'].length != 0){
+              moes_value = data['data'][row_index]['moes'][year_index]
+              if (type != undefined) moes_value = unit_for_value(moes_value, type);
+              cur_value += '<span class="moes"> ± ' + moes_value + '</span>'
+            }
+
 
             html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
           }
@@ -675,13 +706,13 @@ function draw_chart(){
                                   }),
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         change_page_url(data['link']);
-
         var checked_measure = $('input:checked', $('#collapseMeasureType'))[0] //|| $('input', $('#collapseMeasureType'))[0]
-        var type = checked_measure.value;
-        var series = [];
-        var legend_series = [];
-        var years = data['years'];
-        var series_data = data['data'];
+        var type            = checked_measure.value;
+        var series          = [];
+        var legend_series   = [];
+        var years           = data['years'];
+        var series_data     = data['data'];
+
         $.each(series_data, function(i){
           if (!series_data[i]['dims'])
             return "This series doesn't exist"
@@ -689,9 +720,9 @@ function draw_chart(){
           $.each(cur_series_data, function(i){
             if (cur_series_data[i] == SUPPRESSED_VALUE) cur_series_data[i] = null;
           });
-          cur_series_dims = series_data[i]['dims'];
-          cur_series = {};
-          cur_legend_series = {};
+          cur_series_dims    = series_data[i]['dims'];
+          cur_series         = {};
+          cur_legend_series  = {};
           cur_series['data'] = cur_series_data;
           cur_legend_series['data'] = cur_series_data;
 
@@ -704,14 +735,29 @@ function draw_chart(){
           $.each(cur_series_dims, function(dim_index){
             if (cur_series_dims[dim_index] == "NA")
               return "No value for this dimension"
-            // name += dim_index + ": "+cur_series_dims[dim_index]+"<br> ";
             name += ',' + cur_series_dims[dim_index];
           });
 
+
           name += "</div>";
-          cur_series['name'] = name;
+          cur_series['name'] = town_name;
+          cur_series['type'] = display_type;
           cur_legend_series['name'] = town_name;
           series.push(cur_series);
+
+          if (series_data[i]['moes'].length != 0){
+            cur_series_erorrs =  jQuery.extend({},cur_series);
+            low  = parseInt(cur_series_data) - 5 //parseInt(series_data[i]['moes'])
+            high = parseInt(cur_series_data) + 5 //parseInt(series_data[i]['moes'])
+
+            cur_series_erorrs['data'] = [[low, high]];
+            cur_series_erorrs['type'] = 'errorbar';
+            cur_series_erorrs['name'] = town_name + ' error';
+            cur_series_erorrs.stemWidth = 2;
+            cur_series_erorrs.color = '#FF0000';
+            series.push(cur_series_erorrs);
+          }
+
           legend_series.push(cur_legend_series);
         });
 
@@ -726,9 +772,6 @@ function draw_chart(){
         hide_spinner();
 
         $('#container').highcharts({
-            chart: {
-              type: display_type
-            },
             title: {
               text: ''
             },
@@ -771,9 +814,18 @@ function draw_chart(){
             },
             tooltip: {
               formatter: function () {
-                return '<b>' + this.key + '</b><br>' +
+                if (this.series.linkedSeries.length > 0){
+                  return '<b>' + this.key + '</b><br>' +
                        this.series.name + '<br>' +
-                       'Value: <b>' + unit_for_value(this.y, type) + '</b>';
+                       'Value: <b>' + unit_for_value(this.y, type) + '</b>' + '<br/>' +
+                       'Error range: ' + unit_for_value(this.series.linkedSeries[0]['data'][0].low, type) + ' - ' +
+                       unit_for_value(this.series.linkedSeries[0]['data'][0].high, type);
+                } else{
+                   return '<b>' + this.key + '</b><br>' +
+                       this.series.name + '<br>' +
+                       'Value: <b>' + unit_for_value(this.y, type) + '</b>' + '<br/>';
+
+                }
               }
             },
             credits: {
@@ -893,7 +945,7 @@ $(function () {
         is_checked = $(this).prop('checked')
         if (display_type == 'map'){
           $ul = $(this).closest('li').closest('ul')
-          $ul.find('input').prop('checked', false)
+          $ul.find('input[value != "Margins of Error"]').prop('checked', false)
           $(this).prop('checked', is_checked)
         }
         display_data();

@@ -76,10 +76,18 @@
   {% endif %}
   {% for value in dimension.possible_values %}
     {% if value|length > 0 %}
-    <li id = "{{value}}">
-        <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}">
-        <label for="{{value}}Check" class="checkLabel">{{value}}</label>
-    </li>
+      {% if value != 'Margins of Error' %}
+        <li id = "{{value}}">
+            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}">
+            <label for="{{value}}Check" class="checkLabel">{{value}}</label>
+        </li>
+      {% else %}
+        <li id = "{{value}}" class="hidden">
+            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}" checked>
+            <label for="{{value}}Check" class="checkLabel">{{value}}</label>
+        </li>
+      {% endif %}
+
     {% endif %}
   {% endfor %}
   </ul>
@@ -239,6 +247,7 @@
 <script src="/common/js/jspdf.js"></script>
 <script src="/common/js/jspdf.plugin.addimage.js"></script>
 <script src="/common/js/jspdf.plugin.standard_fonts_metrics.js"></script>
+
 <script>
     // L_PREFER_CANVAS = true; // experimental
   </script>
