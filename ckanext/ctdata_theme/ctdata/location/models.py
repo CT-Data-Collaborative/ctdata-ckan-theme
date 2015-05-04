@@ -57,7 +57,7 @@ class CtdataProfile(Base):
                       backref=backref('profiles', lazy='dynamic'))
 
     indicators     = relationship(ProfileIndicator, backref=backref("profile_indicators", lazy='dynamic'))
-    # indicators     = relationship(ProfileIndicator, backref=backref("profile_indicators", lazy='dynamic'))
+    # indicators     = relationship(ProfileIndicator, backref=backref("profile_indicators"))
 
     def __init__(self, name, global_default, user_id):
         self.name = name

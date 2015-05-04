@@ -8,7 +8,7 @@ function getColor(d) {
          d >=  legend_items[3] ?  'rgb(102,134,176)' :
          d >=  legend_items[2] ?  'rgb(137,161,196)' :
          d >=  legend_items[1] ?  'rgb(171,187,216)' :
-         d >=  legend_items[0] ?  'rgb(239,239,255)' :
+         d >=  legend_items[0] - 1 ?  'rgb(239,239,255)' :
 
          d > -10000 ? 'rgb(222, 134, 9)':
                       '';
@@ -100,8 +100,8 @@ function draw_map(){
             return "Skip data for all of connecticut"
           }
 
-          if (data.data[i]['value'] != '-8888' && data.data[i]['value'] != '-9999' && data.data[i]['value'] != "")
-            all_values.push(data.data[i]['value'])
+          // if (data.data[i]['value'] > -1 && data.data[i]['value'] != "")
+          all_values.push(data.data[i]['value'])
 
           if (data.data[i]['value'] == SUPPRESSED_VALUE){
             if (geography_param != 'Town'){
@@ -161,8 +161,6 @@ function draw_map(){
         else if (break_points_alg == 'Array')
           legend_items = break_points_array
 
-
-
         layer = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
           minZoom: 9,
           maxZoom: 11,
@@ -207,7 +205,7 @@ function draw_map(){
         info.update = function (props) {
           if (props ){
             var value = props['Value']
-            if (value == '-8888' || value == "") value = 'No value';
+            if ((value == '-8888' || value == "") && value != 0) value = 'No value';
             if (value == '-9999') value = 'Suppressed';
 
             value = unit_for_value(value, cur_mt)
@@ -270,7 +268,8 @@ function draw_map(){
         $('.operations').hide();
 
         function style(feature) {
-            if (feature.properties['Value'] == '-8888' || feature.properties['Value'] == "" || feature.properties['Value'] == 'No value'){
+            value = feature.properties['Value']
+            if ((value == '-8888' || value == "" || value == 'No value') && value != 0){
               return {
                   weight: 1,
                   opacity: 1,
