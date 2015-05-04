@@ -738,7 +738,6 @@ function draw_chart(){
             name += ',' + cur_series_dims[dim_index];
           });
 
-
           name += "</div>";
           cur_series['name'] = town_name;
           cur_series['type'] = display_type;
@@ -747,10 +746,14 @@ function draw_chart(){
 
           if (series_data[i]['moes'].length != 0){
             cur_series_erorrs =  jQuery.extend({},cur_series);
-            low  = parseInt(cur_series_data) - 5 //parseInt(series_data[i]['moes'])
-            high = parseInt(cur_series_data) + 5 //parseInt(series_data[i]['moes'])
 
-            cur_series_erorrs['data'] = [[low, high]];
+            cur_series_erorrs['data'] = []
+            $.each(cur_series_data, function(j){
+              low  = parseInt(cur_series_data[j]) - parseInt(series_data[i]['moes'][j])
+              high = parseInt(cur_series_data[j]) + parseInt(series_data[i]['moes'][j])
+              cur_series_erorrs['data'].push([low, high]);
+            });
+
             cur_series_erorrs['type'] = 'errorbar';
             cur_series_erorrs['name'] = town_name + ' error';
             cur_series_erorrs.stemWidth = 2;

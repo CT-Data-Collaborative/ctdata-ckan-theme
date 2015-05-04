@@ -78,12 +78,12 @@
     {% if value|length > 0 %}
       {% if value != 'Margins of Error' %}
         <li id = "{{value}}">
-            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}">
+            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","/")}}">
             <label for="{{value}}Check" class="checkLabel">{{value}}</label>
         </li>
       {% else %}
         <li id = "{{value}}" class="hidden">
-            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}" checked>
+            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","/")}}" checked>
             <label for="{{value}}Check" class="checkLabel">{{value}}</label>
         </li>
       {% endif %}
