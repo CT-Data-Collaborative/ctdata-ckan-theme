@@ -218,7 +218,7 @@ function draw_map(){
 
             value = unit_for_value(value, cur_mt)
             if (moes != '')
-              moes  = "<span class='moes'>  ± " + unit_for_value(value, moes) + "</span>"
+              moes  = "<span class='moes'>  ± " + unit_for_value(moes, cur_mt) + "</span>"
             this._div.innerHTML = '<h4><b>' + props['NAME'] + '</b><h4>' + value + ' ' + moes;
           } else
           this._div.innerHTML = '<h4> Hover over a сity </h4>'
