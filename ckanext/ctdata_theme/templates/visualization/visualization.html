@@ -53,7 +53,6 @@
 
 {% for dimension in dimensions %}
 {% if dimension.possible_values %}
-
 <li class="filter">
   <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
   <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">

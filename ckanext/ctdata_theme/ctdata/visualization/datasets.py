@@ -110,12 +110,27 @@ class Dimension(object):
 
         ordered_values = filter(lambda x: x['key'] == name, meta['extras'])
         correct_order  = ordered_values[0]['value'] if len(ordered_values) > 0 else None
-
         self.name     = name
         self.incompat = incompat  # incompatibilities
 
         if correct_order:
-            self.possible_values = correct_order.replace(', ', ',').split(',')
+            omit_values = ['Rate (per 10,000)']
+
+            #### algorithm to omit dimension values with comma.
+
+            for value in omit_values:
+                if value in correct_order:
+                    correct_order = correct_order.replace(value, value.replace(',', '.'))
+            correct_order = correct_order.replace(', ', ',').split(',')
+
+            correct = []
+            for value in correct_order:
+                for correct_value in omit_values:
+                    if value == correct_value.replace(',', '.'):
+                        value = correct_value
+                    correct.append(value)
+
+            self.possible_values = correct
         else:
             self.possible_values = sorted(possible_values, key = alphanum_key)
 
