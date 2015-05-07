@@ -584,6 +584,12 @@ function draw_table(){
 
               if (jQuery.isNumeric(text) == true && array.length == 1)
                 cur_value = parseInt(text).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+              else{
+                if (jQuery.isNumeric(text) == true && array.length == 2 && array[0].length > 4){
+                  array[0]  = parseInt(array[0]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                  cur_value = array.join('.');
+                }
+              }
 
               type = data['data'][row_index]['dims']['Measure Type']
               if (type == undefined && $('input:checked', $('#collapseMeasureType'))[0] != undefined)
