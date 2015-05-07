@@ -242,7 +242,7 @@ function handle_incompatibles(){
 }
 
 function apply_incompatibles(compatibles){
-    all_inputs = $('.indicator-filter-radio')
+    all_inputs = $('.indicator-filter-radio[name!="Measure Type"]')
     $.each(all_inputs, function(i){
         input = $(all_inputs[i])
         if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
