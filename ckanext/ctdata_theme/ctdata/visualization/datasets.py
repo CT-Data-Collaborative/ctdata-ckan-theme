@@ -115,7 +115,22 @@ class Dimension(object):
         self.incompat = incompat  # incompatibilities
 
         if correct_order:
-            self.possible_values = correct_order.replace(', ', ',').split(',')
+            #### algorithm to omit dimension values with comma.
+            # omit_values = ['Rate (per 10,000)']
+
+            # for value in omit_values:
+            #     if value in correct_order:
+            #         correct_order = correct_order.replace(value, value.replace(',', '.'))
+            # correct_order = correct_order.replace(', ', ',').split(',')
+
+            # correct = []
+            # for value in correct_order:
+            #     for correct_value in omit_values:
+            #         if value == correct_value.replace(',', '.'):
+            #             value = correct_value
+            #         correct.append(value)
+
+            self.possible_values = correct_order.replace('; ', ';').split(';')
         else:
             self.possible_values = sorted(possible_values, key = alphanum_key)
 
