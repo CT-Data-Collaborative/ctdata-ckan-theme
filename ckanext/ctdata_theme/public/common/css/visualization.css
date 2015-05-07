@@ -445,3 +445,9 @@ span.moes{
   color: gray;
   padding-left: 5px;
 }
+
+span.column_value{
+  position: relative;
+  top: -15px;
+  background: white;
+}

@@ -795,16 +795,18 @@ function draw_chart(){
               line: {
                   dataLabels: {
                     enabled: true,
+                    useHTML: true,
                     formatter: function () {
-                      return unit_for_value(this.y, type)
+                      return '<span class="column_value"><em>' + unit_for_value(this.y, type) + '</span></em>'
                     }
                   }
               },
               column: {
                   dataLabels: {
                     enabled: true,
+                    useHTML: true,
                     formatter: function () {
-                      return unit_for_value(this.y, type)
+                      return '<span class="column_value"><em>' + unit_for_value(this.y, type) + '</span></em>'
                     }
                   }
               }
