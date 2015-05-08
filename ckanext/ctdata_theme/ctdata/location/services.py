@@ -108,13 +108,8 @@ class LocationService(object):
     def load_indicator_value_for_location(self, filters, dataset_id, location_names):
         db   = Database()
         conn = db.connect()
-
-
         dataset = DatasetService.get_dataset(dataset_id)
-        dataset_meta    = DatasetService.get_dataset_meta(dataset_id)
-        geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
-        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
-
+        geography_param = DatasetService.get_dataset_meta_geo_type(dataset_id)
 
         filters = json.loads(filters)
         arr     = []

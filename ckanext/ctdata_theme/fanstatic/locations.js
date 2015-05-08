@@ -140,7 +140,7 @@ var create_popup    = $("#create_profile_popup"),
         tr  = tr + "<span class='hidden' id='filters_json'>" + JSON.stringify(ind.filters) + "</span>"
         $(ind.filters).each(function(i){
             filter = ind.filters[i]
-            tr = tr + filter.field + ': ' + filter.values[0]+ ' '
+            tr = tr + filter.field + ': ' + filter.values[0] + ' '
         });
         tr = tr + "</span>  <span class='for_csv hidden'>" + ind.dataset + ', ' + ind.variable + ', '
         $(ind.filters).each(function(i){
@@ -154,6 +154,18 @@ var create_popup    = $("#create_profile_popup"),
 
         $(ind.values).each(function(i){
             value = ind.values[i] || '-'
+            text  = value.toString()
+            array = text.split('.')
+
+              if (jQuery.isNumeric(text) == true && array.length == 1)
+                value = parseInt(text).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+              else{
+                if (jQuery.isNumeric(text) == true && array.length == 2 && array[0].length > 4){
+                  array[0]  = parseInt(array[0]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                  value = array.join('.');
+                }
+              }
+
             tr = tr + "<td class='for_csv'><span class='for_csv'>" + value + "</span></td>"
         });
         tr = tr + "<td class='no-border'>\
@@ -242,7 +254,7 @@ function handle_incompatibles(){
 }
 
 function apply_incompatibles(compatibles){
-    all_inputs = $('.indicator-filter-radio')
+    all_inputs = $('.indicator-filter-radio[name!="Measure Type"]')
     $.each(all_inputs, function(i){
         input = $(all_inputs[i])
         if($.inArray($(all_inputs[i]).val(), compatibles) != -1){

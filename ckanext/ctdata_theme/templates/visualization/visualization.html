@@ -53,7 +53,6 @@
 
 {% for dimension in dimensions %}
 {% if dimension.possible_values %}
-
 <li class="filter">
   <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
   <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
@@ -76,10 +75,18 @@
   {% endif %}
   {% for value in dimension.possible_values %}
     {% if value|length > 0 %}
-    <li id = "{{value}}">
-        <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","\/")}}">
-        <label for="{{value}}Check" class="checkLabel">{{value}}</label>
-    </li>
+      {% if value != 'Margins of Error' %}
+        <li id = "{{value}}">
+            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","/")}}">
+            <label for="{{value}}Check" class="checkLabel">{{value}}</label>
+        </li>
+      {% else %}
+        <li id = "{{value}}" class="hidden">
+            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","/")}}" checked>
+            <label for="{{value}}Check" class="checkLabel">{{value}}</label>
+        </li>
+      {% endif %}
+
     {% endif %}
   {% endfor %}
   </ul>
@@ -205,10 +212,12 @@
 
 
 </div>
+<!-- <div id="map"></div> -->
 
 </div>
 </div>
 
+<div id="images"> </div>
 <!-- Create Headline Indicator Popup -->
 {% snippet 'visualization/snippets/create_headline_indicator.html' %}
 
@@ -229,6 +238,8 @@
 <link rel="stylesheet" type="text/css" href="/common/css/jquery.dataTables.css">
 <link rel="stylesheet" type="text/css" href="/common/css/tableTools.css">
 <link rel="stylesheet" type="text/css" href="/common/css/jquery_ui.css">
+<link rel="stylesheet" type="text/css" href="/common/css/leaflet.css">
+<link rel="stylesheet" type="text/css" media="print" href="/common/css/print.css" />
 
 <script src="/common/js/html2canvas.js"></script>
 <script src="/common/js/canvas-to-blob.js"></script>
@@ -236,8 +247,12 @@
 <script src="/common/js/jspdf.plugin.addimage.js"></script>
 <script src="/common/js/jspdf.plugin.standard_fonts_metrics.js"></script>
 
+<script>
+    // L_PREFER_CANVAS = true; // experimental
+  </script>
+
 {% resource 'ctdata_theme/highcharts_src.js' %}
-{% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/map_src.js' %}
+
 {% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/exporting_src.js' %}
 {% resource 'ctdata_theme/Highmaps-1.0.4/js/modules/data_src.js' %}
 
@@ -249,18 +264,28 @@
 {% resource 'ctdata_theme/bootbox.js' %}
 {% resource 'ctdata_theme/jquery_ui.js' %}
 
-{% resource 'ctdata_theme/map_chart.js' %}
+{% resource 'ctdata_theme/map_chart_new.js' %}
 {% resource 'ctdata_theme/visualization.js' %}
 {% resource 'ctdata_theme/exportintg_functions.js' %}
 
-
+{% resource 'ctdata_theme/leaflet-src.js' %}
+{% resource 'ctdata_theme/jquery.print.js' %}
+{% resource 'ctdata_theme/simple_statistics.js' %}
+{% resource 'ctdata_theme/leaflet-imags.js' %}
 
 <script>
 var defaults = [];
 var disabled = [];
 var units = {};
-var geography_param = 'Town'
+var geography_param    = 'Town';
+var break_points_alg   = '';
+var break_points_array = [];
+var map_json_url       = '';
 
+{% if break_points_al %}
+  break_points_alg   = '{{break_points_al}}'
+  break_points_array = {{break_points_ar}}
+{% endif %}
 {% if geography_param %}
 geography_param = '{{geography_param | safe}}'
 {% endif %}
@@ -268,6 +293,8 @@ geography_param = '{{geography_param | safe}}'
 {% if units %}
 units = {{units | safe}}
 {% endif %}
+
+map_json_url = '{{map_json_url}}'
 
 
 {% if default_filters %}

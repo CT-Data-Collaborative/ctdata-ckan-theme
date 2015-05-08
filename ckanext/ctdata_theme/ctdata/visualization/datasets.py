@@ -110,7 +110,6 @@ class Dimension(object):
 
         ordered_values = filter(lambda x: x['key'] == name, meta['extras'])
         correct_order  = ordered_values[0]['value'] if len(ordered_values) > 0 else None
-
         self.name     = name
         self.incompat = incompat  # incompatibilities
 
