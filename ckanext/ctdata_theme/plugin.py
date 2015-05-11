@@ -57,6 +57,9 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         db.init_community_data(config['ctdata.communities_source'])
 
     def before_map(self, route_map):
+        with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.ctdata.compare.controllers:CompareController') as m:
+            m.connect('compare', '/compare', action='compare')
+
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
             m.connect('news', '/news', action='news')
             m.connect('special_projects', '/special_projects', action='special_projects')
@@ -127,11 +130,15 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
     def get_helpers(self):
         return { 'locations_helper': locations,
                  'geography_types': _geography_types,
+                 'empty_href': _empty_href,
                  'link_to_dataset_with_filters': _link_to_dataset_with_filters}
 
 
 
 ####### HELPER METHODS ##########
+
+def _empty_href():
+    return 'javascript:void(0);'
 
 def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = ''):
     dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
