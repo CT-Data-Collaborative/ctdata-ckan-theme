@@ -97,10 +97,12 @@ class LocationService(object):
         self.session.commit()
 
     def get_profile(self, profile_id):
-        if type(profile_id) is unicode:
-            profile = self.session.query(CtdataProfile).filter(CtdataProfile.name == profile_id).first()
-        else:
+        try:
+            int(profile_id)
             profile = self.session.query(CtdataProfile).filter(CtdataProfile.id == profile_id).first()
+        except ValueError:
+            profile = self.session.query(CtdataProfile).filter(CtdataProfile.name == profile_id).first()
+
         return profile
 
     ################ Indicators ############################################
