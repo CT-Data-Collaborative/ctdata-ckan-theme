@@ -220,19 +220,14 @@ class CTDataController(base.BaseController):
         disabled        = DatasetService.get_dataset_meta_disabled_views(dataset_name)
         metadata_fields = DatasetService.get_dataset_meta_visible_metadata(dataset_name)
         metadata_units  = DatasetService.get_dataset_meta_units(dataset_name)
-        break_points_al = DatasetService.get_dataset_meta_break_points(dataset_name)
+        break_points    = DatasetService.get_dataset_meta_break_points(dataset_name)
         defaults        = DatasetService.get_dataset_meta_default_metadata(dataset_name)
         metadata        = filter(lambda x: x['key'] in metadata_fields, dataset.ckan_meta['extras'])
-        break_points_ar = []
         disable_visualizations = DatasetService.get_dataset_meta_hidden_in(dataset_name)
         map_json_url    = DatasetService.get_dataset_map_json_url(dataset_name)
 
         if 'visualization' in disable_visualizations or dataset.ckan_meta['private']:
            h.redirect_to(controller='package', action='read', id=dataset_name)
-
-        if len(break_points_al.split(' - ')) > 1:
-            break_points_ar = json.loads(break_points_al.split(' - ')[1])
-            break_points_al = break_points_al.split(' - ')[0]
 
         if not ind_filters:
             default_filters = defaults
@@ -266,8 +261,7 @@ class CTDataController(base.BaseController):
                                                              'default_filters': default_filters,
                                                              'headline_indicators': headline_indicators,
                                                              'geography_param': geography_param,
-                                                             'break_points_al': break_points_al,
-                                                             'break_points_ar': break_points_ar,
+                                                             'break_points': break_points,
                                                              'map_json_url': map_json_url })
 
     def update_visualization_link(self, dataset_name):
