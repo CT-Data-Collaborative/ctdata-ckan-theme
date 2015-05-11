@@ -160,13 +160,18 @@ function draw_map(){
 
         /**************************************** Draw Map *********************************************/
 
+        step  = parseFloat((1/break_points.buckets).toFixed(2))
+        array = [0]
+        for (var i = 1; i < break_points.buckets; i++) {
+          array.push(array[i-1] + step )
+        };
+        array.push(1)
+        console.log(array)
         // get ranges
         if (break_points.type == 'jenks')
           legend_items = ss.jenks(all_values, break_points.buckets)
-        else if (break_points.type == 'quartile')
-          legend_items = ss.quantile(all_values, [0, .25, .5, .75, 1])
-        else if (break_points.type == 'quintile' || break_points.type == 'quantile')
-          legend_items = ss.quantile(all_values, [0, .2, .4, .6, .8, 1])
+        else if (break_points.type == 'quintile' || break_points.type == 'quantile' || break_points.type == 'quartile')
+          legend_items = ss.quantile(all_values, array)
         else if (break_points.type == 'array')
           legend_items = break_points.array
 
