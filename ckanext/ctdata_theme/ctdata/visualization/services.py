@@ -75,7 +75,7 @@ class DatasetService(object):
 
     @staticmethod
     def get_dataset_meta_break_points(dataset_id):
-        default = "Jenks"
+        default     = {"type": "jenks", "buckets": 5}
         value   = DatasetService.get_dataset_meta_field(dataset_id, 'Break Points', default)
         return value
 
@@ -132,7 +132,7 @@ class DatasetService(object):
         data    = filter(lambda x: x['key'] == field_name, meta)
 
         try:
-            if field_name not in ['Units', 'Default']:
+            if field_name not in ['Units', 'Default', 'Break Points']:
                 value = yaml.load(data[0]['value']).replace(', ', ',')
             else:
                 value = yaml.load(data[0]['value'])

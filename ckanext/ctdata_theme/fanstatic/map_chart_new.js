@@ -161,12 +161,14 @@ function draw_map(){
         /**************************************** Draw Map *********************************************/
 
         // get ranges
-        if (break_points_alg == 'Jenks')
-          legend_items = ss.jenks(all_values, 5)
-        else if (break_points_alg == 'Quantile')
-          legend_items = ss.quantile(all_values, break_points_array)
-        else if (break_points_alg == 'Array')
-          legend_items = break_points_array
+        if (break_points.type == 'jenks')
+          legend_items = ss.jenks(all_values, break_points.buckets)
+        else if (break_points.type == 'quartile')
+          legend_items = ss.quantile(all_values, [0, .25, .5, .75, 1])
+        else if (break_points.type == 'quintile' || break_points.type == 'quantile')
+          legend_items = ss.quantile(all_values, [0, .2, .4, .6, .8, 1])
+        else if (break_points.type == 'array')
+          legend_items = break_points.array
 
         layer = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
           minZoom: 9,
@@ -269,7 +271,7 @@ function draw_map(){
                 '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
                 grades[i] + ' &ndash; ' + grades[i + 1] + '<br>';
             }
-            div.innerHTML += '<br> Breaks type: ' + break_points_alg
+            div.innerHTML += '<br> Breaks type: ' + break_points.type
             return div;
         };
 
