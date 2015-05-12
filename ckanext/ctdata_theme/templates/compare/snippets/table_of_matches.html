@@ -1,0 +1,26 @@
+<div class="spn6">
+<table class="table table-bordered">
+  <thead>
+    <th> Dataset Name </th>
+    <th> Geo Type </th>
+    <th> Geo Type Matches? </th>
+    <th> Number of matches </th>
+    <th> Matches </th>
+  </thead>
+  <tbody>
+    {% for item in comparable %}
+    <tr>
+      <td>{{item['dataset_name']}}</td>
+      <td>{{item['geo_type']}}</td>
+      <td>{{item['geo_type_match']}}</td>
+      <td>{{item['filters_matches_number']}}</td>
+      <td>
+        {% for match in item['filters_values_matches']%}
+          <p> <b>{{match.keys()[0]}}</b>: {{match.values()[0]}}</p>
+        {% endfor %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>

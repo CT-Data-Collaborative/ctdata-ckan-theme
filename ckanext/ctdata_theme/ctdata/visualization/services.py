@@ -131,7 +131,7 @@ class DatasetService(object):
         default = []
         value   = DatasetService.get_dataset_meta_field(dataset_id, 'Dimensions', default)
         if value != default:
-            value = value.split(',')
+            value = value.split(';')
         return value
 
     @staticmethod

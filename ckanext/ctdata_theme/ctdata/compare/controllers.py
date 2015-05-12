@@ -35,7 +35,7 @@ class CompareController(base.BaseController):
         return base.render('compare/compare.html', extra_vars={'dataset_names': dataset_names})
 
     def load_comparable_datasets(self, dataset_name):
-        array = self.compare_service.get_comparable_datasets(dataset_name)
-        embed()
-         # html  = base.render('communities/snippets/indicator_popup.html', extra_vars={'topics': topics, 'geography_types': geography_types})
-        return json.dumps({'success': True, 'html': ''})
+        comparable, years = self.compare_service.get_comparable_datasets(dataset_name)
+
+        html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable, 'years': years})
+        return json.dumps({'success': True, 'html': html})

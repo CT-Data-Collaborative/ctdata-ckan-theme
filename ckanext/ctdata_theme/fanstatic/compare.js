@@ -5,10 +5,9 @@ function load_comparable_datasets(dataset_name){
   $.ajax({type: "GET",
       url: "/compare/load_comparable_datasets/" + dataset_name,
       success: function (data) {
-          // $('#loaded_topics').append($(data.html));
-          // $('#add_indicator').removeClass('disabled')
-          // $('#create_profile_button').removeClass('disabled')
-          // $('#save_profile_as_default').removeClass('disabled')
+        data = JSON.parse(data)
+        $('#datasets_to_compare_with').html('')
+        $('#datasets_to_compare_with').html($(data.html));
       }
   });
 }
