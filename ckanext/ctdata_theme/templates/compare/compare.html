@@ -24,20 +24,10 @@
       </select>
     </div>
 
-    <div class="control-group">
-      <label class="control-label"> With </label>
-      <select class="">
-        <option selected="true" value="empty" class="" id="">
-          <span class="">-- Select Dataset --</span>
-          <span class="caretbox"><span class="caret"></span></span>
-        </option>
-        {% for name in dataset_names %}
-          <option value="{{name}}" class="" id="{{name}}"> {{name|replace("-", " ")|title}} </option>
-        {% endfor %}
-      </select>
-    </div>
-
   </form>
+
+  <div id="datasets_to_compare_with">
+  </div>
 </div>
 
 </div>
