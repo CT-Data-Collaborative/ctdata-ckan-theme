@@ -781,6 +781,7 @@ function draw_chart(){
         hide_spinner();
 
         $('#container').highcharts({
+            chart: { backgroundColor:'transparent' },
             title: {
               text: ''
             },
