@@ -1,4 +1,4 @@
-<div class="spn6">
+<div class="span11">
 <table class="table table-bordered">
   <thead>
     <th> Dataset Name </th>
@@ -16,11 +16,22 @@
       <td>{{item['filters_matches_number']}}</td>
       <td>
         {% for match in item['filters_values_matches']%}
-          <p> <b>{{match.keys()[0]}}</b>: {{match.values()[0]}}</p>
+          <p> <b>{{match.keys()[0]}}</b>:
+            {% for item in match.values()[0] %}
+              {{item}} {% if not loop.last %} , {% endif %}
+            {% endfor %}
+          </p>
         {% endfor %}
       </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+</div>
+
+<div class="span2">
+  <h3> Years ({{years|length}})</h3>
+  {% for year in years %}
+    <p> {{year}} </p>
+  {% endfor %}
 </div>
