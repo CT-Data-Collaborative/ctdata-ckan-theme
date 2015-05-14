@@ -16,14 +16,12 @@ class CompareService(object):
         if len(f_value) == 7:
           splitted  = f_value.split('-')
           formatted = splitted[0] + '-20' + splitted[1]
-          # print formatted
           return f_value in main_filter_values or formatted in main_filter_values
 
         else:
           if len(f_value) == 9:
             splitted  = f_value.split('-')
             formatted = splitted[0] + '-' + splitted[1][-2:]
-            # print formatted
             return f_value in main_filter_values or formatted in main_filter_values
 
       return False
@@ -63,7 +61,7 @@ class CompareService(object):
               values_matches = filter(lambda f_value: f_value in main_filter_values, filter_values)
             if values_matches != []:
               filters_values_matches.append({dim_match: values_matches})
-              filters_matches_number = filters_matches_number + len(filters_values_matches)
+              filters_matches_number = filters_matches_number + len(values_matches)
 
           item = {
             'dataset_name': name,
