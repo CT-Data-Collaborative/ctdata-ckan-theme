@@ -450,4 +450,5 @@ span.column_value{
   position: relative;
   top: -15px;
   background: white;
+  z-index: -1 !important;
 }
