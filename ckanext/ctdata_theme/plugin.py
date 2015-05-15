@@ -55,6 +55,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
         db.init_sa(config['sqlalchemy.url'])
         db.init_community_data(config['ctdata.communities_source'])
+        db.init_years_data(config['ckan.datastore.write_url'])
 
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.ctdata.compare.controllers:CompareController') as m:

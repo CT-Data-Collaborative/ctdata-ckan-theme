@@ -17,7 +17,6 @@ from ..visualization.services import DatasetService
 from ..topic.services import TopicSerivce
 from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
-# from services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
 from ..location.services import LocationService
 from services import CompareService
 
@@ -32,10 +31,11 @@ class CompareController(base.BaseController):
 
     def compare(self):
         dataset_names = toolkit.get_action('package_list')(data_dict={})
-        return base.render('compare/compare.html', extra_vars={'dataset_names': dataset_names})
+        years = sorted(self.compare_service.get_years())
+        return base.render('compare/compare.html', extra_vars={'dataset_names': dataset_names, 'years': years})
 
     def load_comparable_datasets(self, dataset_name):
-        comparable, years = self.compare_service.get_comparable_datasets(dataset_name)
+        comparable = self.compare_service.get_comparable_datasets(dataset_name)
 
-        html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable, 'years': years})
+        html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable})
         return json.dumps({'success': True, 'html': html})

@@ -4,9 +4,18 @@ import ckan.plugins.toolkit as toolkit
 from ..utils import dict_with_key_value
 from ..visualization.services import DatasetService
 from ..community.services import CommunityProfileService
+from models import CtdataYears
 from IPython import embed
 
+from ..database import Database
+from termcolor import colored
+
 class CompareService(object):
+
+    @staticmethod
+    def get_years():
+      session = Database().session_factory()
+      return session.query(CtdataYears).all()
 
     @staticmethod
     def compare_years(f_value, main_filter_values):
@@ -33,7 +42,6 @@ class CompareService(object):
       main_dims     = DatasetService.get_dataset_meta_dimensions(dataset_name)
       main_geo_type = DatasetService.get_dataset_meta_geo_type(dataset_name)
       comparable    = []
-      years         = ''
 
       for name in dataset_names:
         dataset  = toolkit.get_action('package_show')(data_dict={'id': name})
@@ -41,10 +49,6 @@ class CompareService(object):
         geo_type = DatasetService.get_dataset_meta_geo_type(name)
 
         if not dataset['private'] and name != dataset_name:
-          d_years    = DatasetService.get_dataset_meta_field(name, 'Year', [])
-          if d_years != []:
-            years += ';' + d_years
-
           dims_matches = filter(lambda dim: dim in main_dims, dims )
           filters_values_matches = []
           filters_matches_number = 0
@@ -76,6 +80,5 @@ class CompareService(object):
           comparable.append(item)
 
       comparable = sorted(comparable, key=lambda k: k['filters_matches_number'], reverse=True)
-      years = sorted(list(set(years.split(';'))))
 
-      return comparable, years
+      return comparable
