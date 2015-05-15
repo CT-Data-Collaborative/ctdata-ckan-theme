@@ -5,11 +5,14 @@
 {% block page_description %}{% endblock %}
 
 {% block main_content %}
-<!-- <div class="ctdata-wrapper"> -->
-<div class="text-center">
+
+<div>
   <div class="span4">
-    <h3> Years ({{years|length}})</h3>
+     Years ({{years|length }})
+    <a href="{{h.empty_href()}}" class="disabled btn btn-mini btn-default" id="update_years"> Save changes </a>
     <br>
+    <br>
+    <p> <small> Use comma sign to divide values </small></p>
     <table class="table table-bordered">
       <thead>
         <th>Year</th>
@@ -20,17 +23,19 @@
         {% for year in years %}
           <tr>
             <td> {{year.year}} </td>
-            <td> {{year.matches}} </td>
-            <!-- <td>
-              <a href="{{h.empty_href()}}" class="edit-year"> edit </a>
-            </td> -->
+            <td class="span2">
+              <span class="matches"> {{year.matches}} </span>
+              <a href="{{h.empty_href()}}" class="edit_matches pull-right icon-pencil btn btn-mini btn-default"> </a>
+              <input type='text' class="edit_year_matches hidden" id="{{year.id}}" value="{{year.matches}}">
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
+
   </div>
 
-  <div class="span11">
+  <div class="span11 text-center">
     <form class="form-horizontal span6 offset2">
 
     <div class="control-group">
@@ -54,12 +59,25 @@
 
 </div>
 
-<!-- </div> -->
+<div id="message_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content.text-center">
+            <div class="modal-body disable-scroll" id="message">
+
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button class="btn close_popup">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
-<link rel="stylesheet" type="text/css" href="/common/css/visualization.css">
 <link rel="stylesheet" type="text/css" href="/common/css/jquery_ui.css">
 
 {% resource 'ctdata_theme/compare.js' %}

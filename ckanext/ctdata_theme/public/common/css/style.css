@@ -564,4 +564,9 @@ a.underlined_on_hover:hover{
   text-decoration: underline;
 };
 
-
+.edit_matches{
+  font-size: 10px;
+  color: black !important;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
