@@ -1,5 +1,5 @@
 import urlparse
-
+import yaml
 import psycopg2
 import sqlalchemy
 from sqlalchemy import create_engine
@@ -10,10 +10,15 @@ from visualization.models import VisualizationOrmBase
 from location.models import CtdataProfile, Location, LocationProfile
 from .utils import Singleton
 from community.models import Base, CommunityProfile, Town
+from compare.models import CtdataYears
 
 from sqlalchemy.pool import NullPool
 from termcolor import colored
 from IPython import embed
+
+import ckan.plugins.toolkit as toolkit
+import ckan.logic as logic
+from termcolor import colored
 
 class Database(object):
     __metaclass__ = Singleton
@@ -76,6 +81,67 @@ class Database(object):
                 profile = CtdataProfile(str(location.name), True, None)
                 session.add(profile)
 
+
+            curr.close()
+            del curr
+            conn.close()
+
+        session.commit()
+        session.close()
+
+
+    def init_years_data(self, connection_string):
+        session = self.session_factory()
+
+        if session.query(CtdataYears).count() == 0:
+            conn = self.connect()
+            curr = conn.cursor()
+
+            ####### Fill table with years and initial matches
+            #1. Get years
+            dataset_names = toolkit.get_action('package_list')(data_dict={})
+            all_years     = ''
+
+            for name in dataset_names:
+                years   = ''
+                try:
+                    meta    = toolkit.get_action('package_show')(data_dict={'id': name})['extras']
+
+                    data    = filter(lambda x: x['key'] == 'Year', meta)
+
+                    try:
+                      years = yaml.load(data[0]['value'])
+                    except TypeError:
+                      years = []
+                    except AttributeError:
+                      years = []
+                    except IndexError:
+                      years = []
+
+                    if years != []:
+                        if ',' in str(years):
+                            years = str(years).replace(',', ';')
+
+                        all_years += ';' + str(years)
+                except AttributeError:
+                    pass
+            #2. add years
+            all_years = all_years.split(';')
+
+            for year in all_years:
+                if year != '':
+                    formatted = ''
+                    year_to_put = year
+                    if len(str(year)) == 7:
+                      splitted  = str(year).split('-')
+                      formatted = splitted[0] + '-20' + splitted[1]
+                    else:
+                      if len(str(year)) == 9:
+                        splitted  = str(year).split('-')
+                        formatted = splitted[0] + '-' + splitted[1][-2:]
+
+                    new_year = CtdataYears(year_to_put, str(formatted))
+                    session.add(new_year)
 
             curr.close()
             del curr

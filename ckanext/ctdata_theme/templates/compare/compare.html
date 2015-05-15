@@ -5,11 +5,33 @@
 {% block page_description %}{% endblock %}
 
 {% block main_content %}
-<div class="ctdata-wrapper">
+<!-- <div class="ctdata-wrapper"> -->
 <div class="text-center">
-  <!-- <a href="{{h.empty_href()}}"> Choose Dataset </a> -->
+  <div class="span4">
+    <h3> Years ({{years|length}})</h3>
+    <br>
+    <table class="table table-bordered">
+      <thead>
+        <th>Year</th>
+        <th>Matches</th>
+        <!-- <th></th> -->
+      </thead>
+      <tbody>
+        {% for year in years %}
+          <tr>
+            <td> {{year.year}} </td>
+            <td> {{year.matches}} </td>
+            <!-- <td>
+              <a href="{{h.empty_href()}}" class="edit-year"> edit </a>
+            </td> -->
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-  <form class="form-horizontal span6 offset4">
+  <div class="span11">
+    <form class="form-horizontal span6 offset2">
 
     <div class="control-group">
       <label class="control-label"> Compare </label>
@@ -24,13 +46,15 @@
       </select>
     </div>
 
-  </form>
-
-  <div id="datasets_to_compare_with">
+    </form>
+    <br>
+    <div id="datasets_to_compare_with">
+    </div>
   </div>
-</div>
 
 </div>
+
+<!-- </div> -->
 {% endblock %}
 
 {% block scripts %}
