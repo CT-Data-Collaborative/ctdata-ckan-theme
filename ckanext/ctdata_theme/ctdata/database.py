@@ -126,7 +126,7 @@ class Database(object):
                 except AttributeError:
                     pass
             #2. add years
-            all_years = all_years.split(';')
+            all_years = sorted( list(set(all_years.split(';'))) )
 
             for year in all_years:
                 if year != '':
