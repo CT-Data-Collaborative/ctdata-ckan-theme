@@ -15,7 +15,17 @@ class CompareService(object):
     @staticmethod
     def get_years():
       session = Database().session_factory()
-      return session.query(CtdataYears).all()
+      return session.query(CtdataYears).order_by(CtdataYears.year).all()
+
+    @staticmethod
+    def udpdate_year_matches(year_id, matches):
+      session = Database().session_factory()
+      year    = session.query(CtdataYears).filter(CtdataYears.id == year_id).first()
+      year.matches = matches
+
+      session.commit()
+      return year
+
 
     @staticmethod
     def compare_years(f_value, main_filter_values):

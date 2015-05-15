@@ -544,3 +544,9 @@ a.underlined{
 .modal {
   width: 700px;
 }
+.edit_matches{
+  font-size: 10px;
+  color: black !important;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}

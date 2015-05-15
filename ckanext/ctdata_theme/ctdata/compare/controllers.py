@@ -31,7 +31,7 @@ class CompareController(base.BaseController):
 
     def compare(self):
         dataset_names = toolkit.get_action('package_list')(data_dict={})
-        years = sorted(self.compare_service.get_years())
+        years = self.compare_service.get_years()
         return base.render('compare/compare.html', extra_vars={'dataset_names': dataset_names, 'years': years})
 
     def load_comparable_datasets(self, dataset_name):
@@ -39,3 +39,23 @@ class CompareController(base.BaseController):
 
         html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable})
         return json.dumps({'success': True, 'html': html})
+
+    def update_years_matches(self):
+        user_name    = http_request.environ.get("REMOTE_USER")
+
+        if not user_name:
+            abort(401)
+        if http_request.method == 'POST':
+            user = self.user_service.get_or_create_user(user_name) if user_name else None
+
+            json_body   = json.loads(http_request.body, encoding=http_request.charset)
+            names_hash  = json_body.get('names_hash')
+            # years_to_remove  = json_body.get('profiles_to_remove')
+
+            for year_id, matches in names_hash.iteritems():
+                self.compare_service.udpdate_year_matches(int(year_id), matches)
+
+            # for profile_id in profiles_to_remove:
+            #     self.location_service.remove_profile(int(profile_id), user.ckan_user_id)
+
+        return json.dumps({'success': True })
