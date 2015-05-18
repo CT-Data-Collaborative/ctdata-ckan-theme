@@ -104,5 +104,9 @@ class CompareService(object):
           comparable.append(item)
 
       comparable = sorted(comparable, key=lambda k: k['filters_matches_number'], reverse=True)
+      dataset_info = {}
 
-      return comparable
+      for dim in main_dims:
+        dataset_info[dim] = DatasetService.get_dataset_meta_field(dataset_name, dim, '')
+
+      return comparable, dataset_info

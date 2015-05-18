@@ -33,9 +33,9 @@ class CompareController(base.BaseController):
         return base.render('compare/admin_compare.html', extra_vars={'dataset_names': dataset_names, 'years': years})
 
     def load_comparable_datasets(self, dataset_name):
-        comparable = self.compare_service.get_comparable_datasets(dataset_name)
+        comparable, dataset_info = self.compare_service.get_comparable_datasets(dataset_name)
 
-        html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable})
+        html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable, 'dataset_info': dataset_info})
         return json.dumps({'success': True, 'html': html})
 
     def create_year_matches(self):
