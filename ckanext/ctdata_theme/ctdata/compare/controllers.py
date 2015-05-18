@@ -8,7 +8,7 @@ from pylons import session, url
 import ckan.lib.base as base
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
-from ckan.common import response as http_response, request as http_request
+from ckan.common import response as http_response, c, request as http_request
 import ckan.lib.helpers as h
 
 from ..database import Database
@@ -25,14 +25,12 @@ from termcolor import colored
 
 class CompareController(base.BaseController):
     def __init__(self):
-        # self.session         = Database().session_factory()
-        # self.user_service    = UserService(self.session)
         self.compare_service = CompareService
 
     def compare(self):
         dataset_names = toolkit.get_action('package_list')(data_dict={})
         years = self.compare_service.get_years()
-        return base.render('compare/compare.html', extra_vars={'dataset_names': dataset_names, 'years': years})
+        return base.render('compare/admin_compare.html', extra_vars={'dataset_names': dataset_names, 'years': years})
 
     def load_comparable_datasets(self, dataset_name):
         comparable = self.compare_service.get_comparable_datasets(dataset_name)
@@ -43,12 +41,10 @@ class CompareController(base.BaseController):
     def create_year_matches(self):
         user_name    = http_request.environ.get("REMOTE_USER")
 
-        #TODO check id user an admin
-        if not user_name:
+        if not user_name or not c.userobj.sysadmin:
             abort(401)
         if http_request.method == 'POST':
-            # user = self.user_service.get_or_create_user(user_name) if user_name else None
-            # embed()
+
             json_body = json.loads(http_request.body, encoding=http_request.charset)
             year      = json_body.get('year')
             matches   = json_body.get('year_matches')
@@ -61,12 +57,10 @@ class CompareController(base.BaseController):
     def update_years_matches(self):
         user_name    = http_request.environ.get("REMOTE_USER")
 
-        #TODO check id user an admin
-        if not user_name:
+        if not user_name or not c.userobj.sysadmin:
             abort(401)
-        if http_request.method == 'POST':
-            # user = self.user_service.get_or_create_user(user_name) if user_name else None
 
+        if http_request.method == 'POST':
             json_body   = json.loads(http_request.body, encoding=http_request.charset)
             names_hash  = json_body.get('names_hash')
             years_to_remove  = json_body.get('years_to_remove')

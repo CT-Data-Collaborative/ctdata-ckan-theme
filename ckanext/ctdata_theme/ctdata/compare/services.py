@@ -46,19 +46,16 @@ class CompareService(object):
 
     @staticmethod
     def compare_years(f_value, main_filter_values):
-      if len(f_value) == 4:
-        return f_value in main_filter_values
-      else:
-        if len(f_value) == 7:
-          splitted  = f_value.split('-')
-          formatted = splitted[0] + '-20' + splitted[1]
-          return f_value in main_filter_values or formatted in main_filter_values
+      session = Database().session_factory()
 
-        else:
-          if len(f_value) == 9:
-            splitted  = f_value.split('-')
-            formatted = splitted[0] + '-' + splitted[1][-2:]
-            return f_value in main_filter_values or formatted in main_filter_values
+      if f_value in main_filter_values:
+        return True
+      else:
+        for value in main_filter_values:
+          year_value = session.query(CtdataYears).filter(CtdataYears.year == value).first()
+          matches    = year_value.matches.split(',') if year_value.matches else []
+          if f_value in matches:
+              return True
 
       return False
 
