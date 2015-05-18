@@ -1,4 +1,17 @@
 <div class="span11">
+<div id="dataset-info" class="text-left info row">
+  <h3> Dataset Info</h3>
+  <hr>
+  {% for key, value in dataset_info.iteritems()%}
+    <b class="col-xs-4">{{key}} :</b> <span class="col-xs-9">
+    {% for v in value.split(';')%}
+      {{v}} {% if not loop.last %} , {% endif %}
+    {% endfor %}
+    </span>
+    <br>
+  {% endfor %}
+</div>
+<br>
 <table class="table table-bordered">
   <thead>
     <th> Dataset Name </th>
