@@ -711,7 +711,7 @@ function draw_chart(){
                                   }),
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         change_page_url(data['link']);
-        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0] //|| $('input', $('#collapseMeasureType'))[0]
+        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0]
         var type            = checked_measure.value;
         var series          = [];
         var legend_series   = [];
