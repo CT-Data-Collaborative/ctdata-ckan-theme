@@ -1,11 +1,11 @@
-<div id="topnav">
-<div class="spacing">
+<div id="topnav" class="row">
+<div class="spacing col-md-12">
 <ul>
-<li><a href="https://twitter.com/CTOpenData"><i class="fa fa-twitter fa-lg"></i></a></li>
-<li><a href="https://www.facebook.com/pages/CT-Data-Collaborative/150954425018093"><i class="fa fa-facebook fa-lg"></i></a></li>
-<li><a href="/pages/about">About </a></li>
-<li><a href="/pages/news">News</a></li>
-<li><a href="mailto:info@ctdata.org">Contact</a></li>
+<li class="col-xs-1"><a href="https://twitter.com/CTOpenData"><i class="fa fa-twitter fa-lg"></i></a></li>
+<li class="col-xs-1"><a href="https://www.facebook.com/pages/CT-Data-Collaborative/150954425018093"><i class="fa fa-facebook fa-lg"></i></a></li>
+<li class="col-xs-2"><a href="/pages/about">About </a></li>
+<li class="col-xs-2"><a href="/pages/news">News</a></li>
+<li class="col-xs-2"><a href="mailto:info@ctdata.org">Contact</a></li>
 {% if c.userobj %}
     <li>
         <a href="{{ h.url_for(controller='user', action='read', id=c.userobj.name) }}" class="image" title="{{ _('View profile') }}">
@@ -14,7 +14,7 @@
         </a>
     </li>
     {% set new_activities = h.new_activities() %}
-    <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
+    <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %} col-xs-2">
     {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)', 'Dashboard (%(num)d new items)', new_activities) %}
     <a href="{{ h.url_for(controller='user', action='dashboard') }}" title="{{ notifications_tooltip }}">
         <i class="icon-dashboard"></i>
@@ -32,16 +32,16 @@
         </a>
     </li>
 {% else %}
-<li>{% link_for _('Login'), controller='user', action='login' %}</li>
-<li>{% link_for _('Register'), controller='user', action='register', class_='sub' %}</li>
+<li class="col-xs-1">{% link_for _('Login'), controller='user', action='login' %}</li>
+<li class="col-xs-1">{% link_for _('Register'), controller='user', action='register', class_='sub' %}</li>
 {% endif %}
 </ul>
 </div>
 </div>
 
-<div id="hdr">
+<div id="hdr" class="row">
   <div class="spacing">
-    <div class="logo">
+    <div class="logo col-md-2">
       {% if c.action != 'data_gallery' %}
       <a href="/"><img src="/common/images/logo-main.jpg" alt="Connecticut Data Collaborative - Changing the way Connecticut uses data" border="0"/></a>
 
@@ -50,14 +50,14 @@
       {% endif %}
     </div>
 
-    <div class="headernav">
+    <div id="" class="col-md-10">
     <ul>
-      <li><a href="/data_by_topic"><i class="fa fa-play-circle"></i>Data by Topic</a></li>
-      <li><a href="/location"><i class="fa fa-play-circle"></i>Data by Location</a></li>
-      <li><a href="/organization"><i class="fa fa-play-circle"></i>Datasets by Organization</a></li>
-      <li><a href="/pages/data-gallery"><i class="fa fa-play-circle"></i>Data Gallery</a></li>
-      <li><a href="/pages/special-projects"><i class="fa fa-play-circle"></i>Special Projects</a></li>
-      <li><a href="http://nccsweb.urban.org/communityplatform/ct" target="_blank"><i class="fa fa-play-circle"></i>CT Non-profit Strategy Platform</a></li>
+      <li class="col-xs-2"><a href="/data_by_topic"><i class="fa fa-play-circle"></i>Data by Topic</a></li>
+      <li class="col-xs-2"><a href="/location"><i class="fa fa-play-circle"></i>Data by Location</a></li>
+      <li class="col-xs-2"><a href="/organization"><i class="fa fa-play-circle"></i>Datasets by Organization</a></li>
+      <li class="col-xs-2"><a href="/pages/data-gallery"><i class="fa fa-play-circle"></i>Data Gallery</a></li>
+      <li class="col-xs-2"><a href="/pages/special-projects"><i class="fa fa-play-circle"></i>Special Projects</a></li>
+      <li class="col-xs-2"><a href="http://nccsweb.urban.org/communityplatform/ct" target="_blank"><i class="fa fa-play-circle"></i>CT Non-profit Strategy Platform</a></li>
     </ul>
     </div>
 
