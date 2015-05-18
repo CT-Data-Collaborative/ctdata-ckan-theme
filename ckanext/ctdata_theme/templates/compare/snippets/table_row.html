@@ -1,0 +1,13 @@
+<tr>
+  <td class="bordered"> {{year.year}} </td>
+  <td class="span2 bordered">
+    <span class="matches"> {{year.matches}} </span>
+    <a href="{{h.empty_href()}}" class="edit_matches pull-right icon-pencil btn btn-mini btn-default"> </a>
+    <input type='text' class="edit_year_matches hidden" id="{{year.id}}" value="{{year.matches}}">
+  </td>
+  <td class="no-border">
+    <a href="{{h.empty_href()}}" id="{{year.id}}" class="hide_year" style="height: inherit;">
+      <img class="close_pic" style="opacity: 0; margin-left: 10px" src="/common/images/close_pic.png">
+    </a>
+  </td>
+</tr>

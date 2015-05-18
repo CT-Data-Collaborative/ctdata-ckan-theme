@@ -570,3 +570,17 @@ a.underlined_on_hover:hover{
   padding-top: 3px;
   padding-bottom: 3px;
 }
+
+.add-year{
+  font-size: 10px;
+  position: relative;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  left: 10px;
+  top: -5px;
+}
+
+td:hover a.hide_year img{
+  opacity: 1.0 !important;
+}
+

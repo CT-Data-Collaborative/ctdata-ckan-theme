@@ -25,8 +25,8 @@ from termcolor import colored
 
 class CompareController(base.BaseController):
     def __init__(self):
-        self.session         = Database().session_factory()
-        self.user_service    = UserService(self.session)
+        # self.session         = Database().session_factory()
+        # self.user_service    = UserService(self.session)
         self.compare_service = CompareService
 
     def compare(self):
@@ -40,22 +40,41 @@ class CompareController(base.BaseController):
         html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable})
         return json.dumps({'success': True, 'html': html})
 
-    def update_years_matches(self):
+    def create_year_matches(self):
         user_name    = http_request.environ.get("REMOTE_USER")
 
+        #TODO check id user an admin
         if not user_name:
             abort(401)
         if http_request.method == 'POST':
-            user = self.user_service.get_or_create_user(user_name) if user_name else None
+            # user = self.user_service.get_or_create_user(user_name) if user_name else None
+            # embed()
+            json_body = json.loads(http_request.body, encoding=http_request.charset)
+            year      = json_body.get('year')
+            matches   = json_body.get('year_matches')
+
+            year = self.compare_service.create_year_matches(year, matches)
+            html = base.render('compare/snippets/table_row.html', extra_vars={'year': year})
+
+        return json.dumps({'success': True, 'html': html })
+
+    def update_years_matches(self):
+        user_name    = http_request.environ.get("REMOTE_USER")
+
+        #TODO check id user an admin
+        if not user_name:
+            abort(401)
+        if http_request.method == 'POST':
+            # user = self.user_service.get_or_create_user(user_name) if user_name else None
 
             json_body   = json.loads(http_request.body, encoding=http_request.charset)
             names_hash  = json_body.get('names_hash')
-            # years_to_remove  = json_body.get('profiles_to_remove')
+            years_to_remove  = json_body.get('years_to_remove')
 
             for year_id, matches in names_hash.iteritems():
                 self.compare_service.udpdate_year_matches(int(year_id), matches)
 
-            # for profile_id in profiles_to_remove:
-            #     self.location_service.remove_profile(int(profile_id), user.ckan_user_id)
+            for year_id in years_to_remove:
+                self.compare_service.remove_year(int(year_id))
 
         return json.dumps({'success': True })
