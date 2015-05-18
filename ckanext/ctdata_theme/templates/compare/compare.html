@@ -12,8 +12,14 @@
     <a href="{{h.empty_href()}}" class="disabled btn btn-mini btn-default" id="update_years"> Save changes </a>
     <br>
     <br>
+    <form id="new_year">
     <p> <small> Use comma sign to divide values </small></p>
-    <table class="table table-bordered">
+
+    <input name="year" type="text" class="span1" placeholder="Year" required>
+    <input name="year_matches" type="text" class="span2" placeholder="Matches">
+    <a class="btn btn-mini btn-success add-year icon-plus" href="{{h.empty_href()}}"></a>
+    </form>
+    <table class="table">
       <thead>
         <th>Year</th>
         <th>Matches</th>
@@ -21,14 +27,7 @@
       </thead>
       <tbody>
         {% for year in years %}
-          <tr>
-            <td> {{year.year}} </td>
-            <td class="span2">
-              <span class="matches"> {{year.matches}} </span>
-              <a href="{{h.empty_href()}}" class="edit_matches pull-right icon-pencil btn btn-mini btn-default"> </a>
-              <input type='text' class="edit_year_matches hidden" id="{{year.id}}" value="{{year.matches}}">
-            </td>
-          </tr>
+          {% snippet 'compare/snippets/table_row.html', year=year %}
         {% endfor %}
       </tbody>
     </table>
