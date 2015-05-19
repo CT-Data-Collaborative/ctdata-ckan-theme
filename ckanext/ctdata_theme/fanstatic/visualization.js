@@ -76,7 +76,6 @@ function update_headline_indicators(){
         names_hash[$(this).attr('id')]= $(this).val();
     });
 
-
     $.ajax({type: "POST",
       url: "/dataset/"+dataset_id+"/update_indicators",
       data: JSON.stringify({ names_hash: names_hash,
@@ -712,7 +711,7 @@ function draw_chart(){
                                   }),
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
         change_page_url(data['link']);
-        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0] //|| $('input', $('#collapseMeasureType'))[0]
+        var checked_measure = $('input:checked', $('#collapseMeasureType'))[0]
         var type            = checked_measure.value;
         var series          = [];
         var legend_series   = [];
@@ -745,7 +744,7 @@ function draw_chart(){
           });
 
           name += "</div>";
-          cur_series['name'] = town_name;
+          cur_series['name'] = name;
           cur_series['type'] = display_type;
           cur_legend_series['name'] = town_name;
           series.push(cur_series);
