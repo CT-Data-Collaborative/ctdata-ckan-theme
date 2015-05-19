@@ -27,15 +27,22 @@ class CompareController(base.BaseController):
     def __init__(self):
         self.compare_service = CompareService
 
-    def compare(self):
+    def admin_compare(self):
         dataset_names = toolkit.get_action('package_list')(data_dict={})
         years = self.compare_service.get_years()
         return base.render('compare/admin_compare.html', extra_vars={'dataset_names': dataset_names, 'years': years})
 
+    def compare(self):
+        dataset_names = toolkit.get_action('package_list')(data_dict={})
+
+        return base.render('compare/compare.html', extra_vars={'dataset_names': dataset_names})
+
     def load_comparable_datasets(self, dataset_name):
         comparable, dataset_info = self.compare_service.get_comparable_datasets(dataset_name)
-
-        html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable, 'dataset_info': dataset_info})
+        if  '/admin' in c.environ['PATH_INFO']:
+            html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable, 'dataset_info': dataset_info})
+        else:
+            html = base.render('compare/snippets/dataset_matches.html', extra_vars={'comparable': comparable})
         return json.dumps({'success': True, 'html': html})
 
     def create_year_matches(self):
