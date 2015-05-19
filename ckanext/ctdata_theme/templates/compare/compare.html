@@ -1,0 +1,58 @@
+{% extends "page.html" %}
+
+
+{% block page_name %}Compare Data{% endblock %}
+{% block page_description %}{% endblock %}
+
+{% block main_content %}
+
+<div class="">
+  <div class="text-center row">
+    <form class="form-horizontal">
+
+    <div class="control-group">
+      <h4> Choose The First Dataset : </h4>
+      <br>
+      <select id="dataset_name">
+        <option selected="true" value="empty" class="text-center" id="">
+          <span class="">-- Select Dataset --</span>
+          <span class="caretbox"><span class="caret"></span></span>
+        </option>
+        {% for name in dataset_names %}
+          <option value="{{name}}" class="" id="{{name}}"> {{name|replace("-", " ")|title}} </option>
+        {% endfor %}
+      </select>
+    </div>
+    </form>
+
+    <br>
+    <div id="datasets_to_compare_with" class="offset3">
+    </div>
+  </div>
+
+</div>
+
+<div id="message_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content.text-center">
+            <div class="modal-body disable-scroll" id="message">
+
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button class="btn close_popup">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <link rel="stylesheet" type="text/css" href="/common/css/compare.css">
+
+  {% resource 'ctdata_theme/compare.js' %}
+
+{% endblock %}
