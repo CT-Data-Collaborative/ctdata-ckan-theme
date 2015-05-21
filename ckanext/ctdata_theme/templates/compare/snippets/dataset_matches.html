@@ -1,16 +1,19 @@
-<div class="row text-left" id="compare_with">
-  <ul>
-    {% for item in comparable %}
-      {% if item['filters_matches_number'] > 0 %}
-        <li class="span6">
-          <span class="pull-left">{{item['dataset_name']|replace("-", " ")|title}}</span>
-          {% if item['filters_matches_number'] > 5 %}
-            <a class="btn btn-success btn-mini pull-right" ><strong> {{item['filters_matches_number']}} | Compare</strong></a>
-          {% else %}
-            <a class="btn btn-default btn-mini pull-right" ><strong> {{item['filters_matches_number']}} | Compare</strong></a>
-          {% endif %}
-        <li>
-      {% endif %}
-    {% endfor %}
-  </ul>
+<div class="">
+  <h4> Choose The Second One : </h4>
+  <select id="compare_with">
+    <option selected="true" value="empty" class="text-center" id="">
+          <span class="">-- Select Dataset --</span>
+          <span class="caretbox"><span class="caret"></span></span>
+        </option>
+  {% for item in comparable %}
+    {% if item['filters_matches_number'] > 0 %}
+      <option value="{{item['dataset_name']}}" class="" id="{{item['dataset_name']}}">
+        <span class="pull-left">
+         {{item['dataset_name']|replace("-", " ")|title}}
+        </span>
+
+      </option>
+    {% endif %}
+  {% endfor %}
+  </select>
 </div>

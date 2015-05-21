@@ -2,17 +2,22 @@
 
 
 {% block page_name %}Compare Data{% endblock %}
-{% block page_description %}{% endblock %}
+{% block page_description %}<h3>
+  <span id="dataset_name_val"></span>
+  vs
+  <span id="compare_with_val"></span></h3>
+{% endblock %}
 
 {% block main_content %}
 
-<div class="">
-  <div class="text-center row">
+<div class="row">
+  <div class="span3 selects">
+    <h2>Datasets</h2>
+    <br>
     <form class="form-horizontal">
 
     <div class="control-group">
       <h4> Choose The First Dataset : </h4>
-      <br>
       <select id="dataset_name">
         <option selected="true" value="empty" class="text-center" id="">
           <span class="">-- Select Dataset --</span>
@@ -25,12 +30,44 @@
     </div>
     </form>
 
-    <br>
-    <div id="datasets_to_compare_with" class="offset3">
+    <div id="datasets_to_compare_with" class="">
     </div>
   </div>
 
+
+  <div class="span2 data">
+      <h2>Data</h2>
+       <div id="y_axe" class="">
+        <span class="axe_name"> Y </span>
+        <div class="droppable ui-widget-header "></div>
+      </div>
+
+      <div id="x_axe" class="">
+        <span class="axe_name"> X </span>
+        <div class="droppable ui-widget-header "></div>
+      </div>
+      <br>
+      <hr style="position: relative; left: -10%">
+      <div id="matches">
+        <ul>
+          <li class="scale_variant"> Town <a href="javascript:void" class="cancel-drag pull-right icon-remove hidden" ></a></li>
+        </ul>
+      </div>
+
+   </div>
+
+  <div class="span8 graphic">
+      <!-- <h2>Graphic</h2> -->
+
+      <div id="container">
+      </div>
+   </div>
+
 </div>
+
+
+
+
 
 <div id="message_popup" class="modal fade" style="display: none">
     <div class="modal-dialog modal-lg">
@@ -52,7 +89,11 @@
 {% block scripts %}
   {{ super() }}
   <link rel="stylesheet" type="text/css" href="/common/css/compare.css">
+  <link rel="stylesheet" type="text/css" href="/common/css/jquery_ui.css">
 
   {% resource 'ctdata_theme/compare.js' %}
+  {% resource 'ctdata_theme/jquery_ui.js' %}
+  {% resource 'ctdata_theme/vega.js' %}
+  {% resource 'ctdata_theme/d3_v3_min.js' %}
 
 {% endblock %}
