@@ -66,6 +66,7 @@ class CompareService(object):
       main_dims     = DatasetService.get_dataset_meta_dimensions(dataset_name)
       main_geo_type = DatasetService.get_dataset_meta_geo_type(dataset_name)
       comparable    = []
+      matches       = {}
 
       for name in dataset_names:
         dataset  = toolkit.get_action('package_show')(data_dict={'id': name})
@@ -75,6 +76,7 @@ class CompareService(object):
         if not dataset['private'] and name != dataset_name:
           dims_matches = filter(lambda dim: dim in main_dims, dims )
           filters_values_matches = []
+          values = []
           filters_matches_number = 0
           for dim_match in dims_matches:
             main_f_values_data = DatasetService.get_dataset_meta_field(dataset_name, dim_match, [])
@@ -88,6 +90,7 @@ class CompareService(object):
             else:
               values_matches = filter(lambda f_value: f_value in main_filter_values, filter_values)
             if values_matches != []:
+              values.extend(values_matches)
               filters_values_matches.append({dim_match: values_matches})
               filters_matches_number = filters_matches_number + len(values_matches)
 
@@ -102,6 +105,7 @@ class CompareService(object):
             }
 
           comparable.append(item)
+          matches[name] = filters_values_matches
 
       comparable = sorted(comparable, key=lambda k: k['filters_matches_number'], reverse=True)
       dataset_info = {}
@@ -109,4 +113,4 @@ class CompareService(object):
       for dim in main_dims:
         dataset_info[dim] = DatasetService.get_dataset_meta_field(dataset_name, dim, '')
 
-      return comparable, dataset_info
+      return comparable, dataset_info, matches
