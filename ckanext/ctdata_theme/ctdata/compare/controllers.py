@@ -34,21 +34,23 @@ class CompareController(base.BaseController):
 
     def compare(self):
         dataset_names = toolkit.get_action('package_list')(data_dict={})
-
-        # json_body    = json.loads(http_request.body, encoding=http_request.charset)
-        # dataset_name = json_body.get('dataset')
-        # compare_with = json_body.get('compare_with')
-
         return base.render('compare/compare.html', extra_vars={'dataset_names': dataset_names})
 
     def load_comparable_datasets(self, dataset_name):
         comparable, dataset_info, matches = self.compare_service.get_comparable_datasets(dataset_name)
+        main_geo_type = DatasetService.get_dataset_meta_geo_type(dataset_name)
 
         if 'admin' in c.environ['HTTP_REFERER']:
             html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable, 'dataset_info': dataset_info})
         else:
             html = base.render('compare/snippets/dataset_matches.html', extra_vars={'comparable': comparable})
-        return json.dumps({'success': True, 'html': html, 'matches': matches})
+        return json.dumps({'success': True, 'html': html, 'matches': matches, 'main_geo_type': main_geo_type, 'comparable': comparable})
+
+    def join_for_two_datasets(self):
+        json_body    = json.loads(http_request.body, encoding=http_request.charset)
+        data         = self.compare_service.get_join_data_for_two_datasets(json_body)
+
+        return json.dumps({'success': True, 'data': {}})
 
     def create_year_matches(self):
         user_name    = http_request.environ.get("REMOTE_USER")

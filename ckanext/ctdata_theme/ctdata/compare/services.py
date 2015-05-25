@@ -9,6 +9,7 @@ from IPython import embed
 
 from ..database import Database
 from termcolor import colored
+import psycopg2
 
 class CompareService(object):
 
@@ -74,13 +75,21 @@ class CompareService(object):
         geo_type = DatasetService.get_dataset_meta_geo_type(name)
 
         if not dataset['private'] and name != dataset_name:
-          dims_matches = filter(lambda dim: dim in main_dims, dims )
+          dims_matches           = filter(lambda dim: dim in main_dims, dims )
+          dims_no_matches        = filter(lambda dim: dim not in dims_matches, dims )
+          main_dims_no_matches   = filter(lambda dim: dim not in dims_matches, main_dims )
           filters_values_matches = []
-          values = []
+          values                 = []
           filters_matches_number = 0
+          main_no_matches        = []
+          no_matches             = []
+          dataset_info           = {}
+
+          # get all maches
           for dim_match in dims_matches:
             main_f_values_data = DatasetService.get_dataset_meta_field(dataset_name, dim_match, [])
             main_filter_values = main_f_values_data.split(';') if main_f_values_data != [] else []
+            dataset_info[dim_match]  = main_f_values_data
 
             f_values_data = DatasetService.get_dataset_meta_field(name, dim_match, [])
             filter_values = f_values_data.split(';') if f_values_data != [] else []
@@ -94,6 +103,19 @@ class CompareService(object):
               filters_values_matches.append({dim_match: values_matches})
               filters_matches_number = filters_matches_number + len(values_matches)
 
+          # get all values that user will must select for MAIN DATASET (the first one user chose)
+          for dim in main_dims_no_matches:
+            f_values_data      = DatasetService.get_dataset_meta_field(dataset_name, dim, [])
+            dataset_info[dim]  = f_values_data
+            filter_values      = f_values_data.split(';') if f_values_data != [] else []
+            main_no_matches.append({dim: filter_values})
+
+          # get all values that user will must select for DATASET TO COMPARE(the second one user chose)
+          for dim in dims_no_matches:
+            f_values_data = DatasetService.get_dataset_meta_field(name, dim, [])
+            filter_values = f_values_data.split(';') if f_values_data != [] else []
+            no_matches.append({dim: filter_values})
+
           item = {
             'dataset_name': name,
             'geo_type': geo_type,
@@ -101,16 +123,65 @@ class CompareService(object):
             'dims_matches_number': len(dims_matches),
             'dims_matches': dims_matches,
             'filters_matches_number': filters_matches_number,
-            'filters_values_matches': filters_values_matches
+            'filters_values_matches': filters_values_matches,
+            'no_matches': no_matches,
+            'main_no_matches': main_no_matches
             }
 
           comparable.append(item)
           matches[name] = filters_values_matches
 
       comparable = sorted(comparable, key=lambda k: k['filters_matches_number'], reverse=True)
-      dataset_info = {}
 
-      for dim in main_dims:
-        dataset_info[dim] = DatasetService.get_dataset_meta_field(dataset_name, dim, '')
+
+      # for dim in main_dims:
+      #   dataset_info[dim] = DatasetService.get_dataset_meta_field(dataset_name, dim, '')
 
       return comparable, dataset_info, matches
+
+    @staticmethod
+    def get_join_data_for_two_datasets(json_body):
+      data = []
+
+      dataset_name = json_body.get('main_dataset')
+      compare_name = json_body.get('compare_with')
+      matches      = json_body.get('matches')
+      x            = json_body.get('x')
+      y            = json_body.get('y')
+      color        = json_body.get('color')
+      size         = json_body.get('size')
+      shape        = json_body.get('shape')
+
+      dataset      = DatasetService.get_dataset(dataset_name)
+      compare_with = DatasetService.get_dataset(compare_name)
+
+      database = Database()
+
+      try:
+        conn = database.connect()
+        if conn:
+            curs = conn.cursor()
+            curs.execute('''SELECT * FROM public."%s" ''' % (dataset.table_name))
+            dataset_data = curs.fetchall()
+
+            curs = conn.cursor()
+            curs.execute('''SELECT * FROM public."%s" ''' % (compare_with.table_name))
+            compare_data = curs.fetchall()
+
+            conn.commit()
+            curs.close()
+            del curs
+            conn.close()
+
+      except psycopg2.ProgrammingError:
+            data = []
+
+      # embed()
+
+      return data
+
+
+
+
+
+

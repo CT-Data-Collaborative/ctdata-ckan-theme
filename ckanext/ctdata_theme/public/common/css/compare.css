@@ -24,9 +24,17 @@ div.small select{
   min-height: 500px;
 }
 
-#matches ul{
+.marks_select{
   position: relative;
   left: -15%;
+  top: 5px;
+  font-size: 9px;
+  width: 70px;
+  height: 20px;
+}
+#matches ul{
+  /*position: relative;
+  left: -15%;*/
 }
 
 li.scale_variant{
@@ -52,7 +60,7 @@ li.scale_variant{
   padding: 100px;
 }
 
-#y_axe, #x_axe{
+#y_axe, #x_axe, #color, #size, #shape{
   /*z-index: -999;*/
   /*min-width: 100px;*/
   width: auto !important;
@@ -91,12 +99,12 @@ li.scale_variant{
 }
 
 .dropped{
-  background-color: #DCEBD2 !important;
+  background-color: #F3FBFF !important;
 }
 
 .droppable li.scale_variant{
   border:none;
-  background: rgba(240, 240, 240, 0.59)
+  background: rgba(153, 222, 245, 0.68);
 }
 
 .ui-state-hover{
@@ -112,4 +120,46 @@ li.scale_variant{
 a.cancel-drag{
   color: #4670A7 !important;
   text-align: left !important;
+}
+
+#main_dataset_dimensions, #compare_dataset_dimensions{
+  width: 48%;
+  overflow: scroll;
+  margin: 10px;
+}
+
+#compare_dataset_dimensions{
+  margin-top: 20px;
+}
+
+#main_dataset_dimensions{
+  float: left;
+  border-right: 1px dashed #EEE;
+}
+
+label:after {
+  content: "";
+}
+
+label input{
+  position: relative;
+  top: 3px !important;
+  margin-right: 10px !important;
+  margin-left: 2px !important;
+}
+
+#common_dimensions{
+  margin: 10px;
+  width: 98%;
+  border: 1px dashed #EEE;
+  background: aliceblue;
+  padding: 10px;
+}
+
+.span11{
+  width: 960px;
+}
+
+ul#main, ul#compare{
+  padding: 10px;
 }

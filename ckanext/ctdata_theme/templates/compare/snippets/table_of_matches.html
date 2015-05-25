@@ -4,9 +4,11 @@
   <hr>
   {% for key, value in dataset_info.iteritems()%}
     <b class="col-xs-4">{{key}} :</b> <span class="col-xs-9">
-    {% for v in value.split(';')%}
+    {% if value != [] %}
+    {% for v in value.split(';') %}
       {{v}} {% if not loop.last %} , {% endif %}
     {% endfor %}
+    {% endif %}
     </span>
     <br>
   {% endfor %}
@@ -19,11 +21,13 @@
     <th> Geo Type Matches? </th>
     <th> Number of matches </th>
     <th> Matches </th>
+    <th> Dimensions From Selected Dataset That Must Be Checked By User </th>
+    <th> Dimensions From Current Row Dataset That Must Be Checked By User </th>
   </thead>
   <tbody>
     {% for item in comparable %}
     <tr>
-      <td>{{item['dataset_name']}}</td>
+      <td><a href="{{item['dataset_name']}}">{{item['dataset_name']|replace("-", " ")|title}}</a></td>
       <td>{{item['geo_type']}}</td>
       <td>{{item['geo_type_match']}}</td>
       <td>{{item['filters_matches_number']}}</td>
@@ -33,6 +37,24 @@
             {% for item in match.values()[0] %}
               {{item}} {% if not loop.last %} , {% endif %}
             {% endfor %}
+          </p>
+        {% endfor %}
+      </td>
+      <td>
+        {% for not_match in item['main_no_matches'] %}
+          <p> <b>{{not_match.keys()[0]}}</b>
+            <!-- {% for item in not_match.values()[0] %}
+              {{item}} {% if not loop.last %} , {% endif %}
+            {% endfor %} -->
+          </p>
+        {% endfor %}
+      </td>
+      <td>
+        {% for not_match in item['no_matches'] %}
+          <p> <b>{{not_match.keys()[0]}}</b>
+            <!-- {% for item in not_match.values()[0] %}
+              {{item}} {% if not loop.last %} , {% endif %}
+            {% endfor %} -->
           </p>
         {% endfor %}
       </td>
