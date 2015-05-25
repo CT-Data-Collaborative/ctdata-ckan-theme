@@ -73,7 +73,7 @@ function update_headline_indicators(){
     names_hash = {}
 
     $('.edit_name').map(function(){
-        names_hash[$(this).attr('id')]= $(this).val();
+      names_hash[$(this).attr('id')]= $(this).val();
     });
 
     $.ajax({type: "POST",

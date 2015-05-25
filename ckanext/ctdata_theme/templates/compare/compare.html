@@ -2,10 +2,10 @@
 
 
 {% block page_name %}Compare Data{% endblock %}
-{% block page_description %}<h3>
-  <span id="dataset_name_val"></span>
-  vs
-  <span id="compare_with_val"></span></h3>
+{% block page_description %}
+  <span id="dataset_name_val" style="color: black;"></span>
+  <span>vs</span>
+  <span id="compare_with_val" style="color: black;"></span>
 {% endblock %}
 
 {% block main_content %}
@@ -32,6 +32,13 @@
 
     <div id="datasets_to_compare_with" class="">
     </div>
+
+    <!-- <br> -->
+    <hr>
+    <div id="matches">
+      <ul></ul>
+    </div>
+
   </div>
 
 
@@ -39,20 +46,40 @@
       <h2>Data</h2>
        <div id="y_axe" class="">
         <span class="axe_name"> Y </span>
-        <div class="droppable ui-widget-header "></div>
+        <div class="droppable ui-widget-header" id="y"></div>
       </div>
 
       <div id="x_axe" class="">
         <span class="axe_name"> X </span>
-        <div class="droppable ui-widget-header "></div>
+        <div class="droppable ui-widget-header" id="x"></div>
       </div>
       <br>
-      <hr style="position: relative; left: -10%">
-      <div id="matches">
-        <ul>
-          <li class="scale_variant"> Town <a href="javascript:void" class="cancel-drag pull-right icon-remove hidden" ></a></li>
-        </ul>
+      <h2> <span style="position:relative; left: -20px;">Marks</span>
+
+      <select id="change_mark_type" class="marks_select pull-right">
+        <option value="symbol" selected="selected" label="point">symbol</option>
+        <!-- <option value="tick" label="tick">rect</option> -->
+        <option value="bar" label="bar">arc</option>
+        <option value="line" label="line">line</option>
+        <option value="area" label="area">area</option>
+        <!-- <option value="text" label="text">text</option> -->
+      </select>
+      </h2>
+      <div id="color" class="">
+        <span class="axe_name icon-adjust"></span>
+        <div class="droppable ui-widget-header" id="color_s"></div>
       </div>
+
+      <div id="size" class="">
+        <span class="axe_name icon-resize-horizontal"></span>
+        <div class="droppable ui-widget-header" id="size_s"></div>
+      </div>
+
+      <div id="size" class="">
+        <span class="axe_name icon-th-large"> </span>
+        <div class="droppable ui-widget-header" id="size_s"></div>
+      </div>
+
 
    </div>
 
@@ -65,9 +92,7 @@
 
 </div>
 
-
-
-
+{% snippet 'compare/snippets/choose_uniq_options_per_filter_popup.html' %}
 
 <div id="message_popup" class="modal fade" style="display: none">
     <div class="modal-dialog modal-lg">
