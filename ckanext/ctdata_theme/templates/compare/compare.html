@@ -34,12 +34,15 @@
     </div>
 
     <!-- <br> -->
+
     <hr>
+    <div><a href="{{h.empty_href()}}" class="update-filters btn btn-default hidden"> Update Filters </a></div>
     <div id="matches">
       <ul></ul>
     </div>
 
   </div>
+
 
 
   <div class="span2 data">
@@ -116,6 +119,7 @@
   <link rel="stylesheet" type="text/css" href="/common/css/compare.css">
   <link rel="stylesheet" type="text/css" href="/common/css/jquery_ui.css">
 
+  {% resource 'ctdata_theme/to_title_case.js' %}
   {% resource 'ctdata_theme/compare.js' %}
   {% resource 'ctdata_theme/jquery_ui.js' %}
   {% resource 'ctdata_theme/vega.js' %}

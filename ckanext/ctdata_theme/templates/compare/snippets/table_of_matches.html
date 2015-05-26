@@ -27,7 +27,7 @@
   <tbody>
     {% for item in comparable %}
     <tr>
-      <td><a href="{{item['dataset_name']}}">{{item['dataset_name']|replace("-", " ")|title}}</a></td>
+      <td><a href="/dataset/{{item['dataset_name']}}">{{item['dataset_name']|replace("-", " ")|title}}</a></td>
       <td>{{item['geo_type']}}</td>
       <td>{{item['geo_type_match']}}</td>
       <td>{{item['filters_matches_number']}}</td>

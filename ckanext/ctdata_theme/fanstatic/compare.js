@@ -10,52 +10,11 @@ var $main_dataset_select = $("select#dataset_name"),
     size                 = '';
     comparable           = []
 
-String.prototype.toTitleCase = function() {
-  var i, j, str, lowers, uppers;
-  str = this.replace(/([^\W_]+[^\s-]*) */g, function(txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-  });
-
-  // Certain minor words should be left lowercase unless
-  // they are the first or last words in the string
-  lowers = ['A', 'An', 'The', 'And', 'But', 'Or', 'For', 'Nor', 'As', 'At',
-  'By', 'For', 'From', 'In', 'Into', 'Near', 'Of', 'On', 'Onto', 'To', 'With'];
-  for (i = 0, j = lowers.length; i < j; i++)
-    str = str.replace(new RegExp('\\s' + lowers[i] + '\\s', 'g'),
-      function(txt) {
-        return txt.toLowerCase();
-      });
-
-  // Certain words such as initialisms or acronyms should be left uppercase
-  uppers = ['Id', 'Tv'];
-  for (i = 0, j = uppers.length; i < j; i++)
-    str = str.replace('-', ' ').replace(new RegExp('\\b' + uppers[i] + '\\b', 'g'),
-      uppers[i].toUpperCase());
-
-  return str;
-}
-
-function load_comparable_datasets(dataset_name){
-  $.ajax({type: "GET",
-      url: "/compare/load_comparable_datasets/" + dataset_name,
-      success: function (data) {
-        data = JSON.parse(data)
-        $('#datasets_to_compare_with').html('')
-        $('#datasets_to_compare_with').html($(data.html));
-        $compare_with_select = $("select#compare_with")
-        matches = data.matches
-        main_geo_type = data.main_geo_type
-        comparable = data.comparable
-      }
-  });
-}
-
 function close_popup(){
   $('.close_popup').on('click',function() {
     $(this).closest('div.modal').modal('hide');
   });
 }
-
 
 function draw_graph(){
   $('#container').html('');
@@ -162,7 +121,7 @@ function draw_graph(){
 function get_data(){
   $.ajax({type: "POST",
     url: "/compare/join_for_two_datasets/",
-    data: JSON.stringify({ main_dataset: $main_dataset_select.val(), compare_with: $compare_with_select.val(), matches: matches, x: x_axe_name, y: y_axe_name, color: color, size: size, shape: shape}),
+    data: JSON.stringify({ main_dataset: $main_dataset_select.val(), compare_with: $compare_with_select.val(), filters: get_filters()}),
     contentType: 'application/json; charset=utf-8',
     success: function (data) {
       debugger
@@ -174,25 +133,57 @@ function addScale(name){
   $("#matches ul").append('<li class="scale_variant">' + name + '<a href="javascript:void" class="cancel-drag pull-right icon-remove hidden" ></a></li>')
 }
 
-function show_common_li(name){
-  without_spaces = name.replace(/\s/g, '-')
-  $("ul.common_dimensions").append('<li class="common_li"> <h3>' + name + '</h3><ul class="common_li_ul '+ without_spaces +'"></ul></li>')
+function show_matches_in_popup(dataset_matches){
+  $.each(dataset_matches, function(i, item){
+    key = Object.keys(item)[0]
+    without_spaces = key.replace(/\s/g, '-')
+    addScale(key)
+    $("ul.common_dimensions").append('<li class="common_li"> <h4>' + key + '</h4><ul class="common_li_ul '+ without_spaces +'"></ul></li>')
+    $('.scale_variant').draggable({revert: "invalid", helper: "clone"})
+    $.each(item[key], function(j, value){
+      $('ul[class="common_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel></li>')
+    })
+  });
 }
 
-function show_main_li(name){
+function show_non_matches_for_main_dataset_in_popup(main_no_matches){
+  $.each(main_no_matches, function(i, item){
+    key = Object.keys(item)[0]
+    without_spaces = key.replace(/\s/g, '-')
+    $("ul#main.left_dimensions").append('<li class="main_li"> <h4>' + key + '</h4><ul class="main_li_ul '+ without_spaces +'"></ul></li>')
 
+    $.each(item[key], function(j, value){
+      $('ul[class="main_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel></li>')
+    })
+  });
 }
 
-function show_commin_li_ul_li(dimension, value){
-  without_spaces = dimension.replace(/\s/g, '-')
-  // debugger
-  $('ul[class="common_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel</li><br>')
+function show_non_matches_for_comapre_dataset_in_popup(no_matches){
+  $.each(no_matches, function(i, item){
+    key = Object.keys(item)[0]
+    without_spaces = key.replace(/\s/g, '-')
+    $("ul#compare.left_dimensions").append('<li class="compare_li"> <h4>' + key + '</h4><ul class="compare_li_ul '+ without_spaces +'"></ul></li>')
+
+    $.each(item[key], function(j, value){
+      $('ul[class="compare_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel></li>')
+    })
+  });
 }
 
-function show_main_li_ul_li(dimension, value){
-  without_spaces = dimension.replace(/\s/g, '-')
-  $('ul[class="main_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel</li><br>')
+function check_first_inputs(){
+  $('.common_li_ul').each(function(i){
+    $($('.common_li_ul')[i]).find('input').first().attr('checked', true)
+    $($('.main_li_ul')[i]).find('input').first().attr('checked', true)
+    $($('.compare_li_ul')[i]).find('input').first().attr('checked', true)
+  })
 }
+
+function get_filters() {
+  return $('ul').find('input:checked').map(function(i, e) {
+      return {field: $(e).attr('name'), values: [$(e).val()]}
+  }).get();
+}
+
 
 $(document).ready(function(){
   close_popup()
@@ -224,7 +215,6 @@ $(document).ready(function(){
       }
       $(ui.draggable).detach().css({top: 0,left: 0}).appendTo(this);
 
-      get_data();
       draw_graph();
     }
   });
@@ -244,9 +234,13 @@ $(document).ready(function(){
   $(document).on('change', "select#compare_with" , function(){
     $('#dataset_name_val').text( $main_dataset_select.val().toTitleCase() )
     $('#compare_with_val').text( $(this).val().toTitleCase() )
+    $("#matches ul").html('');
+    $("ul.common_dimensions").html('');
+    $('#main_dataset_dimensions').html('<ul class="left_dimensions" id="main"></ul>')
+    $('#compare_dataset_dimensions').html('<ul class="left_dimensions" id="compare"></ul>')
     $('#main_dataset_dimensions').prepend('<h3>' + $main_dataset_select.val().toTitleCase() + '</h3>')
     $('#compare_dataset_dimensions').prepend('<h3>' + $(this).val().toTitleCase() + '</h3>')
-    $("#matches ul").html('');
+    $('.update-filters').removeClass('hidden')
 
     compare_dataset_data = comparable.filter(function( item) {
                           if (item['dataset_name'] == $("select#compare_with").val())
@@ -254,45 +248,22 @@ $(document).ready(function(){
                         })[0]
 
     addScale(main_geo_type)
+    show_matches_in_popup(matches[$(this).val()])
+    show_non_matches_for_main_dataset_in_popup(compare_dataset_data.main_no_matches)
+    show_non_matches_for_comapre_dataset_in_popup(compare_dataset_data.no_matches)
 
-    dataset_matches = matches[$(this).val()]
-
-    $.each(dataset_matches, function(i, item){
-      key = Object.keys(item)[0]
-      addScale(key)
-      show_common_li(key)
-      $('.scale_variant').draggable({revert: "invalid", helper: "clone"})
-      $.each(item[key], function(j, value){
-        $("#matches ul").append('<li class="">' + value + '</li>' )
-        show_commin_li_ul_li(key, value)
-      })
-    });
-
-    $.each(compare_dataset_data.main_no_matches, function(i, item){
-      key = Object.keys(item)[0]
-      without_spaces = key.replace(/\s/g, '-')
-      $("ul#main.left_dimensions").append('<li class="main_li"> <h3>' + key + '</h3><ul class="main_li_ul '+ without_spaces +'"></ul></li>')
-
-      $.each(item[key], function(j, value){
-        $('ul[class="main_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel</li><br>')
-      })
-    });
-
-    $.each(compare_dataset_data.no_matches, function(i, item){
-      key = Object.keys(item)[0]
-      without_spaces = key.replace(/\s/g, '-')
-      $("ul#compare.left_dimensions").append('<li class="compare_li"> <h3>' + key + '</h3><ul class="compare_li_ul '+ without_spaces +'"></ul></li>')
-
-      $.each(item[key], function(j, value){
-        $('ul[class="compare_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel</li><br>')
-      })
-    });
-
-    // debugger
+    check_first_inputs()
     $('#select_uniq_values_popup').modal('show');
   });
 
+  $('#continue_button').on('click', function(){
+    get_data();
+  })
+
   draw_graph();
 
+  $('.update-filters').on('click', function(){
+    $('#select_uniq_values_popup').modal('show');
+  })
 
 })

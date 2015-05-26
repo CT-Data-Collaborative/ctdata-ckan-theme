@@ -127,6 +127,9 @@ a.cancel-drag{
   overflow: scroll;
   margin: 10px;
 }
+#main_dataset_dimensions h3, #compare_dataset_dimensions h3{
+  background: #F3F3F3;
+}
 
 #compare_dataset_dimensions{
   margin-top: 20px;

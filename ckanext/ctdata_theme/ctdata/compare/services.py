@@ -3,7 +3,9 @@ import ckan.plugins.toolkit as toolkit
 
 from ..utils import dict_with_key_value
 from ..visualization.services import DatasetService
-from ..community.services import CommunityProfileService
+from ..location.models import Location
+from ..visualization.querybuilders import QueryBuilderFactory
+from ..visualization.views import ViewFactory
 from models import CtdataYears
 from IPython import embed
 
@@ -140,41 +142,58 @@ class CompareService(object):
       return comparable, dataset_info, matches
 
     @staticmethod
+    def prepare_dataset_filters_to_load_data(dataset_name, dataset, filters, filters_dims):
+      db   = Database()
+      conn = db.connect()
+
+      session           = Database().session_factory()
+      dataset_dims      = filter( lambda  x: x.name in filters_dims, dataset.dimensions)
+      dataset_filters   = filter( lambda  x: x['field'].replace('-', ' ') in map(lambda d: d.name, dataset_dims), filters)
+      dataset_geo_type  = DatasetService.get_dataset_meta_geo_type(dataset_name)
+      variable          = DatasetService.get_dataset_meta_field(dataset_name, 'Variable', '')
+      locs              = session.query(Location).filter(Location.geography_type == dataset_geo_type).all()
+      locations         = map( lambda l: l.name, locs[:2])
+
+      data = []
+      dataset_filters.append({u'field': u'Variable', u'values': [unicode(variable.split(';')[0], "utf-8")] })
+
+      for location_name in locations:
+          query = '''
+                      SELECT "Value" FROM "%s" WHERE "%s"='%s' AND %s
+                  ''' % (dataset.table_name, dataset_geo_type, location_name,  " AND ".join(''' "%s" = '%s' ''' % (f['field'], f['values'][0]) for f in dataset_filters))
+          curs = conn.cursor()
+          curs.execute(query, (dataset.table_name,))
+          value = curs.fetchall()
+          print value
+          val = None
+          if value:
+            val = str(value[0][0]) if str(value[0][0]) != '-9999' else '*'
+
+          data.append({location_name: val})
+
+      conn.commit()
+      curs.close()
+      del curs
+      conn.close()
+
+      return data
+
+    @staticmethod
     def get_join_data_for_two_datasets(json_body):
       data = []
 
       dataset_name = json_body.get('main_dataset')
       compare_name = json_body.get('compare_with')
-      matches      = json_body.get('matches')
-      x            = json_body.get('x')
-      y            = json_body.get('y')
-      color        = json_body.get('color')
-      size         = json_body.get('size')
-      shape        = json_body.get('shape')
+      filters      = json_body.get('filters')
+      for f in filters:
+          f['field'] = f['field'].replace('-', ' ')
 
       dataset      = DatasetService.get_dataset(dataset_name)
       compare_with = DatasetService.get_dataset(compare_name)
+      filters_dims = map( lambda  x: x['field'], filters)
 
-      database = Database()
-
-      try:
-        conn = database.connect()
-        if conn:
-            curs = conn.cursor()
-            curs.execute('''SELECT * FROM public."%s" ''' % (dataset.table_name))
-            dataset_data = curs.fetchall()
-
-            curs = conn.cursor()
-            curs.execute('''SELECT * FROM public."%s" ''' % (compare_with.table_name))
-            compare_data = curs.fetchall()
-
-            conn.commit()
-            curs.close()
-            del curs
-            conn.close()
-
-      except psycopg2.ProgrammingError:
-            data = []
+      dataset_data = CompareService.prepare_dataset_filters_to_load_data(dataset_name, dataset, filters, filters_dims)
+      compare_data = CompareService.prepare_dataset_filters_to_load_data(compare_name, compare_with, filters, filters_dims)
 
       # embed()
 
