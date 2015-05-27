@@ -142,7 +142,7 @@ class CompareService(object):
       return comparable, dataset_info, matches
 
     @staticmethod
-    def prepare_dataset_filters_to_load_data(dataset_name, dataset, filters, filters_dims):
+    def prepare_dataset_filters_to_load_data(dataset_name, dataset, filters, filters_dims, param):
       db   = Database()
       conn = db.connect()
 
@@ -151,25 +151,25 @@ class CompareService(object):
       dataset_filters   = filter( lambda  x: x['field'].replace('-', ' ') in map(lambda d: d.name, dataset_dims), filters)
       dataset_geo_type  = DatasetService.get_dataset_meta_geo_type(dataset_name)
       variable          = DatasetService.get_dataset_meta_field(dataset_name, 'Variable', '')
-      locs              = session.query(Location).filter(Location.geography_type == dataset_geo_type).all()
-      locations         = map( lambda l: l.name, locs[:2])
+      locations         = session.query(Location).filter(Location.geography_type == dataset_geo_type).all()[:20]
+      # locations         = map( lambda l: l.name, locs)
 
       data = []
       dataset_filters.append({u'field': u'Variable', u'values': [unicode(variable.split(';')[0], "utf-8")] })
 
-      for location_name in locations:
+      for location in locations:
+          location_name = location.name
           query = '''
                       SELECT "Value" FROM "%s" WHERE "%s"='%s' AND %s
                   ''' % (dataset.table_name, dataset_geo_type, location_name,  " AND ".join(''' "%s" = '%s' ''' % (f['field'], f['values'][0]) for f in dataset_filters))
           curs = conn.cursor()
           curs.execute(query, (dataset.table_name,))
           value = curs.fetchall()
-          print value
-          val = None
+          val = 0
           if value:
-            val = str(value[0][0]) if str(value[0][0]) != '-9999' else '*'
+            val = str(value[0][0]) if str(value[0][0]) != '-9999' else 0
 
-          data.append({location_name: val})
+          data.append({'fips': location.fips, 'location_name': location_name, 'variable': variable, 'value': val})
 
       conn.commit()
       curs.close()
@@ -192,12 +192,20 @@ class CompareService(object):
       compare_with = DatasetService.get_dataset(compare_name)
       filters_dims = map( lambda  x: x['field'], filters)
 
-      dataset_data = CompareService.prepare_dataset_filters_to_load_data(dataset_name, dataset, filters, filters_dims)
-      compare_data = CompareService.prepare_dataset_filters_to_load_data(compare_name, compare_with, filters, filters_dims)
+      dataset_data = CompareService.prepare_dataset_filters_to_load_data(dataset_name, dataset, filters, filters_dims, 'main_val')
+      compare_data = CompareService.prepare_dataset_filters_to_load_data(compare_name, compare_with, filters, filters_dims, 'compare_val')
 
-      # embed()
+      for data_item in dataset_data:
+        data_item['x'] = dataset_data.index(data_item)
 
-      return data
+      for data_item in compare_data:
+        data_item['x'] = compare_data.index(data_item)
+
+      data = dataset_data + compare_data
+      minimum = min(map(lambda i: float(i['value']), data))
+      maximum = max(map(lambda i: float(i['value']), data))
+
+      return data, minimum, maximum
 
 
 
