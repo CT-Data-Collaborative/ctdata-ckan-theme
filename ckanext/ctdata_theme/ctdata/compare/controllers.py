@@ -48,9 +48,9 @@ class CompareController(base.BaseController):
 
     def join_for_two_datasets(self):
         json_body    = json.loads(http_request.body, encoding=http_request.charset)
-        data         = self.compare_service.get_join_data_for_two_datasets(json_body)
+        data, minimum, maximum = self.compare_service.get_join_data_for_two_datasets(json_body)
 
-        return json.dumps({'success': True, 'data': {}})
+        return json.dumps({'success': True, 'data': data, 'min': minimum, 'max': maximum})
 
     def create_year_matches(self):
         user_name    = http_request.environ.get("REMOTE_USER")
