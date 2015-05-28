@@ -151,7 +151,7 @@ class CompareService(object):
       dataset_filters   = filter( lambda  x: x['field'].replace('-', ' ') in map(lambda d: d.name, dataset_dims), filters)
       dataset_geo_type  = DatasetService.get_dataset_meta_geo_type(dataset_name)
       variable          = DatasetService.get_dataset_meta_field(dataset_name, 'Variable', '')
-      locations         = session.query(Location).filter(Location.geography_type == dataset_geo_type).all()[:20]
+      locations         = session.query(Location).filter(Location.geography_type == dataset_geo_type).all()
       # locations         = map( lambda l: l.name, locs)
 
       data = []
@@ -163,13 +163,13 @@ class CompareService(object):
                       SELECT "Value" FROM "%s" WHERE "%s"='%s' AND %s
                   ''' % (dataset.table_name, dataset_geo_type, location_name,  " AND ".join(''' "%s" = '%s' ''' % (f['field'], f['values'][0]) for f in dataset_filters))
           curs = conn.cursor()
-          curs.execute(query, (dataset.table_name,))
+          curs.execute(query, (dataset.table_name))
           value = curs.fetchall()
           val = 0
           if value:
             val = str(value[0][0]) if str(value[0][0]) != '-9999' else 0
 
-          data.append({'fips': location.fips, 'location_name': location_name, 'variable': variable, 'value': val})
+          data.append({'fips': location.fips, 'location_name': location_name, 'variable': variable, 'value': float(val)})
 
       conn.commit()
       curs.close()

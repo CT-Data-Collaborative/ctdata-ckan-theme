@@ -57,7 +57,7 @@ li.scale_variant{
 
 .graphic{
   min-height: 500px;
-  padding: 50px;
+  padding: 0px;
 }
 
 #y_axe, #x_axe, #color, #size, #shape{
