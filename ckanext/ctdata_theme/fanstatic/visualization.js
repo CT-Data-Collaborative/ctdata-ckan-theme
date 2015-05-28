@@ -498,14 +498,18 @@ function get_filters(){
 function handle_incompatibilities(compatibles){
 
   all_inputs = $("input[type='checkbox'][class != 'indicator_group']");
+
   $.each(all_inputs, function(i){
-    if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
-      $(all_inputs[i]).removeAttr("disabled");
-      $(all_inputs[i]).parent().find("label").css("color", "gray");
+    $input = $(all_inputs[i])
+    found  = false
+    jQuery.each(compatibles, function(i, c){  if (Object.keys(c)[0] == $input.attr('name') && c[Object.keys(c)[0]] == $input.val()) found = true })
+    if(found){
+      $input.removeAttr("disabled");
+      $input.parent().find("label").css("color", "gray");
     }else{
-      $(all_inputs[i]).attr("disabled", true);
-      $(all_inputs[i]).attr("checked", false);
-      $(all_inputs[i]).parent().find("label").css("color", "lightgray");
+      $input.attr("disabled", true);
+      $input.attr("checked", false);
+      $input.parent().find("label").css("color", "lightgray");
     }
   });
 
@@ -656,7 +660,7 @@ function draw_table(){
 
 
       }
-
+  console.log('here')
   hide_spinner();
 });
 }

@@ -91,7 +91,7 @@ class View(object):
           curs.execute(query, filters_values)
           rows = curs.fetchall()
           for row in rows:
-            compatibles.append(str(row[0]))
+            compatibles.append({ cur_col: str(row[0])})
 
         curs.close()
         del curs
@@ -376,7 +376,7 @@ class MapView(View):
           curs.execute(query, filters_values)
           rows = curs.fetchall()
           for row in rows:
-            compatibles.append(str(row[0]))
+            compatibles.append({ cur_col: str(row[0])})
 
         curs.close()
         del curs
