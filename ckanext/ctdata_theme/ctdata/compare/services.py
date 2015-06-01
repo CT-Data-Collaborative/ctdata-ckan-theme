@@ -63,6 +63,15 @@ class CompareService(object):
       return False
 
     @staticmethod
+    def get_year_matches(year):
+      session    = Database().session_factory()
+      year_value = session.query(CtdataYears).filter(CtdataYears.year == year).first()
+      matches    = year_value.matches.split(',') if year_value.matches else []
+
+      return matches
+
+
+    @staticmethod
     def get_comparable_datasets(dataset_name):
       dataset_names = toolkit.get_action('package_list')(data_dict={})
       main_dataset  = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
@@ -147,8 +156,17 @@ class CompareService(object):
       dataset_filters   = filter( lambda  x: x['field'].replace('-', ' ') in map(lambda d: d.name, dataset_dims), filters)
       dataset_geo_type  = DatasetService.get_dataset_meta_geo_type(dataset_name)
       variable_variants = DatasetService.get_dataset_meta_field(dataset_name, 'Variable', '')
+      year_variants     = DatasetService.get_dataset_meta_field(dataset_name, 'Year', '')
       variable_data     = filter( lambda x: x['field'] == 'Variable', dataset_filters)
+      year_data         = filter( lambda x: x['field'] == 'Year', dataset_filters)[0]
       locations         = session.query(Location).filter(Location.geography_type == dataset_geo_type).all()
+
+      if year_data and year_data['values'][0] not in year_variants:
+        matches = CompareService.get_year_matches(year_data['values'][0])
+        for match in matches:
+          if match in year_variants:
+            year_data['values'] = [match]
+
 
       # choose correct variable for dataset
       for variable_data_item in variable_data:
@@ -158,7 +176,6 @@ class CompareService(object):
           dataset_filters.remove(variable_data_item)
 
       data = []
-
       # load data values
       for location in locations:
           location_name = location.name
@@ -168,7 +185,6 @@ class CompareService(object):
           curs = conn.cursor()
           curs.execute(query, (dataset.table_name))
           value = curs.fetchall()
-          print value
           if value:
             val = str(value[0][0]) if str(value[0][0]) != '-9999' else 0
             data.append({'fips': location.fips, 'location_name': location_name, 'variable': variable, 'value': float(val), 'label':  str(float(val))})
@@ -199,14 +215,14 @@ class CompareService(object):
 
 
       for data_item in dataset_data:
-        if not data_item['fips'] == None and not len( filter(lambda x: x['fips'] == data_item['fips'], compare_data) ) == 0:
-          data_item['x'] = dataset_data.index(data_item)
-          data.append(data_item)
+        # if (data_item['fips'] and len( filter(lambda x: x['fips'] == data_item['fips'], compare_data) ) > 0) or len( filter(lambda x: x['location_name'] == data_item['location_name'], dataset_data) ) > 0:
+        data_item['x'] = dataset_data.index(data_item)
+        data.append(data_item)
 
       for data_item in compare_data:
-        if not data_item['fips'] == None and not len( filter(lambda x: x['fips'] == data_item['fips'], dataset_data) ) == 0:
-          data_item['x'] = compare_data.index(data_item)
-          data.append(data_item)
+        # if (data_item['fips'] and len( filter(lambda x: x['fips'] == data_item['fips'], dataset_data) ) > 0) or len( filter(lambda x: x['location_name'] == data_item['location_name'], dataset_data) ) > 0:
+        data_item['x'] = compare_data.index(data_item)
+        data.append(data_item)
 
       minimum = min(map(lambda i: float(i['value']), data)) if data else 0
       maximum = max(map(lambda i: float(i['value']), data)) if data else 0

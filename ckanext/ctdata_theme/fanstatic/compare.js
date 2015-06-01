@@ -28,7 +28,7 @@ function draw_graph(){
   $('#container').html('');
   var spec = {
     "width": 700,
-    "height": 3000,
+    "height": data_items.length * 10,
     // "padding": {"top": 100, "left": 100, "bottom": 300, "right": 100},
     "data": [{"name": "table"}],
     "scales": [
@@ -38,7 +38,7 @@ function draw_graph(){
       },
       {
         "name": "y", "type": "ordinal", "range": "height", "sort": true,
-        "domain": {"data": "table", "field": "data.fips"}
+        "domain": {"data": "table", "field": "data.location_name"}
       },
       {
         "name": "c",
@@ -119,7 +119,7 @@ function draw_graph(){
         "properties": {
           "enter": {
             "x": {"scale": "x", "field": "data.value" },
-            "y": {"scale": "y", "field": "data.fips"},
+            "y": {"scale": "y", "field": "data.location_name"},
             "fill": {"scale": "c", "field": "data.variable"},
             "fillOpacity": {"value": 0.8},
             "size": {"value": 100},
@@ -139,7 +139,7 @@ function draw_graph(){
         "properties": {
           "enter": {
             "x": {"scale": "x", "field": "data.value" },
-            "y": {"scale": "y", "field": "data.fips"},
+            "y": {"scale": "y", "field": "data.location_name"},
             "fill": {"value": "#000"},
             "fillOpacity": {"value": 0},
             "dy": {"value": -10},
@@ -224,7 +224,7 @@ function get_data(){
           $('#select_uniq_values_popup').modal('hide');
       }else{
         $('#container').html('There is no available data to show')
-        ('#select_uniq_values_popup').modal('hide');
+        $('#select_uniq_values_popup').modal('hide');
       }
     }
   });

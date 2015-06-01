@@ -6,7 +6,7 @@
           <span class="caretbox"><span class="caret"></span></span>
         </option>
   {% for item in comparable %}
-    {% if item['filters_matches_number'] > 0 %}
+    {% if item['filters_matches_number'] > 0 and item['geo_type_match'] %}
       <option value="{{item['dataset_name']}}" class="" id="{{item['dataset_name']}}">
         <span class="pull-left">
          {{item['dataset_name']|replace("-", " ")|title}}
