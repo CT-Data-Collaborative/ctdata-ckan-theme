@@ -73,7 +73,7 @@ function update_headline_indicators(){
     names_hash = {}
 
     $('.edit_name').map(function(){
-        names_hash[$(this).attr('id')]= $(this).val();
+      names_hash[$(this).attr('id')]= $(this).val();
     });
 
     $.ajax({type: "POST",
@@ -601,7 +601,7 @@ function draw_table(){
               if (type != undefined)
                 cur_value = unit_for_value(cur_value, type)
 
-              if (data['data'][row_index]['moes'].length != 0){
+              if (data['data'][row_index]['moes'].length != 0 && cur_value != '*'){
                 moes_value = data['data'][row_index]['moes'][year_index]
                 if (type != undefined) moes_value = unit_for_value(moes_value, type);
                 cur_value += '<span class="moes"> ± ' + moes_value + '</span>'
@@ -758,9 +758,11 @@ function draw_chart(){
 
             cur_series_erorrs['data'] = []
             $.each(cur_series_data, function(j){
-              low  = parseInt(cur_series_data[j]) - parseInt(series_data[i]['moes'][j])
-              high = parseInt(cur_series_data[j]) + parseInt(series_data[i]['moes'][j])
-              cur_series_erorrs['data'].push([low, high]);
+              if (cur_series_data[j]){
+                low  = parseInt(cur_series_data[j]) - parseInt(series_data[i]['moes'][j])
+                high = parseInt(cur_series_data[j]) + parseInt(series_data[i]['moes'][j])
+                cur_series_erorrs['data'].push([low, high]);
+              }
             });
 
             cur_series_erorrs['type'] = 'errorbar';
