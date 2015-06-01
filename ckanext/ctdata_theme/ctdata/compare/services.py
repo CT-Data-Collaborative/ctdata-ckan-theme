@@ -78,8 +78,8 @@ class CompareService(object):
 
         if not dataset['private'] and name != dataset_name:
           dims_matches           = filter(lambda dim: dim in main_dims, dims )
-          dims_no_matches        = filter(lambda dim: dim not in dims_matches, dims )
-          main_dims_no_matches   = filter(lambda dim: dim not in dims_matches, main_dims )
+          dims_no_matches        = filter(lambda dim: dim not in dims_matches, dims ) + ['Variable']
+          main_dims_no_matches   = filter(lambda dim: dim not in dims_matches, main_dims ) + ['Variable']
           filters_values_matches = []
           values                 = []
           filters_matches_number = 0
@@ -135,10 +135,6 @@ class CompareService(object):
 
       comparable = sorted(comparable, key=lambda k: k['filters_matches_number'], reverse=True)
 
-
-      # for dim in main_dims:
-      #   dataset_info[dim] = DatasetService.get_dataset_meta_field(dataset_name, dim, '')
-
       return comparable, dataset_info, matches
 
     @staticmethod
@@ -150,13 +146,20 @@ class CompareService(object):
       dataset_dims      = filter( lambda  x: x.name in filters_dims, dataset.dimensions)
       dataset_filters   = filter( lambda  x: x['field'].replace('-', ' ') in map(lambda d: d.name, dataset_dims), filters)
       dataset_geo_type  = DatasetService.get_dataset_meta_geo_type(dataset_name)
-      variable          = DatasetService.get_dataset_meta_field(dataset_name, 'Variable', '')
+      variable_variants = DatasetService.get_dataset_meta_field(dataset_name, 'Variable', '')
+      variable_data     = filter( lambda x: x['field'] == 'Variable', dataset_filters)
       locations         = session.query(Location).filter(Location.geography_type == dataset_geo_type).all()
-      # locations         = map( lambda l: l.name, locs)
+
+      # choose correct variable for dataset
+      for variable_data_item in variable_data:
+        if variable_data_item['values'][0] in variable_variants:
+          variable = variable_data_item['values'][0]
+        else:
+          dataset_filters.remove(variable_data_item)
 
       data = []
-      dataset_filters.append({u'field': u'Variable', u'values': [unicode(variable.split(';')[0], "utf-8")] })
 
+      # load data values
       for location in locations:
           location_name = location.name
           query = '''
@@ -165,11 +168,10 @@ class CompareService(object):
           curs = conn.cursor()
           curs.execute(query, (dataset.table_name))
           value = curs.fetchall()
-          val = 0
+          print value
           if value:
             val = str(value[0][0]) if str(value[0][0]) != '-9999' else 0
-
-          data.append({'fips': location.fips, 'location_name': location_name, 'variable': variable, 'value': float(val)})
+            data.append({'fips': location.fips, 'location_name': location_name, 'variable': variable, 'value': float(val), 'label':  str(float(val))})
 
       conn.commit()
       curs.close()
@@ -195,15 +197,19 @@ class CompareService(object):
       dataset_data = CompareService.prepare_dataset_filters_to_load_data(dataset_name, dataset, filters, filters_dims, 'main_val')
       compare_data = CompareService.prepare_dataset_filters_to_load_data(compare_name, compare_with, filters, filters_dims, 'compare_val')
 
+
       for data_item in dataset_data:
-        data_item['x'] = dataset_data.index(data_item)
+        if not data_item['fips'] == None and not len( filter(lambda x: x['fips'] == data_item['fips'], compare_data) ) == 0:
+          data_item['x'] = dataset_data.index(data_item)
+          data.append(data_item)
 
       for data_item in compare_data:
-        data_item['x'] = compare_data.index(data_item)
+        if not data_item['fips'] == None and not len( filter(lambda x: x['fips'] == data_item['fips'], dataset_data) ) == 0:
+          data_item['x'] = compare_data.index(data_item)
+          data.append(data_item)
 
-      data = dataset_data + compare_data
-      minimum = min(map(lambda i: float(i['value']), data))
-      maximum = max(map(lambda i: float(i['value']), data))
+      minimum = min(map(lambda i: float(i['value']), data)) if data else 0
+      maximum = max(map(lambda i: float(i['value']), data)) if data else 0
 
       return data, minimum, maximum
 

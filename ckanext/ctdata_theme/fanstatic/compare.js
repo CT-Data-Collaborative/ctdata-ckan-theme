@@ -38,7 +38,7 @@ function draw_graph(){
       },
       {
         "name": "y", "type": "ordinal", "range": "height", "sort": true,
-        "domain": {"data": "table", "field": "data.location_name"}
+        "domain": {"data": "table", "field": "data.fips"}
       },
       {
         "name": "c",
@@ -119,19 +119,16 @@ function draw_graph(){
         "properties": {
           "enter": {
             "x": {"scale": "x", "field": "data.value" },
-            "y": {"scale": "y", "field": "data.location_name"},
+            "y": {"scale": "y", "field": "data.fips"},
             "fill": {"scale": "c", "field": "data.variable"},
             "fillOpacity": {"value": 0.8},
             "size": {"value": 100},
-            // "width": {"scale": "x", "band": true, "offset": -1}
           },
           "update": {
-            // "fill": {"scale": "c", "field": "data.variable"},
             "size": {"value": 100},
           },
           "hover": {
             "size": {"value": 300},
-            // "fill": {"value": "#000"},
           }
         }
       },
@@ -142,14 +139,14 @@ function draw_graph(){
         "properties": {
           "enter": {
             "x": {"scale": "x", "field": "data.value" },
-            "text": {"field": "data.value"},
-            "y": {"scale": "y", "field": "data.location_name"},
+            "y": {"scale": "y", "field": "data.fips"},
             "fill": {"value": "#000"},
             "fillOpacity": {"value": 0},
             "dy": {"value": -10},
             "dx": {"value": -13},
             "fontWeight": {"value": 900},
-            "fontSize": {"value": 14}
+            "fontSize": {"value": 14},
+            "text": {"field": "data.label"},
           },
           "update": {
 
@@ -175,11 +172,9 @@ function draw_graph(){
           },
             "update": {
             "size": {"value": 100},
-            // "stroke": {"value": "transparent"}
           },
             "hover": {
             "size": {"value": 100},
-            // "stroke": {"value": "white"}
           }
         }
       }
@@ -217,15 +212,20 @@ function get_data(){
     data: JSON.stringify({ main_dataset: $main_dataset_select.val(), compare_with: $compare_with_select.val(), filters: get_filters()}),
     contentType: 'application/json; charset=utf-8',
     success: function (data) {
-      debugger
-      data_items = JSON.parse(data).data
-      min        = parseInt(JSON.parse(data).min)
-      max        = parseInt(JSON.parse(data).max)
-      x_axe_name = "Value"
-      y_axe_name = ""
 
-      draw_graph();
-      $('#select_uniq_values_popup').modal('hide');
+      data_items = JSON.parse(data).data
+      if (data_items.length > 0){
+          min        = parseInt(JSON.parse(data).min)
+          max        = parseInt(JSON.parse(data).max)
+          x_axe_name = "Value"
+          y_axe_name = ""
+
+          draw_graph();
+          $('#select_uniq_values_popup').modal('hide');
+      }else{
+        $('#container').html('There is no available data to show')
+        ('#select_uniq_values_popup').modal('hide');
+      }
     }
   });
 
@@ -242,7 +242,9 @@ function show_matches_in_popup(dataset_matches){
     $("ul.common_dimensions").append('<li class="common_li"> <h4>' + key + '</h4><ul class="common_li_ul '+ without_spaces +'"></ul></li>')
     $('.scale_variant').draggable({revert: "invalid", helper: "clone"})
     $.each(item[key], function(j, value){
-      $('ul[class="common_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel></li>')
+      $('ul[class="common_li_ul '+ without_spaces + '"]').append(
+        '<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel></li>'
+        )
     })
   });
 }
@@ -250,11 +252,12 @@ function show_matches_in_popup(dataset_matches){
 function show_non_matches_for_main_dataset_in_popup(main_no_matches){
   $.each(main_no_matches, function(i, item){
     key = Object.keys(item)[0]
+    id  = $main_dataset_select.val()
     without_spaces = key.replace(/\s/g, '-')
-    $("ul#main.left_dimensions").append('<li class="main_li"> <h4>' + key + '</h4><ul class="main_li_ul '+ without_spaces +'"></ul></li>')
+    $("ul#main.left_dimensions").append('<li class="main_li"> <h4>' + key + '</h4><ul id="" class="main_li_ul '+ without_spaces +'"></ul></li>')
 
     $.each(item[key], function(j, value){
-      $('ul[class="main_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel></li>')
+      $('ul[class="main_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ id +'_' + without_spaces+ '"value="' + value + '">'+value+'</lablel></li>')
     })
   });
 }
@@ -262,11 +265,12 @@ function show_non_matches_for_main_dataset_in_popup(main_no_matches){
 function show_non_matches_for_comapre_dataset_in_popup(no_matches){
   $.each(no_matches, function(i, item){
     key = Object.keys(item)[0]
+    id = $compare_with_select.val()
     without_spaces = key.replace(/\s/g, '-')
     $("ul#compare.left_dimensions").append('<li class="compare_li"> <h4>' + key + '</h4><ul class="compare_li_ul '+ without_spaces +'"></ul></li>')
 
     $.each(item[key], function(j, value){
-      $('ul[class="compare_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel></li>')
+      $('ul[class="compare_li_ul '+ without_spaces + '"]').append('<li class="dim_value"><label><input type="radio" name="'+ id +'_' + without_spaces+  '"value="' + value + '">'+value+'</lablel></li>')
     })
   });
 }
@@ -280,8 +284,10 @@ function check_first_inputs(){
 }
 
 function get_filters() {
+  main_id = $main_dataset_select.val()
+  compare_id = $compare_with_select.val()
   return $('ul').find('input:checked').map(function(i, e) {
-      return {field: $(e).attr('name'), values: [$(e).val()]}
+      return {field: $(e).attr('name').replace(main_id + '_', '').replace(compare_id + '_', ''), values: [$(e).val()]}
   }).get();
 }
 
