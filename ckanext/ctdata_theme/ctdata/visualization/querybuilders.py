@@ -195,7 +195,7 @@ class QueryBuilderFactory(object):
     def get_query_builder(name, dataset):
         if name == 'table':
             return TableQueryBuilder(dataset)
-        elif name == 'chart':
+        elif name == 'chart' or name == 'compare':
             return ChartQueryBuilder(dataset)
         elif name == 'map':
             return MapQueryBuilder(dataset)

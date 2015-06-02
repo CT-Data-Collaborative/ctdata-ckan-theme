@@ -42,7 +42,6 @@ class Location(Base):
         return profile
 
 
-
 class CtdataProfile(Base):
     __tablename__ = 'ctdata_profiles'
 
