@@ -166,3 +166,13 @@ label input{
 ul#main, ul#compare{
   padding: 10px;
 }
+
+#instructions{
+  position: relative;
+  left: 200px;
+  /*top: 100px;*/
+}
+
+#instructions ul li{
+  color: gray;
+}
