@@ -210,16 +210,19 @@ function get_data(){
     data: JSON.stringify({ main_dataset: $main_dataset_select.val(), compare_with: $compare_with_select.val(), filters: get_filters()}),
     contentType: 'application/json; charset=utf-8',
     success: function (data) {
-
       data_items = JSON.parse(data).data
-      debugger
       if (data_items.length > 0){
           min        = parseInt(JSON.parse(data).min)
           max        = parseInt(JSON.parse(data).max)
           x_axe_name = "Value"
           y_axe_name = ""
 
+          dragToDroppable('y', main_geo_type)
+          dragToDroppable('x', 'Value')
+          dragToDroppable('color_s', 'Variable')
+
           draw_graph();
+
           $('#select_uniq_values_popup').modal('hide');
       }else{
         $('#container').html('There is no available data to show')
@@ -290,6 +293,11 @@ function get_filters() {
   }).get();
 }
 
+function  dragToDroppable(id, value){
+    $('.droppable#' + id).html(
+        '<li class="scale_variant ui-draggable ui-draggable-handle" style="top: 0px; left: 0px;">'+ value +'<a href="javascript:void" class="cancel-drag pull-right icon-remove"></a>'
+    )
+}
 
 $(document).ready(function(){
   close_popup()
@@ -348,12 +356,11 @@ $(document).ready(function(){
     $('#compare_dataset_dimensions').prepend('<h3>' + $(this).val().toTitleCase() + '</h3>')
     $('.update-filters').removeClass('hidden')
 
-    compare_dataset_data = comparable.filter(function( item) {
-                          if (item['dataset_name'] == $("select#compare_with").val())
-                            return item
-                        })[0]
+    compare_dataset_data =  comparable.filter(function( item) {
+                                if (item['dataset_name'] == $("select#compare_with").val())
+                                    return item
+                            })[0]
 
-    addScale(main_geo_type)
     show_matches_in_popup(matches[$(this).val()])
     show_non_matches_for_main_dataset_in_popup(compare_dataset_data.main_no_matches)
     show_non_matches_for_comapre_dataset_in_popup(compare_dataset_data.no_matches)
@@ -366,7 +373,7 @@ $(document).ready(function(){
     get_data();
   })
 
-  draw_graph();
+  // draw_graph();
 
   $('.update-filters').on('click', function(){
     $('#select_uniq_values_popup').modal('show');
