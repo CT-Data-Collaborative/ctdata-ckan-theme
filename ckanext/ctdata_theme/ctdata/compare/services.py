@@ -176,23 +176,12 @@ class CompareService(object):
           dataset_filters.remove(variable_data_item)
 
       data = []
-      # load data values
-      for location in locations:
-          location_name = location.name
-          query = '''
-                      SELECT "Value" FROM "%s" WHERE "%s"='%s' AND %s
-                  ''' % (dataset.table_name, dataset_geo_type, location_name,  " AND ".join(''' "%s" = '%s' ''' % (f['field'], f['values'][0]) for f in dataset_filters))
-          curs = conn.cursor()
-          curs.execute(query, (dataset.table_name))
-          value = curs.fetchall()
-          if value:
-            val = str(value[0][0]) if str(value[0][0]) != '-9999' else 0
-            data.append({'fips': location.fips, 'location_name': location_name, 'variable': variable, 'value': float(val), 'label':  str(float(val))})
-
-      conn.commit()
-      curs.close()
-      del curs
-      conn.close()
+      request_view    = 'compare'
+      request_filters = dataset_filters
+      request_filters.append({'field': dataset_geo_type, 'values': map(lambda x: x.name, locations)})
+      query_builder   = QueryBuilderFactory.get_query_builder(request_view, dataset)
+      view            = ViewFactory.get_view(request_view, query_builder)
+      data, compatibles   = view.get_data(request_filters)
 
       return data
 
@@ -216,16 +205,14 @@ class CompareService(object):
 
       for data_item in dataset_data:
         # if (data_item['fips'] and len( filter(lambda x: x['fips'] == data_item['fips'], compare_data) ) > 0) or len( filter(lambda x: x['location_name'] == data_item['location_name'], dataset_data) ) > 0:
-        data_item['x'] = dataset_data.index(data_item)
         data.append(data_item)
 
       for data_item in compare_data:
         # if (data_item['fips'] and len( filter(lambda x: x['fips'] == data_item['fips'], dataset_data) ) > 0) or len( filter(lambda x: x['location_name'] == data_item['location_name'], dataset_data) ) > 0:
-        data_item['x'] = compare_data.index(data_item)
         data.append(data_item)
 
-      minimum = min(map(lambda i: float(i['value']), data)) if data else 0
-      maximum = max(map(lambda i: float(i['value']), data)) if data else 0
+      minimum = min(map(lambda i: float(i['Value']), data)) if data else 0
+      maximum = max(map(lambda i: float(i['Value']), data)) if data else 0
 
       return data, minimum, maximum
 
