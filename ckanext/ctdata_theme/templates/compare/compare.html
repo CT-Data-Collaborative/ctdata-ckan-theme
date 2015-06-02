@@ -3,9 +3,9 @@
 
 {% block page_name %}Compare Data{% endblock %}
 {% block page_description %}
-  <span id="dataset_name_val" style="color: black;"></span>
+  <span id="dataset_name_val" style="color: black;">--</span>
   <span>vs</span>
-  <span id="compare_with_val" style="color: black;"></span>
+  <span id="compare_with_val" style="color: black;">--</span>
 {% endblock %}
 
 {% block main_content %}
@@ -32,8 +32,6 @@
 
     <div id="datasets_to_compare_with" class="">
     </div>
-
-    <!-- <br> -->
 
     <hr>
     <div><a href="{{h.empty_href()}}" class="update-filters btn btn-default hidden"> Update Filters </a></div>

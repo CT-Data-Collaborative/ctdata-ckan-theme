@@ -2,14 +2,16 @@ var $main_dataset_select = $("select#dataset_name"),
     $compare_with_select = $("select#compare_with"),
     matches              = {},
     x_axe_name           = "Value"
-    y_axe_name           = ""
+    y_axe_name           = "Town"
     main_geo_type        = "",
     mark_type            = "symbol",
-    color                = '',
+    color                = 'data.Variable',
     shape                = '',
     size                 = '',
     min                  = 0,
     max                  = 200000,
+    x_dim                = "data.Value",
+    y_dim                = "data.location_name",
     comparable           = [];
     // data_items           = [];
 
@@ -26,28 +28,37 @@ function close_popup(){
 
 function draw_graph(){
   $('#container').html('');
+  x_axe_type = ( x_axe_name == 'Value' ? "linear" : "ordinal");
+  y_axe_type = ( y_axe_name == 'Value' ? "linear" : "ordinal");
+  height     = ( x_axe_name == 'Value' ?  data_items.length * 10 : 600) - 290;
+  width      = ( y_axe_name == 'Value' ?  data_items.length * 10 : 600);
+
+  console.log(color)
+
   var spec = {
-    "width": 600,
-    "height": data_items.length * 10,
+    "width": width,
+    "height": height,
     "data": [{"name": "table"}],
+    "viewport": [900, 700],
     "scales": [
       {
-        "name": "x", "type": "linear", "range": "width", "nice": true ,"sort": true, //, "domainMin": min, "domainMax": max,
-        "domain": {"data": "table", "field": "data.Value"}
+        "name": "x", "type": x_axe_type, "range": "width", "nice": true ,"sort": true, //, "domainMin": min, "domainMax": max,
+        "domain": {"data": "table", "field": x_dim}
       },
       {
-        "name": "y", "type": "ordinal", "range": "height", "sort": true,
-        "domain": {"data": "table", "field": "data.location_name"}
+        "name": "y", "type": y_axe_type, "range": "height", "sort": true,
+        "domain": {"data": "table", "field": y_dim}
       },
       {
         "name": "c",
         "type": "ordinal",
-        "domain": {"data": "table", "field": "data.Variable"},
-        "range": ["#4670A7", "#080"]
+        "domain": {"data": "table", "field": color},
+        "range": ["#4670A7", "#080", "#000"]
       }
     ],
     "axes": [
-      {"type": "x", "scale": "x", "orient": "top", "offset": 0, "grid": true, "sort": true,"layer": "back","titleOffset": 50, "ticks": 25, "title": x_axe_name,
+      { "type": "x", "scale": "x", "orient": "top", "offset": 0, "grid": true, "sort": true,
+        "layer": "back", "titleOffset": 50, "ticks": 25, "title": x_axe_name,
         "properties": {
            "ticks": {
              "stroke": {"value": "#000"}
@@ -59,7 +70,7 @@ function draw_graph(){
              "fill": {"value": "#000"},
              "angle": {"value": -40},
              "fontSize": {"value": 10},
-             "align": {"value": "right"},
+             "align": {"value": "left"},
              "baseline": {"value": "middle"},
              "dx": {"value": 1},
              "dy": {"value": -10}
@@ -74,7 +85,7 @@ function draw_graph(){
            }
          }
       },
-      {"type": "y", "scale": "y", "grid": true, "title": y_axe_name,
+      {"type": "y", "scale": "y", "grid": true, "title": y_axe_name, "layer": "back", "offset": 0,
         "properties": {
            "ticks": {
              "stroke": {"value": "#000"}
@@ -86,7 +97,8 @@ function draw_graph(){
              "fill": {"value": "#000"},
              "fontSize": {"value": 9},
              "align": {"value": "right"},
-             "baseline": {"value": "middle"}
+             "baseline": {"value": "middle"},
+             "dy": {"value": -7}
              // "dx": {"value": -70}
            },
            "title": {
@@ -108,7 +120,11 @@ function draw_graph(){
         "symbols": {
           "fillOpacity": {"value": 0.8},
           "stroke": {"value": "transparent"}
-        }
+        },
+        "legend": {
+            "x": {"value": -50},
+            "y": {"value": -130},
+          }
       }
     }],
     "marks": [
@@ -117,14 +133,14 @@ function draw_graph(){
         "from": {"data": "table"},
         "properties": {
           "enter": {
-            "x": {"scale": "x", "field": "data.Value" },
-            "y": {"scale": "y", "field": "data.location_name"},
-            "fill": {"scale": "c", "field": "data.Variable"},
+            "x": {"scale": "x", "field": x_dim },
+            "y": {"scale": "y", "field": y_dim},
+            "fill": {"scale": "c", "field": color},
             "fillOpacity": {"value": 0.8},
-            "size": {"value": 100},
+            "size": {"value": 50},
           },
           "update": {
-            "size": {"value": 100},
+            "size": {"value": 50},
           },
           "hover": {
             "size": {"value": 300},
@@ -136,8 +152,8 @@ function draw_graph(){
         "from": {"data": "table"},
         "properties": {
           "enter": {
-            "x": {"scale": "x", "field": "data.Value" },
-            "y": {"scale": "y", "field": "data.location_name"},
+            "x": {"scale": "x", "field": x_dim },
+            "y": {"scale": "y", "field": y_dim},
             "fill": {"value": "#000"},
             "fillOpacity": {"value": 0},
             "dy": {"value": -10},
@@ -163,16 +179,16 @@ function draw_graph(){
         "from": {"data": "table"},
         "properties": {
           "enter": {
-            "x": {"scale": "x", "field": "data.Value", "offset": 0},
-            "y": {"scale": "y", "field": "data.x", "offset": 0},
+            "x": {"scale": "x", "field": x_dim, "offset": 0},
+            "y": {"scale": "y", "field": y_dim, "offset": 0},
             "fill": {"value": "transparent"},
             "strokeWidth": {"value": 2},
           },
             "update": {
-            "size": {"value": 100},
+            "size": {"value": 50},
           },
             "hover": {
-            "size": {"value": 100},
+            "size": {"value": 50},
           }
         }
       }
@@ -220,6 +236,7 @@ function get_data(){
           dragToDroppable('y', main_geo_type)
           dragToDroppable('x', 'Value')
           dragToDroppable('color_s', 'Variable')
+          $('.scale_variant').draggable({revert: "invalid", helper: "clone"})
 
           draw_graph();
 
@@ -317,15 +334,17 @@ $(document).ready(function(){
 
       switch($(this).attr('id')) {
         case "x":
-          x_axe_name = $(ui.draggable).text(); break;
+          x_axe_name = $(ui.draggable).text();
+          x_dim      = "data." + $(ui.draggable).text(); break;
         case "y":
-          y_axe_name = $(ui.draggable).text(); break;
-        case "color":
-          color = $(ui.draggable).text(); break;
-        case "size":
-          size  = $(ui.draggable).text(); break;
-        case "shape":
-          shape = $(ui.draggable).text(); break;
+          y_axe_name = $(ui.draggable).text();
+          y_dim      = "data." + $(ui.draggable).text(); break;
+        case "color_s":
+          color = "data." + $(ui.draggable).text(); break;
+        case "size_s":
+          size  = "data." + $(ui.draggable).text(); break;
+        case "shape_s":
+          shape = "data." + $(ui.draggable).text(); break;
       }
       $(ui.draggable).detach().css({top: 0,left: 0}).appendTo(this);
 
@@ -364,6 +383,8 @@ $(document).ready(function(){
     show_matches_in_popup(matches[$(this).val()])
     show_non_matches_for_main_dataset_in_popup(compare_dataset_data.main_no_matches)
     show_non_matches_for_comapre_dataset_in_popup(compare_dataset_data.no_matches)
+
+    $('.scale_variant').draggable({revert: "invalid", helper: "clone"})
 
     check_first_inputs()
     $('#select_uniq_values_popup').modal('show');

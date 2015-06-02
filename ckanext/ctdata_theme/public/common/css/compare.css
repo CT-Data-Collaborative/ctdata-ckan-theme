@@ -169,10 +169,15 @@ ul#main, ul#compare{
 
 #instructions{
   position: relative;
-  left: 200px;
-  /*top: 100px;*/
+  left: 145px;
 }
 
 #instructions ul li{
   color: gray;
 }
+
+/*#container{
+  height: 700px;
+  width: 900px;
+  overflow: scroll;
+}*/
