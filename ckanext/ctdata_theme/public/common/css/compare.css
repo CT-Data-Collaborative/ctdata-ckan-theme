@@ -176,6 +176,11 @@ ul#main, ul#compare{
   color: gray;
 }
 
+#error{
+  font-size: 21px;
+  margin: 145px;
+  color: #A35050;
+}
 /*#container{
   height: 700px;
   width: 900px;

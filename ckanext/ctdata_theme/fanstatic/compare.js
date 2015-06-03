@@ -289,7 +289,7 @@ function get_data(){
 
           $('#select_uniq_values_popup').modal('hide');
       }else{
-        $('#container').html('There is no available data to show')
+        $('#container').html('<div id="error">There is no available data to show. </div>')
         $('#select_uniq_values_popup').modal('hide');
       }
     }
