@@ -30,10 +30,8 @@ function draw_graph(){
   $('#container').html('');
   x_axe_type = ( x_axe_name == 'Value' ? "linear" : "ordinal");
   y_axe_type = ( y_axe_name == 'Value' ? "linear" : "ordinal");
-  height     = ( x_axe_name == 'Value' ?  data_items.length * 10 : 600) - 290;
-  width      = ( y_axe_name == 'Value' ?  data_items.length * 10 : 600);
-
-  console.log(color)
+  height     = ( y_axe_name == 'Town'  ?  count_uniq_values_for(y_axe_name) * 10 : 900);
+  width      = ( x_axe_name == 'Town'  ?  count_uniq_values_for(x_axe_name) * 10 : 600);
 
   var spec = {
     "width": width,
@@ -53,7 +51,7 @@ function draw_graph(){
         "name": "c",
         "type": "ordinal",
         "domain": {"data": "table", "field": color},
-        "range": ["#4670A7", "#080", "#000"]
+        "range": ["#4670A7", "#080", "#c4c4c4","#A3E4FA", '#E8D619', '#19E85B', '#BE2287', '#BE2251','#6C6164','#9419E8','#C84130', '#B9C830']
       }
     ],
     "axes": [
@@ -114,7 +112,7 @@ function draw_graph(){
     "legends": [
     {
       "fill": "c",
-      "title": "Variable",
+      "title": color.replace('data.', '') || 'Color',
       "offset": 0,
       "properties": {
         "symbols": {
@@ -122,7 +120,7 @@ function draw_graph(){
           "stroke": {"value": "transparent"}
         },
         "legend": {
-            "x": {"value": -50},
+            "x": {"value": -150},
             "y": {"value": -130},
           }
       }
@@ -171,26 +169,6 @@ function draw_graph(){
             "fillOpacity": {"value": 1}
           }
         }
-      },
-
-      {
-        "type": mark_type,
-        "interactive": false,
-        "from": {"data": "table"},
-        "properties": {
-          "enter": {
-            "x": {"scale": "x", "field": x_dim, "offset": 0},
-            "y": {"scale": "y", "field": y_dim, "offset": 0},
-            "fill": {"value": "transparent"},
-            "strokeWidth": {"value": 2},
-          },
-            "update": {
-            "size": {"value": 50},
-          },
-            "hover": {
-            "size": {"value": 50},
-          }
-        }
       }
     ]
   };
@@ -220,6 +198,12 @@ function draw_graph(){
 
 }
 
+function count_uniq_values_for(key){
+    ar = []
+    $.each(data_items, function(i, el){ if (ar.indexOf(el[key]) == -1) ar.push(el[key]) })
+    return ar.length
+}
+
 function get_data(){
   $.ajax({type: "POST",
     url: "/compare/join_for_two_datasets/",
@@ -230,15 +214,16 @@ function get_data(){
       if (data_items.length > 0){
           min        = parseInt(JSON.parse(data).min)
           max        = parseInt(JSON.parse(data).max)
-          x_axe_name = "Value"
-          y_axe_name = ""
+          // x_axe_name = "Value"
+          // y_axe_name = ""
+
+
+          draw_graph();
 
           dragToDroppable('y', main_geo_type)
           dragToDroppable('x', 'Value')
           dragToDroppable('color_s', 'Variable')
           $('.scale_variant').draggable({revert: "invalid", helper: "clone"})
-
-          draw_graph();
 
           $('#select_uniq_values_popup').modal('hide');
       }else{
@@ -262,7 +247,7 @@ function show_matches_in_popup(dataset_matches){
     $('.scale_variant').draggable({revert: "invalid", helper: "clone"})
     $.each(item[key], function(j, value){
       $('ul[class="common_li_ul '+ without_spaces + '"]').append(
-        '<li class="dim_value"><label><input type="radio" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel></li>'
+        '<li class="dim_value"><label><input type="checkbox" name="'+ without_spaces+ '"value="' + value + '">'+value+'</lablel></li>'
         )
     })
   });
@@ -303,11 +288,24 @@ function check_first_inputs(){
 }
 
 function get_filters() {
-  main_id = $main_dataset_select.val()
-  compare_id = $compare_with_select.val()
-  return $('ul').find('input:checked').map(function(i, e) {
-      return {field: $(e).attr('name').replace(main_id + '_', '').replace(compare_id + '_', ''), values: [$(e).val()]}
-  }).get();
+  var filters = [];
+  dimensions = $("li.common_li, li.main_li, li.compare_li")
+
+  $.each(dimensions, function(i){
+    var cur_dim = $(dimensions[i]);
+    var cur_filter = {'field': cur_dim.find('h4').text(), 'values': []};
+    var checked = cur_dim.find("input:checked")
+
+    $.each(checked, function(option){
+      cur_filter['values'].push(checked[option].value);
+    });
+
+    if(checked.length != 0)
+      filters.push(cur_filter);
+  });
+
+  return filters;
+
 }
 
 function  dragToDroppable(id, value){
@@ -360,8 +358,27 @@ $(document).ready(function(){
   $(document).on('click', '.cancel-drag', function(){
     $li = $(this).closest('li')
     $li.find('a').addClass('hidden')
-    $(this).closest('li').closest('div').removeClass('dropped')
+
+    id = $(this).closest('li').closest('div').attr('id');
+
+    switch(id) {
+        case "x":
+          x_axe_name = 'x'
+          x_dim      = 'data.y'; break;
+        case "y":
+          y_axe_name = 'y';
+          y_dim      = 'data.y'; break;
+        case "color_s":
+          color = ''; break;
+        case "size_s":
+          size  = ''; break;
+        case "shape_s":
+          shape = ''; break;
+    }
+
     $("#matches ul").append($li )
+    $(this).closest('li').closest('div').removeClass('dropped')
+    draw_graph();
   })
 
   $(document).on('change', "select#compare_with" , function(){
