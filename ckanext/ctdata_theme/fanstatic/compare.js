@@ -12,6 +12,8 @@ var $main_dataset_select = $("select#dataset_name"),
     max                  = 200000,
     x_dim                = "data.Value",
     y_dim                = "data.location_name",
+    default_color        = 'blue',
+    default_size         = 50
     comparable           = [];
     // data_items           = [];
 
@@ -51,7 +53,13 @@ function draw_graph(){
         "name": "c",
         "type": "ordinal",
         "domain": {"data": "table", "field": color},
-        "range": ["#4670A7", "#080", "#c4c4c4","#A3E4FA", '#E8D619', '#19E85B', '#BE2287', '#BE2251','#6C6164','#9419E8','#C84130', '#B9C830']
+        "range": ["#4670A7", "#080","#B63535", '#E8D619', '#19E85B', '#BE2287', '#BE2251','#6C6164','#9419E8','#C84130', '#B9C830']
+      },
+      {
+        "name": "d",
+        "type": "ordinal",
+        "domain": {"data": "table", "field": size},
+        "range": [50, 100, 150, 200, 250, 300]
       }
     ],
     "axes": [
@@ -110,21 +118,33 @@ function draw_graph(){
       }
     ],
     "legends": [
-    {
-      "fill": "c",
-      "title": color.replace('data.', '') || 'Color',
-      "offset": 0,
-      "properties": {
-        "symbols": {
-          "fillOpacity": {"value": 0.8},
-          "stroke": {"value": "transparent"}
-        },
-        "legend": {
-            "x": {"value": -150},
-            "y": {"value": -130},
-          }
+      {
+        "fill": "c",
+        "title": 'Color',
+        "offset": 0,
+        "properties": {
+          "symbols": {
+            "fillOpacity": {"value": 0.8},
+            "stroke": {"value": "transparent"}
+          },
+          "legend": {
+              "x": {"value": -150},
+              "y": {"value": -130},
+            }
+        }
+      },
+      {
+        "size": "d",
+        "title": 'Size',
+        "offset": 0,
+        "properties": {
+          "legend": {
+              "x": {"value": 100},
+              "y": {"value": -130},
+            }
+        }
       }
-    }],
+    ],
     "marks": [
       {
         "type": mark_type,
@@ -133,15 +153,16 @@ function draw_graph(){
           "enter": {
             "x": {"scale": "x", "field": x_dim },
             "y": {"scale": "y", "field": y_dim},
+            "stroke": {"scale": "c", "field": color},
             "fill": {"scale": "c", "field": color},
-            "fillOpacity": {"value": 0.8},
-            "size": {"value": 50},
+            "fillOpacity": {"value": 0.2},
+            "size": {"scale": "d", "field": size}
           },
           "update": {
-            "size": {"value": 50},
+            "size": {"scale": "d", "field": size},
           },
           "hover": {
-            "size": {"value": 300},
+            "size": {"value": default_size * 6},
           }
         }
       },
@@ -161,12 +182,34 @@ function draw_graph(){
             "text": {"field": "data.label"},
           },
           "update": {
-
-            "fillOpacity": {"value": 0}
+            "fillOpacity": {"value": 0},
+            "size": {"value": 300}
           },
           "hover": {
             "size": {"value": 300},
             "fillOpacity": {"value": 1}
+          }
+        }
+      },
+      {
+        "type": mark_type,
+        "interactive": false,
+        "from": {"data": "table"},
+        "properties": {
+          "enter": {
+            "x": {"scale": "x", "field": x_dim, "offset": 0},
+            "y": {"scale": "y", "field": y_dim, "offset": 0},
+            "fill": {"value": "transparent"},
+            "strokeWidth": {"value": 2},
+            // "shape": {"value": "symbol"}
+          },
+            "update": {
+            // "size": {"value": default_size},
+            "size": {"scale": "d", "field": size}
+          },
+            "hover": {
+            // "size": {"value": default_size},
+            "size": {"scale": "d", "field": size}
           }
         }
       }
@@ -411,7 +454,7 @@ $(document).ready(function(){
     get_data();
   })
 
-  // draw_graph();
+  draw_graph();
 
   $('.update-filters').on('click', function(){
     $('#select_uniq_values_popup').modal('show');
