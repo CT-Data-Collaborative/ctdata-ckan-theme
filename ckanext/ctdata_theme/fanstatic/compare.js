@@ -6,8 +6,8 @@ var $main_dataset_select = $("select#dataset_name"),
     main_geo_type        = "",
     mark_type            = "symbol",
     color                = 'data.Variable',
-    shape                = '',
-    size                 = '',
+    shape                = 'data.shape',
+    size                 = 'data.size',
     min                  = 0,
     max                  = 200000,
     x_dim                = "data.Value",
@@ -60,6 +60,12 @@ function draw_graph(){
         "type": "ordinal",
         "domain": {"data": "table", "field": size},
         "range": [50, 100, 150, 200, 250, 300]
+      },
+      {
+        "name": "e",
+        "type": "ordinal",
+        "domain": {"data": "table", "field": shape},
+        "range": ['circle', 'square', 'cross', 'diamond', 'triangle-up', 'triangle-down']
       }
     ],
     "axes": [
@@ -128,7 +134,7 @@ function draw_graph(){
             "stroke": {"value": "transparent"}
           },
           "legend": {
-              "x": {"value": -150},
+              "x": {"value": -50},
               "y": {"value": -130},
             }
         }
@@ -139,7 +145,18 @@ function draw_graph(){
         "offset": 0,
         "properties": {
           "legend": {
-              "x": {"value": 100},
+              "x": {"value": 200},
+              "y": {"value": -130},
+            }
+        }
+      },
+      {
+        "shape": "e",
+        "title": 'Shape',
+        "offset": 0,
+        "properties": {
+          "legend": {
+              "x": {"value": 350},
               "y": {"value": -130},
             }
         }
@@ -156,7 +173,8 @@ function draw_graph(){
             "stroke": {"scale": "c", "field": color},
             "fill": {"scale": "c", "field": color},
             "fillOpacity": {"value": 0.2},
-            "size": {"scale": "d", "field": size}
+            "size": {"scale": "d", "field": size},
+            "shape": {"scale": "e", "field": shape},
           },
           "update": {
             "size": {"scale": "d", "field": size},
@@ -201,6 +219,7 @@ function draw_graph(){
             "y": {"scale": "y", "field": y_dim, "offset": 0},
             "fill": {"value": "transparent"},
             "strokeWidth": {"value": 2},
+            "shape": {"scale": "e", "field": shape},
             // "shape": {"value": "symbol"}
           },
             "update": {
@@ -412,11 +431,11 @@ $(document).ready(function(){
           y_axe_name = 'y';
           y_dim      = 'data.y'; break;
         case "color_s":
-          color = ''; break;
+          color = 'data.color'; break;
         case "size_s":
-          size  = ''; break;
+          size  = 'data.size'; break;
         case "shape_s":
-          shape = ''; break;
+          shape = 'data.shape'; break;
     }
 
     $("#matches ul").append($li )
@@ -454,7 +473,7 @@ $(document).ready(function(){
     get_data();
   })
 
-  draw_graph();
+  // draw_graph();
 
   $('.update-filters').on('click', function(){
     $('#select_uniq_values_popup').modal('show');

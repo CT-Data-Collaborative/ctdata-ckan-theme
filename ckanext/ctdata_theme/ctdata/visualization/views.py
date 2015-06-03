@@ -270,6 +270,9 @@ class CompareView(View):
             data_item['x'] = data.index(data_item)
             data_item['Value'] = float(data_item['Value'])
             data_item['Year'] = str(data_item['Year'])
+            data_item['color'] = 'Default'
+            data_item['shape'] = 'Default'
+            data_item['size']  = 'Default'
 
         compatibles = self.get_compatibles(filters)
         return data, compatibles
