@@ -21,19 +21,18 @@ String.prototype.toTitleCase = function() {
       uppers[i].toUpperCase());
 
   return str;
-}
+};
 
-function load_comparable_datasets(dataset_name){
-  $.ajax({type: "GET",
-      url: "/compare/load_comparable_datasets/" + dataset_name,
-      success: function (data) {
-        data = JSON.parse(data)
-        $('#datasets_to_compare_with').html('')
-        $('#datasets_to_compare_with').html($(data.html));
-        $compare_with_select = $("select#compare_with")
-        matches = data.matches
-        main_geo_type = data.main_geo_type
-        comparable = data.comparable
-      }
-  });
-}
+// function load_comparable_datasets(dataset_name){
+//   $.ajax({type: "GET",
+//       url: "/compare/load_comparable_datasets/" + dataset_name,
+//       success: function (data) {
+//         data = JSON.parse(data)
+//         $('#datasets_to_compare_with').html('')
+//         $('#datasets_to_compare_with').html($(data.html));
+//         $compare_with_select = $("select#compare_with")
+//         matches = data.matches
+//         main_geo_type = data.main_geo_type
+//         comparable = data.comparable
+//       }
+// });

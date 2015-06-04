@@ -2,7 +2,7 @@ var $main_dataset_select = $("select#dataset_name"),
     $compare_with_select = $("select#compare_with"),
     matches              = {},
     x_axe_name           = "Value"
-    y_axe_name           = "Town"
+    y_axe_name           = "",
     main_geo_type        = "",
     mark_type            = "symbol",
     color                = 'data.Variable',
@@ -32,8 +32,9 @@ function draw_graph(){
   $('#container').html('');
   x_axe_type = ( x_axe_name == 'Value' ? "linear" : "ordinal");
   y_axe_type = ( y_axe_name == 'Value' ? "linear" : "ordinal");
-  height     = ( y_axe_name == 'Town'  ?  count_uniq_values_for(y_axe_name) * 10 : 900);
-  width      = ( x_axe_name == 'Town'  ?  count_uniq_values_for(x_axe_name) * 10 : 600);
+
+  height     = ( y_axe_name == main_geo_type  ?  count_uniq_values_for(y_axe_name) * 12 : 900);
+  width      = ( x_axe_name == main_geo_type  ?  count_uniq_values_for(x_axe_name) * 10 : 600);
 
   var spec = {
     "width": width,
@@ -70,7 +71,7 @@ function draw_graph(){
     ],
     "axes": [
       { "type": "x", "scale": "x", "orient": "top", "offset": 0, "grid": true, "sort": true,
-        "layer": "back", "titleOffset": 50, "ticks": 25, "title": x_axe_name,
+        "layer": "back", "titleOffset": 50, "ticks": 25, "title": '',
         "properties": {
            "ticks": {
              "stroke": {"value": "#000"}
@@ -97,7 +98,7 @@ function draw_graph(){
            }
          }
       },
-      {"type": "y", "scale": "y", "grid": true, "title": y_axe_name, "layer": "back", "offset": 0,
+      {"type": "y", "scale": "y", "grid": true, "title": '', "layer": "back", "offset": 0,
         "properties": {
            "ticks": {
              "stroke": {"value": "#000"}
@@ -110,7 +111,7 @@ function draw_graph(){
              "fontSize": {"value": 9},
              "align": {"value": "right"},
              "baseline": {"value": "middle"},
-             "dy": {"value": -7}
+             "dy": {"value": 0}
              // "dx": {"value": -70}
            },
            "title": {
@@ -276,12 +277,9 @@ function get_data(){
       if (data_items.length > 0){
           min        = parseInt(JSON.parse(data).min)
           max        = parseInt(JSON.parse(data).max)
-          // x_axe_name = "Value"
-          // y_axe_name = ""
-
 
           draw_graph();
-
+          y_axe_name = main_geo_type
           dragToDroppable('y', main_geo_type)
           dragToDroppable('x', 'Value')
           dragToDroppable('color_s', 'Variable')
@@ -342,11 +340,16 @@ function show_non_matches_for_comapre_dataset_in_popup(no_matches){
 }
 
 function check_first_inputs(){
-  $('.common_li_ul').each(function(i){
-    $($('.common_li_ul')[i]).find('input').first().attr('checked', true)
-    $($('.main_li_ul')[i]).find('input').first().attr('checked', true)
-    $($('.compare_li_ul')[i]).find('input').first().attr('checked', true)
-  })
+  // $('.common_li_ul').each(function(i){
+    $('.common_li_ul').each(function(i, el){
+      $(el).find('input').first().attr('checked', true)
+    });
+    $('.main_li_ul').each(function(i, el){
+      $(el).find('input').first().attr('checked', true)
+    });
+    $('.compare_li_ul').each(function(i, el){
+      $(el).find('input').first().attr('checked', true)
+    });
 }
 
 function get_filters() {
@@ -374,6 +377,22 @@ function  dragToDroppable(id, value){
     $('.droppable#' + id).html(
         '<li class="scale_variant ui-draggable ui-draggable-handle" style="top: 0px; left: 0px;">'+ value +'<a href="javascript:void" class="cancel-drag pull-right icon-remove"></a>'
     )
+}
+
+function load_comparable_datasets(dataset_name){
+  $.ajax({type: "GET",
+      url: "/compare/load_comparable_datasets/" + dataset_name,
+      success: function (data) {
+        data = JSON.parse(data)
+        $('#datasets_to_compare_with').html('')
+        $('#datasets_to_compare_with').html($(data.html));
+        $compare_with_select = $("select#compare_with")
+        matches = data.matches
+        main_geo_type = data.main_geo_type
+        y_axe_name = data.main_geo_type
+        comparable = data.comparable
+      }
+  });
 }
 
 $(document).ready(function(){

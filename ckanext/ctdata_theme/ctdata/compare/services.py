@@ -157,8 +157,16 @@ class CompareService(object):
       dataset_geo_type  = DatasetService.get_dataset_meta_geo_type(dataset_name)
       variable_variants = DatasetService.get_dataset_meta_field(dataset_name, 'Variable', '')
       year_variants     = DatasetService.get_dataset_meta_field(dataset_name, 'Year', '')
-      variable_data     = filter( lambda x: x['field'] == 'Variable', dataset_filters)
-      year_data         = filter( lambda x: x['field'] == 'Year', dataset_filters)[0]
+      try:
+        variable_data   = filter( lambda x: x['field'] == 'Variable', dataset_filters)
+      except IndexError:
+        return []
+
+      try:
+        year_data       = filter( lambda x: x['field'] == 'Year', dataset_filters)[0]
+      except IndexError:
+        return []
+
       locations         = session.query(Location).filter(Location.geography_type == dataset_geo_type).all()
 
       if year_data and year_data['values'][0] not in year_variants:
