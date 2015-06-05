@@ -42,18 +42,19 @@ h1, h2, h3, h4 {
 #topnav {
 	width:100%;
 	height:35px;
+	margin: 0;
 	background:#4670a7;
 }
 #topnav .spacing {
-	margin:0 10%;
-	width:1024px;
+	width: 100%;
 }
 #topnav ul {
 	list-style-type:none;
-	margin:0;
+	margin-bottom: 13px;
 	padding:0;
 	font-family:'Questrial', Arial, Sans-Serif;
 	float:right;
+	line-height: 35px;
 }
 #topnav li {
 	float:left;
@@ -76,34 +77,33 @@ h1, h2, h3, h4 {
 }
 
 #hdr {
+	margin:0;
 	text-align:left;
 	background:#fff;
-	width:100%;
-	height:110px;
 	border-bottom:1px dotted #ccc;
 }
 #hdr .spacing {
-	margin:0 10%;
-	width:1024px;
+	margin-bottom: 110px;
 }
 #hdr .logo {
-	margin: -35px 0 0 -50px;
-	float:left;
-	/*width: 217px;*/
+	margin: -42px 0 0 10%;
+	float: left;
 }
 
+#hdr .responsive{
+	margin: -8px 0 0 10% !important;
+}
 #hdr .headernav {
 
 }
 #hdr ul {
 	list-style-type:none;
-	margin:0;
-	margin-left: 250px;
+	margin-right: 50px;
+	margin-left: 50px;
 	padding:0;
 	font-family:'Roboto Condensed', Helvetica, Arial, Sans-Serif;
 	font-weight:normal;
-	width: 1000px;
-	/*float:right;*/
+	float:right;
 }
 #hdr li {
 	float:left;

@@ -255,17 +255,20 @@ function handle_incompatibles(){
 
 function apply_incompatibles(compatibles){
     all_inputs = $('.indicator-filter-radio[name!="Measure Type"]')
+
     $.each(all_inputs, function(i){
-        input = $(all_inputs[i])
-        if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
-            input.removeAttr("disabled");
-            input.parent().find("span").css("color", "black");
+        $input = $(all_inputs[i])
+        found  = false
+        jQuery.each(compatibles, function(i, c){  if (Object.keys(c)[0] == $input.attr('name') && c[Object.keys(c)[0]] == $input.val()) found = true })
+        if(found){
+          $input.removeAttr("disabled");
+          $input.parent().find("span").css("color", "gray");
         }else{
-            input.attr("disabled", true);
-            input.attr("checked",  false);
-            input.parent().find("span").css("color", "lightgray");
+          $input.attr("disabled", true);
+          $input.attr("checked", false);
+          $input.parent().find("span").css("color", "lightgray");
         }
-    });
+      });
 }
 
 $(function(){

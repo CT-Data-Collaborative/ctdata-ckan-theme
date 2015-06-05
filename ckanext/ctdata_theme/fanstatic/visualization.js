@@ -73,7 +73,7 @@ function update_headline_indicators(){
     names_hash = {}
 
     $('.edit_name').map(function(){
-        names_hash[$(this).attr('id')]= $(this).val();
+      names_hash[$(this).attr('id')]= $(this).val();
     });
 
     $.ajax({type: "POST",
@@ -498,14 +498,18 @@ function get_filters(){
 function handle_incompatibilities(compatibles){
 
   all_inputs = $("input[type='checkbox'][class != 'indicator_group']");
+
   $.each(all_inputs, function(i){
-    if($.inArray($(all_inputs[i]).val(), compatibles) != -1){
-      $(all_inputs[i]).removeAttr("disabled");
-      $(all_inputs[i]).parent().find("label").css("color", "gray");
+    $input = $(all_inputs[i])
+    found  = false
+    jQuery.each(compatibles, function(i, c){  if (Object.keys(c)[0] == $input.attr('name') && c[Object.keys(c)[0]] == $input.val()) found = true })
+    if(found){
+      $input.removeAttr("disabled");
+      $input.parent().find("label").css("color", "gray");
     }else{
-      $(all_inputs[i]).attr("disabled", true);
-      $(all_inputs[i]).attr("checked", false);
-      $(all_inputs[i]).parent().find("label").css("color", "lightgray");
+      $input.attr("disabled", true);
+      $input.attr("checked", false);
+      $input.parent().find("label").css("color", "lightgray");
     }
   });
 
@@ -597,7 +601,7 @@ function draw_table(){
               if (type != undefined)
                 cur_value = unit_for_value(cur_value, type)
 
-              if (data['data'][row_index]['moes'].length != 0){
+              if (data['data'][row_index]['moes'].length != 0 && cur_value != '*'){
                 moes_value = data['data'][row_index]['moes'][year_index]
                 if (type != undefined) moes_value = unit_for_value(moes_value, type);
                 cur_value += '<span class="moes"> ± ' + moes_value + '</span>'
@@ -656,7 +660,7 @@ function draw_table(){
 
 
       }
-
+  console.log('here')
   hide_spinner();
 });
 }
@@ -754,9 +758,11 @@ function draw_chart(){
 
             cur_series_erorrs['data'] = []
             $.each(cur_series_data, function(j){
-              low  = parseInt(cur_series_data[j]) - parseInt(series_data[i]['moes'][j])
-              high = parseInt(cur_series_data[j]) + parseInt(series_data[i]['moes'][j])
-              cur_series_erorrs['data'].push([low, high]);
+              if (cur_series_data[j]){
+                low  = parseInt(cur_series_data[j]) - parseInt(series_data[i]['moes'][j])
+                high = parseInt(cur_series_data[j]) + parseInt(series_data[i]['moes'][j])
+                cur_series_erorrs['data'].push([low, high]);
+              }
             });
 
             cur_series_erorrs['type'] = 'errorbar';
