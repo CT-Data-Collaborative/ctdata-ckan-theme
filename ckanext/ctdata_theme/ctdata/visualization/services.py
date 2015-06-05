@@ -127,6 +127,14 @@ class DatasetService(object):
         return value
 
     @staticmethod
+    def get_dataset_meta_dimensions(dataset_id):
+        default = []
+        value   = DatasetService.get_dataset_meta_field(dataset_id, 'Dimensions', default)
+        if value != default:
+            value = value.split(';')
+        return value
+
+    @staticmethod
     def get_dataset_meta_field(dataset_id, field_name, default):
         meta    = toolkit.get_action('package_show')(data_dict={'id': dataset_id})['extras']
         data    = filter(lambda x: x['key'] == field_name, meta)

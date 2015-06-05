@@ -512,5 +512,7 @@ a.edit_indicator img{
 	-webkit-box-shadow: none;
 }
 
-
+.table td.bordered{
+  border: 1px solid rgb(238, 238, 238);
+}
 

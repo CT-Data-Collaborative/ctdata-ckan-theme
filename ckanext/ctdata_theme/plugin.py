@@ -55,8 +55,17 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
         db.init_sa(config['sqlalchemy.url'])
         db.init_community_data(config['ctdata.communities_source'])
+        db.init_years_data(config['ckan.datastore.write_url'])
 
     def before_map(self, route_map):
+        with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.ctdata.compare.controllers:CompareController') as m:
+            m.connect('admin_compare', '/admin/compare', action='admin_compare')
+            m.connect('compare', '/compare', action='compare')
+            m.connect('load_comparable_datasets', '/compare/load_comparable_datasets/{dataset_name}', action='load_comparable_datasets')
+            m.connect('update_years_matches', '/compare/update_years_matches', action='update_years_matches')
+            m.connect('add_year_matches', '/compare/add_year_matches', action='create_year_matches')
+            m.connect('join_for_two_datasets', '/compare/join_for_two_datasets/', action='join_for_two_datasets')
+
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
             m.connect('news', '/news', action='news')
             m.connect('special_projects', '/special_projects', action='special_projects')
@@ -127,11 +136,15 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
     def get_helpers(self):
         return { 'locations_helper': locations,
                  'geography_types': _geography_types,
+                 'empty_href': _empty_href,
                  'link_to_dataset_with_filters': _link_to_dataset_with_filters}
 
 
 
 ####### HELPER METHODS ##########
+
+def _empty_href():
+    return 'javascript:void(0);'
 
 def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = ''):
     dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
