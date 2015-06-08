@@ -1,0 +1,93 @@
+{% extends "page.html" %}
+
+{% block subtitle %}Profile Page{% endblock %}
+{% block page_name %}Profile Page{% endblock %}
+{% block page_description %} Welcome to your account profile page on <a href="http://ctdata.org">ctdata.org</a> {% endblock %}
+
+{% block primary %}
+
+<div class="left-block">
+  <div class="text-center">
+    <h2> User Info
+    {% link_for 'Manage My Profile', controller='user', action='edit', id=c.user.name, class_='btn btn-mini btn-default pull-right', icon='wrench' %}
+    </h2>
+  </div>
+
+  <div class="user-image">
+    {{ h.gravatar((c.userobj.email_hash if c and c.userobj else ''), size=200) }}
+    <br>
+    <br>
+    <h3>{{ c.userobj.display_name }}</h3>
+
+    <p class="empty">
+      {% trans %} You have not provided a biography. {% endtrans %}
+    </p>
+
+    <p class="">
+      <b>Username:</b>
+      {{ c.user_dict.name }}
+    </p>
+
+    <p class="">
+      <b>Email:</b>
+      {{ c.user_dict.email }}
+    </p>
+    <p class="">
+      <b>Member Since:</b>
+      {{ h.render_datetime(c.user_dict.created) }}
+    </p>
+  </div>
+
+</div>
+
+<div class="right-block">
+
+  <div class="block">
+    <div class="text-center"><h2> Gallery </h2></div>
+
+    <div class="block-content">
+      <ul>
+        {% for profile in profiles %}
+          <li class="item">
+            <h4> <a href="/community/{{profile.id}}" class="">{{profile.name}}</4>
+
+            <a href="javascript:void(0)" class="remove_profile pull-right btn btn-default btn-mini" id="{{profile.id}}">
+              <i class='fa fa-times text-info'></i>
+            </a>
+            </h3>
+
+            <!-- {% for indicator in profile.indicators %}
+              <span class="indicator">
+              <a href="{{indicator.link_to_visualization()}}" class="underlined"> {{ indicator.dataset_name() }} </a>
+              </span>
+            {% endfor %} -->
+
+          <!-- <br class="clear"> -->
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+  <div class="block">
+    <div class="text-center"><h2> Datasets News </h2></div>
+  </div>
+  <div class="block">
+    <div class="text-center"><h2> Groups News </h2></div>
+  </div>
+  <div class="block">
+    <div class="text-center"><h2> Profiles </h2></div>
+  </div>
+
+</div>
+
+
+
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="/common/css/user_page.css">
+
+{% endblock %}

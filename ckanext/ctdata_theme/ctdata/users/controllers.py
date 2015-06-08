@@ -29,6 +29,24 @@ class UserController(UserController):
         self.user_service = UserService(self.session)
         self.location_service = LocationService(self.session)
 
+    def user_page(self):
+        user_name = http_request.environ.get("REMOTE_USER")
+        user      = self.user_service.get_or_create_user(user_name) if user_name else None
+
+        if not user:
+            return self.login()
+
+        try:
+            context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
+            c.user_dict = get_action('user_show')(context, {'id': c.user})
+        except toolkit.ObjectNotFound:
+            abort(404)
+
+        profiles = self.location_service.get_user_profiles(user.ckan_user_id)
+
+        return base.render('user/user_page.html', extra_vars={'profiles': profiles})
+
+
     def community_profiles(self, user_id):
         user_name = http_request.environ.get("REMOTE_USER")
 
@@ -36,7 +54,7 @@ class UserController(UserController):
         c.user  = user_id
         context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
         try:
-            c.user_dict = get_action('user_show')(context, {'id': user_id})
+            c.user_dict = get_action('user_show')(context, {'id': user_id,'include_num_followers': True})
         except toolkit.ObjectNotFound:
             abort(404)
 
@@ -80,7 +98,7 @@ class UserController(UserController):
         context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
 
         try:
-            c.user_dict = get_action('user_show')(context, {'id': user_id})
+            c.user_dict = get_action('user_show')(context, {'id': user_id,'include_num_followers': True})
         except toolkit.ObjectNotFound:
             abort(404)
         return base.render('user/user_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': user_name, 'requested_user_name': requested_user_name})
