@@ -80,6 +80,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         with routes.mapper.SubMapper(
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
+            m.connect('user_page', '/user-page', action='user_page')
             m.connect('user_community_profiles', '/user/{user_id}/community_profiles', action='community_profiles')
             m.connect('my_gallery', '/dashboard/gallery', action='my_gallery')
             m.connect('my_community_profiles', '/dashboard/community-profiles', action='my_community_profiles')

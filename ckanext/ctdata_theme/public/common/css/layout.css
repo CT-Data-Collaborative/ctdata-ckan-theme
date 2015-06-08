@@ -456,9 +456,9 @@ white-space: nowrap;
 .col-7{ width:33px;}
 
 
-a.underlined{
+/*a.underlined{
 	text-decoration: underline !important;
-}
+}*/
 
 a.disabled {
   opacity: 0.5;
