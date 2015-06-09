@@ -56,17 +56,27 @@
 }
 
 li.item{
-  border-bottom: 1px dashed #C4C4C4;
+  border-bottom: 1px dotted #C4C4C4;
   margin-bottom: 3px;
   margin-top: 3px;
+  padding-bottom: 5px;
   /*background: rgba(210, 236, 244, 0.11);*/
 }
 
+li.item h4{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
 li.item h4 a{
   color: black !important;;
-  text-decoration: underline !important;
+}
+li.item h4 a:hover, span.indicator a:hover{
+  color: black !important;;
 }
 
+span.indicator a{
+  color: gray !important;;
+}
 
 
 

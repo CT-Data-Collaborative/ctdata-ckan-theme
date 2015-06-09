@@ -43,8 +43,16 @@ class UserController(UserController):
             abort(404)
 
         profiles = self.location_service.get_user_profiles(user.ckan_user_id)
+        indicators = self.community_profile_service.get_gallery_indicators_for_user(user.ckan_user_id, 'all')
 
-        return base.render('user/user_page.html', extra_vars={'profiles': profiles})
+         # Get list of groups
+        context   = {'model': model, 'session': model.Session, 'user': c.user or c.author, 'for_view': True,
+                   'auth_user_obj': c.userobj, 'use_cache': False}
+        data_dict = {'am_member': True}
+        users_groups     = get_action('group_list_authz')(context, data_dict)
+        c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
+
+        return base.render('user/user_page.html', extra_vars={'profiles': profiles, 'gallery_indicators': indicators})
 
 
     def community_profiles(self, user_id):

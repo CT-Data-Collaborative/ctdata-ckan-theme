@@ -43,7 +43,7 @@
 <div class="right-block">
 
   <div class="block">
-    <div class="text-center"><h2> Gallery </h2></div>
+    <div class="text-center"><h2> Profiles </h2></div>
 
     <div class="block-content">
       <ul>
@@ -52,15 +52,16 @@
             <h4> <a href="/community/{{profile.id}}" class="">{{profile.name}}</4>
 
             <a href="javascript:void(0)" class="remove_profile pull-right btn btn-default btn-mini" id="{{profile.id}}">
-              <i class='fa fa-times text-info'></i>
+              <i class='fa fa-times text-error'></i>
             </a>
             </h3>
 
-            <!-- {% for indicator in profile.indicators %}
+            {% for indicator in profile.indicators %}
               <span class="indicator">
               <a href="{{indicator.link_to_visualization()}}" class="underlined"> {{ indicator.dataset_name() }} </a>
               </span>
-            {% endfor %} -->
+              <br>
+            {% endfor %}
 
           <!-- <br class="clear"> -->
           </li>
@@ -70,24 +71,118 @@
 
   </div>
   <div class="block">
+    <div class="text-center"><h2> Gallery
+    </h2></div>
+
+    <div class="block-content">
+    {% if gallery_indicators %}
+      <table class='table my_table hidden'>
+          <thead>
+              <th> Indicator </th>
+              <th> Groups </th>
+              <th>Permission</th>
+          </thead>
+          <tbody>
+              {% for indicator in gallery_indicators %}
+                <tr class="table_data" id="{{indicator.id}}">
+                    <td class='name'> {{indicator.name}}</td>
+                    <td class='groups'>
+                      {% for group in indicator.groups(c) %}
+                        <a href="{{'/group/' + group['name']}}"> {{group['title']}} </a>
+                        <br/>
+                        <span class="group_id hidden">{{group['id']}}</span>
+                        <span class="group_name hidden">{{group['title']}}</span>
+
+                      {% endfor %}
+                    </td>
+                    <td class="permission">
+                      {{indicator.permission}}
+                    </td>
+                </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+
+
+      <ul>
+          {% for indicator in gallery_indicators %}
+            <li class="dataset-item" id="{{indicator.id}}">
+              <div class= 'dataset-content'>
+                <h3 class='dataset-heading'>
+                  <a href="{{ indicator.link_to_visualization() }}">
+                    {% if  indicator.visualization_type == 'table' %}
+                      <img id="table_icon" src="/common/images/displayopt1-inv.png" alt="" />
+                    {% endif %}
+                    {% if  indicator.visualization_type == 'chart' %}
+                      <img id="bar_icon" src="/common/images/displayopt2.png" alt="" />
+                    {% endif %}
+                    {% if  indicator.visualization_type == 'line' %}
+                      <img id="line_icon" src="/common/images/displayopt3.png" alt="" />
+                    {% endif %}
+                    {% if  indicator.visualization_type == 'map' %}
+                      <img id="line_icon" src="/common/images/displayopt4.png" alt="" />
+                    {% endif %}
+
+                    {{indicator.name}}
+
+                  </a>
+
+                  <a href="javascript:void(0)" class="remove_indicator pull-right btn btn-default btn-mini" id="{{indicator.id}}"><i class='fa fa-times text-error'></i></a>
+                  <a href="javascript:void(0)" class="edit_indicator btn btn-default btn-mini pull-right" id="{{indicator.id}}">Edit</a>
+                </h3>
+                Dataset: {{indicator.dataset_name()}}
+                <br>
+                Created: {{indicator.created_at.date()}}
+                {% if indicator.groups(c) %}
+                <br>
+                Groups:
+                {% for group in indicator.groups(c) %}
+                  <a href="{{'/group/' + group['name']}}"> {{group['title']}} </a>
+
+                  {% if loop.index != indicator.groups(c)|length %}
+                    ,
+                  {% endif %}
+                {% endfor %}
+                {% endif %}
+                <br>
+                Permission: {{indicator.permission}}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+
+      <br/>
+      <br/>
+    {% else %}
+        There're no indicators for this gallery yet.
+    {% endif %}
+
+    </div>
+
+
+
+  </div>
+
+  <div class="block">
     <div class="text-center"><h2> Datasets News </h2></div>
   </div>
   <div class="block">
     <div class="text-center"><h2> Groups News </h2></div>
   </div>
-  <div class="block">
-    <div class="text-center"><h2> Profiles </h2></div>
-  </div>
 
 </div>
 
 
-
+{% snippet 'visualization/snippets/save_indicator_to_gallery.html', group_dropdown=c.group_dropdown %}
 {% endblock %}
+
 
 
 {% block scripts %}
 {{ super() }}
 <link rel="stylesheet" type="text/css" href="/common/css/user_page.css">
+{% resource 'ctdata_theme/my_gallery.js' %}
+{% resource 'ctdata_theme/bootbox.js' %}
+{% resource 'ctdata_theme/user_communities.js' %}
 
 {% endblock %}
