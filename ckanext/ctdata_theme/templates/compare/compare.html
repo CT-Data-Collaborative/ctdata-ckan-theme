@@ -30,6 +30,7 @@
     </div>
     </form>
 
+    <div class="spinner small"> <img src="/common/images/loading.gif"/> </div>
     <div id="datasets_to_compare_with" class="">
     </div>
 
@@ -43,7 +44,20 @@
 
 
 
-  <div class="span2 data">
+  <div class="span3 data">
+
+
+      <h2> <span style="position:relative; left: -27px;">Item Info</span>
+      <span class="help-text">Hover over the item </span>
+      </h2>
+      <div id="info">
+        <b><span class="location"></span></b>
+        <br>
+        <span class="variable_1"></span> <b><span class="variable_1_value"></span></b>
+        <br>
+        <span class="variable_2"></span> <b><span class="variable_2_value"></span></b>
+      </div>
+        <br>
       <h2>Data</h2>
        <div id="y_axe" class="">
         <span class="axe_name"> Y </span>
@@ -55,16 +69,8 @@
         <div class="droppable ui-widget-header" id="x"></div>
       </div>
       <br>
-      <h2> <span style="position:relative; left: 0px;">Marks</span>
+      <h2> <span style="position:relative; left: 0px;">Marks</span></h2>
 
-     <!--  <select id="change_mark_type" class="marks_select pull-right">
-        <option value="symbol" selected="selected" label="point">symbol</option>
-        <option value="tick" label="tick">rect</option>
-        <option value="line" label="line">line</option>
-        <option value="area" label="area">area</option>
-        <!-- <option value="text" label="text">text</option> -->
-      <!-- </select> -->
-      </h2>
       <div id="color" class="">
         <span class="axe_name icon-adjust"></span>
         <div class="droppable ui-widget-header" id="color_s"></div>
@@ -79,6 +85,7 @@
         <span class="axe_name icon-th-large"> </span>
         <div class="droppable ui-widget-header" id="shape_s"></div>
       </div>
+
    </div>
 
   <div class="span8 graphic">
@@ -101,7 +108,9 @@
           </ul>
         </div>
       </div>
-   </div>
+  </div>
+
+
 
 </div>
 
