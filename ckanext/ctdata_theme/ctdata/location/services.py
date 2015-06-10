@@ -34,6 +34,9 @@ class LocationService(object):
     def get_locations_by_type(self, type):
         return self.session.query(Location).filter(Location.geography_type == type ).all()
 
+    def get_locations_by_type(self, type):
+        return self.session.query(Location).filter(Location.geography_type == type ).all()
+
     def get_location(self, location_name):
         location = self.session.query(Location).filter(Location.name == location_name).first()
         if not location:

@@ -259,6 +259,23 @@ class ChartView(View):
 
         return result
 
+class CompareView(View):
+    def convert_data(self, data, filters):
+        geography       = filter(lambda x: x['key'] == 'Geography', self.query_builder.dataset.ckan_meta['extras'])
+        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
+        for data_item in data:
+            data_item['label'] = str(data_item['Value'])
+            data_item['location_name'] = data_item[geography_param]
+            data_item['x'] = data.index(data_item)
+            data_item['Value'] = float(data_item['Value'])
+            data_item['Year'] = str(data_item['Year'])
+            data_item['color'] = 'Default'
+            data_item['shape'] = 'Default'
+            data_item['size']  = 'Default'
+
+        compatibles = self.get_compatibles(filters)
+        return data, compatibles
 
 class ProfileView(View):
     """
@@ -430,6 +447,8 @@ class ViewFactory(object):
             return TableView(querybuilder, database)
         elif name == 'chart':
             return ChartView(querybuilder, database)
+        elif name == 'compare':
+            return CompareView(querybuilder, database)
         elif name == 'profile':
             return ProfileView(querybuilder, database)
         elif name == 'map':
