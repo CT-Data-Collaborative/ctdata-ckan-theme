@@ -200,8 +200,11 @@ class CompareService(object):
       dataset_name = json_body.get('main_dataset')
       compare_name = json_body.get('compare_with')
       filters      = json_body.get('filters')
+      matches      = json_body.get('matches')
+      matches_keys = map(lambda m: m.keys()[0], matches) + [DatasetService.get_dataset_meta_geo_type(dataset_name)]
+
       for f in filters:
-          f['field'] = f['field'].replace('-', ' ')
+        f['field'] = f['field'].replace('-', ' ')
 
       dataset      = DatasetService.get_dataset(dataset_name)
       compare_with = DatasetService.get_dataset(compare_name)
@@ -210,16 +213,30 @@ class CompareService(object):
       dataset_data = CompareService.prepare_dataset_filters_to_load_data(dataset_name, dataset, filters, filters_dims, 'main_val')
       compare_data = CompareService.prepare_dataset_filters_to_load_data(compare_name, compare_with, filters, filters_dims, 'compare_val')
 
-
       for data_item in dataset_data:
-        # if (data_item['fips'] and len( filter(lambda x: x['fips'] == data_item['fips'], compare_data) ) > 0) or len( filter(lambda x: x['location_name'] == data_item['location_name'], dataset_data) ) > 0:
-        data_item['y'] = 0
-        data.append(data_item)
+        for compare_item in compare_data:
+          matches = True
+          for match_key in matches_keys:
+            if data_item[match_key] != compare_item[match_key]:
+              matches = False
+              break
 
-      for data_item in compare_data:
-        # if (data_item['fips'] and len( filter(lambda x: x['fips'] == data_item['fips'], dataset_data) ) > 0) or len( filter(lambda x: x['location_name'] == data_item['location_name'], dataset_data) ) > 0:
-        data_item['y'] = 1
-        data.append(data_item)
+          if matches:
+            data_item[ data_item['Variable']]    = data_item['Value']
+            data_item[ compare_item['Variable']] = compare_item['Value']
+            data_item['label'] = '%s - %s: %s, %s: %s.' % (data_item['location_name'], data_item['Variable'], data_item['Value'], compare_item['Variable'], compare_item['Value'])
+            data.append(data_item)
+
+
+      # if (data_item['fips'] and len( filter(lambda x: x['fips'] == data_item['fips'], compare_data) ) > 0) or len( filter(lambda x: x['location_name'] == data_item['location_name'], dataset_data) ) > 0:
+      # if len( filter(lambda x: x['location_name'] == data_item['location_name'], dataset_data) ) > 0
+      #   data_item['y'] = 0
+      #   data.append(data_item)
+
+      # for data_item in compare_data:
+      #   # if (data_item['fips'] and len( filter(lambda x: x['fips'] == data_item['fips'], dataset_data) ) > 0) or len( filter(lambda x: x['location_name'] == data_item['location_name'], dataset_data) ) > 0:
+      #   data_item['y'] = 1
+      #   data.append(data_item)
 
       minimum = min(map(lambda i: float(i['Value']), data)) if data else 0
       maximum = max(map(lambda i: float(i['Value']), data)) if data else 0

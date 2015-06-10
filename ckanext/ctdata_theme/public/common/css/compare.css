@@ -53,8 +53,23 @@ li.scale_variant{
 .data{
   border-right: dotted 1px #BFBDBD;
   min-height: 500px;
+  padding-left: 10px;
 }
 
+#info{
+  position:relative;
+  left: -27px;
+  border-bottom: dotted 1px #BFBDBD;
+  min-height: 85px;
+}
+.help-text{
+  font-size: 10px;
+  color: gray;
+}
+
+.variable_1, .variable_2{
+  font-size: 11px;
+}
 .graphic{
   min-height: 500px;
   padding: 0px;
@@ -87,7 +102,7 @@ li.scale_variant{
   bottom: 100% !important;
   vertical-align: middle;
   height: inherit;
-  padding-top: 7%;
+  padding-top: 5%;
 }
 
 .droppable{
@@ -180,6 +195,20 @@ ul#main, ul#compare{
   font-size: 21px;
   margin: 145px;
   color: #A35050;
+}
+
+.spinner.small{
+  /*display: block;*/
+  width: 90px;
+  height: 90px;
+  position: relative;
+  top: 180px;
+  left: 50px;
+}
+
+.spinner img{
+  width: 95px;
+  height: 60px;
 }
 /*#container{
   height: 700px;
