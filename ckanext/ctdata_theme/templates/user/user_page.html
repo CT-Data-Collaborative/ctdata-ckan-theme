@@ -1,7 +1,7 @@
 {% extends "page.html" %}
 
-{% block subtitle %}Profile Page{% endblock %}
-{% block page_name %}Profile Page{% endblock %}
+{% block subtitle %}My Dashboard{% endblock %}
+{% block page_name %}My Dashboard{% endblock %}
 {% block page_description %} Welcome to your account profile page on <a href="http://ctdata.org">ctdata.org</a> {% endblock %}
 
 {% block primary %}
@@ -9,7 +9,7 @@
 <div class="left-block">
   <div class="text-center">
     <h2> User Info
-    {% link_for 'Manage My Profile', controller='user', action='edit', id=c.user.name, class_='btn btn-mini btn-default pull-right', icon='wrench' %}
+    {% link_for 'Manage My Profile', controller='user', action='edit', id=c.userobj.name, class_='btn btn-mini btn-default pull-right', icon='wrench' %}
     </h2>
   </div>
 
@@ -40,8 +40,18 @@
 
 </div>
 
-<div class="right-block">
 
+
+
+
+<div class="right-block">
+  <div class="logout-block pull-right">
+    <a href="{{ h.url_for('/user/_logout') }}" title="{{ _('Log out') }}" class="btn btn-mini">
+      <i class="icon-signout"></i> Logout
+    </a>
+  </div>
+  <br>
+  <br>
   <div class="block">
     <div class="text-center"><h2> Profiles </h2></div>
 
@@ -51,8 +61,9 @@
           <li class="item">
             <h4> <a href="/community/{{profile.id}}" class="">{{profile.name}}</4>
 
-            <a href="javascript:void(0)" class="remove_profile pull-right btn btn-default btn-mini" id="{{profile.id}}">
-              <i class='fa fa-times text-error'></i>
+            <a href="javascript:void(0)" class="remove_profile underlined pull-right btn-mini" id="{{profile.id}}">
+              Remove
+              <!-- <i class='fa fa-times text-error'></i> -->
             </a>
             </h3>
 
@@ -126,9 +137,9 @@
                     {{indicator.name}}
 
                   </a>
-
-                  <a href="javascript:void(0)" class="remove_indicator pull-right btn btn-default btn-mini" id="{{indicator.id}}"><i class='fa fa-times text-error'></i></a>
-                  <a href="javascript:void(0)" class="edit_indicator btn btn-default btn-mini pull-right" id="{{indicator.id}}">Edit</a>
+                  <!-- <i class='fa fa-times text-error'></i> -->
+                  <a href="javascript:void(0)" class="remove_indicator underlined pull-right btn-mini" id="{{indicator.id}}">Remove</a>
+                  <a href="javascript:void(0)" class="edit_indicator underlined btn-mini pull-right" id="{{indicator.id}}">Edit</a>
                 </h3>
                 Dataset: {{indicator.dataset_name()}}
                 <br>
@@ -158,16 +169,19 @@
     {% endif %}
 
     </div>
-
-
-
   </div>
 
   <div class="block">
     <div class="text-center"><h2> Datasets News </h2></div>
+    <div class="block-content">
+      {{ c.dataset_activity_stream }}
+    </div>
   </div>
   <div class="block">
     <div class="text-center"><h2> Groups News </h2></div>
+    <div class="block-content">
+      {{ c.group_activity_stream }}
+    </div>
   </div>
 
 </div>

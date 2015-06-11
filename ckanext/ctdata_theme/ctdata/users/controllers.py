@@ -18,8 +18,11 @@ from ..topic.services import TopicSerivce
 from ..location.services import LocationService
 from ckan.controllers.user import UserController
 from IPython import embed
+import ckan.lib.helpers as h
+import ckan.lib.activity_streams as activity_streams
 
 import ckan.logic as logic
+from pylons import config
 get_action = logic.get_action
 
 class UserController(UserController):
@@ -29,29 +32,95 @@ class UserController(UserController):
         self.user_service = UserService(self.session)
         self.location_service = LocationService(self.session)
 
-    def user_page(self):
+    def index(self):
+        if c.userobj and c.userobj.sysadmin:
+            LIMIT = 20
+
+            page = self._get_page_number(request.params)
+            c.q = request.params.get('q', '')
+            c.order_by = request.params.get('order_by', 'name')
+
+            context = {'return_query': True, 'user': c.user or c.author,
+                       'auth_user_obj': c.userobj}
+
+            data_dict = {'q': c.q,
+                         'order_by': c.order_by}
+            try:
+                check_access('user_list', context, data_dict)
+            except NotAuthorized:
+                abort(401, _('Not authorized to see this page'))
+
+            users_list = get_action('user_list')(context, data_dict)
+
+            c.page = h.Page(
+                collection=users_list,
+                page=page,
+                url=h.pager_url,
+                item_count=users_list.count(),
+                items_per_page=LIMIT
+            )
+            return render('user/list.html')
+        else:
+            return h.redirect_to('/')
+
+
+    def logged_in(self):
+        came_from = http_request.params.get('came_from', '')
+        if h.url_is_local(came_from):
+            return h.redirect_to(str(came_from))
+
+        if c.user:
+            context = None
+            data_dict = {'id': c.user}
+
+            user_dict = get_action('user_show')(context, data_dict)
+            user_ref = c.userobj.get_reference_preferred_for_uri()
+            return h.redirect_to('/')
+        else:
+            err = 'Login failed. Bad username or password.'
+            if  h.asbool(config.get('ckan.legacy_templates', 'false')):
+                h.flash_error(err)
+                h.redirect_to(controller='user',
+                              action='login', came_from=came_from)
+            else:
+                return self.login(error=err)
+
+    def dashboard(self):
         user_name = http_request.environ.get("REMOTE_USER")
         user      = self.user_service.get_or_create_user(user_name) if user_name else None
 
+
         if not user:
             return self.login()
-
         try:
             context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
             c.user_dict = get_action('user_show')(context, {'id': c.user})
         except toolkit.ObjectNotFound:
             abort(404)
 
-        profiles = self.location_service.get_user_profiles(user.ckan_user_id)
-        indicators = self.community_profile_service.get_gallery_indicators_for_user(user.ckan_user_id, 'all')
+        profiles   = self.location_service.get_user_profiles(c.userobj.id)
+        indicators = self.community_profile_service.get_gallery_indicators_for_user(c.userobj.id, 'all')
 
-         # Get list of groups
-        context   = {'model': model, 'session': model.Session, 'user': c.user or c.author, 'for_view': True,
-                   'auth_user_obj': c.userobj, 'use_cache': False}
-        data_dict = {'am_member': True}
+        data_dict = {'am_member': True }
         users_groups     = get_action('group_list_authz')(context, data_dict)
         c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
 
+        c.followee_list = get_action('followee_list')(context, {'id': c.userobj.id})
+        activity_stream = logic.get_action('dashboard_activity_list')(context, data_dict)
+
+        c.dataset_activity = filter(lambda a: len(a['data'].keys()) > 0 and a['data'].keys()[0] == 'package', activity_stream)
+        c.group_activity   = filter(lambda a: len(a['data'].keys()) > 0 and a['data'].keys()[0] == 'group',   activity_stream)
+
+        extra_vars = {
+            'controller': 'user',
+            'action': 'dashboard',
+            'offset': 0,
+        }
+
+        c.dataset_activity_stream = activity_streams.activity_list_to_html(context, c.dataset_activity, extra_vars)
+        c.group_activity_stream   = activity_streams.activity_list_to_html(context, c.group_activity, extra_vars)
+
+        self.session.close()
         return base.render('user/user_page.html', extra_vars={'profiles': profiles, 'gallery_indicators': indicators})
 
 
