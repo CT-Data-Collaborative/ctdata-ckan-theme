@@ -101,5 +101,6 @@ span.indicator a{
   color: gray !important;;
 }
 
-
-
+.gray_text{
+  color: gray;
+}
