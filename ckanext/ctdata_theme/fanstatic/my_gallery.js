@@ -14,6 +14,9 @@ function show_groups_list_or_hide(){
 }
 
 $(function(){
+  $('.load-more').hide()
+  $('.actor').find('a').attr('href', 'javascript:void')
+
   $('.create_headline_indicator').html('Update')
   $('.close_popup').click(function() {
     $("#create_gallery_indicator_popup").modal('hide')
