@@ -9,7 +9,8 @@
 {% if c.userobj %}
     <li>
         <a href="/dashboard" class="image" title="{{ _('View profile') }}">
-          {{ h.gravatar((c.userobj.email_hash if c and c.userobj else ''), size=22) }}
+          <i class="icon-dashboard"></i>
+
             <!-- <span class="username">{{ c.userobj.display_name }}</span> -->
             My Dashboard
         </a>
@@ -22,11 +23,11 @@
         <span>{{ new_activities }}</span>
     </a>
     </li> -->
-    <li>
+    <!-- <li>
         <a href="{{ h.url_for(controller='user', action='edit', id=c.userobj.name) }}" title="{{ _('Edit settings') }}">
             <i class="icon-cog"></i>
         </a>
-    </li>
+    </li> -->
 {% else %}
 <li class="">{% link_for _('Login'), controller='user', action='login' %}</li>
 <li class="">{% link_for _('Register'), controller='user', action='register', class_='sub' %}</li>
