@@ -16,7 +16,6 @@
   <div class="user-image">
     {{ h.gravatar((c.userobj.email_hash if c and c.userobj else ''), size=200) }}
     <br>
-    <br>
     <h3>{{ c.userobj.display_name }}</h3>
 
     <p class="empty">
@@ -167,21 +166,10 @@
         {% for profile in profiles %}
           <li class="item">
             <h4> <a href="/community/{{profile.id}}" class="">{{profile.name}}</4>
-
             <a href="javascript:void(0)" class="remove_profile underlined pull-right btn-mini" id="{{profile.id}}">
               Remove
-              <!-- <i class='fa fa-times text-error'></i> -->
             </a>
             </h3>
-
-            {% for indicator in profile.indicators %}
-              <span class="indicator">
-              <a href="{{indicator.link_to_visualization()}}" class="underlined"> {{ indicator.dataset_name() }} </a>
-              </span>
-              <br>
-            {% endfor %}
-
-          <!-- <br class="clear"> -->
           </li>
         {% endfor %}
       </ul>
