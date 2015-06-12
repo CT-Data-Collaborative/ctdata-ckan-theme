@@ -93,6 +93,79 @@ class GroupController(GroupController):
       self.session.close()
       return json.dumps({'success': True})
 
+
+    def index(self):
+        group_type = self._guess_group_type()
+
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user or c.author, 'for_view': True,
+                   'with_private': False}
+
+        q = c.q = http_request.params.get('q', '')
+        data_dict = {'all_fields': True, 'q': q}
+
+        sort_by = c.sort_by_selected = http_request.params.get('sort')
+        if sort_by:
+            data_dict['sort'] = sort_by
+        try:
+            self._check_access('site_read', context)
+        except NotAuthorized:
+            abort(401, _('Not authorized to see this page'))
+
+        # pass user info to context as needed to view private datasets of
+        # orgs correctly
+        if c.userobj:
+            context['user_id'] = c.userobj.id
+            context['user_is_admin'] = c.userobj.sysadmin
+
+        # results = self._action('group_list_authz')(context, data_dict)
+        results = self._action('group_list_authz')(context, {'all_fields': True, 'q': q})
+        c.page = h.Page(
+            collection=results,
+            page = self._get_page_number(http_request.params),
+            url=h.pager_url,
+            items_per_page=21
+        )
+        return base.render(self._index_template(group_type))
+
+    def read(self, id, limit=20):
+        group_type = self._get_group_type(id.split('@')[0])
+        if group_type != self.group_type:
+            abort(404, _('Incorrect group type'))
+
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user or c.author,
+                   'schema': self._db_to_form_schema(group_type=group_type),
+                   'for_view': True}
+        data_dict = {'id': id}
+
+        # unicode format (decoded from utf8)
+        q = c.q = request.params.get('q', '')
+
+        try:
+            # Do not query for the group datasets when dictizing, as they will
+            # be ignored and get requested on the controller anyway
+            data_dict['include_datasets'] = False
+            c.group_dict = self._action('group_show')(context, data_dict)
+            c.members    = self._action('member_list')(context, {'id': id, 'object_type': 'user'})
+            # c.members  = []
+
+            # for member in members:
+            #   user_id = member[0]
+            #   state   = self.user_service.get_user_state(user_id)
+            #   member  = member + (state,)
+
+            #   c.members.append(member)
+
+            c.group = context['group']
+        except NotFound:
+            abort(404, _('Group not found'))
+        except NotAuthorized:
+            abort(401, _('Unauthorized to read group %s') % id)
+
+        self._read(id, limit)
+        return render(self._read_template(c.group_dict['type']))
+
     def members(self, id):
         context = {'model': model, 'session': model.Session,
                    'user': c.user or c.author}
