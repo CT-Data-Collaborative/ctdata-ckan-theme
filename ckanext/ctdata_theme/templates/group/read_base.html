@@ -13,14 +13,18 @@
 {% block content_action %}
   {% if h.check_access('group_update', {'id': c.group_dict.id}) %}
     {% link_for _('Manage'), controller='group', action='edit', id=c.group_dict.name, class_='btn', icon='wrench' %}
+  {% else %}
+    <div class="follow_button">
+      {{ h.follow_button('group', c.group_dict.id) }}
+    </div>
   {% endif %}
+
 {% endblock %}
 
 {% block content_primary_nav %}
   {{ h.build_nav_icon('group_read', _('Datasets'), id=c.group_dict.name) }}
   {{ h.build_nav_icon('group_indicators', _('Indicators'), group_id=c.group_dict.name ) }}
   {{ h.build_nav_icon('group_activity', _('Activity Stream'), id=c.group_dict.name, offset=0) }}
-  {{ h.build_nav_icon('group_about', _('About'), id=c.group_dict.name) }}
 {% endblock %}
 
 {% block secondary_content %}
