@@ -87,7 +87,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
         with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
-            m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
+            # m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
+            m.connect('/user/edit', action='edit')
             m.connect('user_edit', '/user/edit/{id:.*}', action='edit',ckan_icon='cog')
             m.connect('dashboard', '/dashboard', action='dashboard')
             m.connect('/user/me', action='me')

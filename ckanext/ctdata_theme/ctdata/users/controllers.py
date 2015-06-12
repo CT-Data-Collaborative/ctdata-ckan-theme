@@ -40,9 +40,9 @@ class UserController(UserController):
         if c.userobj and c.userobj.sysadmin:
             LIMIT = 20
 
-            page = self._get_page_number(request.params)
-            c.q = request.params.get('q', '')
-            c.order_by = request.params.get('order_by', 'name')
+            page = self._get_page_number(http_request.params)
+            c.q = http_request.params.get('q', '')
+            c.order_by = http_request.params.get('order_by', 'name')
 
             context = {'return_query': True, 'user': c.user or c.author,
                        'auth_user_obj': c.userobj}
@@ -63,7 +63,7 @@ class UserController(UserController):
                 item_count=users_list.count(),
                 items_per_page=LIMIT
             )
-            return render('user/list.html')
+            return base.render('user/list.html')
         else:
             return h.redirect_to('/')
 
@@ -345,4 +345,5 @@ class UserController(UserController):
 
         c.group_followee_list   = filter(lambda i: i['type'] == 'group',  c.followee_list)
         c.dataset_followee_list = filter(lambda i: i['type'] == 'dataset',  c.followee_list)
+
         return base.render('user/edit.html')
