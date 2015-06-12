@@ -1,0 +1,66 @@
+{% extends 'user/edit_base.html' %}
+
+{% block actions_content %}{% endblock %}
+{% block subtitle %}Manage Profile{% endblock %}
+{% block page_name %}Manage Profile{% endblock %}
+{% block page_description %} {% endblock %}
+
+{% block breadcrumb_content %}
+  <li><a href="{{ h.url_for(controller='user', action='read', id=c.user_dict.name) }}">{{ c.user_dict.display_name }}</a></li>
+  <li class="active"><a href="#">{{ _('Manage') }}</a></li>
+{% endblock %}
+
+{% block primary_content_inner %}
+  {{ c.form | safe }}
+{% endblock %}
+
+{% block secondary_content %}
+  <section class="module module-narrow module-shallow manage_subscriptions">
+  <h3> Manage your newsfeeds </h3>
+
+  <h3>Groups:</h3>
+
+  {% if c.group_followee_list %}
+    <ul>
+      {% for item in c.group_followee_list %}
+        {% if item.type == 'group' or item.type == 'dataset'%}
+          <span class="pull-left subscription_name"><a href='/group/{{item.dict.name}}'>{{item.dict.name | title}}</a></span>
+          <span class="follow_button pull-right">
+            {{ h.follow_button(item.type, item.dict.name) }}
+          </span>
+          <br>
+          <br>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <span class="gray_text"> To subscribe to any group go to any group page and follow it.</span>
+  {% endif %}
+
+  <h3>Datasets:</h3>
+  {% if c.dataset_followee_list %}
+  <ul>
+    {% for item in c.dataset_followee_list %}
+      {% if item.type == 'group' or item.type == 'dataset'%}
+        <span class="pull-left subscription_name"><a href='/dataset/{{item.dict.name}}'>{{item.dict.name | title}}</a></span>
+        <span class="follow_button pull-right">
+          {{ h.follow_button(item.type, item.dict.name) }}
+        </span>
+        <br>
+        <br>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
+  {% else %}
+    <span class="gray_text">To subscribe to any dataset go to dataset page and follow it.</span>
+  {% endif %}
+
+  </section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="/common/css/user_page.css">
+
+{% endblock %}
