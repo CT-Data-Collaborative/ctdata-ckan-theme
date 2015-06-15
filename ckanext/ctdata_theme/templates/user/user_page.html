@@ -151,9 +151,15 @@
   </div>
 
   <div class="block">
-    <div class="text-center"><h2> Groups News </h2></div>
+    <div class="text-center"><h2> Groups </h2></div>
     <div class="block-content">
-      {{ c.group_activity_stream }}
+      {% for group in groups %}
+        <h3><a href="/group/{{group.name}}" class="underlined">{{ group.display_name }}</a> News</h3>
+        </br>
+        {{ group.activities }}
+        <hr>
+      {% endfor %}
+      <br>
     </div>
   </div>
 
