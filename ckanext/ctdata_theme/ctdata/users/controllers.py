@@ -105,9 +105,9 @@ class UserController(UserController):
         profiles   = self.location_service.get_user_profiles(c.userobj.id)
         indicators = self.community_profile_service.get_gallery_indicators_for_user(c.userobj.id, 'all')
 
-        data_dict = {'am_member': True }
-        users_groups     = get_action('group_list_authz')(context, data_dict)
-        c.group_dropdown = [[group['id'], group['display_name']] for group in users_groups ]
+        data_dict        = {'am_member': True }
+        groups           = get_action('group_list_authz')(context, data_dict)
+        c.group_dropdown = [[group['id'], group['display_name']] for group in groups ]
 
         c.followee_list = get_action('followee_list')(context, {'id': c.userobj.id})
         activity_stream = logic.get_action('dashboard_activity_list')(context, data_dict)
@@ -121,11 +121,16 @@ class UserController(UserController):
             'offset': 0,
         }
 
+        for group in groups:
+            activities = filter(lambda g: g['object_id'] == group['id'], c.group_activity)
+            group['activities'] =  activity_streams.activity_list_to_html(context, activities, extra_vars)
+
+
         c.dataset_activity_stream = activity_streams.activity_list_to_html(context, c.dataset_activity, extra_vars)
         c.group_activity_stream   = activity_streams.activity_list_to_html(context, c.group_activity, extra_vars)
 
         self.session.close()
-        return base.render('user/user_page.html', extra_vars={'profiles': profiles, 'gallery_indicators': indicators})
+        return base.render('user/user_page.html', extra_vars={'profiles': profiles, 'gallery_indicators': indicators, 'groups': groups})
 
 
     def community_profiles(self, user_id):
