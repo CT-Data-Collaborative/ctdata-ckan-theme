@@ -17,22 +17,25 @@
         [{{ _('Deleted') }}]
       {% endif %}
     </h1>
+
     {% endblock %}
     {% block description %}
     {% if group.description %}
-      <p>
-        {{ h.markdown_extract(group.description) }}
+      <p id="description">
+        {{ group.description }}
       </p>
 
-      {{c.members}}
-      {% for member in c.members %}
-
-      {{ h.linked_user(member[0], maxlength=20) }}
-    {% endfor %}
     {% endif %}
 
     {% endblock %}
     {% endblock %}
   </section>
 </div>
+{% endblock %}
+
+
+{% block scripts %}
+
+{% resource 'ctdata_theme/readmore.js' %}
+
 {% endblock %}

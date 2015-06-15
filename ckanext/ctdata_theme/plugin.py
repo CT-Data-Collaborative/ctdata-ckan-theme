@@ -113,6 +113,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 controller='ckanext.ctdata_theme.ctdata.group.controllers:GroupController') as m:
             m.connect('group_indicators', '/group/indicators/{group_id}', action='group_indicators')
             m.connect('group_members', '/group/members/{id}', action='members', ckan_icon='group')
+            m.connect('group_new', '/group/new', action='new')
+            m.connect('group_read', '/group/{id}', action='read', ckan_icon='sitemap')
             m.connect('group_action', '/group/{action}/{id}', action = 'member_new')
             m.connect('group_user_autocomplete', '/group/user_autocomplete', action = 'user_autocomplete')
             m.connect('update_group_indicators', '/group/update_group_indicators', action='update_group_indicators')

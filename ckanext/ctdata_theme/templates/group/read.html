@@ -41,6 +41,21 @@
 
 {% block secondary_content %}
   {{ super() }}
+  <section class="module module-narrow module-shallow">
+    <h2 class="module-heading"> Members
+      {% if c.is_group_author %}
+        <a href="/group/members/{{c.group['name']}}" class="pull-right btn btn-mini" style="margin-top: -4px;"> Manage Members </a>
+      {% endif %}
+    </h2>
+    <br>
+    <div style="padding-left: 17px;">
+    {% for member in c.members %}
+      {{ h.linked_user(member[0], maxlength=20) }}
+      <br>
+      <br>
+    {% endfor %}
+    </div>
+  </section>
   {% for facet in c.facet_titles %}
     {{ h.snippet('snippets/facet_list.html', title=c.facet_titles[facet], name=facet, extras={'id':c.group_dict.id}) }}
   {% endfor %}
