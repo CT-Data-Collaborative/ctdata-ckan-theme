@@ -8,7 +8,7 @@ from pylons import session, url
 import ckan.lib.base as base
 import ckan.model    as model
 import ckan.plugins.toolkit as toolkit
-from ckan.common import response as http_response, c, request as http_request
+from ckan.common import response as http_response, c, request as http_request, _
 
 from ..database import Database
 from ..users.services import UserService
@@ -140,7 +140,7 @@ class GroupController(GroupController):
         data_dict = {'id': id}
 
         # unicode format (decoded from utf8)
-        q = c.q = request.params.get('q', '')
+        q = c.q = http_request.params.get('q', '')
 
         try:
             # Do not query for the group datasets when dictizing, as they will
@@ -148,23 +148,49 @@ class GroupController(GroupController):
             data_dict['include_datasets'] = False
             c.group_dict = self._action('group_show')(context, data_dict)
             c.members    = self._action('member_list')(context, {'id': id, 'object_type': 'user'})
-            # c.members  = []
+            c.group      = context['group']
+            group_admins = filter(lambda u: u['capacity'] == 'admin', c.group_dict['users'])
 
-            # for member in members:
-            #   user_id = member[0]
-            #   state   = self.user_service.get_user_state(user_id)
-            #   member  = member + (state,)
+            c.is_group_author = c.user in map(lambda u: u['name'], group_admins)
 
-            #   c.members.append(member)
-
-            c.group = context['group']
         except NotFound:
             abort(404, _('Group not found'))
         except NotAuthorized:
             abort(401, _('Unauthorized to read group %s') % id)
 
         self._read(id, limit)
-        return render(self._read_template(c.group_dict['type']))
+        return base.render(self._read_template(c.group_dict['type']))
+
+    def new(self, data=None, errors=None, error_summary=None):
+        group_type = self._guess_group_type(True)
+        if data:
+            data['type'] = group_type
+
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user or c.author,
+                   'save': 'save' in http_request.params,
+                   'parent': http_request.params.get('parent', None)}
+        try:
+            self._check_access('group_create', context)
+        except NotAuthorized:
+            abort(401, _('Unauthorized to create a group'))
+
+        if context['save'] and not data:
+            return self._save_new(context, group_type)
+
+        data = data or {}
+        if not data.get('image_url', '').startswith('http'):
+            data.pop('image_url', None)
+
+        errors = errors or {}
+        error_summary = error_summary or {}
+        vars = {'data': data, 'errors': errors,
+                'error_summary': error_summary, 'action': 'new'}
+
+        self._setup_template_variables(context, data, group_type=group_type)
+        c.form = base.render(self._group_form(group_type=group_type),
+                        extra_vars=vars)
+        return base.render(self._new_template(group_type))
 
     def members(self, id):
         context = {'model': model, 'session': model.Session,
