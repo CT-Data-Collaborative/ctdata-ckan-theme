@@ -55,8 +55,17 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
         db.init_sa(config['sqlalchemy.url'])
         db.init_community_data(config['ctdata.communities_source'])
+        db.init_years_data(config['ckan.datastore.write_url'])
 
     def before_map(self, route_map):
+        with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.ctdata.compare.controllers:CompareController') as m:
+            m.connect('admin_compare', '/admin/compare', action='admin_compare')
+            m.connect('compare', '/compare', action='compare')
+            m.connect('load_comparable_datasets', '/compare/load_comparable_datasets/{dataset_name}', action='load_comparable_datasets')
+            m.connect('update_years_matches', '/compare/update_years_matches', action='update_years_matches')
+            m.connect('add_year_matches', '/compare/add_year_matches', action='create_year_matches')
+            m.connect('join_for_two_datasets', '/compare/join_for_two_datasets/', action='join_for_two_datasets')
+
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
             m.connect('news', '/news', action='news')
             m.connect('special_projects', '/special_projects', action='special_projects')
@@ -70,6 +79,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.community.controllers:CommunityProfilesController') as m:
             m.connect('community_get_filters', '/community/get_filters/{dataset_id}', action='get_filters')
+            m.connect('community_get_incompatibles', '/community/get_incompatibles/{dataset_id}', action='get_incompatibles')
             m.connect('community_get_topics', '/community/get_topics', action='get_topics')
             m.connect('community_add_indicator', '/community/add_indicator', action='add_indicator')
             m.connect('community_update_profile_indicators', '/community/update_profile_indicators', action='update_profile_indicators')
@@ -79,6 +89,13 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         with routes.mapper.SubMapper(
                 route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
+            # m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
+            m.connect('/user/edit', action='edit')
+            m.connect('user_edit', '/user/edit/{id:.*}', action='edit',ckan_icon='cog')
+            m.connect('dashboard', '/dashboard', action='dashboard')
+            m.connect('/user/me', action='me')
+            m.connect('/user_index', '/user', action='index')
+            m.connect('/user/logged_in', action='logged_in')
             m.connect('user_community_profiles', '/user/{user_id}/community_profiles', action='community_profiles')
             m.connect('my_gallery', '/dashboard/gallery', action='my_gallery')
             m.connect('my_community_profiles', '/dashboard/community-profiles', action='my_community_profiles')
@@ -126,11 +143,15 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
     def get_helpers(self):
         return { 'locations_helper': locations,
                  'geography_types': _geography_types,
+                 'empty_href': _empty_href,
                  'link_to_dataset_with_filters': _link_to_dataset_with_filters}
 
 
 
 ####### HELPER METHODS ##########
+
+def _empty_href():
+    return 'javascript:void(0);'
 
 def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = ''):
     dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()
@@ -205,45 +226,28 @@ class CTDataController(base.BaseController):
 
         try:
             if ind_filters:
-                ind_filters =  json.dumps(json.loads(ind_filters))
+                ind_filters = json.dumps(json.loads(ind_filters))
         except ValueError:
             ind_filters = None
 
         try:
             dataset = DatasetService.get_dataset(dataset_name)
-            dataset_meta = DatasetService.get_dataset_meta(dataset_name)
-            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
-            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
-            help_info = filter(lambda x: x['key'] == 'Help',  dataset.ckan_meta['extras'])
-            help_str  = help_info[0]['value'] if help_info else ''
         except toolkit.ObjectNotFound:
             abort(404)
 
-        metadata = dataset_meta['extras']
+        help_str        = DatasetService.get_dataset_meta_help(dataset_name)
+        geography_param = DatasetService.get_dataset_meta_geo_type(dataset_name)
+        disabled        = DatasetService.get_dataset_meta_disabled_views(dataset_name)
+        metadata_fields = DatasetService.get_dataset_meta_visible_metadata(dataset_name)
+        metadata_units  = DatasetService.get_dataset_meta_units(dataset_name)
+        break_points    = DatasetService.get_dataset_meta_break_points(dataset_name)
+        defaults        = DatasetService.get_dataset_meta_default_metadata(dataset_name)
+        metadata        = filter(lambda x: x['key'] in metadata_fields, dataset.ckan_meta['extras'])
+        disable_visualizations = DatasetService.get_dataset_meta_hidden_in(dataset_name)
+        map_json_url    = DatasetService.get_dataset_map_json_url(dataset_name)
 
-        hidden_in_data = filter(lambda x: x['key'] == 'Hidden In', metadata)
-        try:
-            disable_visualizations = 'visualization' in yaml.load(hidden_in_data[0]['value'])
-        except IndexError:
-            disable_visualizations = False
-
-        if disable_visualizations or dataset.ckan_meta['private']:
+        if 'visualization' in disable_visualizations or dataset.ckan_meta['private']:
            h.redirect_to(controller='package', action='read', id=dataset_name)
-
-        default_metadata = filter(lambda x: x['key'] == 'Default', metadata)
-
-        try:
-          defaults = yaml.load(default_metadata[0]['value'])
-          if type(defaults) is list:
-            defaults = defaults[0]
-        except IndexError:
-          defaults = []
-
-        disabled_metadata = filter(lambda x: x['key'] == "Disabled Views", metadata)
-        try:
-          disabled = yaml.load(disabled_metadata[0]['value']).replace(', ', ',').split(',')
-        except IndexError:
-          disabled = []
 
         if not ind_filters:
             default_filters = defaults
@@ -255,24 +259,6 @@ class CTDataController(base.BaseController):
             except TypeError:
                 default_filters = ind_filters
 
-        # metadata fileds for visualization page
-        visible_metadata_fields = filter(lambda x: x['key'] == 'Visible Metadata', metadata)
-
-        try:
-            metadata_fields = yaml.load(visible_metadata_fields[0]['value'])
-            metadata_fields.replace(', ', ',').split(',')
-        except IndexError:
-            metadata_fields = ['Description', 'Full Description', 'Suppression' ,'Source', 'Contributor']
-
-        # load units
-        visible_metadata_fields = filter(lambda x: x['key'] == 'Units', metadata)
-
-        try:
-            metadata_units = yaml.load(visible_metadata_fields[0]['value'])
-        except IndexError:
-            metadata_units = {"Number": " ", "Percent": " "}
-
-        metadata = filter(lambda x: x['key'] in metadata_fields, metadata)
 
         headline_indicators = self.community_profile_service.get_headline_indicators_for_dataset(dataset.ckan_meta['id'])
 
@@ -294,26 +280,24 @@ class CTDataController(base.BaseController):
                                                              'disabled': disabled,
                                                              'default_filters': default_filters,
                                                              'headline_indicators': headline_indicators,
-                                                             'geography_param': geography_param})
+                                                             'geography_param': geography_param,
+                                                             'break_points': break_points,
+                                                             'map_json_url': map_json_url })
 
     def update_visualization_link(self, dataset_name):
         json_body = json.loads(http_request.body, encoding=http_request.charset)
+        try:
+            dataset = DatasetService.get_dataset(dataset_name)
+        except toolkit.ObjectNotFound:
+            abort(404)
 
         view_param       = json_body.get('view')
         request_view     = 'chart' if view_param in ['table', 'column', 'line'] else view_param
         request_filters  = json_body.get('filters')
-        data = {}
-        data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
-
-        try:
-            dataset = DatasetService.get_dataset(dataset_name)
-            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
-            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
-        except toolkit.ObjectNotFound:
-            abort(404)
-
-        query_builder = QueryBuilderFactory.get_query_builder(request_view, dataset)
-        view = ViewFactory.get_view(request_view, query_builder)
+        data             = {}
+        data['link']     = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
+        query_builder    = QueryBuilderFactory.get_query_builder(request_view, dataset)
+        view             = ViewFactory.get_view(request_view, query_builder)
         data['compatibles'] = view.get_compatibles(request_filters)
 
         http_response.headers['Content-type'] = 'application/json'
@@ -328,7 +312,6 @@ class CTDataController(base.BaseController):
 
         view_param         = json_body.get('view')
         request_view       = 'chart' if view_param in ['table', 'column', 'line'] else view_param
-
         request_filters    = json_body.get('filters')
         omit_single_values = json_body.get('omit_single_values')
 
@@ -340,18 +323,16 @@ class CTDataController(base.BaseController):
 
         try:
             dataset = DatasetService.get_dataset(dataset_name)
-            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
-            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
         except toolkit.ObjectNotFound:
             abort(404)
 
-        query_builder = QueryBuilderFactory.get_query_builder(request_view, dataset)
-        view = ViewFactory.get_view(request_view, query_builder)
+        geography_param = DatasetService.get_dataset_meta_geo_type(dataset_name)
+        query_builder   = QueryBuilderFactory.get_query_builder(request_view, dataset)
+        view            = ViewFactory.get_view(request_view, query_builder)
+        data            = view.get_data(request_filters)
 
-        data = view.get_data(request_filters)
         if omit_single_values:
             data = self._hide_dims_with_one_value(data, geography_param)
-
 
         data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
 
@@ -388,6 +369,8 @@ class CTDataController(base.BaseController):
                         except KeyError:
                             pass
         except KeyError:
+            pass
+        except IndexError:
             pass
 
         return data

@@ -1,4 +1,4 @@
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, BigInteger, Boolean, Table, DateTime
 from sqlalchemy.orm import relationship, backref
@@ -40,7 +40,6 @@ class Location(Base):
         profile = model.Session.query(CtdataProfile).filter(CtdataProfile.name == self.name).first()
 
         return profile
-
 
 
 class CtdataProfile(Base):

@@ -1,0 +1,87 @@
+{% extends "page.html" %}
+
+
+{% block page_name %}Admin Compare Data{% endblock %}
+{% block page_description %}{% endblock %}
+
+{% block main_content %}
+
+<div>
+  <div class="span4">
+     Years ({{years|length }})
+    <a href="{{h.empty_href()}}" class="disabled btn btn-mini btn-default" id="update_years"> Save changes </a>
+    <br>
+    <br>
+    <form id="new_year">
+    <p> <small> Use comma sign to divide values </small></p>
+
+    <input name="year" type="text" class="span1" placeholder="Year" required>
+    <input name="year_matches" type="text" class="span2" placeholder="Matches">
+    <a class="btn btn-mini btn-success add-year icon-plus" href="{{h.empty_href()}}"></a>
+    </form>
+    <table class="table">
+      <thead>
+        <th>Year</th>
+        <th>Matches</th>
+      </thead>
+      <tbody>
+        {% for year in years %}
+          {% snippet 'compare/snippets/table_row.html', year=year %}
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+
+  <div class="span11 text-center">
+    <form class="form-horizontal span6 offset2">
+
+    <div class="control-group">
+      <label class="control-label"> Compare </label>
+      <select id="dataset_name">
+        <option selected="true" value="empty" class="" id="">
+          <span class="">-- Select Dataset --</span>
+          <span class="caretbox"><span class="caret"></span></span>
+        </option>
+        {% for name in dataset_names %}
+          <option value="{{name}}" class="" id="{{name}}"> {{name|replace("-", " ")|title}} </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    </form>
+    <br>
+    <div id="datasets_to_compare_with">
+    </div>
+  </div>
+
+</div>
+
+<div id="message_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content.text-center">
+            <div class="modal-body disable-scroll" id="message">
+
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button class="btn close_popup">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="/common/css/jquery_ui.css">
+<link rel="stylesheet" type="text/css" href="/common/css/compare.css">
+
+{% resource 'ctdata_theme/admin_compare.js' %}
+
+<script>
+
+</script>
+{% endblock %}

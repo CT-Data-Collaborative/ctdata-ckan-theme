@@ -34,6 +34,9 @@ class LocationService(object):
     def get_locations_by_type(self, type):
         return self.session.query(Location).filter(Location.geography_type == type ).all()
 
+    def get_locations_by_type(self, type):
+        return self.session.query(Location).filter(Location.geography_type == type ).all()
+
     def get_location(self, location_name):
         location = self.session.query(Location).filter(Location.name == location_name).first()
         if not location:
@@ -97,7 +100,12 @@ class LocationService(object):
         self.session.commit()
 
     def get_profile(self, profile_id):
-        profile = self.session.query(CtdataProfile).filter(CtdataProfile.id == profile_id).first()
+        try:
+            int(profile_id)
+            profile = self.session.query(CtdataProfile).filter(CtdataProfile.id == profile_id).first()
+        except ValueError:
+            profile = self.session.query(CtdataProfile).filter(CtdataProfile.name == profile_id).first()
+
         return profile
 
     ################ Indicators ############################################
@@ -105,13 +113,8 @@ class LocationService(object):
     def load_indicator_value_for_location(self, filters, dataset_id, location_names):
         db   = Database()
         conn = db.connect()
-
-
         dataset = DatasetService.get_dataset(dataset_id)
-        dataset_meta    = DatasetService.get_dataset_meta(dataset_id)
-        geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
-        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
-
+        geography_param = DatasetService.get_dataset_meta_geo_type(dataset_id)
 
         filters = json.loads(filters)
         arr     = []

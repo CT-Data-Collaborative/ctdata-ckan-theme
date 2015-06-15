@@ -112,6 +112,24 @@ class TableQueryBuilder(QueryBuilder):
 
 
 class ChartQueryBuilder(QueryBuilder):
+    def determine_multifield(self, filters):
+        """
+        Returns a field for which there's specified several filter values (multifield).
+        it's not one of the 'Year', 'Town' or 'Measure Type' fields. If there're no filters
+        with several values for a field, it returns the first field other than 'Year', 'Town' or 'Measure type'
+
+        And apparently 'Variable' was later added to the list of fields that can't be multifields. In the prototype it's
+         possible for 'Variable' to be multifield, but I'm not going to remove it from the non-multifields list, because
+         I'm afraid I can break something.
+        """
+        can_be_multifield = ['Variable']
+        valid_filters = filter(lambda f: f['field'] in can_be_multifield, filters)
+        # either field with several values or the first field if there's no such
+        try:
+            return (filter(lambda f: len(f['values']) > 1, valid_filters) or valid_filters)[0]['field']
+        except IndexError:
+            return None
+
     def get_order_by(self, filters):
         table_columns = map(lambda (x): x.name, self.dataset.dimensions)
         table_columns.remove("Year")
@@ -125,6 +143,24 @@ class ChartQueryBuilder(QueryBuilder):
 
 
 class MapQueryBuilder(QueryBuilder):
+    def determine_multifield(self, filters):
+        """
+        Returns a field for which there's specified several filter values (multifield).
+        it's not one of the 'Year', 'Town' or 'Measure Type' fields. If there're no filters
+        with several values for a field, it returns the first field other than 'Year', 'Town' or 'Measure type'
+
+        And apparently 'Variable' was later added to the list of fields that can't be multifields. In the prototype it's
+         possible for 'Variable' to be multifield, but I'm not going to remove it from the non-multifields list, because
+         I'm afraid I can break something.
+        """
+        can_be_multifield = ['Variable']
+        valid_filters = filter(lambda f: f['field'] in can_be_multifield, filters)
+        # either field with several values or the first field if there's no such
+        try:
+            return (filter(lambda f: len(f['values']) > 1, valid_filters) or valid_filters)[0]['field']
+        except IndexError:
+            return None
+
     def get_columns(self, filters):
       table_columns = map( lambda (x): x.name, self.dataset.dimensions)
       table_columns.append('Value')
@@ -159,7 +195,7 @@ class QueryBuilderFactory(object):
     def get_query_builder(name, dataset):
         if name == 'table':
             return TableQueryBuilder(dataset)
-        elif name == 'chart':
+        elif name == 'chart' or name == 'compare':
             return ChartQueryBuilder(dataset)
         elif name == 'map':
             return MapQueryBuilder(dataset)

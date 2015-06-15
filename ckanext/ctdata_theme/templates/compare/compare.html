@@ -1,0 +1,147 @@
+{% extends "page.html" %}
+
+
+{% block page_name %}Compare Data{% endblock %}
+{% block page_description %}
+  <span id="dataset_name_val" style="color: black;">--</span>
+  <span>vs</span>
+  <span id="compare_with_val" style="color: black;">--</span>
+{% endblock %}
+
+{% block main_content %}
+
+<div class="row">
+  <div class="span3 selects">
+    <h2>Datasets</h2>
+    <br>
+    <form class="form-horizontal">
+
+    <div class="control-group">
+      <h4> Choose The First Dataset : </h4>
+      <select id="dataset_name">
+        <option selected="true" value="empty" class="text-center" id="">
+          <span class="">-- Select Dataset --</span>
+          <span class="caretbox"><span class="caret"></span></span>
+        </option>
+        {% for name in dataset_names %}
+          <option value="{{name}}" class="" id="{{name}}"> {{name|replace("-", " ")|title}} </option>
+        {% endfor %}
+      </select>
+    </div>
+    </form>
+
+    <div class="spinner small"> <img src="/common/images/loading.gif"/> </div>
+    <div id="datasets_to_compare_with" class="">
+    </div>
+
+    <hr>
+    <div><a href="{{h.empty_href()}}" class="update-filters btn btn-default hidden"> Update Filters </a></div>
+    <div id="matches">
+      <ul></ul>
+    </div>
+
+  </div>
+
+
+
+  <div class="span3 data">
+
+
+      <h2> <span style="position:relative; left: -27px;">Item Info</span>
+      <span class="help-text">Hover over the item </span>
+      </h2>
+      <div id="info">
+        <b><span class="location"></span></b>
+        <br>
+        <span class="variable_1"></span> <b><span class="variable_1_value"></span></b>
+        <br>
+        <span class="variable_2"></span> <b><span class="variable_2_value"></span></b>
+      </div>
+        <br>
+      <h2>Data</h2>
+       <div id="y_axe" class="">
+        <span class="axe_name"> Y </span>
+        <div class="droppable ui-widget-header" id="y"></div>
+      </div>
+
+      <div id="x_axe" class="">
+        <span class="axe_name"> X </span>
+        <div class="droppable ui-widget-header" id="x"></div>
+      </div>
+      <br>
+      <h2> <span style="position:relative; left: 0px;">Marks</span></h2>
+
+      <div id="color" class="">
+        <span class="axe_name icon-adjust"></span>
+        <div class="droppable ui-widget-header" id="color_s"></div>
+      </div>
+
+      <div id="size" class="">
+        <span class="axe_name icon-resize-horizontal"></span>
+        <div class="droppable ui-widget-header" id="size_s"></div>
+      </div>
+
+      <div id="size" class="">
+        <span class="axe_name icon-th-large"> </span>
+        <div class="droppable ui-widget-header" id="shape_s"></div>
+      </div>
+
+   </div>
+
+  <div class="span8 graphic">
+      <div id="container">
+        <div id="instructions">
+          <h2>How To Instructions:</h2>
+          <br>
+          <ul>
+            <li> 1. Select the first dataset to compare</li>
+            <li> 2. Wait for a second and you will see the second select box. </li>
+            <li> 3. Choose the second dataset to compare with. </li>
+            <li> 4. Check value for each not-matched dimension for each dataset. </li>
+            <li> 5. Check out the result. </li>
+            <br>
+            <li> 6. Drag & drop dimensions to see the graph from different angles</li>
+            <br>
+            <li> <i class="icon-adjust"> </i> - Color will depend on dragged dimension </li>
+            <li> <i class="icon-resize-horizontal"> </i> - Size will depend on dragged dimension </li>
+            <li> <i class="icon-th-large"> </i> - Shape will depend on dragged dimension </li>
+          </ul>
+        </div>
+      </div>
+  </div>
+
+
+
+</div>
+
+{% snippet 'compare/snippets/choose_uniq_options_per_filter_popup.html' %}
+
+<div id="message_popup" class="modal fade" style="display: none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content.text-center">
+            <div class="modal-body disable-scroll" id="message">
+
+            </div>
+            <div class="modal-footer">
+                <div style="float: right">
+                    <button class="btn close_popup">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <link rel="stylesheet" type="text/css" href="/common/css/compare.css">
+  <link rel="stylesheet" type="text/css" href="/common/css/jquery_ui.css">
+
+  {% resource 'ctdata_theme/to_title_case.js' %}
+  {% resource 'ctdata_theme/compare.js' %}
+  {% resource 'ctdata_theme/jquery_ui.js' %}
+  {% resource 'ctdata_theme/vega.js' %}
+  {% resource 'ctdata_theme/d3_v3_min.js' %}
+
+{% endblock %}

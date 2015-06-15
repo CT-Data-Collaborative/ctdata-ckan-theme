@@ -55,7 +55,6 @@ class View(object):
 
         except psycopg2.ProgrammingError:
             result['data'] = []
-
         return  result
 
     def get_compatibles(self, filters):
@@ -92,7 +91,7 @@ class View(object):
           curs.execute(query, filters_values)
           rows = curs.fetchall()
           for row in rows:
-            compatibles.append(str(row[0]))
+            compatibles.append({ cur_col: str(row[0])})
 
         curs.close()
         del curs
@@ -176,10 +175,10 @@ class ChartView(View):
         geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
 
         towns_from_filters = dict_with_key_value('field', geography_param, filters)['values']
-        years_fltrs = dict_with_key_value('field', 'Year', filters)
+        years_fltrs        = dict_with_key_value('field', 'Year', filters)
         years_from_filters = years_fltrs.get('values') if years_fltrs else None
-        sorted_towns = sorted(towns_from_filters)
-        sorted_years = sorted(map(lambda y: str(y), years_from_filters)) if years_from_filters else []
+        sorted_towns       = sorted(towns_from_filters)
+        sorted_years       = sorted(map(lambda y: str(y), years_from_filters)) if years_from_filters else []
         if towns_from_filters[0].lower() == 'all':
             sorted_towns = []
             sorted_years = []
@@ -188,15 +187,33 @@ class ChartView(View):
         check_town, check_year = 0, 0
 
         last_row_dims = None
-        current_row = None
-        last_dims = None
+        current_row   = None
+        last_dims     = None
         next_row_dims = None
-        cur_year = None
-        current_town = None
+        cur_year      = None
+        current_town  = None
+
+        moes = filter( lambda d: d['Variable'] == 'Margins of Error', data)
+        map( lambda m: data.remove(m), moes)
+
         for row in data:
             next_row_dims = row
-            cur_year = next_row_dims.pop('Year', None)
-            cur_value = next_row_dims.pop('Value', None)
+            cur_value     = next_row_dims.pop('Value', None)
+            cur_moes      = None
+
+            #seach for margins of errors data data
+            temp_data_item = dict(row)
+            temp_data_item.pop('Variable')
+
+            for moes_item in moes:
+                temp_moes_item = dict(moes_item)
+                temp_moes_item.pop('Variable')
+                temp_moes_item.pop('Value')
+
+                if temp_data_item == temp_moes_item:
+                    cur_moes = moes_item['Value']
+
+            cur_year      = next_row_dims.pop('Year', None)
             if cmp(last_row_dims, next_row_dims) != 0:
                 if last_row_dims:
                     while check_year < len(sorted_years):
@@ -207,7 +224,7 @@ class ChartView(View):
                     result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(sorted_years)})
                     check_town += 1
                 current_town = {'dims': {k: str(v) for k, v in next_row_dims.items()},
-                                'data': []}
+                                'data': [], 'moes': []}
                 last_row_dims = next_row_dims
                 check_town += 1
                 check_year = 0
@@ -221,6 +238,8 @@ class ChartView(View):
 
             try:
                 current_town['data'].append(float(cur_value))
+                if cur_moes:
+                    current_town['moes'].append(float(cur_moes))
             except ValueError:
                 current_town['data'].append(None)
             except TypeError:
@@ -237,8 +256,26 @@ class ChartView(View):
             result['data'].append({'name': sorted_towns[check_town], 'data': [None]*len(years_from_filters)})
             check_town += 1
         result['compatibles'] = self.get_compatibles(filters)
+
         return result
 
+class CompareView(View):
+    def convert_data(self, data, filters):
+        geography       = filter(lambda x: x['key'] == 'Geography', self.query_builder.dataset.ckan_meta['extras'])
+        geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+
+        for data_item in data:
+            data_item['label'] = str(data_item['Value'])
+            data_item['location_name'] = data_item[geography_param]
+            data_item['x'] = data.index(data_item)
+            data_item['Value'] = float(data_item['Value'])
+            data_item['Year'] = str(data_item['Year'])
+            data_item['color'] = 'Default'
+            data_item['shape'] = 'Default'
+            data_item['size']  = 'Default'
+
+        compatibles = self.get_compatibles(filters)
+        return data, compatibles
 
 class ProfileView(View):
     """
@@ -356,7 +393,7 @@ class MapView(View):
           curs.execute(query, filters_values)
           rows = curs.fetchall()
           for row in rows:
-            compatibles.append(str(row[0]))
+            compatibles.append({ cur_col: str(row[0])})
 
         curs.close()
         del curs
@@ -372,6 +409,8 @@ class MapView(View):
         geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
 
 
+        moes = filter( lambda d: d['Variable'] == 'Margins of Error', data)
+        map( lambda m: data.remove(m), moes)
 
         for row in data:
             if 'FIPS' in list(row.keys()):
@@ -379,10 +418,24 @@ class MapView(View):
             else:
                 fips = ''
 
-            value = '' if row['Value'] == None else float(row['Value'])
+            cur_value  = row.pop('Value', None)
+            value      = '' if cur_value in [None, 'NA'] else float(cur_value)
+            cur_moes   = None
 
-            result['data'].append({'code': row[geography_param], 'value': value, 'fips': fips})
+            #seach for margins of errors data data
+            temp_data_item = dict(row)
+            temp_data_item.pop('Variable')
 
+            for moes_item in moes:
+                temp_moes_item = dict(moes_item)
+                temp_moes_item.pop('Variable')
+                temp_moes_item.pop('Value')
+                if temp_data_item == temp_moes_item:
+                    cur_moes = moes_item['Value']
+
+            moes_value = '' if cur_moes in [None, 'NA'] else float(cur_moes)
+
+            result['data'].append({'code': row[geography_param], 'value': value, 'fips': fips, 'moes': moes_value})
         result['compatibles'] = self.get_compatibles(filters)
         return result
 
@@ -394,6 +447,8 @@ class ViewFactory(object):
             return TableView(querybuilder, database)
         elif name == 'chart':
             return ChartView(querybuilder, database)
+        elif name == 'compare':
+            return CompareView(querybuilder, database)
         elif name == 'profile':
             return ProfileView(querybuilder, database)
         elif name == 'map':

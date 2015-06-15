@@ -391,9 +391,7 @@ class CommunityProfileService(object):
         for indicator in indicators:
             filters = json.loads(indicator.filters)
             dataset = DatasetService.get_dataset(indicator.dataset_id)
-
-            geography       = filter(lambda x: x['key'] == 'Geography', dataset.ckan_meta['extras'])
-            geography_param = geography[0]['value'] if len(geography) > 0 else 'Town'
+            geography_param = DatasetService.get_dataset_meta_geo_type(indicator.dataset_id)
 
             qb      = QueryBuilderFactory.get_query_builder('profile', dataset)
             view    = ViewFactory.get_view('profile', qb)

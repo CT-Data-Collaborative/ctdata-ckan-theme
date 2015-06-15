@@ -140,7 +140,7 @@ var create_popup    = $("#create_profile_popup"),
         tr  = tr + "<span class='hidden' id='filters_json'>" + JSON.stringify(ind.filters) + "</span>"
         $(ind.filters).each(function(i){
             filter = ind.filters[i]
-            tr = tr + filter.field + ': ' + filter.values[0]+ ' '
+            tr = tr + filter.field + ': ' + filter.values[0] + ' '
         });
         tr = tr + "</span>  <span class='for_csv hidden'>" + ind.dataset + ', ' + ind.variable + ', '
         $(ind.filters).each(function(i){
@@ -154,6 +154,18 @@ var create_popup    = $("#create_profile_popup"),
 
         $(ind.values).each(function(i){
             value = ind.values[i] || '-'
+            text  = value.toString()
+            array = text.split('.')
+
+              if (jQuery.isNumeric(text) == true && array.length == 1)
+                value = parseInt(text).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+              else{
+                if (jQuery.isNumeric(text) == true && array.length == 2 && array[0].length > 4){
+                  array[0]  = parseInt(array[0]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                  value = array.join('.');
+                }
+              }
+
             tr = tr + "<td class='for_csv'><span class='for_csv'>" + value + "</span></td>"
         });
         tr = tr + "<td class='no-border'>\
@@ -217,6 +229,7 @@ var create_popup    = $("#create_profile_popup"),
 
 function draw_ind_if_towns_popup_closed(data){
         $('#towns_popup').on('hidden', function () {
+            geo_type_locations = $('#towns').find('.location-checkbox').not('[class*="hidden"]').find('input:checked').map(function(i, e) {return $(e).val()}).get();
             if (geo_type_locations.length == 0){
 
                 enable_options_for_profile();
@@ -231,6 +244,33 @@ function draw_ind_if_towns_popup_closed(data){
     }
 
 
+function handle_incompatibles(){
+    $.ajax({type: "POST",
+      url: "/community/get_incompatibles/" + current_dataset,
+      data: JSON.stringify({view: 'table', filters: get_filters()}),
+      contentType: 'application/json; charset=utf-8'}).done(function(data) {
+        apply_incompatibles(data.compatibles)
+      });
+}
+
+function apply_incompatibles(compatibles){
+    all_inputs = $('.indicator-filter-radio[name!="Measure Type"]')
+
+    $.each(all_inputs, function(i){
+        $input = $(all_inputs[i])
+        found  = false
+        jQuery.each(compatibles, function(i, c){  if (Object.keys(c)[0] == $input.attr('name') && c[Object.keys(c)[0]] == $input.val()) found = true })
+        if(found){
+          $input.removeAttr("disabled");
+          $input.parent().find("span").css("color", "gray");
+        }else{
+          $input.attr("disabled", true);
+          $input.attr("checked", false);
+          $input.parent().find("span").css("color", "lightgray");
+        }
+      });
+}
+
 $(function(){
     if (window.location.pathname != "/manage-locations"){
         load_profile_indicators();
@@ -238,6 +278,10 @@ $(function(){
     }
 
   var form = $('form#new_location');
+
+  $(document).on('click', '.indicator-filter-radio', function (){
+    handle_incompatibles()
+  });
 
   $('#save_location').on('click', function(){
     $.ajax({type: "POST",
@@ -444,7 +488,6 @@ $(function(){
                             $('.edit_locations#' + current_geo_type).click()
 
                         }
-
                         draw_ind_if_towns_popup_closed(data);
                     }
                     else {
