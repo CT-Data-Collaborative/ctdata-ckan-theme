@@ -109,10 +109,15 @@ class CompareService(object):
               values_matches = filter(lambda f_value: CompareService.compare_years(f_value, main_filter_values), filter_values)
             else:
               values_matches = filter(lambda f_value: f_value in main_filter_values, filter_values)
+
             if values_matches != []:
               values.extend(values_matches)
               filters_values_matches.append({dim_match: values_matches})
               filters_matches_number = filters_matches_number + len(values_matches)
+            else:
+              if dim_match != 'Variable':
+                main_dims_no_matches.append(dim_match)
+                dims_no_matches.append(dim_match)
 
           # get all values that user will must select for MAIN DATASET (the first one user chose)
           for dim in main_dims_no_matches:
