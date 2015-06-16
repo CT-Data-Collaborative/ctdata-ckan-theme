@@ -268,7 +268,11 @@ class CompareView(View):
             data_item['label'] = str(data_item['Value'])
             data_item['location_name'] = data_item[geography_param]
             data_item['x'] = data.index(data_item)
-            data_item['Value'] = float(data_item['Value']) if data_item['Value']
+            try:
+                data_item['Value'] = float(data_item['Value'])
+            except ValueError:
+                data_item['Value'] = 0
+
             data_item['Year'] = str(data_item['Year'])
             data_item['color'] = 'Default'
             data_item['shape'] = 'Default'
