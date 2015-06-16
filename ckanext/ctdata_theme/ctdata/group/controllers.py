@@ -8,7 +8,7 @@ from pylons import session, url
 import ckan.lib.base as base
 import ckan.model    as model
 import ckan.plugins.toolkit as toolkit
-from ckan.common import response as http_response, c, request as http_request, _
+from ckan.common import response as http_response, c, request as http_request, _, g
 
 from ..database import Database
 from ..users.services import UserService
@@ -23,6 +23,8 @@ import ckan.lib.helpers as h
 import ckan.logic       as logic
 import ckan.lib.jsonp   as jsonp
 import ckan.new_authz   as new_authz
+import ckan.lib.mailer  as mailer
+from urlparse import urljoin
 
 get_action      = logic.get_action
 NotFound        = logic.NotFound
@@ -244,22 +246,27 @@ class GroupController(GroupController):
                 data_dict['id'] = id
 
                 email     = data_dict.get('email')
-                user_name = data_dict['username'].split(' ')[len(data_dict['username'].split(' ')) - 2]
+                # user_name = data_dict['username'].split(' ')[len(data_dict['username'].split(' ')) - 2]
 
-                if user_name:
-                  data_dict['username'] = user_name
-                  c.group_dict = self._action('group_member_create')(context, data_dict)
+                # if user_name:
+                #   data_dict['username'] = user_name
+                #   c.group_dict = self._action('group_member_create')(context, data_dict)
 
                 if email:
-                  if not self.user_service.check_if_email_exits(email):
-                    user_data_dict = { 'email': email, 'group_id': data_dict['id'], 'role': data_dict['role']}
-                    del data_dict['email']
-                    user_dict    = self._action('user_invite')(context, user_data_dict)
-                    data_dict['username'] = user_dict['name']
-                    c.group_dict = self._action('group_member_create')(context, data_dict)
+                  user = self.user_service.get_user_by_email(email)
+                  if user:
+                    self.send_invite_to_group(user, id)
+                    # if not user:
+                    #   user_data_dict = { 'email': email, 'group_id': data_dict['id'], 'role': data_dict['role']}
+                    #   del data_dict['email']
+                    #   user_dict             = self._action('user_invite')(context, user_data_dict)
+                    #   data_dict['username'] = user_dict['name']
+                    #   c.group_dict = self._action('group_member_create')(context, data_dict)
 
                   else:
-                    h.flash_error('User with this email already exists')
+                    h.flash_error('User with this email already invited to this group')
+                else:
+                  h.flash_error('Please enter correct email.')
 
                 self._redirect_to(controller='group', action='members', id=id)
             else:
@@ -282,6 +289,61 @@ class GroupController(GroupController):
             h.flash_error(e.error_summary)
         return self._render_template('group/member_new.html')
 
+    def add_member(self, id):
+      user_id = http_request.params.get('user_id', '')
+      user    = self.user_service.get_user_by_id(user_id)
+
+      try:
+        group = get_action('group_show')(context, {'id': id})
+      except toolkit.ObjectNotFound:
+        abort(404)
+
+      data_dict = {'username': user['name']}
+
+      c.group_dict = self._action('group_member_create')(context, data_dict)
+      # user_name = data_dict['username'].split(' ')[len(data_dict['username'].split(' ')) - 2]
+      # if user_name:
+      #   data_dict['username'] = user_name
+      #   c.group_dict = self._action('group_member_create')(context, data_dict)
+
+      embed()
+      return ''
+
+    def send_invite_to_group(self, user, group):
+
+      # mailer.create_reset_key(user)
+      body    = self.get_group_invite_body(user, group)
+      subject = 'Invite in group'
+      self.mail_user(user, subject, body)
+
+    def aceept_link(self, user, group):
+      key  = uuid.uuid4().hex[:10]
+      path = '/group/add_member/%s?user_id=%s&key=%s'%(group, user['id'], unicode(key))
+      url  = urljoin(g.site_url, path)
+
+      return url
+
+    def mail_user(self, recipient, subject, body, headers={}):
+      if (recipient['email'] is None) or not len(recipient['email']):
+          raise MailerException(_("No recipient email address available!"))
+      mailer.mail_recipient(recipient['display_name'], recipient['email'], subject,
+              body, headers=headers)
+
+    def get_group_invite_body(self, user, group):
+      invite_message = _(
+      "You have been invited to {group}."
+      "\n"
+      "To accept this invitiation, please follow the link:\n"
+      "\n"
+      "   {aceept_link}\n"
+      )
+
+      d = {
+          'aceept_link': self.aceept_link(user, group),
+          'group': group,
+          'user_name': user['name'],
+          }
+      return invite_message.format(**d)
 
 
 
