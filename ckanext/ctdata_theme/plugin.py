@@ -116,6 +116,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('group_new', '/group/new', action='new')
             m.connect('group_read', '/group/{id}', action='read', ckan_icon='sitemap')
             m.connect('group_action', '/group/{action}/{id}', action = 'member_new')
+            m.connect('group_add_member', '/group/add_member/{id}', action = 'add_member')
             m.connect('group_user_autocomplete', '/group/user_autocomplete', action = 'user_autocomplete')
             m.connect('update_group_indicators', '/group/update_group_indicators', action='update_group_indicators')
             m.connect('group_index', '/group', action='index', highlight_actions='index search')
