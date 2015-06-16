@@ -268,6 +268,7 @@ class CompareView(View):
             data_item['label'] = str(data_item['Value'])
             data_item['location_name'] = data_item[geography_param]
             data_item['x'] = data.index(data_item)
+
             try:
                 data_item['Value'] = float(data_item['Value'])
             except ValueError:
