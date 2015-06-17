@@ -385,12 +385,20 @@ span.dot{
   color: #eee;
   position: relative;
   top: -5px;
+<<<<<<< HEAD
   left: -21px;
   margin-right: -15px;
   /* font-size: 12px; */
   font-weight: 100;
 }
 
+=======
+  left: -10px;
+  margin-right: -7px;
+  /*font-size: 12px;*/
+  font-weight: 900;
+}
+>>>>>>> padding for data by location lists
 @media screen and (max-width: 1070px) {
     .subtopic {
         width: 33.6%;
@@ -589,3 +597,8 @@ td:hover a.hide_year img{
   margin-left: 0;
   padding: 10px;
 }
+
+a.underlined_on_hover:hover{
+  text-decoration: underline;
+};
+
