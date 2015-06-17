@@ -385,10 +385,10 @@ span.dot{
   color: #eee;
   position: relative;
   top: -5px;
-  left: -10px;
-  margin-right: -7px;
-  /*font-size: 12px;*/
-  font-weight: 900;
+  left: -21px;
+  margin-right: -15px;
+  /* font-size: 12px; */
+  font-weight: 100;
 }
 @media screen and (max-width: 1070px) {
     .subtopic {
