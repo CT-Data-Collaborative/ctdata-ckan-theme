@@ -376,6 +376,20 @@ label {font-weight: normal; cursor: auto}
   margin-left: 10px;
 }
 
+.subtopic_col ul li{
+  padding-bottom: 0.4em;
+  /*list-style-type: circle;*/
+}
+
+span.dot{
+  color: #eee;
+  position: relative;
+  top: -5px;
+  left: -10px;
+  margin-right: -7px;
+  /*font-size: 12px;*/
+  font-weight: 900;
+}
 @media screen and (max-width: 1070px) {
     .subtopic {
         width: 33.6%;
@@ -569,3 +583,9 @@ td:hover a.hide_year img{
   margin-left: 0;
   padding: 10px;
 }
+
+a.underlined_on_hover:hover{
+  text-decoration: underline;
+};
+
+
