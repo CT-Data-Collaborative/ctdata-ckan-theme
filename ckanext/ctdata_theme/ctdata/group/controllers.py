@@ -26,6 +26,7 @@ import ckan.new_authz   as new_authz
 import ckan.lib.mailer  as mailer
 from urlparse import urljoin
 
+_validate       = dict_fns.validate
 get_action      = logic.get_action
 NotFound        = logic.NotFound
 NotAuthorized   = logic.NotAuthorized
@@ -290,24 +291,48 @@ class GroupController(GroupController):
         return self._render_template('group/member_new.html')
 
     def add_member(self, id):
-      user_id = http_request.params.get('user_id', '')
-      user    = self.user_service.get_user_by_id(user_id)
+      # user    = self.user_service.get_user_by_id(user_id)
+      user_id  = http_request.params.get('user_id', '')
+      context  = {'model': model, 'session': model.Session, 'user': c.user or c.author}
+      user     = self.user_service.get_user_by_id(user_id)
+      session  = model.Session
+      schema   = logic.schema.member_schema()
+      username = user['name']
+      role     = 'member'
+      result   = model.User.get(username)
+      # group    = model.Group.get(group_id)
 
       try:
         group = get_action('group_show')(context, {'id': id})
       except toolkit.ObjectNotFound:
         abort(404)
 
-      data_dict = {'username': user['name']}
+      data_dict    = {'id': id, 'username': user['name'], 'include_datasets': False}
+      data, errors = _validate(data_dict, schema, context)
+      # c.group_dict = self._action('_group_or_org_member_create')(context, data_dict)
 
-      c.group_dict = self._action('group_member_create')(context, data_dict)
-      # user_name = data_dict['username'].split(' ')[len(data_dict['username'].split(' ')) - 2]
-      # if user_name:
-      #   data_dict['username'] = user_name
-      #   c.group_dict = self._action('group_member_create')(context, data_dict)
+      # embed()
+      # model   = context['model']
 
-      embed()
-      return ''
+      if not user:
+        message = _(u'User {username} does not exist.').format(username=username)
+        raise ValidationError({'message': message}, error_summary=message)
+
+      member_dict = {
+          'id': id,
+          'object': user_id,
+          'object_type': 'user',
+          'capacity': role,
+      }
+      member_create_context = {
+          'model': model,
+          'user': model.User.get(user['name']),
+          'session': session,
+          'ignore_auth': context.get('ignore_auth'),
+      }
+      return logic.get_action('member_create')(member_create_context,
+                                               member_dict)
+
 
     def send_invite_to_group(self, user, group):
 
