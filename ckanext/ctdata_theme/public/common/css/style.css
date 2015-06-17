@@ -385,20 +385,13 @@ span.dot{
   color: #eee;
   position: relative;
   top: -5px;
-<<<<<<< HEAD
   left: -21px;
   margin-right: -15px;
   /* font-size: 12px; */
   font-weight: 100;
+
 }
 
-=======
-  left: -10px;
-  margin-right: -7px;
-  /*font-size: 12px;*/
-  font-weight: 900;
-}
->>>>>>> padding for data by location lists
 @media screen and (max-width: 1070px) {
     .subtopic {
         width: 33.6%;
