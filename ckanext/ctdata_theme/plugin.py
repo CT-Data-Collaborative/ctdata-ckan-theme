@@ -75,8 +75,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('update_visualization_link', '/update_visualization_link/{dataset_name}', action='update_visualization_link')
             m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
 
-        with routes.mapper.SubMapper(
-                route_map,
+        with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.community.controllers:CommunityProfilesController') as m:
             m.connect('community_get_filters', '/community/get_filters/{dataset_id}', action='get_filters')
             m.connect('community_get_incompatibles', '/community/get_incompatibles/{dataset_id}', action='get_incompatibles')
@@ -86,8 +85,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('community_remove_indicator','/community/remove_indicator/{indicator_id}', action='remove_indicator')
 
 
-        with routes.mapper.SubMapper(
-                route_map,
+        with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
             # m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
             m.connect('/user/edit', action='edit')
@@ -104,25 +102,26 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('update_gallery_indicator',  '/user/update_gallery_indicator', action='update_gallery_indicator')
             m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
 
-        with routes.mapper.SubMapper(
-                route_map,
+        with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
             m.connect('page_about', '/pages/about', action='about')
             m.connect('page_news', '/pages/news', action='news')
             m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
             m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
 
-        with routes.mapper.SubMapper(
-                route_map,
+        with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.group.controllers:GroupController') as m:
+            m.connect('group_user_autocomplete', '/group/user_autocomplete', action = 'user_autocomplete')
             m.connect('group_indicators', '/group/indicators/{group_id}', action='group_indicators')
             m.connect('group_members', '/group/members/{id}', action='members', ckan_icon='group')
+            m.connect('group_new', '/group/new', action='new')
+            m.connect('group_read', '/group/{id}', action='read', ckan_icon='sitemap')
             m.connect('group_action', '/group/{action}/{id}', action = 'member_new')
-            m.connect('group_user_autocomplete', '/group/user_autocomplete', action = 'user_autocomplete')
+            m.connect('group_remove_member', '/group/remove_member/{id}', action = 'remove_member')
             m.connect('update_group_indicators', '/group/update_group_indicators', action='update_group_indicators')
+            m.connect('group_index', '/group', action='index', highlight_actions='index search')
 
-        with routes.mapper.SubMapper(
-                route_map,
+        with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.location.controllers:LocationsController') as m:
             m.connect('locations', '/location', action='locations_index')
             m.connect('data_by_location', '/data-by-location', action='data_by_location')

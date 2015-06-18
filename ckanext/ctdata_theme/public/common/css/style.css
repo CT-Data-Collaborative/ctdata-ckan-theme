@@ -584,8 +584,12 @@ td:hover a.hide_year img{
   padding: 10px;
 }
 
+.gray_text{
+  color: gray;
+  font-size: 11px;
+}
+
 a.underlined_on_hover:hover{
   text-decoration: underline;
 };
-
 

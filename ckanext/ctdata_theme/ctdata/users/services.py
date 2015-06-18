@@ -19,9 +19,35 @@ class UserService(object):
                      'auth_user_obj': c.userobj}
         data_dict, groups_dict = {}, {}
 
-        users = get_action('user_list')(context, data_dict)
+        users  = get_action('user_list')(context, data_dict)
         result = filter(lambda user: user['email'] == email, users)
         return result != []
+
+    def get_user_by_email(self, email):
+        context   = {'model': model, 'session': model.Session,
+                     'user': c.user or c.author, 'for_view': True,
+                     'auth_user_obj': c.userobj}
+        data_dict, groups_dict = {}, {}
+
+        users  = get_action('user_list')(context, data_dict)
+        result = filter(lambda user: user['email'] == email, users)
+        if result != []:
+            return result[0]
+        else:
+            return None
+
+    def get_user_by_id(self, id):
+        context   = {'model': model, 'session': model.Session,
+                     'user': c.user or c.author, 'for_view': True,
+                     'auth_user_obj': c.userobj}
+        data_dict, groups_dict = {}, {}
+
+        users  = get_action('user_list')(context, data_dict)
+        result = filter(lambda user: user['id'] == id, users)
+        if result != []:
+            return result[0]
+        else:
+            return None
 
     def get_user_state(self, user_id):
 
