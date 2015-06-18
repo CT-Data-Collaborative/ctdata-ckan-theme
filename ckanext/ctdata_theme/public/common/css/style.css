@@ -595,3 +595,8 @@ a.underlined_on_hover:hover{
   text-decoration: underline;
 };
 
+.gray_text{
+  color: gray;
+  font-size: 11px;
+}
+
