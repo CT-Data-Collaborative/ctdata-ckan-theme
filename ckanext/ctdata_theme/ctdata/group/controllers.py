@@ -34,6 +34,7 @@ ValidationError = logic.ValidationError
 clean_dict      = logic.clean_dict
 tuplize_dict    = logic.tuplize_dict
 parse_params    = logic.parse_params
+get_or_bust     = logic.get_or_bust
 
 class GroupController(GroupController):
     def __init__(self):
@@ -236,38 +237,32 @@ class GroupController(GroupController):
       return user_list
 
     def member_new(self, id):
-        context = {'model': model, 'session': model.Session,
-                   'user': c.user or c.author}
-
-        #self._check_access('group_delete', context, {'id': id})
+        context = {'model': model, 'session': model.Session,'user': c.user or c.author}
         try:
             if http_request.method == 'POST':
-                data_dict = clean_dict(dict_fns.unflatten(
-                    tuplize_dict(parse_params(http_request.params))))
+                data_dict = clean_dict(dict_fns.unflatten(tuplize_dict(parse_params(http_request.params))))
                 data_dict['id'] = id
 
                 email     = data_dict.get('email')
-                # user_name = data_dict['username'].split(' ')[len(data_dict['username'].split(' ')) - 2]
+                user_name = data_dict['username'].split(' ')[len(data_dict['username'].split(' ')) - 2]
 
-                # if user_name:
-                #   data_dict['username'] = user_name
-                #   c.group_dict = self._action('group_member_create')(context, data_dict)
+                if user_name:
+                  user = get_action('user_show')(context, {'id': user_name})
+                  data_dict['username'] = user_name
+                  c.group_dict = self._action('group_member_create')(context, data_dict)
+                  self.send_email_with_reject_button(user, id)
 
                 if email:
                   user = self.user_service.get_user_by_email(email)
-                  if user:
-                    self.send_invite_to_group(user, id)
-                    # if not user:
-                    #   user_data_dict = { 'email': email, 'group_id': data_dict['id'], 'role': data_dict['role']}
-                    #   del data_dict['email']
-                    #   user_dict             = self._action('user_invite')(context, user_data_dict)
-                    #   data_dict['username'] = user_dict['name']
-                    #   c.group_dict = self._action('group_member_create')(context, data_dict)
+                  if not user:
+                    user_data_dict = { 'email': email, 'group_id': data_dict['id'], 'role': data_dict['role']}
+                    del data_dict['email']
+                    user_dict             = self._action('user_invite')(context, user_data_dict)
+                    data_dict['username'] = user_dict['name']
+                    c.group_dict          = self._action('group_member_create')(context, data_dict)
 
-                  else:
-                    h.flash_error('User with this email already invited to this group')
-                else:
-                  h.flash_error('Please enter correct email.')
+                    user = get_action('user_show')(context, {'id': data_dict['username']})
+                    self.send_email_with_reject_button(user, id)
 
                 self._redirect_to(controller='group', action='members', id=id)
             else:
@@ -277,11 +272,11 @@ class GroupController(GroupController):
                     c.user_role = new_authz.users_role_for_group_or_org(id, user) or 'member'
                 else:
                     c.user_role = 'member'
+
                 c.group_dict = self._action('group_show')(context, {'id': id})
-                group_type = 'organization' if c.group_dict['is_organization'] else 'group'
-                c.roles = self._action('member_roles_list')(
-                    context, {'group_type': group_type}
-                )
+                group_type   = 'organization' if c.group_dict['is_organization'] else 'group'
+                c.roles      = self._action('member_roles_list')(context, {'group_type': group_type})
+
         except NotAuthorized:
             abort(401, _('Unauthorized to add member to group %s') % '')
         except NotFound:
@@ -290,60 +285,47 @@ class GroupController(GroupController):
             h.flash_error(e.error_summary)
         return self._render_template('group/member_new.html')
 
-    def add_member(self, id):
-      # user    = self.user_service.get_user_by_id(user_id)
-      user_id  = http_request.params.get('user_id', '')
-      context  = {'model': model, 'session': model.Session, 'user': c.user or c.author}
-      user     = self.user_service.get_user_by_id(user_id)
-      session  = model.Session
-      schema   = logic.schema.member_schema()
-      username = user['name']
-      role     = 'member'
-      result   = model.User.get(username)
-      # group    = model.Group.get(group_id)
+    def remove_member(self, id):
+      user    = c.user or c.author
+      group   = model.Group.get(id)
+      user_id = http_request.params.get('user_id')
+      member_dict    = { 'id': id, 'object': user_id, 'object_type': 'user', }
+      member_context = { 'model': model, 'user': user, 'session': model.Session}
 
-      try:
-        group = get_action('group_show')(context, {'id': id})
-      except toolkit.ObjectNotFound:
-        abort(404)
+      group_id, obj_id, obj_type = get_or_bust(member_dict, ['id', 'object', 'object_type'])
 
-      data_dict    = {'id': id, 'username': user['name'], 'include_datasets': False}
-      data, errors = _validate(data_dict, schema, context)
-      # c.group_dict = self._action('_group_or_org_member_create')(context, data_dict)
+      if not group:
+        raise NotFound('Group was not found.')
 
-      # embed()
-      # model   = context['model']
+      obj_class = logic.model_name_to_class(model, obj_type)
+      obj       = obj_class.get(obj_id)
 
-      if not user:
-        message = _(u'User {username} does not exist.').format(username=username)
-        raise ValidationError({'message': message}, error_summary=message)
+      if not obj:
+          raise NotFound('%s was not found.' % obj_type.title())
 
-      member_dict = {
-          'id': id,
-          'object': user_id,
-          'object_type': 'user',
-          'capacity': role,
-      }
-      member_create_context = {
-          'model': model,
-          'user': model.User.get(user['name']),
-          'session': session,
-          'ignore_auth': context.get('ignore_auth'),
-      }
-      return logic.get_action('member_create')(member_create_context,
-                                               member_dict)
+      member = model.Session.query(model.Member).\
+              filter(model.Member.table_name == obj_type).\
+              filter(model.Member.table_id == obj.id).\
+              filter(model.Member.group_id == group.id).\
+              filter(model.Member.state    == 'active').first()
+      if member:
+          rev = model.repo.new_revision()
+          rev.author = member_context.get('user')
+          rev.message = _(u'REST API: Delete Member: %s') % obj_id
+          member.delete()
+          model.repo.commit()
 
+      h.flash_notice(_('Group member has been deleted.'))
+      return self._redirect_to(controller='group', action='read', id=id)
 
-    def send_invite_to_group(self, user, group):
-
-      # mailer.create_reset_key(user)
+    def send_email_with_reject_button(self, user, group):
       body    = self.get_group_invite_body(user, group)
       subject = 'Invite in group'
       self.mail_user(user, subject, body)
 
-    def aceept_link(self, user, group):
+    def reject_link(self, user, group):
       key  = uuid.uuid4().hex[:10]
-      path = '/group/add_member/%s?user_id=%s&key=%s'%(group, user['id'], unicode(key))
+      path = '/group/remove_member/%s?user_id=%s&key=%s'%(group, user['id'], unicode(key))
       url  = urljoin(g.site_url, path)
 
       return url
@@ -355,19 +337,25 @@ class GroupController(GroupController):
               body, headers=headers)
 
     def get_group_invite_body(self, user, group):
+      group_obj   = model.Group.get(group)
       invite_message = _(
-      "You have been invited to {group}."
+      "You have been invited to {group_obj.display_name}."
+      "Follow this link to see the group:\n"
+      "   {group_link}\n"
       "\n"
-      "To accept this invitiation, please follow the link:\n"
       "\n"
-      "   {aceept_link}\n"
+      "To reject this invitiation, please follow the link:\n"
+      "\n"
+      "   {reject_link}\n"
       )
 
       d = {
-          'aceept_link': self.aceept_link(user, group),
-          'group': group,
+          'group_link':  urljoin(g.site_url, '/group/'+ group_obj.name),
+          'reject_link': self.reject_link(user, group),
+          'group_obj': group_obj,
           'user_name': user['name'],
           }
+
       return invite_message.format(**d)
 
 

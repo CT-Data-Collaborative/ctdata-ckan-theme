@@ -10,15 +10,50 @@
 {% block primary_content_inner %}
   {% link_for _('Back to all members'), controller='group', action='members', id=group.name, class_='btn pull-right', icon='arrow-left' %}
   <h1 class="page-heading">
-    {% block page_heading %}{{ _('Edit Member') if user else _('Add Member') }}{% endblock %}
+    {% block page_heading %}{{ _('Edit Member') if user else _('Add Member')}} <span class='gray_text'> User will recieve email notification. </span>{% endblock %}
   </h1>
   {% block form %}
+
   <form class="dataset-form form-horizontal add-member-form" method='post'>
     <div class="row-fluid">
-      {% if not user %}
       <div class="control-group control-medium">
+        {% if not user %}
+        <label class="control-label" for="username">
+          {{ _('Existing User') }}
+        </label>
+
         <span>
-          {{ _('If you wish to invite user to this group, enter their email address.') }}
+          {{ _('If you wish to add an existing user, search for their username below (case sensitive).') }}
+        </span>
+        {% endif %}
+      <div class="controls">
+          {% if user %}
+            User:
+            <span class="user-name">
+            {{ h.linked_gravatar(user.email_hash, 20) }}
+             <b>  {{ user.display_name }} </b>
+             </span>
+            <input type="hidden" name="username" value="{{ user.name }}" />
+            <input class="hidden" id="username" name="username" type="text" value="{{ user.name }}"
+            disabled="True" class="control-medium">
+          {% else %}
+            <input id="username" type="text" name="username" placeholder="Username"
+            value="" class="control-medium" data-module="autocomplete"
+            data-module-source="/group/user_autocomplete?q=?">
+          {% endif %}
+        </div>
+      </div>
+
+      {% if not user %}
+      <div class="add-member-or">
+        {{ _('or') }}
+      </div>
+      <div class="control-group control-medium">
+        <label class="control-label" for="email">
+          {{ _('New User') }}
+        </label>
+        <span>
+          {{ _('If you wish to invite a new user, enter their email address.') }}
         </span>
         <div class="controls">
           <br>
