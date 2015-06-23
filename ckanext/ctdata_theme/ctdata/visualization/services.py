@@ -132,7 +132,9 @@ class DatasetService(object):
         data    = filter(lambda x: x['key'] == field_name, meta)
 
         try:
-            if field_name not in ['Units', 'Default', 'Break Points']:
+            if field_name in ['Help']:
+                value = data[0]['value']
+            elif field_name not in ['Units', 'Default', 'Break Points']:
                 value = yaml.load(data[0]['value']).replace(', ', ',')
             else:
                 value = yaml.load(data[0]['value'])
