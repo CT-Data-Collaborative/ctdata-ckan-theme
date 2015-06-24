@@ -389,9 +389,13 @@ span.dot{
   margin-right: -15px;
   /* font-size: 12px; */
   font-weight: 100;
+<<<<<<< HEAD
 
 }
 
+=======
+}
+>>>>>>> fedf840476cab5e56665c3ffe133fcbea9776a2e
 @media screen and (max-width: 1070px) {
     .subtopic {
         width: 33.6%;
@@ -561,10 +565,6 @@ a.underlined{
   width: 700px;
 }
 
-a.underlined_on_hover:hover{
-  text-decoration: underline;
-};
-
 .edit_matches{
   font-size: 10px;
   color: black !important;
@@ -599,4 +599,3 @@ a.underlined_on_hover:hover{
   color: gray;
   font-size: 11px;
 }
-
