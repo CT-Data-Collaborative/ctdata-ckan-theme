@@ -8,7 +8,7 @@ from pylons import session, url
 import ckan.lib.base as base
 import ckan.model    as model
 import ckan.plugins.toolkit as toolkit
-from ckan.common import response as http_response, c, request as http_request
+from ckan.common import response as http_response, c, request as http_request, _, g
 
 from ..database import Database
 from ..users.services import UserService
@@ -23,7 +23,10 @@ import ckan.lib.helpers as h
 import ckan.logic       as logic
 import ckan.lib.jsonp   as jsonp
 import ckan.new_authz   as new_authz
+import ckan.lib.mailer  as mailer
+from urlparse import urljoin
 
+_validate       = dict_fns.validate
 get_action      = logic.get_action
 NotFound        = logic.NotFound
 NotAuthorized   = logic.NotAuthorized
@@ -31,6 +34,7 @@ ValidationError = logic.ValidationError
 clean_dict      = logic.clean_dict
 tuplize_dict    = logic.tuplize_dict
 parse_params    = logic.parse_params
+get_or_bust     = logic.get_or_bust
 
 class GroupController(GroupController):
     def __init__(self):
@@ -93,6 +97,105 @@ class GroupController(GroupController):
       self.session.close()
       return json.dumps({'success': True})
 
+
+    def index(self):
+        group_type = self._guess_group_type()
+
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user or c.author, 'for_view': True,
+                   'with_private': False}
+
+        q = c.q = http_request.params.get('q', '')
+        data_dict = {'all_fields': True, 'q': q}
+
+        sort_by = c.sort_by_selected = http_request.params.get('sort')
+        if sort_by:
+            data_dict['sort'] = sort_by
+        try:
+            self._check_access('site_read', context)
+        except NotAuthorized:
+            abort(401, _('Not authorized to see this page'))
+
+        # pass user info to context as needed to view private datasets of
+        # orgs correctly
+        if c.userobj:
+            context['user_id'] = c.userobj.id
+            context['user_is_admin'] = c.userobj.sysadmin
+
+        # results = self._action('group_list_authz')(context, data_dict)
+        results = self._action('group_list_authz')(context, {'all_fields': True, 'q': q})
+        c.page = h.Page(
+            collection=results,
+            page = self._get_page_number(http_request.params),
+            url=h.pager_url,
+            items_per_page=21
+        )
+        return base.render(self._index_template(group_type))
+
+    def read(self, id, limit=20):
+        group_type = self._get_group_type(id.split('@')[0])
+        if group_type != self.group_type:
+            abort(404, _('Incorrect group type'))
+
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user or c.author,
+                   'schema': self._db_to_form_schema(group_type=group_type),
+                   'for_view': True}
+        data_dict = {'id': id}
+
+        # unicode format (decoded from utf8)
+        q = c.q = http_request.params.get('q', '')
+
+        try:
+            # Do not query for the group datasets when dictizing, as they will
+            # be ignored and get requested on the controller anyway
+            data_dict['include_datasets'] = False
+            c.group_dict = self._action('group_show')(context, data_dict)
+            c.members    = self._action('member_list')(context, {'id': id, 'object_type': 'user'})
+            c.group      = context['group']
+            group_admins = filter(lambda u: u['capacity'] == 'admin', c.group_dict['users'])
+
+            c.is_group_author = c.user in map(lambda u: u['name'], group_admins)
+
+        except NotFound:
+            abort(404, _('Group not found'))
+        except NotAuthorized:
+            abort(401, _('Unauthorized to read group %s') % id)
+
+        self._read(id, limit)
+        return base.render(self._read_template(c.group_dict['type']))
+
+    def new(self, data=None, errors=None, error_summary=None):
+        group_type = self._guess_group_type(True)
+        if data:
+            data['type'] = group_type
+
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user or c.author,
+                   'save': 'save' in http_request.params,
+                   'parent': http_request.params.get('parent', None)}
+        try:
+            self._check_access('group_create', context)
+        except NotAuthorized:
+            abort(401, _('Unauthorized to create a group'))
+
+        if context['save'] and not data:
+            return self._save_new(context, group_type)
+
+        data = data or {}
+        if not data.get('image_url', '').startswith('http'):
+            data.pop('image_url', None)
+
+        errors = errors or {}
+        error_summary = error_summary or {}
+        vars = {'data': data, 'errors': errors,
+                'error_summary': error_summary, 'action': 'new'}
+
+        self._setup_template_variables(context, data, group_type=group_type)
+        c.form = base.render(self._group_form(group_type=group_type),
+                        extra_vars=vars)
+        return base.render(self._new_template(group_type))
+
     def members(self, id):
         context = {'model': model, 'session': model.Session,
                    'user': c.user or c.author}
@@ -134,33 +237,32 @@ class GroupController(GroupController):
       return user_list
 
     def member_new(self, id):
-        context = {'model': model, 'session': model.Session,
-                   'user': c.user or c.author}
-
-        #self._check_access('group_delete', context, {'id': id})
+        context = {'model': model, 'session': model.Session,'user': c.user or c.author}
         try:
             if http_request.method == 'POST':
-                data_dict = clean_dict(dict_fns.unflatten(
-                    tuplize_dict(parse_params(http_request.params))))
+                data_dict = clean_dict(dict_fns.unflatten(tuplize_dict(parse_params(http_request.params))))
                 data_dict['id'] = id
 
                 email     = data_dict.get('email')
                 user_name = data_dict['username'].split(' ')[len(data_dict['username'].split(' ')) - 2]
 
                 if user_name:
+                  user = get_action('user_show')(context, {'id': user_name})
                   data_dict['username'] = user_name
                   c.group_dict = self._action('group_member_create')(context, data_dict)
+                  self.send_email_with_reject_button(user, id)
 
                 if email:
-                  if not self.user_service.check_if_email_exits(email):
+                  user = self.user_service.get_user_by_email(email)
+                  if not user:
                     user_data_dict = { 'email': email, 'group_id': data_dict['id'], 'role': data_dict['role']}
                     del data_dict['email']
-                    user_dict    = self._action('user_invite')(context, user_data_dict)
+                    user_dict             = self._action('user_invite')(context, user_data_dict)
                     data_dict['username'] = user_dict['name']
-                    c.group_dict = self._action('group_member_create')(context, data_dict)
+                    c.group_dict          = self._action('group_member_create')(context, data_dict)
 
-                  else:
-                    h.flash_error('User with this email already exists')
+                    user = get_action('user_show')(context, {'id': data_dict['username']})
+                    self.send_email_with_reject_button(user, id)
 
                 self._redirect_to(controller='group', action='members', id=id)
             else:
@@ -170,11 +272,11 @@ class GroupController(GroupController):
                     c.user_role = new_authz.users_role_for_group_or_org(id, user) or 'member'
                 else:
                     c.user_role = 'member'
+
                 c.group_dict = self._action('group_show')(context, {'id': id})
-                group_type = 'organization' if c.group_dict['is_organization'] else 'group'
-                c.roles = self._action('member_roles_list')(
-                    context, {'group_type': group_type}
-                )
+                group_type   = 'organization' if c.group_dict['is_organization'] else 'group'
+                c.roles      = self._action('member_roles_list')(context, {'group_type': group_type})
+
         except NotAuthorized:
             abort(401, _('Unauthorized to add member to group %s') % '')
         except NotFound:
@@ -183,6 +285,96 @@ class GroupController(GroupController):
             h.flash_error(e.error_summary)
         return self._render_template('group/member_new.html')
 
+    def remove_member(self, id):
+      user    = c.user or c.author
+      group   = model.Group.get(id)
+      user_id = http_request.params.get('user_id')
+      member_dict    = { 'id': id, 'object': user_id, 'object_type': 'user', }
+      member_context = { 'model': model, 'user': user, 'session': model.Session}
+
+      group_id, obj_id, obj_type = get_or_bust(member_dict, ['id', 'object', 'object_type'])
+
+      if not group:
+        raise NotFound('Group was not found.')
+
+      obj_class = logic.model_name_to_class(model, obj_type)
+      obj       = obj_class.get(obj_id)
+
+      if not obj:
+          raise NotFound('%s was not found.' % obj_type.title())
+
+      member = model.Session.query(model.Member).\
+              filter(model.Member.table_name == obj_type).\
+              filter(model.Member.table_id == obj.id).\
+              filter(model.Member.group_id == group.id).\
+              filter(model.Member.state    == 'active').first()
+      if member:
+          rev = model.repo.new_revision()
+          rev.author = member_context.get('user')
+          rev.message = _(u'REST API: Delete Member: %s') % obj_id
+          member.delete()
+          model.repo.commit()
+
+      h.flash_notice(_('Group member has been deleted.'))
+      return self._redirect_to(controller='group', action='read', id=id)
+
+    def _get_page_number(self, params, key='page', default=1):
+        """
+        Returns the page number from the provided params after
+        verifies that it is an integer.
+
+        If it fails it will abort the request with a 400 error
+        """
+        p = params.get(key, default)
+
+        try:
+            p = int(p)
+            if p < 1:
+                raise ValueError("Negative number not allowed")
+        except ValueError, e:
+            abort(400, ('"page" parameter must be a positive integer'))
+
+        return p
+
+    def send_email_with_reject_button(self, user, group):
+      body    = self.get_group_invite_body(user, group)
+      subject = 'Invite in group'
+      self.mail_user(user, subject, body)
+
+    def reject_link(self, user, group):
+      key  = uuid.uuid4().hex[:10]
+      path = '/group/remove_member/%s?user_id=%s&key=%s'%(group, user['id'], unicode(key))
+      url  = urljoin(g.site_url, path)
+
+      return url
+
+    def mail_user(self, recipient, subject, body, headers={}):
+      if (recipient['email'] is None) or not len(recipient['email']):
+          raise MailerException(_("No recipient email address available!"))
+      mailer.mail_recipient(recipient['display_name'], recipient['email'], subject,
+              body, headers=headers)
+
+    def get_group_invite_body(self, user, group):
+      group_obj   = model.Group.get(group)
+      invite_message = _(
+      "You have been invited to {group_obj.display_name}."
+      "Follow this link to see the group:\n"
+      "   {group_link}\n"
+      "\n"
+      "\n"
+      "To reject this invitiation, please follow the link:\n"
+      "\n"
+      "   {reject_link}\n"
+      )
+
+      d = {
+          'group_link':  urljoin(g.site_url, '/group/'+ group_obj.name),
+          'reject_link': self.reject_link(user, group),
+          'group_obj': group_obj,
+          'user_name': user['name'],
+          }
+
+      return invite_message.format(**d)
 
 
 

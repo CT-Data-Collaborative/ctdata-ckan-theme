@@ -55,8 +55,17 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
         db.init_sa(config['sqlalchemy.url'])
         db.init_community_data(config['ctdata.communities_source'])
+        db.init_years_data(config['ckan.datastore.write_url'])
 
     def before_map(self, route_map):
+        with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.ctdata.compare.controllers:CompareController') as m:
+            m.connect('admin_compare', '/admin/compare', action='admin_compare')
+            m.connect('compare', '/compare', action='compare')
+            m.connect('load_comparable_datasets', '/compare/load_comparable_datasets/{dataset_name}', action='load_comparable_datasets')
+            m.connect('update_years_matches', '/compare/update_years_matches', action='update_years_matches')
+            m.connect('add_year_matches', '/compare/add_year_matches', action='create_year_matches')
+            m.connect('join_for_two_datasets', '/compare/join_for_two_datasets/', action='join_for_two_datasets')
+
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
             m.connect('news', '/news', action='news')
             m.connect('special_projects', '/special_projects', action='special_projects')
@@ -66,8 +75,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('update_visualization_link', '/update_visualization_link/{dataset_name}', action='update_visualization_link')
             m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
 
-        with routes.mapper.SubMapper(
-                route_map,
+        with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.community.controllers:CommunityProfilesController') as m:
             m.connect('community_get_filters', '/community/get_filters/{dataset_id}', action='get_filters')
             m.connect('community_get_incompatibles', '/community/get_incompatibles/{dataset_id}', action='get_incompatibles')
@@ -77,9 +85,14 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('community_remove_indicator','/community/remove_indicator/{indicator_id}', action='remove_indicator')
 
 
-        with routes.mapper.SubMapper(
-                route_map,
+        with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
+            m.connect('/user/edit', action='edit')
+            m.connect('user_edit', '/user/edit/{id:.*}', action='edit',ckan_icon='cog')
+            m.connect('dashboard', '/dashboard', action='dashboard')
+            m.connect('/user/me', action='me')
+            m.connect('/user_index', '/user', action='index')
+            m.connect('/user/logged_in', action='logged_in')
             m.connect('user_community_profiles', '/user/{user_id}/community_profiles', action='community_profiles')
             m.connect('my_gallery', '/dashboard/gallery', action='my_gallery')
             m.connect('my_community_profiles', '/dashboard/community-profiles', action='my_community_profiles')
@@ -87,26 +100,30 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('remove_gallery_indicators', '/user/remove_gallery_indicators', action='remove_gallery_indicators')
             m.connect('update_gallery_indicator',  '/user/update_gallery_indicator', action='update_gallery_indicator')
             m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
+            m.connect('/user/activity/{id}/{offset}', action='activity')
+            m.connect('user_activity_stream', '/user/activity/{id}',action='activity', ckan_icon='time')
+            m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
 
-        with routes.mapper.SubMapper(
-                route_map,
+        with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
             m.connect('page_about', '/pages/about', action='about')
             m.connect('page_news', '/pages/news', action='news')
             m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
             m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
 
-        with routes.mapper.SubMapper(
-                route_map,
+        with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.group.controllers:GroupController') as m:
+            m.connect('group_user_autocomplete', '/group/user_autocomplete', action = 'user_autocomplete')
             m.connect('group_indicators', '/group/indicators/{group_id}', action='group_indicators')
             m.connect('group_members', '/group/members/{id}', action='members', ckan_icon='group')
+            m.connect('group_new', '/group/new', action='new')
+            m.connect('group_read', '/group/{id}', action='read', ckan_icon='sitemap')
             m.connect('group_action', '/group/{action}/{id}', action = 'member_new')
-            m.connect('group_user_autocomplete', '/group/user_autocomplete', action = 'user_autocomplete')
+            m.connect('group_remove_member', '/group/remove_member/{id}', action = 'remove_member')
             m.connect('update_group_indicators', '/group/update_group_indicators', action='update_group_indicators')
+            m.connect('group_index', '/group', action='index', highlight_actions='index search')
 
-        with routes.mapper.SubMapper(
-                route_map,
+        with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.location.controllers:LocationsController') as m:
             m.connect('locations', '/location', action='locations_index')
             m.connect('data_by_location', '/data-by-location', action='data_by_location')
@@ -127,11 +144,15 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
     def get_helpers(self):
         return { 'locations_helper': locations,
                  'geography_types': _geography_types,
+                 'empty_href': _empty_href,
                  'link_to_dataset_with_filters': _link_to_dataset_with_filters}
 
 
 
 ####### HELPER METHODS ##########
+
+def _empty_href():
+    return 'javascript:void(0);'
 
 def _link_to_dataset_with_filters(dataset, filters, view = 'table', location = ''):
     dataset_url  = dataset.replace(' ', '-').replace("'", '').lower()

@@ -1,0 +1,207 @@
+{% extends "page.html" %}
+
+{% block subtitle %}My Dashboard{% endblock %}
+{% block page_name %}My Dashboard{% endblock %}
+{% block page_description %} Welcome to your account profile page on <a href="http://ctdata.org">ctdata.org</a> {% endblock %}
+
+{% block primary %}
+
+<div class="left-block">
+  <div class="text-center">
+    <h2> User Info
+    {% link_for 'Manage My Profile', controller='user', action='edit', id=c.userobj.name, class_='btn btn-mini btn-default pull-right', icon='wrench' %}
+    </h2>
+  </div>
+
+  <div class="user-image">
+    {{ h.gravatar((c.userobj.email_hash if c and c.userobj else ''), size=200) }}
+    <br>
+    <h3>{{ c.userobj.display_name }}</h3>
+
+    <p class="empty">
+      {% trans %} You have not provided a biography. {% endtrans %}
+    </p>
+
+    <p class="">
+      <b>Username:</b>
+      {{ c.user_dict.name }}
+    </p>
+
+    <p class="">
+      <b>Email:</b>
+      {{ c.user_dict.email }}
+    </p>
+    <p class="">
+      <b>Member Since:</b>
+      {{ h.render_datetime(c.user_dict.created) }}
+    </p>
+  </div>
+
+</div>
+
+
+<div class="right-block">
+  <div class="logout-block pull-right">
+    <a href="{{ h.url_for('/user/_logout') }}" title="{{ _('Log out') }}" class="btn btn-mini">
+      <i class="icon-signout"></i> Logout
+    </a>
+  </div>
+  <br>
+  <br>
+
+  <div class="block">
+    <div class="text-center"><h2> Gallery
+    </h2></div>
+
+    <div class="block-content">
+    {% if gallery_indicators %}
+      <table class='table my_table hidden'>
+          <thead>
+              <th> Indicator </th>
+              <th> Groups </th>
+              <th>Permission</th>
+          </thead>
+          <tbody>
+              {% for indicator in gallery_indicators %}
+                <tr class="table_data" id="{{indicator.id}}">
+                    <td class='name'> {{indicator.name}}</td>
+                    <td class='groups'>
+                      {% for group in indicator.groups(c) %}
+                        <a href="{{'/group/' + group['name']}}"> {{group['title']}} </a>
+                        <br/>
+                        <span class="group_id hidden">{{group['id']}}</span>
+                        <span class="group_name hidden">{{group['title']}}</span>
+
+                      {% endfor %}
+                    </td>
+                    <td class="permission">
+                      {{indicator.permission}}
+                    </td>
+                </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+
+
+      <ul>
+          {% for indicator in gallery_indicators %}
+            <li class="dataset-item" id="{{indicator.id}}">
+              <div class= 'dataset-content'>
+                <h3 class='dataset-heading'>
+                  <a href="{{ indicator.link_to_visualization() }}">
+                    {% if  indicator.visualization_type == 'table' %}
+                      <img id="table_icon" src="/common/images/displayopt1-inv.png" alt="" />
+                    {% endif %}
+                    {% if  indicator.visualization_type == 'chart' %}
+                      <img id="bar_icon" src="/common/images/displayopt2.png" alt="" />
+                    {% endif %}
+                    {% if  indicator.visualization_type == 'line' %}
+                      <img id="line_icon" src="/common/images/displayopt3.png" alt="" />
+                    {% endif %}
+                    {% if  indicator.visualization_type == 'map' %}
+                      <img id="line_icon" src="/common/images/displayopt4.png" alt="" />
+                    {% endif %}
+
+                    {{indicator.name}}
+
+                  </a>
+                  <!-- <i class='fa fa-times text-error'></i> -->
+                  <a href="javascript:void(0)" class="remove_indicator underlined pull-right btn-mini" id="{{indicator.id}}">Remove</a>
+                  <a href="javascript:void(0)" class="edit_indicator underlined btn-mini pull-right" id="{{indicator.id}}">Edit</a>
+                </h3>
+                Dataset: {{indicator.dataset_name()}}
+                <br>
+                Created: {{indicator.created_at.date()}}
+                {% if indicator.groups(c) %}
+                <br>
+                Groups:
+                {% for group in indicator.groups(c) %}
+                  <a href="{{'/group/' + group['name']}}"> {{group['title']}} </a>
+
+                  {% if loop.index != indicator.groups(c)|length %}
+                    ,
+                  {% endif %}
+                {% endfor %}
+                {% endif %}
+                <br>
+                Permission: {{indicator.permission}}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+
+      <br/>
+      <br/>
+    {% else %}
+      <span class="gray_text">
+        There're no indicators for this gallery yet.
+        <br>
+<!--         To create your own profile visit <a href="/location"> Data by Location </a> page. -->
+      </span>
+    {% endif %}
+
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="text-center"><h2> Datasets News </h2></div>
+    <div class="block-content">
+      {{ c.dataset_activity_stream }}
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="text-center"><h2> Groups  <a href="/group" class="btn btn-mini pull-right">Manage Groups</a></h2></div>
+    <div class="block-content">
+      {% for group in groups %}
+        <h3><a href="/group/{{group.name}}" class="underlined">{{ group.display_name }}</a> News</h3>
+        </br>
+        {{ group.activities }}
+        <hr>
+      {% endfor %}
+      <br>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="text-center"><h2> Profiles </h2></div>
+
+    <div class="block-content">
+    {% if profiles %}
+      <ul>
+        {% for profile in profiles %}
+          <li class="item">
+            <h4> <a href="/community/{{profile.id}}" class="">{{profile.name}}</4>
+            <a href="javascript:void(0)" class="remove_profile underlined pull-right btn-mini" id="{{profile.id}}">
+              Remove
+            </a>
+            </h3>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <span class="gray_text">
+        There're no profiles yet.
+        <br>
+        To create your own profile visit <a href="/location"> Data by Location </a> page.
+      </span>
+    {% endif %}
+    </div>
+  </div>
+
+</div>
+
+
+{% snippet 'visualization/snippets/save_indicator_to_gallery.html', group_dropdown=c.group_dropdown %}
+{% endblock %}
+
+
+
+{% block scripts %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="/common/css/user_page.css">
+{% resource 'ctdata_theme/my_gallery.js' %}
+{% resource 'ctdata_theme/bootbox.js' %}
+{% resource 'ctdata_theme/user_communities.js' %}
+
+{% endblock %}

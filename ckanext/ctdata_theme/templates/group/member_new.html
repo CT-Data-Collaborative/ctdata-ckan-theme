@@ -10,9 +10,10 @@
 {% block primary_content_inner %}
   {% link_for _('Back to all members'), controller='group', action='members', id=group.name, class_='btn pull-right', icon='arrow-left' %}
   <h1 class="page-heading">
-    {% block page_heading %}{{ _('Edit Member') if user else _('Add Member') }}{% endblock %}
+    {% block page_heading %}{{ _('Edit Member') if user else _('Add Member')}} <span class='gray_text'> User will recieve email notification. </span>{% endblock %}
   </h1>
   {% block form %}
+
   <form class="dataset-form form-horizontal add-member-form" method='post'>
     <div class="row-fluid">
       <div class="control-group control-medium">
@@ -25,7 +26,7 @@
           {{ _('If you wish to add an existing user, search for their username below (case sensitive).') }}
         </span>
         {% endif %}
-        <div class="controls">
+      <div class="controls">
           {% if user %}
             User:
             <span class="user-name">
@@ -42,6 +43,7 @@
           {% endif %}
         </div>
       </div>
+
       {% if not user %}
       <div class="add-member-or">
         {{ _('or') }}
