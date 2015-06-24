@@ -87,7 +87,6 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
         with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
-            m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
             m.connect('/user/edit', action='edit')
             m.connect('user_edit', '/user/edit/{id:.*}', action='edit',ckan_icon='cog')
             m.connect('dashboard', '/dashboard', action='dashboard')
@@ -101,6 +100,9 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('remove_gallery_indicators', '/user/remove_gallery_indicators', action='remove_gallery_indicators')
             m.connect('update_gallery_indicator',  '/user/update_gallery_indicator', action='update_gallery_indicator')
             m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
+            m.connect('/user/activity/{id}/{offset}', action='activity')
+            m.connect('user_activity_stream', '/user/activity/{id}',action='activity', ckan_icon='time')
+            m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
 
         with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
