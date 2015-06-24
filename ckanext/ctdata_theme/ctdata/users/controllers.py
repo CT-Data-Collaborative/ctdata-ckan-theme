@@ -265,7 +265,7 @@ class UserController(UserController):
         return json.dumps({'success': True})
 
     def read(self, id=None):
-        if id == c.userobj.name:
+        if c.userobj and id == c.userobj.name:
             return self.dashboard()
 
         context = {'model': model, 'session': model.Session,
