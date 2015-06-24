@@ -93,7 +93,6 @@ class UserController(UserController):
         user_name = http_request.environ.get("REMOTE_USER")
         user      = self.user_service.get_or_create_user(user_name) if user_name else None
 
-
         if not user:
             return self.login()
         try:
@@ -266,6 +265,9 @@ class UserController(UserController):
         return json.dumps({'success': True})
 
     def read(self, id=None):
+        if id == c.userobj.name:
+            return self.dashboard()
+
         context = {'model': model, 'session': model.Session,
                    'user': c.user or c.author, 'auth_user_obj': c.userobj,
                    'for_view': True}
@@ -283,8 +285,7 @@ class UserController(UserController):
         if h.asbool(config.get('ckan.legacy_templates', False)):
             c.user_activity_stream = get_action('user_activity_list_html')(
                 context, {'id': c.user_dict['id']})
-        if id == c.userobj.name:
-            return self.dashboard()
+
         return base.render('user/read.html')
 
 
