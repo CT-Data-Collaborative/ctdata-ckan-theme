@@ -10,8 +10,6 @@
     <li>
         <a href="/dashboard" class="image" title="{{ _('View profile') }}">
           <i class="icon-dashboard"></i>
-
-            <!-- <span class="username">{{ c.userobj.display_name }}</span> -->
             My Dashboard
         </a>
     </li>
@@ -29,8 +27,12 @@
         </a>
     </li> -->
 {% else %}
-<li class="">{% link_for _('Login'), controller='user', action='login' %}</li>
-<li class="">{% link_for _('Register'), controller='user', action='register', class_='sub' %}</li>
+<li class="">
+  <a href="{{ h.url_for(controller='user', action='login') }}" title="{{ _('Edit settings') }}">
+    <i class="icon-dashboard"></i>
+      My Dashboard
+  </a>
+</li>
 {% endif %}
 </ul>
 </div>
