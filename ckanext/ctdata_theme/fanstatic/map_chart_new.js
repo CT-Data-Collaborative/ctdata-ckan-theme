@@ -100,8 +100,8 @@ function draw_map(){
             return "Skip data for all of connecticut"
           }
 
-          // if (data.data[i]['value'] > -1 && data.data[i]['value'] != "")
-          all_values.push(data.data[i]['value'])
+          if (data.data[i]['value'] > -1 && data.data[i]['value'] != '-9999')
+            all_values.push(data.data[i]['value']);
 
           if (data.data[i]['value'] == SUPPRESSED_VALUE){
             if (geography_param != 'Town'){
@@ -183,6 +183,8 @@ function draw_map(){
             'Imagery © <a href="http://mapbox.com">Mapbox</a>',
           id: 'examples.map-20v6611k'
         })
+
+        $("#container").html('<div id="map"></div>');
 
         var map = L.map('map',{layers: [layer] }).setView([41.571, -72.68], 1);
 

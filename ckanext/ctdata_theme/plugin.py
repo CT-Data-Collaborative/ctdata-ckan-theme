@@ -75,6 +75,9 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('update_visualization_link', '/update_visualization_link/{dataset_name}', action='update_visualization_link')
             m.connect('dataset_update_indicators', '/dataset/{dataset_name}/update_indicators', action='update_indicators')
 
+        with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.ctdata.package.controllers:PackageController') as m:
+            m.connect('dataset_groups', '/dataset/groups/{id}', action='groups', ckan_icon='group')
+
         with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.community.controllers:CommunityProfilesController') as m:
             m.connect('community_get_filters', '/community/get_filters/{dataset_id}', action='get_filters')
