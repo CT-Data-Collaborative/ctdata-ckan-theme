@@ -8,7 +8,7 @@ from pylons import session, url
 import ckan.lib.base as base
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
-from ckan.common import response as http_response, c, request as http_request
+from ckan.common import response as http_response, c, request as http_request, _
 
 from ..database import Database
 from ..users.services import UserService
@@ -30,6 +30,14 @@ check_access  = logic.check_access
 ValidationError = logic.ValidationError
 
 class UserController(UserController):
+    def activity_stream_string_added_dataset_to_group(context, activity):
+        return _("{actor} added the dataset {dataset} to the group {group}")
+    def activity_stream_string_removed_dataset_from_group(context, activity):
+        return _("{actor} removed the dataset {dataset} from the group {group}")
+
+    activity_streams.activity_stream_string_functions['removed dataset from group'] = activity_stream_string_removed_dataset_from_group
+    activity_streams.activity_stream_string_functions['added dataset to group'] = activity_stream_string_added_dataset_to_group
+
     def __init__(self):
         self.session = Database().session_factory()
         self.community_profile_service = CommunityProfileService(self.session)
