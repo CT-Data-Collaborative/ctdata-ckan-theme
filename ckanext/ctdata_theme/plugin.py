@@ -87,7 +87,6 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
         with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.users.controllers:UserController') as m:
-            # m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
             m.connect('/user/edit', action='edit')
             m.connect('user_edit', '/user/edit/{id:.*}', action='edit',ckan_icon='cog')
             m.connect('dashboard', '/dashboard', action='dashboard')
@@ -101,6 +100,25 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('remove_gallery_indicators', '/user/remove_gallery_indicators', action='remove_gallery_indicators')
             m.connect('update_gallery_indicator',  '/user/update_gallery_indicator', action='update_gallery_indicator')
             m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
+            m.connect('/user/activity/{id}/{offset}', action='activity')
+            m.connect('user_activity_stream', '/user/activity/{id}',action='activity', ckan_icon='time')
+
+            m.connect('user_generate_apikey', '/user/generate_key/{id}', action='generate_apikey')
+            m.connect('user_follow', '/user/follow/{id}', action='follow')
+            m.connect('/user/unfollow/{id}', action='unfollow')
+            m.connect('user_followers', '/user/followers/{id:.*}', action='followers', ckan_icon='group')
+            m.connect('user_delete', '/user/delete/{id}', action='delete')
+            m.connect('/user/reset/{id:.*}', action='perform_reset')
+            m.connect('register', '/user/register', action='register')
+            m.connect('login', '/user/login', action='login')
+            m.connect('/user/_logout', action='logout')
+            m.connect('/user/logged_in', action='logged_in')
+            m.connect('/user/logged_out', action='logged_out')
+            m.connect('/user/logged_out_redirect', action='logged_out_page')
+            m.connect('/user/reset', action='request_reset')
+            m.connect('/user/set_lang/{lang}', action='set_lang')
+
+            m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
 
         with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
