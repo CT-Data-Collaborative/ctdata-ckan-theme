@@ -76,19 +76,21 @@ class CompareService(object):
       dataset_names = toolkit.get_action('package_list')(data_dict={})
       main_dataset  = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
       main_dims     = DatasetService.get_dataset_meta_dimensions(dataset_name)
+      main_dims_names = map(lambda dim: dim.name, main_dims)
       main_geo_type = DatasetService.get_dataset_meta_geo_type(dataset_name)
       comparable    = []
       matches       = {}
 
       for name in dataset_names:
-        dataset  = toolkit.get_action('package_show')(data_dict={'id': name})
-        dims     = DatasetService.get_dataset_meta_dimensions(name)
-        geo_type = DatasetService.get_dataset_meta_geo_type(name)
+        dataset    = toolkit.get_action('package_show')(data_dict={'id': name})
+        dims       = DatasetService.get_dataset_meta_dimensions(name)
+        dims_names = map(lambda dim: dim.name, dims)
+        geo_type   = DatasetService.get_dataset_meta_geo_type(name)
 
         if not dataset['private'] and name != dataset_name:
-          dims_matches           = filter(lambda dim: dim in main_dims, dims )
-          dims_no_matches        = filter(lambda dim: dim not in dims_matches, dims ) + ['Variable']
-          main_dims_no_matches   = filter(lambda dim: dim not in dims_matches, main_dims ) + ['Variable']
+          dims_matches           = filter(lambda dim: dim in main_dims_names, dims_names )
+          dims_no_matches        = filter(lambda dim: dim not in dims_matches, dims_names ) + ['Variable']
+          main_dims_no_matches   = filter(lambda dim: dim not in dims_matches, main_dims_names ) + ['Variable']
           filters_values_matches = []
           values                 = []
           filters_matches_number = 0
@@ -115,7 +117,7 @@ class CompareService(object):
               filters_values_matches.append({dim_match: values_matches})
               filters_matches_number = filters_matches_number + len(values_matches)
             else:
-              if dim_match != 'Variable':
+              if dim_match not in ['Variable', geo_type, main_geo_type]:
                 main_dims_no_matches.append(dim_match)
                 dims_no_matches.append(dim_match)
 
