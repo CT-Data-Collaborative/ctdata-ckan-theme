@@ -208,16 +208,33 @@ function set_filters(display_type){
   if(display_type == 'map' && map_filters.length > 0){
     filters_to_update = map_filters;
   }
+  console.log('chart_filters: ')
+  console.log(chart_filters)
   if(display_type != 'map' && display_type != 'table' && chart_filters.length > 0){
+    console.log("in if(display_type != 'map' && display_type != 'table' && chart_filters.length > 0")
     filters_to_update = chart_filters;
   }
   if(display_type == 'table' && table_filters.length > 0){
     filters_to_update = table_filters;
   }
+
+  console.log('filters_to_update: ')
+  console.log(filters_to_update)
+
   if(filters_to_update.length > 0){
+    console.log('in if(filters_to_update.length > 0)')
+    console.log('start each')
     $.each(filters_to_update, function(i){
       column = filters_to_update[i]
+      console.log('column: ')
+      console.log(column)
+      console.log('start check column values')
       $.each(column['values'], function(value){
+        console.log("column['field'] : ")
+        console.log(column['field'])
+        console.log("column['values'][value] : ")
+        console.log(column['values'][value])
+        console.log($("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']"))
         $("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']").prop('checked', true);
       });
     });
