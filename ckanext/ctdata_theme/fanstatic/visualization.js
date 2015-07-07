@@ -190,6 +190,7 @@ function check_defaults(){
 }
 
 function save_filters(display_type){
+  console.log('start save_filters function')
   if(display_type == 'table')
     table_filters = get_filters()
 
@@ -197,9 +198,12 @@ function save_filters(display_type){
     map_filters = get_filters()
   else
     chart_filters = get_filters()
+
+  console.log('finish save_filters function')
 }
 
 function set_filters(display_type){
+  console.log('start set_filters')
   filters_to_update = []
   if(display_type == 'map' && map_filters.length > 0){
     filters_to_update = map_filters;
@@ -218,9 +222,11 @@ function set_filters(display_type){
       });
     });
   }
+  console.log('finish set_filters')
 }
 
 function set_display_type(new_type){
+  console.log('fire set_display_type function (switch type btn click)')
   set_icon(new_type);
   save_filters(display_type);
   set_filters(new_type);
@@ -244,10 +250,12 @@ function set_display_type(new_type){
       //In table view
       reset_checkbox();
   }
+  console.log('display data should be next')
   display_data();
 }
 
 function set_icon(type){
+  console.log('start set_icon function')
   if (type == "map") {
     $("#map_icon").attr("src", "/common/images/displayopt4-inv.png");
   } else {
@@ -268,6 +276,7 @@ function set_icon(type){
   } else {
     $("#table_icon").attr("src", "/common/images/displayopt1.png");
   }
+  console.log('finish set_icon function')
 }
 
 
