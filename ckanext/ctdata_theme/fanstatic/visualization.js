@@ -235,7 +235,8 @@ function set_filters(display_type){
         console.log("column['values'][value] : ")
         console.log(column['values'][value])
         console.log($("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']"))
-        $("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']").prop('checked', true);
+        // $("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']").prop('checked', true);
+        $('input[class*="'+column['field']+ '"]'+'[value="'+column['values'][value]+'"]').prop('checked', true);
       });
     });
   }
