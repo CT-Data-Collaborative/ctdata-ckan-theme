@@ -1,21 +1,18 @@
 from sqlalchemy import *
 from migrate import *
 
-import ckan.plugins.toolkit as toolkit
-from IPython import embed
-
 meta = MetaData()
 
 def upgrade(migrate_engine):
   meta = MetaData(bind=migrate_engine)
 
-  years = Table('ctdata_years', meta,
-    Column('id', Integer, primary_key = True),
-    Column('year', String, nullable = False),
-    Column('matches',  String, default  = '')
-  )
+  # years = Table('ctdata_years', meta,
+  #   Column('id', Integer, primary_key = True),
+  #   Column('year', String, nullable = False),
+  #   Column('matches',  String, default  = '')
+  # )
 
-  years.create()
+  # years.create()
 
 def downgrade(migrate_engine):
   meta = MetaData(bind=migrate_engine)

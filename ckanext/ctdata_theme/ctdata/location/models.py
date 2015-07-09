@@ -26,6 +26,9 @@ class Location(Base):
     public = Column(Boolean, default=False)
     geography_type = Column(String, default='Town')
 
+    region_id      = Column(String, ForeignKey('ctdata_regions.id'))
+    # region         = relationship(Region,   backref="ctdata_regions")
+
     def __init__(self, name, fips, geography_type):
         self.fips   = fips
         self.name   = name
@@ -41,6 +44,22 @@ class Location(Base):
 
         return profile
 
+class Region(Base):
+    __tablename__ = 'ctdata_regions'
+
+    id             = Column(Integer, primary_key=True)
+    name           = Column(String)
+    user_id        = Column(String, ForeignKey('ctdata_user_info.ckan_user_id'))
+    user           = relationship(UserInfo, backref="user_regions")
+    locations      = relationship(Location, backref=backref('ctdata_locations'))
+
+    def __init__(self, name, user_id):
+        self.name = name
+        self.user_id = user_id
+
+    def __repr__(self):
+        return "Profile %s %s %s" % (self.name, self.user_id)
+
 
 class CtdataProfile(Base):
     __tablename__ = 'ctdata_profiles'
@@ -49,14 +68,16 @@ class CtdataProfile(Base):
     name           = Column(String)
     global_default = Column(Boolean, default=False)
 
-    user_id        = Column(String, ForeignKey('ctdata_user_info.ckan_user_id'))
+    region_id      = Column(String, ForeignKey('ctdata_regions.id'))
+    region         = relationship(Region,   backref="ctdata_regions")
 
+    user_id        = Column(String, ForeignKey('ctdata_user_info.ckan_user_id'))
     user           = relationship(UserInfo, backref="user_profiles")
     locations      = relationship(Location, secondary='ctdata_locations_profiles',
                       backref=backref('profiles', lazy='dynamic'))
 
-    indicators     = relationship(ProfileIndicator, backref=backref("profile_indicators", lazy='dynamic'))
-    # indicators     = relationship(ProfileIndicator, backref=backref("profile_indicators"))
+    # indicators     = relationship(ProfileIndicator, backref=backref("profile_indicators", lazy='dynamic'))
+    indicators     = relationship(ProfileIndicator, backref=backref("profile_indicators"))
 
     def __init__(self, name, global_default, user_id):
         self.name = name

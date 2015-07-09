@@ -201,6 +201,7 @@ class UserInfo(Base):
 
     # profiles   = association_proxy("user_profiles", "profile")
     indicators = association_proxy("indicators_links", "indicator")
+    regions    = association_proxy("user_regions", "region")
 
     def __init__(self, ckan_user_id, is_admin=False):
         self.ckan_user_id = ckan_user_id
