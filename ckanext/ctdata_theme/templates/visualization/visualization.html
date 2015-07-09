@@ -55,7 +55,7 @@
 {% if dimension.possible_values %}
 <li class="filter">
   <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")|replace("'", "")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
-  <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
+  <div id="collapse{{dimension.name|replace(" ","")|replace("'", "")}}" class="panel-collapse collapse">
     <span>
       {% if dimension.name == geography_param %}
         <a href="javascript:void(0);" class="select-all">Select All</a>
