@@ -190,6 +190,7 @@ function check_defaults(){
 }
 
 function save_filters(display_type){
+  // console.log('start save_filters function')
   if(display_type == 'table')
     table_filters = get_filters()
 
@@ -197,30 +198,55 @@ function save_filters(display_type){
     map_filters = get_filters()
   else
     chart_filters = get_filters()
+
+  // console.log('finish save_filters function')
 }
 
 function set_filters(display_type){
+  // console.log('start set_filters')
   filters_to_update = []
   if(display_type == 'map' && map_filters.length > 0){
     filters_to_update = map_filters;
   }
+  // console.log('chart_filters: ')
+  // console.log(chart_filters)
   if(display_type != 'map' && display_type != 'table' && chart_filters.length > 0){
+    // console.log("in if(display_type != 'map' && display_type != 'table' && chart_filters.length > 0")
     filters_to_update = chart_filters;
   }
   if(display_type == 'table' && table_filters.length > 0){
     filters_to_update = table_filters;
   }
+
+  // console.log('filters_to_update: ')
+  // console.log(filters_to_update)
+
   if(filters_to_update.length > 0){
+    // console.log('in if(filters_to_update.length > 0)')
+    // console.log('start each')
     $.each(filters_to_update, function(i){
       column = filters_to_update[i]
+      // console.log('column: ')
+      // console.log(column)
+      // console.log('start check column values')
       $.each(column['values'], function(value){
-        $("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']").prop('checked', true);
+        // console.log("column['field'] : ")
+        // console.log(column['field'])
+        // console.log("column['values'][value] : ")
+        // console.log(column['values'][value])
+        //console.log($("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']"))
+        // $("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']").prop('checked', true);
+        // $('input[class*="'+column['field']+ '"]'+'[value="'+column['values'][value]+'"]').prop('checked', true);
+        colfield = column['field'].replace("'","");
+        $('input[class*="'+colfield+ '"]'+'[value="'+column['values'][value]+'"]').prop('checked', true);
       });
     });
   }
+  // console.log('finish set_filters')
 }
 
 function set_display_type(new_type){
+  // console.log('fire set_display_type function (switch type btn click)')
   set_icon(new_type);
   save_filters(display_type);
   set_filters(new_type);
@@ -244,10 +270,12 @@ function set_display_type(new_type){
       //In table view
       reset_checkbox();
   }
+  // console.log('display data should be next')
   display_data();
 }
 
 function set_icon(type){
+  // console.log('start set_icon function')
   if (type == "map") {
     $("#map_icon").attr("src", "/common/images/displayopt4-inv.png");
   } else {
@@ -268,6 +296,7 @@ function set_icon(type){
   } else {
     $("#table_icon").attr("src", "/common/images/displayopt1.png");
   }
+  // console.log('finish set_icon function')
 }
 
 
@@ -351,6 +380,7 @@ function display_error(message){
 }
 
 function display_data(){
+    // console.log('Start display_data function');
     display_filters();
     display_spinner();
     set_icon(display_type);
@@ -362,15 +392,24 @@ function display_data(){
       new_type = display_type
     }
 
+    // console.log('new_type: ' + new_type );
+    // console.log('display_type: ' + display_type );
+
     if(disabled.indexOf(new_type) > -1){
+      console.log('throw error: This visualization is disabled for this dataset');
       display_error("This visualization is disabled for this dataset");
       hide_spinner();
       return 0;
     }
 
     towns = $("input[class='" + geography_param.replace(/\s/g, "") + "']:checked");
+    // console.log('checked towns:');
+    // console.log(towns);
     years = $("input.Year:checked");
     error = ''
+
+    // console.log('checked years:');
+    // console.log(years);
 
      // collapse_geo = $('#collapse' + geography_param)
     collapse_geo = $("[id='collapse" + geography_param + "']")
@@ -399,6 +438,7 @@ function display_data(){
 
     if(towns.length == 0 && display_type != 'map'){
       if (window.location.href.indexOf(geography_param) > -1) {
+          console.log('update_visualization_link')
           $.ajax({type: "POST",
               url: "/update_visualization_link/"+dataset_id,
               data: JSON.stringify({view: 'table', filters: get_filters()}),
@@ -411,10 +451,12 @@ function display_data(){
 
       hide_spinner();
       error = "Please select a " + geography_param;
+      console.log('Throw error: Please select a' + geography_param)
     }
 
     if (years.length == 0){
       if (window.location.href.indexOf("Year") > -1) {
+        console.log('update_visualization_link')
           $.ajax({type: "POST",
               url: "/update_visualization_link/"+dataset_id,
               data: JSON.stringify({view: 'table', filters: get_filters()}),
@@ -426,11 +468,13 @@ function display_data(){
       }
       hide_spinner();
       error = "Please select a year";
+      console.log('Throw error: Please select a year')
     }
 
     ch_variables = $("input.Variable:checked[value != 'Margins of Error']");
     if(ch_variables.length == 0){
       if (window.location.href.indexOf(geography_param) > -1) {
+          console.log('update_visualization_link')
           $.ajax({type: "POST",
               url: "/update_visualization_link/"+dataset_id,
               data: JSON.stringify({view: 'table', filters: get_filters()}),
@@ -443,8 +487,8 @@ function display_data(){
 
       hide_spinner();
       error = "Please select a Variable" ;
+      console.log('Throw error: Please select a Variable')
     }
-
 
     if (error != ''){
         $("#container_2").html('');
@@ -468,14 +512,19 @@ function display_data(){
       draw_table();
       break;
     default:
+
       //Show the print and save icons
       needed_view_type = 'line_or_chart'
       $(".operations").css("visibility","visible");
       $('.operations').show();
+      console.log(needed_view_type)
+      console.log('Draw table for chart')
       draw_table();
+      console.log('Draw chart')
       draw_chart();
   }
 
+  console.log('Stop display_data function!');
 }
 
 function get_filters(){
@@ -498,7 +547,7 @@ function get_filters(){
 }
 
 function handle_incompatibilities(compatibles){
-
+  console.log(' Start handle incompatibilities: ');
   all_inputs = $("input[type='checkbox'][class != 'indicator_group']");
 
   $.each(all_inputs, function(i){
@@ -515,11 +564,16 @@ function handle_incompatibilities(compatibles){
     }
   });
 
+  console.log('compatibles:');
+  console.log(compatibles);
+  console.log('Finish handle incompatibilities!');
 }
 
 function draw_table(){
+  console.log('Start drawing table')
   var dataset_id = $("#dataset_id").val(),
       dataset_title = $("dataset_title").val();
+  console.log('Start ajax to get vizualization_data')
   $.ajax({type: "POST",
           url: "/vizualization_data/"+dataset_id,
           data: JSON.stringify({view: 'table',
@@ -527,7 +581,7 @@ function draw_table(){
                                omit_single_values: true
                                }),
           contentType: 'application/json; charset=utf-8'}).done(function(data) {
-
+      console.log(data)
       handle_incompatibilities(data['compatibles']);
       if (needed_view_type == 'table')
         change_page_url(data['link']);
@@ -541,6 +595,7 @@ function draw_table(){
       all_dims = data['data'][first_idx]['dims'];
       selected_dims = {};
 
+    console.log('Start process data for table')
      $.each(data['data'], function(d){
         $.each(all_dims, function(dim_name){
           if(data['data'][d]['dims']){
@@ -638,7 +693,9 @@ function draw_table(){
             html += "<td class='col-" + col_num + "'>" + cur_value + "</td>";
           }
         });
-     html = html+"</tbody></table>";
+      console.log('Finish process data for table')
+      console.log('Insert html table')
+      html = html+"</tbody></table>";
       if (needed_view_type == 'line_or_chart'){
         $("#container_2").html(html);
         $("#container_2").removeClass('hidden')
@@ -662,7 +719,7 @@ function draw_table(){
 
 
       }
-  console.log('here')
+  console.log('Finish drawing table!')
   hide_spinner();
 });
 }
@@ -704,11 +761,13 @@ function change_page_url(link){
   window.history.pushState(title, title, link);
 }
 function draw_chart(){
+  console.log('Start draw chart')
   var dataset_id = $("#dataset_id").val(),
       dataset_title = $("#dataset_title").val(),
       description = $("#profile_info").text(),
       source = $('#Source').text();
   set_chart_checkbox();
+  console.log('start ajax call to get vizualization_data')
   $.ajax({type: "POST",
             url: "/vizualization_data/" + dataset_id,
             data: JSON.stringify({view: display_type,
@@ -716,6 +775,8 @@ function draw_chart(){
                                   omit_single_values: true
                                   }),
             contentType: 'application/json; charset=utf-8'}).done(function(data) {
+        console.log('Ajax call done.');
+        console.log(data)
         change_page_url(data['link']);
         var checked_measure = $('input:checked', $('#collapseMeasureType'))[0]
         var type            = checked_measure.value;
@@ -724,6 +785,7 @@ function draw_chart(){
         var years           = data['years'];
         var series_data     = data['data'];
 
+        console.log('start process visualization data for chart')
         $.each(series_data, function(i){
           if (!series_data[i]['dims'])
             return "This series doesn't exist"
@@ -777,6 +839,8 @@ function draw_chart(){
           legend_series.push(cur_legend_series);
         });
 
+        console.log('finish process visualization data for chart!')
+
         if(series.length == 0) {
           hide_spinner();
           return display_error("No results, please select different filters");
@@ -787,6 +851,7 @@ function draw_chart(){
 
         hide_spinner();
 
+        console.log('Draw highchart!');
         $('#container').highcharts({
             chart: { backgroundColor:'transparent' },
             title: {
@@ -866,6 +931,8 @@ function draw_chart(){
             }
         });
     });
+
+  console.log('Finish drawing chart')
 }
 
 function display_spinner(){
@@ -879,7 +946,11 @@ function hide_spinner(){
 }
 
 function display_filters(){
+  console.log('Start display_filters function: ')
   filters = get_filters();
+  console.log('filters: ')
+  console.log(filters)
+
   filter_text = "";
   $.each(filters, function(i){
     if (filters[i]['field'] == geography_param) return "Skip town";
@@ -891,6 +962,7 @@ function display_filters(){
   $li = $('li#Connecticut')
   $li.prependTo($li.closest('ul')[0]);
 
+  console.log('End display_filters function!')
 }
 
 function hide_or_show_clear_link(){

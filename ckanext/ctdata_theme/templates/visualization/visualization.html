@@ -54,8 +54,8 @@
 {% for dimension in dimensions %}
 {% if dimension.possible_values %}
 <li class="filter">
-  <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
-  <div id="collapse{{dimension.name|replace(" ","")}}" class="panel-collapse collapse">
+  <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")|replace("'", "")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
+  <div id="collapse{{dimension.name|replace(" ","")|replace("'", "")}}" class="panel-collapse collapse">
     <span>
       {% if dimension.name == geography_param %}
         <a href="javascript:void(0);" class="select-all">Select All</a>
@@ -77,12 +77,12 @@
     {% if value|length > 0 %}
       {% if value != 'Margins of Error' %}
         <li id = "{{value}}">
-            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","/")}}">
+            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","/")|replace("'", "")}}">
             <label for="{{value}}Check" class="checkLabel">{{value}}</label>
         </li>
       {% else %}
         <li id = "{{value}}" class="hidden">
-            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","/")}}" checked>
+            <input type="checkbox" id="{{value}}Check" value="{{value}}" name="{{dimension.name}}" class="{{dimension.name|replace(" ","")|replace("/","/")|replace("'", "")}}" checked>
             <label for="{{value}}Check" class="checkLabel">{{value}}</label>
         </li>
       {% endif %}
