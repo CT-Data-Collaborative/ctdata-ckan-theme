@@ -17,9 +17,10 @@ def upgrade(migrate_engine):
 
     rigions.create()
 
-    regions   = Table('ctdata_locations', meta, autoload=True)
-    locations = Table('ctdata_locations', meta, autoload=True)
-    profiles  = Table('ctdata_profiles',  meta, autoload=True)
+    regions    = Table('ctdata_locations', meta, autoload=True)
+    locations  = Table('ctdata_locations', meta, autoload=True)
+    profiles   = Table('ctdata_profiles',  meta, autoload=True)
+    indicators = Table('ctdata_profile_indicators',  meta, autoload=True)
 
     region_id = Column('region_id', Integer, ForeignKey('ctdata_regions.id'))
     region_id.create(locations)
@@ -27,7 +28,8 @@ def upgrade(migrate_engine):
     region_id = Column('region_id', Integer, ForeignKey('ctdata_regions.id'))
     region_id.create(profiles)
 
-    pass
+    aggregated = Column('aggregated', Boolean, default = False)
+    aggregated.create(indicators)
 
 def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)

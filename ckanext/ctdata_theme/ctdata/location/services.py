@@ -87,8 +87,19 @@ class LocationService(object):
             profile.locations.append(self.get_location(location_name))
 
         for indicator in indicators:
-           indicator  = self.create_indicator(indicator['name'], indicator['filters'], indicator['dataset_id'], user, indicator['ind_type'], 'table', profile.id)
-           profile.indicators.append(indicator)
+            params  = {
+                'name':       indicator['name'],
+                'filters':    indicator['filters'],
+                'dataset_id': indicator['dataset_id'],
+                'data_type':  indicator['ind_type'],
+                'years':      int(years),
+                'variable':   variable,
+                'visualization_type': 'table',
+                'profile_id': profile.id,
+                'user':       user}
+
+            indicator = self.create_indicator(params)
+            profile.indicators.append(indicator)
 
         self.session.commit()
         return profile
@@ -145,40 +156,59 @@ class LocationService(object):
         conn.close()
         return arr
 
+    def new_indicator(self, params):
 
-    def new_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, profile_id = None, permission = 'public', description = '', group_ids = ''):
-        dataset = DatasetService.get_dataset(dataset_id)
+        dataset = DatasetService.get_dataset(params['dataset_id'])
+        params['dataset_id'] = dataset.ckan_meta['id']
 
-        if type(filters) is not list:
-            filters = json.loads(filters)
+        if params['ind_type'] != 'common':
+            user_indicators_id = self.session.query(UserIndicatorLink.indicator_id)\
+                .filter(and_(UserIndicatorLink.user_id == params['user'].ckan_user_id,
+                             UserIndicatorLink.deleted == False)).all()
+            existing_inds = self.session.query(ProfileIndicator)\
+                .filter(and_(ProfileIndicator.dataset_id == dataset.ckan_meta['id'],
+                             ProfileIndicator.id.in_(user_indicators_id)))
+
+            # check that there're currently no such indicators in the db
+            # there's a JSON type for fields in postgre, so maybe there's a way to do it using SQL
+            for ex_ind in existing_inds:
+                ex_fltrs = json.loads(ex_ind.filters)
+                # python allows us to compare lists of dicts
+                if sorted(params['filters']) == sorted(ex_fltrs) and params['ind_type'] != 'gallery':
+                    raise ProfileAlreadyExists("Profile with such dataset and filters already exists")
+
+
+        if type(params['filters']) is not list:
+            params['filters'] = json.loads(params['filters'])
         try:
-            data_type = dict_with_key_value("field", "Measure Type", filters)['values'][0]
-            years     = dict_with_key_value("field", "Year", filters)['values'][0]
+            params['data_type'] = dict_with_key_value("field", "Measure Type", params['filters'])['values'][0]
+            params['years']     = dict_with_key_value("field", "Year", params['filters'])['values'][0]
         except (TypeError, AttributeError, IndexError):
             raise toolkit.ObjectNotFound("There must be values for the 'Measure Type' and 'Year' filters")
 
-        variable_fltr = dict_with_key_value("field", "Variable", filters)
-        variable = ''
-        if variable_fltr:
-            variable = variable_fltr["values"][0] if "values" in variable_fltr else None
+        variable_fltr = dict_with_key_value("field", "Variable", params['filters'])
+        params['variable'] = ''
 
+        if variable_fltr:
+            params['variable'] = variable_fltr["values"][0] if "values" in variable_fltr else None
         try:
-            years = int(years)
+            params['years'] = int(params['years'])
         except ValueError:
             try:
-                years = datetime.datetime.strptime("2008-09-03 00:00:00", "%Y-%m-%d %H:%M:%S").year
+                params['years'] = int(datetime.datetime.strptime("2008-09-03 00:00:00", "%Y-%m-%d %H:%M:%S").year)
             except ValueError:
-                raise toolkit.ObjectNotFound("'Year' filter value must be an integer "
-                                             "or have '%Y-%m-%d %H:%M:%S' format")
+                raise toolkit.ObjectNotFound("'Year' filter value must be an integer or have '%Y-%m-%d %H:%M:%S' format")
 
+        params['filters'] = json.dumps(params['filters'])
 
-        indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], data_type, int(years),
-                                     variable, ind_type, visualization_type, profile_id, permission, description, group_ids)
-
+        indicator = ProfileIndicator(params)
         return indicator
 
-    def create_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, profile_id = None, permission = 'public', description = '', group_ids = ''):
-        indicator = self.new_indicator(name, filters, dataset_id, owner, ind_type, visualization_type, profile_id, permission, description, group_ids)
+    def create_indicator(self, params):
+        indicator = self.new_indicator(params)
+
+        if params['ind_type'] != 'common':
+            params['user'].indicators.append(indicator)
 
         self.session.add(indicator)
         self.session.commit()

@@ -54,9 +54,20 @@ class CommunityProfilesController(base.BaseController):
                 abort(400)
 
             try:
+                params = {
+                    'name':        name,
+                    'filters':     filters,
+                    'dataset_id':  dataset_id,
+                    'ind_type':    ind_type,
+                    'visualization_type': visualization_type,
+                    'user':        user,
+                    'permission':  permission,
+                    'description': description,
+                    'group_ids':   group_ids,
+                    'user': user
+                }
 
-                indicator =  self.community_profile_service.create_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, description, group_ids)
-
+                indicator =  self.location_service.create_indicator(params)
                 self.session.commit()
 
                 ind_data = {

@@ -7,12 +7,11 @@ var create_popup    = $("#create_profile_popup"),
     new_indicators  = [],
     indicators      = [],
     locations       = location_names,
-    selected_geography_type = 'Town',
     default_profile_id = $('#default_profile_id').text(),
-    geo_types       = JSON.parse(geo_types),
-    current_indicator = undefined,
-    remember_index  = undefined,
-    found_in  = undefined,
+    geo_types          = JSON.parse(geo_types),
+    current_indicator  = undefined,
+    remember_index     = undefined,
+    found_in           = undefined,
     current_dataset ;
 
     function load_topics(){
@@ -68,7 +67,6 @@ var create_popup    = $("#create_profile_popup"),
     }
 
     function draw_table(type, indicators_data, towns){
-
         table = "<table class='table my_table' id='table-" + type + "'>\
                     <thead>\
                         <th>Dataset</th>\
@@ -401,13 +399,11 @@ $(function(){
     });
 
     $(document).on('click', '#update_indicator', function() {
-        id = current_indicator.find('.hide_indicator').attr('id')
-
-
+        id          = current_indicator.find('.hide_indicator').attr('id')
         old_filters = current_indicator.find("#filters_json").text().split(', ').join(',').split(': ').join(':')
-
-        inds = indicators.concat(new_indicators)
+        inds        = indicators.concat(new_indicators)
         all_filters = []
+
         $(inds).each(function(i) {
             all_filters.push(inds[i]['filters'].split(', ').join(',').split(': ').join(':'))
         });

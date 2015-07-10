@@ -117,7 +117,7 @@ class LocationsController(base.BaseController):
             permission  = json_body.get('permission')
             description = json_body.get('description')
             group_ids   = json_body.get('group_ids')
-            visualization_type   = json_body.get('visualization_type') or 'table'
+            visualization_type = json_body.get('visualization_type') or 'table'
 
             http_response.headers['Content-type'] = 'application/json'
             locations_hash = {}
@@ -143,9 +143,21 @@ class LocationsController(base.BaseController):
                 abort(400)
 
             try:
-                indicator =  self.location_service.new_indicator(name, filters, dataset_id, user, ind_type, visualization_type, permission, description, group_ids)
+                params = {
+                    'name':        name,
+                    'filters':     filters,
+                    'dataset_id':  dataset_id,
+                    'ind_type':   ind_type,
+                    'visualization_type': visualization_type,
+                    'user':        user,
+                    'permission':  permission,
+                    'description': description,
+                    'group_ids':   group_ids
+                }
+
+                indicator = self.location_service.new_indicator(params)
                 geo_type  = indicator.dataset_geography_type()
-                values    =  self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
+                values    = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
 
                 ind_data = {
                          'id': indicator.id,
@@ -313,7 +325,19 @@ class LocationsController(base.BaseController):
         #save new indicators
         for indicator in indicators:
             if not indicator['id']:
-                indicator  = self.location_service.create_indicator(indicator['name'], indicator['filters'], indicator['dataset_id'], user, indicator['ind_type'], 'table', profile.id)
+                params = {
+                        'name':       indicator['name'],
+                        'filters':    indicator['filters'],
+                        'dataset_id': indicator['dataset_id'],
+                        'data_type':  indicator['ind_type'],
+                        'years':      int(years),
+                        'variable':   variable,
+                        'visualization_type': 'table',
+                        'profile_id': profile.id,
+                        'user':       user
+                    }
+
+                indicator = self.location_service.create_indicator(params)
                 profile.indicators.append(indicator)
 
         if profile.user and profile.user == user:
