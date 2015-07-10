@@ -190,7 +190,7 @@ function check_defaults(){
 }
 
 function save_filters(display_type){
-  console.log('start save_filters function')
+  // console.log('start save_filters function')
   if(display_type == 'table')
     table_filters = get_filters()
 
@@ -199,41 +199,41 @@ function save_filters(display_type){
   else
     chart_filters = get_filters()
 
-  console.log('finish save_filters function')
+  // console.log('finish save_filters function')
 }
 
 function set_filters(display_type){
-  console.log('start set_filters')
+  // console.log('start set_filters')
   filters_to_update = []
   if(display_type == 'map' && map_filters.length > 0){
     filters_to_update = map_filters;
   }
-  console.log('chart_filters: ')
-  console.log(chart_filters)
+  // console.log('chart_filters: ')
+  // console.log(chart_filters)
   if(display_type != 'map' && display_type != 'table' && chart_filters.length > 0){
-    console.log("in if(display_type != 'map' && display_type != 'table' && chart_filters.length > 0")
+    // console.log("in if(display_type != 'map' && display_type != 'table' && chart_filters.length > 0")
     filters_to_update = chart_filters;
   }
   if(display_type == 'table' && table_filters.length > 0){
     filters_to_update = table_filters;
   }
 
-  console.log('filters_to_update: ')
-  console.log(filters_to_update)
+  // console.log('filters_to_update: ')
+  // console.log(filters_to_update)
 
   if(filters_to_update.length > 0){
-    console.log('in if(filters_to_update.length > 0)')
-    console.log('start each')
+    // console.log('in if(filters_to_update.length > 0)')
+    // console.log('start each')
     $.each(filters_to_update, function(i){
       column = filters_to_update[i]
-      console.log('column: ')
-      console.log(column)
-      console.log('start check column values')
+      // console.log('column: ')
+      // console.log(column)
+      // console.log('start check column values')
       $.each(column['values'], function(value){
-        console.log("column['field'] : ")
-        console.log(column['field'])
-        console.log("column['values'][value] : ")
-        console.log(column['values'][value])
+        // console.log("column['field'] : ")
+        // console.log(column['field'])
+        // console.log("column['values'][value] : ")
+        // console.log(column['values'][value])
         //console.log($("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']"))
         // $("input[class*='"+column['field']+"']"+"[value='"+column['values'][value]+"']").prop('checked', true);
         // $('input[class*="'+column['field']+ '"]'+'[value="'+column['values'][value]+'"]').prop('checked', true);
@@ -242,11 +242,11 @@ function set_filters(display_type){
       });
     });
   }
-  console.log('finish set_filters')
+  // console.log('finish set_filters')
 }
 
 function set_display_type(new_type){
-  console.log('fire set_display_type function (switch type btn click)')
+  // console.log('fire set_display_type function (switch type btn click)')
   set_icon(new_type);
   save_filters(display_type);
   set_filters(new_type);
@@ -270,12 +270,12 @@ function set_display_type(new_type){
       //In table view
       reset_checkbox();
   }
-  console.log('display data should be next')
+  // console.log('display data should be next')
   display_data();
 }
 
 function set_icon(type){
-  console.log('start set_icon function')
+  // console.log('start set_icon function')
   if (type == "map") {
     $("#map_icon").attr("src", "/common/images/displayopt4-inv.png");
   } else {
@@ -296,7 +296,7 @@ function set_icon(type){
   } else {
     $("#table_icon").attr("src", "/common/images/displayopt1.png");
   }
-  console.log('finish set_icon function')
+  // console.log('finish set_icon function')
 }
 
 
@@ -380,7 +380,7 @@ function display_error(message){
 }
 
 function display_data(){
-    console.log('Start display_data function');
+    // console.log('Start display_data function');
     display_filters();
     display_spinner();
     set_icon(display_type);
@@ -392,8 +392,8 @@ function display_data(){
       new_type = display_type
     }
 
-    console.log('new_type: ' + new_type );
-    console.log('display_type: ' + display_type );
+    // console.log('new_type: ' + new_type );
+    // console.log('display_type: ' + display_type );
 
     if(disabled.indexOf(new_type) > -1){
       console.log('throw error: This visualization is disabled for this dataset');
@@ -403,13 +403,13 @@ function display_data(){
     }
 
     towns = $("input[class='" + geography_param.replace(/\s/g, "") + "']:checked");
-    console.log('checked towns:');
-    console.log(towns);
+    // console.log('checked towns:');
+    // console.log(towns);
     years = $("input.Year:checked");
     error = ''
 
-    console.log('checked years:');
-    console.log(years);
+    // console.log('checked years:');
+    // console.log(years);
 
      // collapse_geo = $('#collapse' + geography_param)
     collapse_geo = $("[id='collapse" + geography_param + "']")
