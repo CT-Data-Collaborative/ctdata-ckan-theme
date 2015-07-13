@@ -5,6 +5,14 @@
           Edit Towns
         </div>
         <div class="modal-body">
+          <div id="regions">
+            <select id="regions">
+            {% for region in regions %}
+              <option value="{{region.id}}"> {{region.name}}
+            {% endfor %}
+            </select>
+            <input type="hidden" value="false" id="save_as_region">
+          </div>
           <div id="towns">
             <ul style="">
               {% for location in locations %}

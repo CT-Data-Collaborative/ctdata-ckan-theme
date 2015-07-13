@@ -10,7 +10,7 @@ import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 from ckan.common import response as http_response, c, request as http_request
 import ckan.lib.helpers as h
-from models import Location, CtdataProfile, LocationProfile
+from models import Location, CtdataProfile, LocationProfile, Region
 
 from ..utils import dict_with_key_value
 from ..database import Database
@@ -42,6 +42,7 @@ class LocationsController(base.BaseController):
         if not default_profile:
             abort(404)
         locations   = self.location_service.get_all_locations()
+        regions     = self.location_service.get_regions()
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
         geo_types   =  self.location_service.location_geography_types()
 
@@ -58,7 +59,8 @@ class LocationsController(base.BaseController):
             location_name = 'No Location'
 
         self.session.close()
-        return base.render('location/show.html', extra_vars={'location': location_name,
+        return base.render('location/show.html', extra_vars={'regions':   regions,
+                                                             'location':  location_name,
                                                              'locations': locations,
                                                              'all_current_locations': all_current_locations,
                                                              'towns_names': towns_names,
@@ -117,11 +119,17 @@ class LocationsController(base.BaseController):
             permission  = json_body.get('permission')
             description = json_body.get('description')
             group_ids   = json_body.get('group_ids')
+            aggregated  = json_body.get('aggregated')
+            region_id   = json_body.get('region_id')
+            print colored(region_id, 'blue')
+            region      = None
             visualization_type = json_body.get('visualization_type') or 'table'
 
             http_response.headers['Content-type'] = 'application/json'
             locations_hash = {}
             all_current_locations=[]
+            locations_to_put = []
+            region_locations = []
 
             if locations:
                 for type in geo_types:
@@ -133,6 +141,10 @@ class LocationsController(base.BaseController):
                 for type in geo_types:
                     locations_hash[type]  = map(lambda t: t.name, locations)
                     all_current_locations += locations_hash[type]
+
+            if region_id:
+                region = self.location_service.get_region_by_id(region_id)
+                region_locations = map(lambda l: l.name, region.locations)
 
             ######### load indicators data
 
@@ -147,17 +159,44 @@ class LocationsController(base.BaseController):
                     'name':        name,
                     'filters':     filters,
                     'dataset_id':  dataset_id,
-                    'ind_type':   ind_type,
-                    'visualization_type': visualization_type,
+                    'ind_type':    ind_type,
                     'user':        user,
                     'permission':  permission,
                     'description': description,
-                    'group_ids':   group_ids
+                    'group_ids':   group_ids,
+                    'aggregated':  aggregated,
+                    'visualization_type': visualization_type
                 }
 
                 indicator = self.location_service.new_indicator(params)
                 geo_type  = indicator.dataset_geography_type()
-                values    = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
+                # values    = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
+
+                # if aggregated and len(values) > 0:
+                #     values = [sum(values)/len(values)]
+
+                if aggregated:
+                    if not region and len(locations_to_put) > 0:
+                        region = Region('New region', c.userobj.id)
+                        region.locations = locations_to_put
+                        self.session.add(region)
+
+                        print colored(region, 'green')
+                        # print colored(region.locations, 'green')
+
+                        for location in locations_to_put:
+                            location.region_id = region.id
+
+                        self.session.commit()
+                        region_locations = map(lambda l: l.name, region.locations)
+
+                    values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, region_locations)
+                    print colored(values, 'yellow')
+
+                    values = [sum(map(lambda v: int(v),values))/len(values)] if len(values) > 0 else []
+                    print colored(values, 'green')
+                else:
+                    values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
 
                 ind_data = {
                          'id': indicator.id,
@@ -252,6 +291,7 @@ class LocationsController(base.BaseController):
             return json.dumps({'success': True, 'ind_data': {}, 'towns':  []})
 
         location_names = json_body.get('locations')
+        region_id      = json_body.get('region_id')
         location_names = location_names.split(',')
 
         profile        = self.location_service.get_profile(profile_id)
@@ -260,7 +300,9 @@ class LocationsController(base.BaseController):
         geo_types      = self.location_service.location_geography_types()
         locations_hash = {}
         all_current_locations = []
-
+        region = None
+        locations_to_put = []
+        region_locations = []
 
         locations_records = self.location_service.get_all_locations()
 
@@ -268,6 +310,10 @@ class LocationsController(base.BaseController):
             locations_to_put      = filter(lambda t: t.geography_type == type and t.name in location_names, locations_records)
             locations_hash[type]  = map(lambda t: t.name, locations_to_put)
             all_current_locations += locations_hash[type]
+
+        if region_id:
+            region = self.location_service.get_region_by_id(region_id)
+            region_locations = map(lambda l: l.name, region.locations)
 
         ######### load indicators data
 
@@ -279,7 +325,22 @@ class LocationsController(base.BaseController):
             for indicator in profile.indicators:
                 ######### load indicators values only for locations with corresponding dataset
                 geo_type  = indicator.dataset_geography_type()
-                values    = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
+                if indicator.aggregated:
+                    if not region and len(locations_to_put) > 0:
+                        region = Region('New region', c.userobj.id)
+                        region.location = locations_to_put
+                        self.session.add(region)
+
+                        for location in locations_to_put:
+                            location.region_id = region.id
+
+                        self.session.commit()
+                        region_locations = map(lambda l: l.name, region.locations)
+
+                    values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, region_locations)
+                    values = [sum(values)/len(values)] if len(values) > 0 else []
+                else:
+                    values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
 
                 data  = {}
                 data  = {

@@ -78,13 +78,13 @@ var create_popup    = $("#create_profile_popup"),
 
         $(indicators_data).each(function(i){
             indicators.push({ id: indicators_data[i]['id'], dataset_id: indicators_data[i]['dataset_id'], name: "", ind_type: 'common',
+                          aggregated: indicators_data[i]['aggregated'],
                           permission: 'public', filters: indicators_data[i]['filters'], description: '', geo_type: indicators_data[i]['geo_type'] })
 
-            tr = build_tr_from_data(indicators_data[i])
-
+            tr    = build_tr_from_data(indicators_data[i])
             table = table + tr
         });
-        table = table +  "</tbody></table>";
+        table = table + "</tbody></table>";
 
         $(".table-div-" + type).html(table);
     }
@@ -190,12 +190,14 @@ var create_popup    = $("#create_profile_popup"),
     function reload_data_for_new_indicators(){
         locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
         locations = locations.join(',');
+        aggregated = $('#enable_data_aggregation').prop('checked');
+        region_id  = $('select#regions').val();
         $(new_indicators).each(function(i){
             $('.spinner').show();
             ind = new_indicators[i]
             $.ajax({type: "POST",
                 url: "/location/load_indicator",
-                data: JSON.stringify({ dataset_id: ind['dataset_id'], name: "", ind_type: 'common',
+                data: JSON.stringify({ dataset_id: ind['dataset_id'], name: "", ind_type: 'common', aggregated: aggregated, region_id: region_id,
                                        permission: 'public', filters: ind['filters'], description: '', locations: locations}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
@@ -430,8 +432,10 @@ $(function(){
     $(document).on('click', '#save_indicator', function() {
         $("#indicator_adding_error").animate({opacity: 0}, 300);
         geo_type_locations = $('#towns').find('.location-checkbox').not('[class*="hidden"]').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+        new_filters        = get_filters()
+        aggregated         = $('#enable_data_aggregation').prop('checked')
+        region_id          = $('select#regions').val()
 
-        new_filters = get_filters()
         if (current_indicator != undefined)
             new_filters = get_updated_filters()
 
@@ -453,17 +457,15 @@ $(function(){
         }
 
         if ( index == -1 || current_indicator){
-
             new_indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common',
                           permission: 'public', filters: JSON.stringify(new_filters), description: ''});
 
-
-            locations =  $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+            locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
             locations = locations.join(',');
 
             $.ajax({type: "POST",
                 url: "/location/load_indicator",
-                data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common',
+                data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common', aggregated: aggregated, region_id: region_id,
                                        permission: 'public', filters: new_filters, description: '', locations: locations}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
@@ -480,7 +482,7 @@ $(function(){
                         }
                         else{
                             enable_options_for_profile();
-                            current_geo_type =$('#select_geography_type').val()
+                            current_geo_type = $('#select_geography_type').val()
                             $('div.modal').modal('hide');
                             $('.edit_locations#' + current_geo_type).click()
 
@@ -518,14 +520,16 @@ $(function(){
 
     $('.save_towns').click(function() {
         $('div.modal').modal('hide');
-        locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
-        locations = locations.join(',');
+        locations  = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+        locations  = locations.join(',');
+        aggregated = $('#enable_data_aggregation').prop('checked')
+        region_id  = $('select#regions').val()
 
         $('.spinner').show();
 
         $.ajax({type: "POST",
             url: "/load_profile_indicators/" + default_profile_id,
-            data: JSON.stringify({locations: locations, ids_to_remove: ids_to_remove}),
+            data: JSON.stringify({locations: locations, ids_to_remove: ids_to_remove, aggregated: aggregated, region_id: region_id}),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 indicators_data = data.ind_data;

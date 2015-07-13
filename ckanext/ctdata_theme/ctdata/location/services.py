@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 import ckan.plugins.toolkit as toolkit
 
-from models import Location, CtdataProfile, LocationProfile
+from models import Location, CtdataProfile, LocationProfile, Region
 from ..community.models import CommunityProfile, ProfileIndicator, ProfileIndicatorValue, Town, UserIndicatorLink
 from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
@@ -30,9 +30,6 @@ class LocationService(object):
         types = map(lambda x: x[0], sql_result)
 
         return types
-
-    def get_locations_by_type(self, type):
-        return self.session.query(Location).filter(Location.geography_type == type ).all()
 
     def get_locations_by_type(self, type):
         return self.session.query(Location).filter(Location.geography_type == type ).all()
@@ -64,6 +61,12 @@ class LocationService(object):
             self.session.delete(location_profile)
 
         self.session.commit()
+
+    def get_regions(self):
+        return self.session.query(Region).all()
+
+    def get_region_by_id(self, id):
+        return self.session.query(Region).filter(Region.id == id).first()
 
     ################ Profiles   ############################################
     def get_default_location_profile(self):
@@ -157,7 +160,6 @@ class LocationService(object):
         return arr
 
     def new_indicator(self, params):
-
         dataset = DatasetService.get_dataset(params['dataset_id'])
         params['dataset_id'] = dataset.ckan_meta['id']
 

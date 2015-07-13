@@ -50,26 +50,24 @@ class ProfileIndicator(Base):
     __tablename__ = 'ctdata_profile_indicators'
 
     id = Column(Integer, primary_key=True)
-    dataset_id = Column(String)
-    is_global  = Column(Boolean)
-    data_type  = Column(String)
-    year       = Column(Integer)
-    variable   = Column(String)
-    filters    = Column(Text)
-    name       = Column(String)
-    ind_type   = Column(String)
-    temp       = Column(Boolean)
-    permission = Column(String)
-    group_ids  = Column(String)
-    created_at = Column(DateTime)
-    visualization_type = Column(String)
+    year        = Column(Integer)
+    dataset_id  = Column(String)
+    data_type   = Column(String)
+    variable    = Column(String)
+    name        = Column(String)
+    ind_type    = Column(String)
+    permission  = Column(String)
+    group_ids   = Column(String)
+    created_at  = Column(DateTime)
     description = Column(Text)
+    filters     = Column(Text)
     aggregated  = Column(Boolean, default = False)
+    temp        = Column(Boolean)
+    is_global   = Column(Boolean)
+    profile_id  = Column(BigInteger, ForeignKey('ctdata_profiles.id'))
+    visualization_type = Column(String)
 
-    profile_id = Column(BigInteger, ForeignKey('ctdata_profiles.id'))
-
-    #TODO: send hash intead of such a big amount of attrs; remove unused columns
-    def __init__(self, args): #name, filters, dataset_id, data_type, year, variable, ind_type, visualization_type, profile_id, permission, description, group_ids, aggregated = False):
+    def __init__(self, args):
         self.name         = args['name']
         self.filters      = args['filters']
         self.dataset_id   = args['dataset_id']

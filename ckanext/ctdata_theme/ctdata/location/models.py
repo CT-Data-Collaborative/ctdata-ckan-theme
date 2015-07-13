@@ -58,7 +58,7 @@ class Region(Base):
         self.user_id = user_id
 
     def __repr__(self):
-        return "Profile %s %s %s" % (self.name, self.user_id)
+        return "Region %s %s %s" % (self.name, self.user_id, self.locations)
 
 
 class CtdataProfile(Base):
