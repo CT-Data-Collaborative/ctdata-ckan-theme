@@ -257,7 +257,6 @@ class LocationsController(base.BaseController):
             locations_hash[type]  = map(lambda t: t.name, locations_to_put)
             all_current_locations += locations_hash[type]
 
-
         ######### load indicators data
 
         ind_data = {}
