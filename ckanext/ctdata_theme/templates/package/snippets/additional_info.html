@@ -49,19 +49,10 @@
     {% block extras scoped %}
         {% for extra in h.sorted_extras(pkg_dict.extras) %}
             {% set key, value = extra %}
-              <!-- {% if key in ['Default', 'Disabled Dimensions', 'Disabled View', 'Hidden In', 'Units', 'Visible Metadata', 'Help'] %}
-                {% if user.sysadmin %}
-                  <div class="con_row">
-                      <label>{{ _(key) }}</label>
-                      <p>{{ value }}</p>
-                  </div>
-                {% endif %}
-              {% else %} -->
-                <div class="con_row">
-                    <label>{{ _(key) }}</label>
-                    <p>{{ value }}</p>
-                </div>
-              <!-- {% endif %} -->
+              <div class="con_row">
+                  <label>{{ _(key) }}</label>
+                  <p>{{ value }}</p>
+              </div>
         {% endfor %}
     {% endblock %}
 
