@@ -49,7 +49,7 @@
     {% block extras scoped %}
         {% for extra in h.sorted_extras(pkg_dict.extras) %}
             {% set key, value = extra %}
-            {% if key not in ['Default', 'Disabled Views', 'Hidden In', 'Units', 'Visible Metadata'] %}
+            {% if key not in ['Default', 'Disabled Dimensions','Disabled Views', 'Hidden In', 'Units', 'Visible Metadata'] %}
             <div class="con_row">
                 <label>{{ _(key) }}</label>
                 <p>{{ value }}</p>
