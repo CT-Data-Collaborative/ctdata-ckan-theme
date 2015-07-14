@@ -33,10 +33,7 @@ class LocationsController(base.BaseController):
         self.user_service      = UserService(self.session)
         self.location_service  = LocationService(self.session)
 
-    #end
-
     def locations_index(self):
-
         default_profile = self.location_service.get_default_location_profile()
 
         if not default_profile:
@@ -68,40 +65,36 @@ class LocationsController(base.BaseController):
                                                              'default_profile': default_profile,
                                                              'geo_types': json.dumps(geo_types) ,
                                                              'geo_types_array': geo_types})
-    #end
 
     def data_by_location(self):
         locations = self.location_service.get_all_locations()
-
         self.session.close()
         return base.render('location/data_by_location.html', extra_vars={'locations': locations})
-    #end
 
     def manage_locations(self):
         locations = self.location_service.get_all_locations()
 
         self.session.close()
         return base.render('location/manage_locations.html', extra_vars={'locations': locations})
-    #end
 
     def create_location(self):
         if http_request.method == 'POST':
             json_body = json.loads(http_request.body, encoding=http_request.charset)
             name      = json_body.get('name')
             fips      = json_body.get('fips')
-            geography_type = json_body.get('geography_type')
+            geo_type  = json_body.get('geography_type')
+            location  = self.location_service.create(name, fips, geo_type)
+            profile   = CtdataProfile(str(location.name), True, None)
 
-            location = self.location_service.create(name, fips, geography_type)
-            profile  = CtdataProfile(str(location.name), True, None)
             self.session.add(profile)
             self.session.commit()
 
         self.session.close()
         http_response.headers['Content-type'] = 'application/json'
         return json.dumps({'location_name': location.name, 'location_fips': location.fips, 'location_geography_type': location.geography_type})
-    #end
 
     def load_indicator(self):
+        http_response.headers['Content-type'] = 'application/json'
         session_id = session.id
         user_name  = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
         geo_types  = self.location_service.location_geography_types()
@@ -109,27 +102,15 @@ class LocationsController(base.BaseController):
 
         if http_request.method == 'POST':
             user = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
-
             json_body   = json.loads(http_request.body, encoding=http_request.charset)
-            filters     = json_body.get('filters')
             locations   = json_body.get('locations')
-            dataset_id  = json_body.get('dataset_id')
-            name        = json_body.get('name')
-            ind_type    = json_body.get('ind_type')
-            permission  = json_body.get('permission')
-            description = json_body.get('description')
-            group_ids   = json_body.get('group_ids')
-            aggregated  = json_body.get('aggregated')
             region_id   = json_body.get('region_id')
-            print colored(region_id, 'blue')
             region      = None
-            visualization_type = json_body.get('visualization_type') or 'table'
-
-            http_response.headers['Content-type'] = 'application/json'
-            locations_hash = {}
-            all_current_locations=[]
             locations_to_put = []
             region_locations = []
+            locations_hash   = {}
+            ind_data         = {}
+            all_current_locations = []
 
             if locations:
                 for type in geo_types:
@@ -148,68 +129,28 @@ class LocationsController(base.BaseController):
 
             ######### load indicators data
 
-            ind_data = {}
+
             for geo_type in geo_types:
                 ind_data[geo_type] = []
-            if not filters or not dataset_id:
+            if not json_body.get('filters') or not json_body.get('dataset_id'):
                 abort(400)
 
             try:
                 params = {
-                    'name':        name,
-                    'filters':     filters,
-                    'dataset_id':  dataset_id,
-                    'ind_type':    ind_type,
                     'user':        user,
-                    'permission':  permission,
-                    'description': description,
-                    'group_ids':   group_ids,
-                    'aggregated':  aggregated,
-                    'visualization_type': visualization_type
+                    'name':        json_body.get('name'),
+                    'filters':     json_body.get('filters'),
+                    'dataset_id':  json_body.get('dataset_id'),
+                    'ind_type':    json_body.get('ind_type'),
+                    'permission':  json_body.get('permission'),
+                    'description': json_body.get('description'),
+                    'group_ids':   json_body.get('group_ids'),
+                    'aggregated':  json_body.get('aggregated'),
+                    'visualization_type': json_body.get('visualization_type') or 'table'
                 }
 
                 indicator = self.location_service.new_indicator(params)
-                geo_type  = indicator.dataset_geography_type()
-                # values    = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
-
-                # if aggregated and len(values) > 0:
-                #     values = [sum(values)/len(values)]
-
-                if aggregated:
-                    if not region and len(locations_to_put) > 0:
-                        region = Region('New region', c.userobj.id)
-                        region.locations = locations_to_put
-                        self.session.add(region)
-
-                        print colored(region, 'green')
-                        # print colored(region.locations, 'green')
-
-                        for location in locations_to_put:
-                            location.region_id = region.id
-
-                        self.session.commit()
-                        region_locations = map(lambda l: l.name, region.locations)
-
-                    values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, region_locations)
-                    print colored(values, 'yellow')
-
-                    values = [sum(map(lambda v: int(v),values))/len(values)] if len(values) > 0 else []
-                    print colored(values, 'green')
-                else:
-                    values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
-
-                ind_data = {
-                         'id': indicator.id,
-                    'filters': indicator.filters,
-                  'data_type': indicator.data_type,
-                       'year': dict_with_key_value("field", "Year", json.loads(indicator.filters))['values'][0],
-                    'link_to': indicator.link_to_visualization_with_locations(locations_hash[type]),
-                    'dataset': indicator.dataset_name(),
-                 'dataset_id': indicator.dataset_id,
-                   'variable': indicator.variable,
-                   'geo_type': geo_type,
-                   'values'  : values
-                }
+                ind_data  = self.indicator_data_to_dict(indicator, region, locations_to_put, locations_hash, region_locations)
 
                 self.session.close()
                 return json.dumps({'success': True, 'indicator': ind_data })
@@ -247,7 +188,6 @@ class LocationsController(base.BaseController):
     #end
 
     def community_profile(self, profile_id):
-
         default_profile = self.location_service.get_profile(profile_id)
 
         if not default_profile:
@@ -282,29 +222,32 @@ class LocationsController(base.BaseController):
     def load_profile_indicators(self, profile_id):
         http_response.headers['Content-type'] = 'application/json'
 
-        session_id     = session.id
-        user_name      = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
         try:
             json_body  = json.loads(http_request.body, encoding=http_request.charset)
         except ValueError:
             self.session.close()
             return json.dumps({'success': True, 'ind_data': {}, 'towns':  []})
 
-        location_names = json_body.get('locations')
-        region_id      = json_body.get('region_id')
-        location_names = location_names.split(',')
+        session_id        = session.id
+        user_name         = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
+        location_names    = json_body.get('locations')
+        region_id         = json_body.get('region_id')
+        location_names    = location_names.split(',')
 
-        profile        = self.location_service.get_profile(profile_id)
-        user           = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
-        locations      = []
-        geo_types      = self.location_service.location_geography_types()
-        locations_hash = {}
-        all_current_locations = []
-        region = None
-        locations_to_put = []
-        region_locations = []
-
+        profile           = self.location_service.get_profile(profile_id)
+        user              = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
+        geo_types         = self.location_service.location_geography_types()
         locations_records = self.location_service.get_all_locations()
+        locations         = []
+        locations_hash    = {}
+        ind_data          = {}
+        region            = None
+        locations_to_put  = []
+        region_locations  = []
+        all_current_locations = []
+
+        for geo_type in geo_types:
+            ind_data[geo_type] = []
 
         for type in geo_types:
             locations_to_put      = filter(lambda t: t.geography_type == type and t.name in location_names, locations_records)
@@ -317,51 +260,48 @@ class LocationsController(base.BaseController):
 
         ######### load indicators data
 
-        ind_data = {}
-        for geo_type in geo_types:
-            ind_data[geo_type] = []
-
         if profile:
             for indicator in profile.indicators:
-                ######### load indicators values only for locations with corresponding dataset
-                geo_type  = indicator.dataset_geography_type()
-                if indicator.aggregated:
-                    if not region and len(locations_to_put) > 0:
-                        region = Region('New region', c.userobj.id)
-                        region.location = locations_to_put
-                        self.session.add(region)
-
-                        for location in locations_to_put:
-                            location.region_id = region.id
-
-                        self.session.commit()
-                        region_locations = map(lambda l: l.name, region.locations)
-
-                    values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, region_locations)
-                    values = [sum(values)/len(values)] if len(values) > 0 else []
-                else:
-                    values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
-
-                data  = {}
-                data  = {
-                         'id': indicator.id,
-                    'filters': indicator.filters,
-                  'data_type': indicator.data_type,
-                       'year': dict_with_key_value("field", "Year", json.loads(indicator.filters))['values'][0],
-                    'link_to': indicator.link_to_visualization_with_locations(locations_hash[geo_type]),
-                    'dataset': indicator.dataset_name(),
-                 'dataset_id': indicator.dataset_id,
-                   'variable': indicator.variable,
-                   'geo_type': geo_type,
-                   'values'  : values
-                }
-
+                data = self.indicator_data_to_dict(indicator, region, locations_to_put, locations_hash, region_locations)
                 ind_data[geo_type].append(data)
-        else:
-           data  = {}
 
         self.session.close()
         return json.dumps({'success': True, 'ind_data': ind_data, 'all_current_locations':  all_current_locations, 'locations_hash': locations_hash})
+    #end
+
+    def indicator_data_to_dict(self, indicator, region, locations_to_put, locations_hash, region_locations):
+        geo_type  = indicator.dataset_geography_type()
+        if indicator.aggregated:
+            if not region and len(locations_to_put) > 0:
+                region = Region('New region', c.userobj.id)
+                region.locations = locations_to_put
+                self.session.add(region)
+
+                for location in locations_to_put:
+                    location.region_id = region.id
+
+                self.session.commit()
+                region_locations = map(lambda l: l.name, region.locations)
+
+            values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, region_locations)
+            values = [sum(map(lambda v: int(v),values))/len(values)] if len(values) > 0 else []
+        else:
+            values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
+
+        ind_data = {
+                 'id': indicator.id,
+            'filters': indicator.filters,
+          'data_type': indicator.data_type,
+               'year': dict_with_key_value("field", "Year", json.loads(indicator.filters))['values'][0],
+            'link_to': indicator.link_to_visualization_with_locations(locations_hash[geo_type]),
+            'dataset': indicator.dataset_name(),
+         'dataset_id': indicator.dataset_id,
+           'variable': indicator.variable,
+           'geo_type': geo_type,
+           'values'  : values
+        }
+
+        return ind_data
     #end
 
     def save_local_default(self, profile_id):
@@ -434,7 +374,3 @@ class LocationsController(base.BaseController):
 
         self.session.close()
         return json.dumps({'success': True })
-
-
-
-
