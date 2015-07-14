@@ -28,6 +28,11 @@
             {% block package_additional_info %}
                 {% snippet "package/snippets/additional_info.html", pkg_dict=pkg %}
             {% endblock %}
+            {% if c.userobj.sysadmin %}
+                {% block package_config_metadata %}
+                    {% snippet "package/snippets/config_metadata.html", pkg_dict=pkg %}
+                {% endblock %}
+            {% endif %}
         </div>
     </div>
 {% endblock %}
