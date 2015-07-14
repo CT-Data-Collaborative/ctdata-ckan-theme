@@ -50,7 +50,7 @@
         {% for extra in h.sorted_extras(pkg_dict.extras) %}
             {% set key, value = extra %}
               {% if key in ['Default', 'Disabled Dimensions', 'Disabled View', 'Hidden In', 'Units', 'Visible Metadata', 'Help'] %}
-                {% if c.userobj.sysadmin %}
+                {% if user.sysadmin %}
                   <div class="con_row">
                       <label>{{ _(key) }}</label>
                       <p>{{ value }}</p>
