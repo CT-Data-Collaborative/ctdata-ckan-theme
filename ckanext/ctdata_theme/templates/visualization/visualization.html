@@ -52,7 +52,7 @@
 <ul>
 
 {% for dimension in dimensions %}
-{% if dimension.possible_values %}
+{% if dimension.possible_values and dimension.name not in disable_dimensions %}
 <li class="filter">
   <a href="#collapse{{dimension.name|replace(" ", "")|replace("/", "\/")|replace("'", "")}}" data-toggle="collapse" class="togglebtn dimension">{{dimension.name}}</a>
   <div id="collapse{{dimension.name|replace(" ","")|replace("'", "")}}" class="panel-collapse collapse">
@@ -280,7 +280,6 @@ units = {{units | safe}}
 {% endif %}
 
 map_json_url = '{{map_json_url}}'
-
 
 {% if default_filters %}
 defaults = {{default_filters | safe}}
