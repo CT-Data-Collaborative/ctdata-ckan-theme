@@ -263,8 +263,10 @@ class CTDataController(base.BaseController):
         break_points    = DatasetService.get_dataset_meta_break_points(dataset_name)
         defaults        = DatasetService.get_dataset_meta_default_metadata(dataset_name)
         metadata        = filter(lambda x: x['key'] in metadata_fields, dataset.ckan_meta['extras'])
-        disable_visualizations = DatasetService.get_dataset_meta_hidden_in(dataset_name)
         map_json_url    = DatasetService.get_dataset_map_json_url(dataset_name)
+
+        disable_visualizations = DatasetService.get_dataset_meta_hidden_in(dataset_name)
+        disable_dimensions     = DatasetService.get_dataset_meta_disabled_dimensions(dataset_name)
 
         if 'visualization' in disable_visualizations or dataset.ckan_meta['private']:
            h.redirect_to(controller='package', action='read', id=dataset_name)
@@ -294,6 +296,7 @@ class CTDataController(base.BaseController):
 
         self.session.close()
         return base.render('visualization/visualization.html', extra_vars={'dataset': dataset.ckan_meta,
+                                                             'disable_dimensions': disable_dimensions,
                                                              'dimensions': dataset.dimensions,
                                                              'units':    metadata_units,
                                                              'metadata': metadata,
