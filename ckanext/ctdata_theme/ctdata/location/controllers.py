@@ -41,7 +41,7 @@ class LocationsController(base.BaseController):
         locations   = self.location_service.get_all_locations()
         regions     = self.location_service.get_regions()
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
-        geo_types   =  self.location_service.location_geography_types()
+        geo_types   =  self.location_service.location_geography_types() + ['regions']
 
         locations_hash = {}
         all_current_locations = []
@@ -108,7 +108,7 @@ class LocationsController(base.BaseController):
             region      = None
             locations_to_put = []
             region_locations = []
-            locations_hash   = {}
+            locations_hash   = {'regions': []}
             ind_data         = {}
             all_current_locations = []
 
@@ -123,12 +123,12 @@ class LocationsController(base.BaseController):
                     locations_hash[type]  = map(lambda t: t.name, locations)
                     all_current_locations += locations_hash[type]
 
-            if region_id:
+            if region_id and region_id != 'not_selected':
                 region = self.location_service.get_region_by_id(region_id)
                 region_locations = map(lambda l: l.name, region.locations)
+                locations_hash['regions'] = [region.name]
 
             ######### load indicators data
-
 
             for geo_type in geo_types:
                 ind_data[geo_type] = []
@@ -150,7 +150,7 @@ class LocationsController(base.BaseController):
                 }
 
                 indicator = self.location_service.new_indicator(params)
-                ind_data  = self.indicator_data_to_dict(indicator, region, locations_to_put, locations_hash, region_locations)
+                ind_data  = self.indicator_data_to_dict(indicator, region, locations_to_put, locations_hash, region_locations, region_id)
 
                 self.session.close()
                 return json.dumps({'success': True, 'indicator': ind_data })
@@ -249,30 +249,38 @@ class LocationsController(base.BaseController):
         for geo_type in geo_types:
             ind_data[geo_type] = []
 
+        ind_data['regions'] = []
+
         for type in geo_types:
             locations_to_put      = filter(lambda t: t.geography_type == type and t.name in location_names, locations_records)
             locations_hash[type]  = map(lambda t: t.name, locations_to_put)
             all_current_locations += locations_hash[type]
 
-        if region_id:
+        locations_hash['regions'] = []
+
+        if region_id and region_id != 'not_selected':
             region = self.location_service.get_region_by_id(region_id)
             region_locations = map(lambda l: l.name, region.locations)
+            locations_hash['regions'] = [region.name]
 
         ######### load indicators data
 
         if profile:
             for indicator in profile.indicators:
-                data = self.indicator_data_to_dict(indicator, region, locations_to_put, locations_hash, region_locations)
-                ind_data[geo_type].append(data)
+                data = self.indicator_data_to_dict(indicator, region, locations_to_put, locations_hash, region_locations, region_id)
+                if indicator.aggregated:
+                    ind_data['regions'].append(data)
+                else:
+                    ind_data[geo_type].append(data)
 
         self.session.close()
         return json.dumps({'success': True, 'ind_data': ind_data, 'all_current_locations':  all_current_locations, 'locations_hash': locations_hash})
     #end
 
-    def indicator_data_to_dict(self, indicator, region, locations_to_put, locations_hash, region_locations):
+    def indicator_data_to_dict(self, indicator, region, locations_to_put, locations_hash, region_locations, region_id):
         geo_type  = indicator.dataset_geography_type()
         if indicator.aggregated:
-            if not region and len(locations_to_put) > 0:
+            if not region and len(locations_to_put) > 0 and region_id != 'not_selected':
                 region = Region('New region', c.userobj.id)
                 region.locations = locations_to_put
                 self.session.add(region)
@@ -284,7 +292,7 @@ class LocationsController(base.BaseController):
                 region_locations = map(lambda l: l.name, region.locations)
 
             values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, region_locations)
-            values = [sum(map(lambda v: int(v),values))/len(values)] if len(values) > 0 else []
+            values = [sum(map(lambda v: int(v) if v else 0, values))/len(values)] if len(values) > 0 else []
         else:
             values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
 
@@ -298,7 +306,9 @@ class LocationsController(base.BaseController):
          'dataset_id': indicator.dataset_id,
            'variable': indicator.variable,
            'geo_type': geo_type,
-           'values'  : values
+         'aggregated': indicator.aggregated,
+           'values'  : values,
+        'locations_names': region.name if region and indicator.aggregated else locations_hash[geo_type]
         }
 
         return ind_data

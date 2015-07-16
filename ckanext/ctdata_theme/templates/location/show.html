@@ -34,7 +34,13 @@
   <div class="span12">
     <span id="default_profile_id" class="hidden">{{default_profile_id}}</span>
     {% for type in geo_types_array %}
-      <a href="javascript:void(0)" id="{{type}}" class="edit_locations btn btn-default hidden"> Edit {{ type}}s </a>
+      <a href="javascript:void(0)" id="{{type}}" class="edit_locations btn btn-default hidden">
+        {% if type == 'regions' %}
+          Edit Region
+        {% else %}
+          Edit {{ type}}s
+        {% endif %}
+      </a>
       <div class="table-div-{{type}}"></div>
       <br>
       <br>

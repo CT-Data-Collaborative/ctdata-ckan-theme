@@ -9,13 +9,13 @@ def upgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
     user_info  = Table('ctdata_user_info', meta, autoload=True)
 
-    rigions = Table('ctdata_regions', meta,
+    regions = Table('ctdata_regions', meta,
       Column('id',     Integer, primary_key = True),
       Column('name',    String, nullable = False),
       Column('user_id', String, ForeignKey('ctdata_user_info.ckan_user_id'))
     )
 
-    rigions.create()
+    regions.create()
 
     regions    = Table('ctdata_locations', meta, autoload=True)
     locations  = Table('ctdata_locations', meta, autoload=True)

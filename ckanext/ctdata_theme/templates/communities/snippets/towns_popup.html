@@ -7,6 +7,7 @@
         <div class="modal-body">
           <div id="regions">
             <select id="regions">
+            <option disabled selected value="not_selected"> -- select an option -- </option>
             {% for region in regions %}
               <option value="{{region.id}}"> {{region.name}}
             {% endfor %}
