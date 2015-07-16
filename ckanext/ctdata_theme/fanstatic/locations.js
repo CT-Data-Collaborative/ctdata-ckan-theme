@@ -14,240 +14,238 @@ var create_popup    = $("#create_profile_popup"),
     current_region     = undefined,
     current_dataset ;
 
-    function load_topics(){
-        if ($('#loaded_topics').html() == ""){
-            $('#add_indicator').addClass('disabled')
-            $('#create_profile_button').addClass('disabled')
-            $('#save_profile_as_default').addClass('disabled')
-            $.ajax({type: "GET",
-                url: "/community/get_topics/",
-                success: function (data) {
-                    $('#loaded_topics').append($(data.html));
-                    $('#add_indicator').removeClass('disabled')
-                    $('#create_profile_button').removeClass('disabled')
-                    $('#save_profile_as_default').removeClass('disabled')
-                }
-            });
-        }
+function load_topics(){
+    if ($('#loaded_topics').html() == ""){
+        $('#add_indicator').addClass('disabled')
+        $('#create_profile_button').addClass('disabled')
+        $('#save_profile_as_default').addClass('disabled')
+        $.ajax({type: "GET",
+            url: "/community/get_topics/",
+            success: function (data) {
+                $('#loaded_topics').append($(data.html));
+                $('#add_indicator').removeClass('disabled')
+                $('#create_profile_button').removeClass('disabled')
+                $('#save_profile_as_default').removeClass('disabled')
+            }
+        });
     }
+}
 
-    function build_filters(filter_data) {
-        var filters_html = '<ul>';
-        $.each(filter_data, function(i, fltr) {
-            filters_html += '<li>';
-            filters_html += '<h3 class="indicator-filter-name">' + fltr.name + '</h3>';
-            filters_html += '<ul>';
-            $.each(fltr.values, function(j, val) {
-                filters_html += '<li class="indicator-filter">';
-                filters_html += '<span class="indicator-filter-value">' + val + '</span>';
-                filters_html += '<input type="radio" class="indicator-filter-radio" name="' + fltr.name + '" value="' + val + '"';
-                if (j == 0)
-                    filters_html += ' checked';
-                filters_html += '>';
-                filters_html += '</li>';
-            });
-            filters_html += '</ul>';
+function build_filters(filter_data) {
+    var filters_html = '<ul>';
+    $.each(filter_data, function(i, fltr) {
+        filters_html += '<li>';
+        filters_html += '<h3 class="indicator-filter-name">' + fltr.name + '</h3>';
+        filters_html += '<ul>';
+        $.each(fltr.values, function(j, val) {
+            filters_html += '<li class="indicator-filter">';
+            filters_html += '<span class="indicator-filter-value">' + val + '</span>';
+            filters_html += '<input type="radio" class="indicator-filter-radio" name="' + fltr.name + '" value="' + val + '"';
+            if (j == 0)
+                filters_html += ' checked';
+            filters_html += '>';
             filters_html += '</li>';
         });
         filters_html += '</ul>';
+        filters_html += '</li>';
+    });
+    filters_html += '</ul>';
 
-        return filters_html;
-    }
+    return filters_html;
+}
 
-    function get_filters() {
-        return $('#filters').find('input:checked').map(function(i, e) {
-            return {field: $(e).attr('name'), values: [$(e).val()]}
-        }).get();
-    }
+function get_filters() {
+    return $('#filters').find('input:checked').map(function(i, e) {
+        return {field: $(e).attr('name'), values: [$(e).val()]}
+    }).get();
+}
 
-    function get_updated_filters() {
-        return $('#edit_indicator_filters').find('input:checked').map(function(i, e) {
-            return {field: $(e).attr('name'), values: [$(e).val()]}
-        }).get();
-    }
+function get_updated_filters() {
+    return $('#edit_indicator_filters').find('input:checked').map(function(i, e) {
+        return {field: $(e).attr('name'), values: [$(e).val()]}
+    }).get();
+}
 
-    function draw_table(type, indicators_data, towns){
-        table = "<table class='table my_table' id='table-" + type + "'>\
-                    <thead>\
-                        <th>Dataset</th>\
-                        <th>Data Type</th>\
-                        <th>Year</th>"
+function draw_table(type, indicators_data, towns){
+    table = "<table class='table my_table' id='table-" + type + "'>\
+                <thead>\
+                    <th>Dataset</th>\
+                    <th>Data Type</th>\
+                    <th>Year</th>"
 
-        $(towns).each(function(i){ table = table + '<th>' +towns[i] + '</th>' });
-        table = table + "</thead><tbody>"
+    $(towns).each(function(i){ table = table + '<th>' +towns[i] + '</th>' });
+    table = table + "</thead><tbody>"
 
-        $(indicators_data).each(function(i){
-            indicators.push({ id: indicators_data[i]['id'], dataset_id: indicators_data[i]['dataset_id'], name: "", ind_type: 'common',
-                          aggregated: indicators_data[i]['aggregated'], towns: towns,
-                          permission: 'public', filters: indicators_data[i]['filters'], description: '', geo_type: indicators_data[i]['geo_type'] })
+    $(indicators_data).each(function(i){
+        indicators.push({ id: indicators_data[i]['id'], dataset_id: indicators_data[i]['dataset_id'], name: "", ind_type: 'common',
+                      aggregated: indicators_data[i]['aggregated'], towns: towns,
+                      permission: 'public', filters: indicators_data[i]['filters'], description: '', geo_type: indicators_data[i]['geo_type'] })
 
-            tr    = build_tr_from_data(indicators_data[i])
-            table = table + tr
-        });
-        table = table + "</tbody></table>";
+        tr    = build_tr_from_data(indicators_data[i])
+        table = table + tr
+    });
+    table = table + "</tbody></table>";
 
-        $(".table-div-" + type).html(table);
-    }
+    $(".table-div-" + type).html(table);
+}
 
 
-    function load_profile_indicators(){
-        $('.spinner').show();
-        var deferred = $.Deferred();
+function load_profile_indicators(){
+    $('.spinner').show();
+    var deferred = $.Deferred();
 
-        $.ajax({type: "POST",
-            url: "/load_profile_indicators/" + default_profile_id,
-            data: JSON.stringify({locations: locations, ids_to_remove: ids_to_remove}),
-            contentType: 'application/json; charset=utf-8',
-            success: function (data) {
-                indicators_data = data.ind_data;
-                indicators      = []
-                $('locations_list').text(data.all_current_locations);
+    $.ajax({type: "POST",
+        url: "/load_profile_indicators/" + default_profile_id,
+        data: JSON.stringify({locations: locations, ids_to_remove: ids_to_remove}),
+        contentType: 'application/json; charset=utf-8',
+        success: function (data) {
+            indicators_data = data.ind_data;
+            indicators      = []
+            $('locations_list').text(data.all_current_locations);
 
-                $(geo_types).each(function(i){
-                    type = geo_types[i]
-                    draw_table(type, indicators_data[type], data.locations_hash[type]);
+            $(geo_types).each(function(i){
+                type = geo_types[i]
+                draw_table(type, indicators_data[type], data.locations_hash[type]);
 
-                    if (indicators_data[type].length == 0){
-                        $('.edit_locations#' + type).addClass('hidden');
-                        $('.table-div-' + type).addClass('hidden');
-                    }
-                    else{
-                        $('.edit_locations#' + type).removeClass('hidden');
-                        $('.table-div-' + type).removeClass('hidden');
-                    }
-                });
-                enable_options_for_profile();
-                $('.spinner').hide();
-            }
-        });
-    }
-
-    function build_tr_from_data(indicators_data){
-        ind = indicators_data
-        id = ind.id
-        ind.filters = JSON.parse(ind.filters)
-
-        if (id != null && ids_to_remove.indexOf(id.toString()) > -1)
-            tr  = "<tr class='table_data hidden'>"
-        else
-            tr  = "<tr class='table_data'>"
-
-        tr  = tr +  "<td class='column_1 for_csv'>\
-                        <span class='indicator_id hidden'>" + id + " </span>"
-        tr  = tr + "<a href='" + ind.link_to + "'>" + ind.dataset + ", " + ind.variable + " </a><span>"
-        tr  = tr + "<span class='hidden' id='filters_json'>" + JSON.stringify(ind.filters) + "</span>"
-        $(ind.filters).each(function(i){
-            filter = ind.filters[i]
-            tr = tr + filter.field + ': ' + filter.values[0] + ' '
-        });
-        tr = tr + "</span>  <span class='for_csv hidden'>" + ind.dataset + ', ' + ind.variable + ', '
-        $(ind.filters).each(function(i){
-            filter = ind.filters[i]
-            tr = tr + filter.field + ': ' + filter.values[0] + ' ' + ','
-        });
-        tr = tr + "</span>"
-        tr = tr + "</td>\
-                <td class='for_csv'><span class='for_csv'>" + ind.data_type + "</span></td>\
-                <td class='for_csv'><span class='for_csv'>" + ind.year  + "</span></td>"
-
-        $(ind.values).each(function(i){
-            value = ind.values[i] || '-'
-            text  = value.toString()
-            array = text.split('.')
-
-              if (jQuery.isNumeric(text) == true && array.length == 1)
-                value = parseInt(text).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-              else{
-                if (jQuery.isNumeric(text) == true && array.length == 2 && array[0].length > 4){
-                  array[0]  = parseInt(array[0]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                  value = array.join('.');
+                if (indicators_data[type].length == 0){
+                    $('.edit_locations#' + type).addClass('hidden');
+                    $('.table-div-' + type).addClass('hidden');
                 }
-              }
-
-            tr = tr + "<td class='for_csv'><span class='for_csv'>" + value + "</span></td>"
-        });
-        tr = tr + "<td class='no-border'>\
-                        <a href='javascript:void(0)' id=" + id + " dataset='" + ind.dataset_id + "' class='edit_indicator' style='height: inherit;'>\
-                            <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/pencil.png'>\
-                        </a>\
-                        <a href='javascript:void(0)' id=" + id + " class='hide_indicator' style='height: inherit;'>\
-                            <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/close_pic.png'>\
-                        </a>\
-                    </td>\
-                </tr>";
-        return tr
-    }
-
-    function draw_raw(indicators_data, index){
-        tr = build_tr_from_data(indicators_data)
-        if (indicators_data['aggregated'])
-            geo_type = 'regions'
-        else
-            geo_type = indicators_data['geo_type']
-
-        if (index != null)
-            $($('.table-div-' + geo_type).find('tbody').find('tr')[index]).replaceWith(tr)
-        else
-            $('.table-div-' + geo_type).find('tbody').append( tr )
-    }
-
-    function reload_data_for_new_indicators(){
-        locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
-        locations = locations.join(',');
-        aggregated = $('#enable_data_aggregation').prop('checked');
-        region_id  = $('select#regions').val();
-        $(new_indicators).each(function(i){
-            $('.spinner').show();
-            ind = new_indicators[i]
-            $.ajax({type: "POST",
-                url: "/location/load_indicator",
-                data: JSON.stringify({ dataset_id: ind['dataset_id'], name: "", ind_type: 'common', aggregated: ind['aggregated'], region_id: region_id,
-                                       permission: 'public', filters: ind['filters'], description: '', locations: locations}),
-                contentType: 'application/json; charset=utf-8',
-                success: function (data) {
-                    draw_raw(data.indicator, null);
-                    geo_type = (data.indicator['aggregated'] ? 'regions' : data.indicator['geo_type'])
-                    $('.edit_locations#' + geo_type).removeClass('hidden');
-                    $('.table-div-' + geo_type).removeClass('hidden');
-                    $('.spinner').hide();
+                else{
+                    $('.edit_locations#' + type).removeClass('hidden');
+                    $('.table-div-' + type).removeClass('hidden');
                 }
             });
-        });
-
-    }
-
-    function enable_options_for_profile(){
-        if (indicators.length > 0 || new_indicators.length > 0){
-            $('#create_profile_button').removeClass('hidden');
-            $('.download_btn').removeClass('hidden');
-            $('#add_indicator').closest('li').closest('ul').removeClass('add_indicator_button_in_center')
-
+            enable_options_for_profile();
+            $('.spinner').hide();
         }
-        else{
-            $('#create_profile_button').addClass('hidden');
-            $('.download_btn').addClass('hidden');
-            $('#add_indicator').closest('ul').closest('ul').addClass('add_indicator_button_in_center')
-        }
+    });
+}
 
-        $('#add_indicator').closest('li').closest('ul').removeClass('hidden')
-    }
+function build_tr_from_data(indicators_data){
+    ind = indicators_data
+    id = ind.id
+    ind.filters = JSON.parse(ind.filters)
 
-function draw_ind_if_towns_popup_closed(data){
-        $('#towns_popup').on('hidden', function () {
-            geo_type_locations = $('#towns').find('.location-checkbox').not('[class*="hidden"]').find('input:checked').map(function(i, e) {return $(e).val()}).get();
-            if (geo_type_locations.length == 0 || data.indicator['aggregated']){
+    if (id != null && ids_to_remove.indexOf(id.toString()) > -1)
+        tr  = "<tr class='table_data hidden'>"
+    else
+        tr  = "<tr class='table_data'>"
 
-                enable_options_for_profile();
-                draw_raw(data.indicator, remember_index);
+    tr  = tr +  "<td class='column_1 for_csv'>\
+                    <span class='indicator_id hidden'>" + id + " </span>"
+    tr  = tr + "<a href='" + ind.link_to + "'>" + ind.dataset + ", " + ind.variable + " </a><span>"
+    tr  = tr + "<span class='hidden' id='filters_json'>" + JSON.stringify(ind.filters) + "</span>"
+    $(ind.filters).each(function(i){
+        filter = ind.filters[i]
+        tr = tr + filter.field + ': ' + filter.values[0] + ' '
+    });
+    tr = tr + "</span>  <span class='for_csv hidden'>" + ind.dataset + ', ' + ind.variable + ', '
+    $(ind.filters).each(function(i){
+        filter = ind.filters[i]
+        tr = tr + filter.field + ': ' + filter.values[0] + ' ' + ','
+    });
+    tr = tr + "</span>"
+    tr = tr + "</td>\
+            <td class='for_csv'><span class='for_csv'>" + ind.data_type + "</span></td>\
+            <td class='for_csv'><span class='for_csv'>" + ind.year  + "</span></td>"
+
+    $(ind.values).each(function(i){
+        value = ind.values[i] || '-'
+        text  = value.toString()
+        array = text.split('.')
+
+          if (jQuery.isNumeric(text) == true && array.length == 1)
+            value = parseInt(text).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          else{
+            if (jQuery.isNumeric(text) == true && array.length == 2 && array[0].length > 4){
+              array[0]  = parseInt(array[0]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+              value = array.join('.');
+            }
+          }
+
+        tr = tr + "<td class='for_csv'><span class='for_csv'>" + value + "</span></td>"
+    });
+    tr = tr + "<td class='no-border'>\
+                    <a href='javascript:void(0)' id=" + id + " dataset='" + ind.dataset_id + "' class='edit_indicator' style='height: inherit;'>\
+                        <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/pencil.png'>\
+                    </a>\
+                    <a href='javascript:void(0)' id=" + id + " class='hide_indicator' style='height: inherit;'>\
+                        <img class='close_pic' style='opacity: 0; margin-left: 10px' src='/common/images/close_pic.png'>\
+                    </a>\
+                </td>\
+            </tr>";
+    return tr
+}
+
+function draw_raw(indicators_data, index){
+    tr = build_tr_from_data(indicators_data)
+    if (indicators_data['aggregated'])
+        geo_type = 'regions'
+    else
+        geo_type = indicators_data['geo_type']
+
+    if (index != null)
+        $($('.table-div-' + geo_type).find('tbody').find('tr')[index]).replaceWith(tr)
+    else
+        $('.table-div-' + geo_type).find('tbody').append( tr )
+}
+
+function reload_data_for_new_indicators(){
+    locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+    locations = locations.join(',');
+    aggregated = $('#enable_data_aggregation').prop('checked');
+    region_id  = $('select#regions').val();
+    $(new_indicators).each(function(i){
+        $('.spinner').show();
+        ind = new_indicators[i]
+        $.ajax({type: "POST",
+            url: "/location/load_indicator",
+            data: JSON.stringify({ dataset_id: ind['dataset_id'], name: "", ind_type: 'common', aggregated: ind['aggregated'], region_id: region_id,
+                                   permission: 'public', filters: ind['filters'], description: '', locations: locations}),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                draw_raw(data.indicator, null);
                 geo_type = (data.indicator['aggregated'] ? 'regions' : data.indicator['geo_type'])
                 $('.edit_locations#' + geo_type).removeClass('hidden');
                 $('.table-div-' + geo_type).removeClass('hidden');
-                $('div.modal').modal('hide');
-                $('create_profile_button').removeClass('hidden');
-
+                $('.spinner').hide();
             }
         });
+    });
+
+}
+
+function enable_options_for_profile(){
+    if (indicators.length > 0 || new_indicators.length > 0){
+        $('#create_profile_button').removeClass('hidden');
+        $('.download_btn').removeClass('hidden');
+        $('#add_indicator').closest('li').closest('ul').removeClass('add_indicator_button_in_center')
     }
+    else{
+        $('#create_profile_button').addClass('hidden');
+        $('.download_btn').addClass('hidden');
+        $('#add_indicator').closest('ul').closest('ul').addClass('add_indicator_button_in_center')
+    }
+    $('#add_indicator').closest('li').closest('ul').removeClass('hidden')
+}
+
+function draw_ind_if_towns_popup_closed(data){
+    $('#towns_popup').on('hidden', function () {
+        geo_type_locations = $('#towns').find('.location-checkbox').not('[class*="hidden"]').find('input:checked').map(function(i, e) {return $(e).val()}).get();
+        if (geo_type_locations.length == 0 || data.indicator['aggregated']){
+
+            enable_options_for_profile();
+            draw_raw(data.indicator, remember_index);
+            geo_type = (data.indicator['aggregated'] ? 'regions' : data.indicator['geo_type'])
+            $('.edit_locations#' + geo_type).removeClass('hidden');
+            $('.table-div-' + geo_type).removeClass('hidden');
+            $('div.modal').modal('hide');
+            $('create_profile_button').removeClass('hidden');
+
+        }
+    });
+}
 
 
 function handle_incompatibles(){
@@ -274,7 +272,7 @@ function apply_incompatibles(compatibles){
           $input.attr("checked", false);
           $input.parent().find("span").css("color", "lightgray");
         }
-      });
+    });
 }
 
 function collect_all_filters_for(indicators){
@@ -345,13 +343,14 @@ $(function(){
 
         $('.location-checkbox').addClass('hidden')
         $('.location-checkbox.' + type).removeClass('hidden')
-        aggregated = $('#enable_data_aggregation').prop('checked')
-        if (!aggregated){
-            $('#regions').hide()
-            $('select#regions').find('option').first().attr('selected', true)
+        // aggregated = $('#enable_data_aggregation').prop('checked')
+        if (type != 'regions'){
+            $('select#regions').hide()
+            // $('select#regions').find('option').first().attr('selected', true)
         }
         else
-            $('#regions').show()
+           $('select#regions').show()
+
         $("#towns_popup").modal('show');
     })
 
@@ -366,7 +365,7 @@ $(function(){
         $(indicators).each(function(i) {
             if (!found && id == $(indicators)[i].id ) {
                 index = i;
-                found=true
+                found = true
             };
         });
 
@@ -388,8 +387,7 @@ $(function(){
         if (index != undefined) new_indicators.splice(index, 1);
     });
 
-
-     $(document).on('click', '.dataset_chooser', function() {
+    $(document).on('click', '.dataset_chooser', function() {
         $("#save_indicator").addClass('hidden')
         $('li', $('ul.indicator-sub-topics')).removeClass('active')
         current_dataset = $(this).attr('id');
@@ -615,7 +613,5 @@ $(function(){
             return false;
         }
     });
-
-    // $("select#regions").attr("selectedIndex", -1);
 
 });
