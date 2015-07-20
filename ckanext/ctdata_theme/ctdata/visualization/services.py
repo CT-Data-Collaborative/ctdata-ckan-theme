@@ -127,6 +127,12 @@ class DatasetService(object):
         return value
 
     @staticmethod
+    def get_dataset_meta_domain(dataset_id):
+        default = ''
+        value   = DatasetService.get_dataset_meta_field(dataset_id, 'Domain', default)
+        return value
+
+    @staticmethod
     def get_dataset_meta_dimensions(dataset_id):
         default = []
         value   = DatasetService.get_dataset_meta_field(dataset_id, 'Dimensions', default)
@@ -140,7 +146,7 @@ class DatasetService(object):
         data    = filter(lambda x: x['key'] == field_name, meta)
 
         try:
-            if field_name in ['Help']:
+            if field_name in ['Help', 'Domain']:
                 value = data[0]['value']
             elif field_name not in ['Units', 'Default', 'Break Points']:
                 value = yaml.load(data[0]['value']).replace(', ', ',')

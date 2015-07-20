@@ -215,3 +215,13 @@ ul#main, ul#compare{
   width: 900px;
   overflow: scroll;
 }*/
+
+
+.popup-blue-header{
+  background-color: #4670a7;
+  color: white;
+}
+
+.popup-blue-header h2{
+  color: white;
+}

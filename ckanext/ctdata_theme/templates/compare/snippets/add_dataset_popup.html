@@ -1,0 +1,78 @@
+<div id="add_dataset_popup" class="modal fade" style="display: none">
+  <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+
+        <div class="modal-header popup-blue-header">
+          <h2>Select Dataset</h2>
+        </div>
+
+        <div class="modal-body">
+          <form class="form-horizontal">
+            <div class="control-group">
+              <label class="control-label" > <h3> Geography: </h3></label>
+              <div class="controls">
+                <select id="geo_type">
+                  <option selected="true" value="empty" class="text-center" id="">
+                    <span class="">-- Select Geography --</span>
+                    <span class="caretbox"><span class="caret"></span></span>
+                  </option>
+                  {% for geo_type in geo_types %}
+                    <option> {{geo_type}} </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" > <h3> Domain: </h3> </label>
+              <div class="controls">
+                <select id="domain" disabled>
+                  <option selected="true" value="empty" class="text-center" id="">
+                    <span class="">-- Select Domain --</span>
+                    <span class="caretbox"><span class="caret"></span></span>
+                  </option>
+                  {% for domain in domains %}
+                    <option> {{domain}} </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" > <h3> Dataset: </h3> </label>
+              <div class="controls">
+                <select id="dataset_name" disabled>
+                  <option selected="true" value="empty" class="text-center" id="">
+                    <span class="">-- Select Dataset --</span>
+                    <span class="caretbox"><span class="caret"></span></span>
+                  </option>
+                  {% for dataset in datasets %}
+                    <option class="dataset_option" value="{{dataset[name]}}" id="{{dataset[name]}}" domain="{{dataset['domain']}}" geo_type="{{dataset['geo_type']}}">
+                      {{dataset['name']|replace("-", " ")|title}}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+            </div>
+          </form>
+          <hr>
+          <div class="offset">
+            <h2> Filter? </h2>
+            <br>
+            <a href="{{h.empty_href()}}" class="btn btn-success"> Now </a>
+            <a href="{{h.empty_href()}}" class="btn btn-danger"> Later </a>
+          </div>
+        </div>
+
+
+        <!-- <div class="modal-footer">
+          <div style="float: right">
+            <button class="save_towns btn btn-primary">Save</button>
+            <button class="btn close_popup">Cancel</button>
+          </div>
+        </div> -->
+
+    </div>
+  </div>
+</div>

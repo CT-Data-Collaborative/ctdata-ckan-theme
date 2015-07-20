@@ -33,8 +33,21 @@ class CompareController(base.BaseController):
         return base.render('compare/admin_compare.html', extra_vars={'dataset_names': dataset_names, 'years': years})
 
     def compare(self):
+        datasets   = []
+        domains    = []
+        geo_types  = []
         dataset_names = toolkit.get_action('package_list')(data_dict={})
-        return base.render('compare/compare.html', extra_vars={'dataset_names': dataset_names})
+
+        for dataset_name in dataset_names:
+            domain   = DatasetService.get_dataset_meta_domain(dataset_name)
+            geo_type = DatasetService.get_dataset_meta_geo_type(dataset_name)
+
+            if domain   not in domains:   domains.append(domain)
+            if geo_type not in geo_types: geo_types.append(geo_type)
+
+            datasets.append({ 'name': dataset_name, 'domain': domain, 'geo_type': geo_type })
+
+        return base.render('compare/compare.html', extra_vars={'datasets': datasets, 'geo_types': geo_types, 'domains': domains})
 
     def load_comparable_datasets(self, dataset_name):
         comparable, dataset_info, matches = self.compare_service.get_comparable_datasets(dataset_name)
