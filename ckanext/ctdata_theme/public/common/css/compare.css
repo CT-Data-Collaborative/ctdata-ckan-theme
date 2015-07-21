@@ -247,3 +247,9 @@ a.close_popup.i, .close_popup.i:hover{
   color: white;
   text-decoration: none;
 }
+
+.possible_value label{
+  position: relative;
+  left: 8px;
+  top: 4px;
+}

@@ -70,6 +70,16 @@ class CompareService(object):
 
       return matches
 
+    @staticmethod
+    def get_comparable_dataset_data(dataset_name):
+      dataset_data = toolkit.get_action('package_show')(data_dict={'id': dataset_name})
+      dataset      = DatasetService.get_dataset(dataset_name)
+      dims         = []
+
+      for dim in dataset.dimensions:
+        dims.append( { 'name': dim.name, 'possible_values': dim.possible_values, 'selected_value': None, 'macthes': False } )
+
+      return { 'title': dataset_data['title'], 'dims': dims }
 
     @staticmethod
     def get_comparable_datasets(dataset_name):

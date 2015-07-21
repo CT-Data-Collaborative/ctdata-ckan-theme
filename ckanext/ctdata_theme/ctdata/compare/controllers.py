@@ -49,20 +49,27 @@ class CompareController(base.BaseController):
 
         return base.render('compare/compare.html', extra_vars={'datasets': datasets, 'geo_types': geo_types, 'domains': domains})
 
+
+    def load_comparable_dataset_data(self, dataset_name):
+        data     = self.compare_service.get_comparable_dataset_data(dataset_name)
+        geo_type = http_request.GET.get('geo_type')
+
+        data['filtering_html'] = base.render('compare/snippets/filter_dataset_popup_body.html', extra_vars={'data': data, 'geo_type': geo_type})
+        return json.dumps({'success': True, 'dataset_data': data})
+
     def load_comparable_datasets(self, dataset_name):
+        print colored('collect data for dataset', 'green')
         comparable, dataset_info, matches = self.compare_service.get_comparable_datasets(dataset_name)
         # main_geo_type = DatasetService.get_dataset_meta_geo_type(dataset_name)
 
         main_geo_type = http_request.GET.get('geo_type')
-
-        # embed()
 
         if 'admin' in c.environ['HTTP_REFERER']:
             html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable, 'dataset_info': dataset_info})
         else:
             html = ''
             # html = base.render('compare/snippets/dataset_matches.html', extra_vars={'comparable': comparable})
-        return json.dumps({'success': True, 'html': html, 'matches': matches, 'main_geo_type': main_geo_type, 'comparable': comparable})
+        return json.dumps({'success': True, 'html': html, 'matches': matches, 'main_geo_type': main_geo_type, 'comparable': comparable, 'dataset_info': dataset_info})
 
     def join_for_two_datasets(self):
         json_body    = json.loads(http_request.body, encoding=http_request.charset)

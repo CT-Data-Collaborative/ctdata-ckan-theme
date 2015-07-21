@@ -175,29 +175,57 @@ function  dragToDroppable(id, value){
 
 function load_comparable_data(dataset){
   $.ajax({type: "GET",
-      url: "/compare/load_comparable_datasets/" + dataset.name,
+      url: "/compare/load_comparable_dataset_data/" + dataset.name,
       data: dataset,
       success: function (data) {
         data = JSON.parse(data)
-        // $('#datasets_to_compare_with').html('')
-        // $('#datasets_to_compare_with').html($(data.html));
-        $compare_with_select = $("select#compare_with")
-        matches              = data.matches
-        main_geo_type        = data.main_geo_type
-        // y_axe_name           = data.main_geo_type
-        comparable           = data.comparable
-        $('.spinner').hide()
+        dataset.dims_data  = data.dataset_data.dims
+        dataset.title      = data.dataset_data.title
+        dataset.filtering_html = data.dataset_data['filtering_html']
+
+        $('.spinner').hide();
+        $('#add_dataset_popup').modal('hide')
+
+        if (dataset.filter)
+          show_filter_popup_for(dataset);
+        else
+          put_data_to_correct_dataset(dataset);
+
       }
   });
 }
 
 
+function show_filter_popup_for(dataset){
+  $('#filter_dataset_popup').find('.modal-body').html(dataset.filtering_html)
+  $('#filter_dataset_popup').modal('show')
+  done_with_select_filters(dataset);
+}
 
+function done_with_select_filters(dataset){
+  $('.done_with_select_filters').on('click', function(){
+
+    $.each( dataset.dims_data, function(i, dim){
+      dim.selected_value = $('input[name="' + dim.name + '"]:checked').val()
+    });
+
+    dataset.filtered = true
+    $('#filter_dataset_popup').modal('hide');
+  });
+
+  put_data_to_correct_dataset(dataset);
+
+  //show first dataset uner add dataset btn
+}
+
+function put_data_to_correct_dataset(dataset){
+  dataset_1 == empty_dataset_hash ? dataset_1 = dataset : dataset_2 = dataset
+}
 
 var geo_type = null,
     domain = null,
-    empty_dataset_hash =  { name: null, filtered: false, geo_type: null, domain: null, data: null },
-
+    empty_dataset_hash = { name: null, title: null, filter: false, filtered: false, geo_type: null, domain: null, dims_data: null, filtering_html: null },
+    dataset   = null,
     dataset_1 = empty_dataset_hash,
     dataset_2 = empty_dataset_hash;
 
@@ -235,7 +263,7 @@ $(document).ready(function(){
     dataset.name     = $('select#dataset_name').val();
     dataset.geo_type = geo_type;
     dataset.domain   = domain;
-    dataset.filter   = $(this).attr('filter');
+    dataset.filter   = $(this).attr('filter') == "true";
 
     load_comparable_data( dataset )
   });

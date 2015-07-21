@@ -12,6 +12,7 @@
 
 {% snippet 'compare/snippets/add_dataset_popup.html', datasets = datasets, geo_types = geo_types, domains = domains %}
 {% snippet 'compare/snippets/help_popup.html' %}
+{% snippet 'compare/snippets/filter_dataset_popup.html' %}
 
 <div class="row">
   <div class="span3 selects">
@@ -23,12 +24,29 @@
     <div id="datasets_to_compare_with" class="">
     </div>
 
-    <hr>
+    <!-- <hr>
     <div><a href="{{h.empty_href()}}" class="update-filters btn btn-default hidden"> Update Filters </a></div>
     <div id="matches">
       <ul></ul>
+    </div> -->
+
+    <div id="common_dimensions">
+      <h3> Common Dimensions </h3>
+      <div id="content">
+      </div>
     </div>
 
+    <div id="dataset_1_dimensions">
+      <h3 class="dataset_1_title"> </h3>
+      <div id="content">
+      </div>
+    </div>
+
+    <div id="dataset_2_dimensions">
+      <h3 class="dataset_2_title"> </h3>
+      <div id="content">
+      </div>
+    </div>
   </div>
 
 
