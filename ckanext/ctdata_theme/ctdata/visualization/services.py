@@ -134,8 +134,21 @@ class DatasetService(object):
 
     @staticmethod
     def get_dataset_meta_dimensions(dataset_id):
+        # default = []
+        # value   = DatasetService.get_dataset_meta_field(dataset_id, 'Dimensions', default)
+        # if value != default:
+        #     value = value.split(';')
+        try:
+            dataset = DatasetService.get_dataset(dataset_id)
+            dimensions = dataset.dimensions
+        except  urllib2.HTTPError:
+            dimensions = []
+        return dimensions
+
+    @staticmethod
+    def get_dataset_meta_disabled_dimensions(dataset_id):
         default = []
-        value   = DatasetService.get_dataset_meta_field(dataset_id, 'Dimensions', default)
+        value   = DatasetService.get_dataset_meta_field(dataset_id, 'Disabled Dimensions', default)
         if value != default:
             value = value.split(';')
         return value
