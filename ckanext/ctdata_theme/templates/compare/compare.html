@@ -11,6 +11,7 @@
 {% block main_content %}
 
 {% snippet 'compare/snippets/add_dataset_popup.html', datasets = datasets, geo_types = geo_types, domains = domains %}
+{% snippet 'compare/snippets/help_popup.html' %}
 
 <div class="row">
   <div class="span3 selects">
@@ -81,20 +82,20 @@
         <div id="instructions">
           <h2>Plot Window: Add Dataset and Create</h2>
           <!-- <h2>How To Instructions:</h2> -->
- <!--          <br>
+          <br>
           <ul>
-            <li> 1. Select the first dataset to compare</li>
-            <li> 2. Wait for a second and you will see the second select box. </li>
-            <li> 3. Choose the second dataset to compare with. </li>
-            <li> 4. Check value for each not-matched dimension for each dataset. </li>
-            <li> 5. Check out the result. </li>
-            <br>
+            <li> Step 1: Pick your first dataset from our catalog</li>
+            <li> Step 2: Decide to filter this dataset now or later. </li>
+            <li> Step 3: Pick a second dataset and filter now or later. </li>
+            <li> Step 4: Resolve mismatches using our built-in wizard. </li>
+            <li> Step 5: View and configure plot or add more filter constraints. </li>
+            <!-- <br>
             <li> 6. Drag & drop dimensions to see the graph from different angles</li>
             <br>
             <li> <i class="icon-adjust"> </i> - Color will depend on dragged dimension </li>
             <li> <i class="icon-resize-horizontal"> </i> - Size will depend on dragged dimension </li>
-            <li> <i class="icon-th-large"> </i> - Shape will depend on dragged dimension </li>
-          </ul> -->
+            <li> <i class="icon-th-large"> </i> - Shape will depend on dragged dimension </li> -->
+          </ul>
         </div>
       </div>
   </div>

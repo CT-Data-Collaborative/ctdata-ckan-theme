@@ -51,12 +51,17 @@ class CompareController(base.BaseController):
 
     def load_comparable_datasets(self, dataset_name):
         comparable, dataset_info, matches = self.compare_service.get_comparable_datasets(dataset_name)
-        main_geo_type = DatasetService.get_dataset_meta_geo_type(dataset_name)
+        # main_geo_type = DatasetService.get_dataset_meta_geo_type(dataset_name)
+
+        main_geo_type = http_request.GET.get('geo_type')
+
+        # embed()
 
         if 'admin' in c.environ['HTTP_REFERER']:
             html = base.render('compare/snippets/table_of_matches.html', extra_vars={'comparable': comparable, 'dataset_info': dataset_info})
         else:
-            html = base.render('compare/snippets/dataset_matches.html', extra_vars={'comparable': comparable})
+            html = ''
+            # html = base.render('compare/snippets/dataset_matches.html', extra_vars={'comparable': comparable})
         return json.dumps({'success': True, 'html': html, 'matches': matches, 'main_geo_type': main_geo_type, 'comparable': comparable})
 
     def join_for_two_datasets(self):

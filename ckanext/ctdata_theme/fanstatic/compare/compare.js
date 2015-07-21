@@ -156,13 +156,31 @@ function  dragToDroppable(id, value){
     )
 }
 
-function load_comparable_datasets(dataset_name){
+// function load_comparable_datasets(dataset_name){
+//   $.ajax({type: "GET",
+//       url: "/compare/load_comparable_datasets/" + dataset_name,
+//       success: function (data) {
+//         data = JSON.parse(data)
+//         $('#datasets_to_compare_with').html('')
+//         $('#datasets_to_compare_with').html($(data.html));
+//         $compare_with_select = $("select#compare_with")
+//         matches              = data.matches
+//         main_geo_type        = data.main_geo_type
+//         // y_axe_name           = data.main_geo_type
+//         comparable           = data.comparable
+//         $('.spinner').hide()
+//       }
+//   });
+// }
+
+function load_comparable_data(dataset){
   $.ajax({type: "GET",
-      url: "/compare/load_comparable_datasets/" + dataset_name,
+      url: "/compare/load_comparable_datasets/" + dataset.name,
+      data: dataset,
       success: function (data) {
         data = JSON.parse(data)
-        $('#datasets_to_compare_with').html('')
-        $('#datasets_to_compare_with').html($(data.html));
+        // $('#datasets_to_compare_with').html('')
+        // $('#datasets_to_compare_with').html($(data.html));
         $compare_with_select = $("select#compare_with")
         matches              = data.matches
         main_geo_type        = data.main_geo_type
@@ -173,8 +191,15 @@ function load_comparable_datasets(dataset_name){
   });
 }
 
+
+
+
 var geo_type = null,
-    domain   = null;
+    domain = null,
+    empty_dataset_hash =  { name: null, filtered: false, geo_type: null, domain: null, data: null },
+
+    dataset_1 = empty_dataset_hash,
+    dataset_2 = empty_dataset_hash;
 
 $(document).ready(function(){
   close_popup()
@@ -183,31 +208,43 @@ $(document).ready(function(){
     $('#add_dataset_popup').modal('show');
   });
 
+  $('a.call-help').on('click', function(){
+    $('#help_popup').modal('show');
+  });
+
   $('select#geo_type').on('change',  function(){
     geo_type = $(this).val();
 
-    // $('.dataset_option[geo_type != "'+ geo_type + '"]').hide();
-    // $('.dataset_option[geo_type  = "'+ geo_type + '"]').show();
-
+    $('select#domain').val( $('select#domain option:first').val() );
     $('select#domain').attr('disabled', false)
+    $('select#dataset_name').val( $('select#dataset_name option:first').val() );
     $('select#dataset_name').attr('disabled', true)
   })
 
   $('select#domain').on('change',  function(){
     domain = $(this).val();
 
-    // debugger
-    // $('.dataset_option[geo_type != "'+ geo_type + '"][domain !="'+ domain +'"]').hide();
     $('.dataset_option').hide();
     $('.dataset_option[geo_type  = "'+ geo_type + '"][domain  ="'+ domain +'"]').show();
+    $('select#dataset_name').val( $('select#dataset_name option:first').val() );
     $('select#dataset_name').attr('disabled', false)
   })
 
-  $main_dataset_select.on('change', function(){
-    $('.spinner').show()
-    $('#datasets_to_compare_with').html('')
-    load_comparable_datasets( $(this).val() )
+  $('a.filter_q').on('click', function(){
+    dataset          = empty_dataset_hash
+    dataset.name     = $('select#dataset_name').val();
+    dataset.geo_type = geo_type;
+    dataset.domain   = domain;
+    dataset.filter   = $(this).attr('filter');
+
+    load_comparable_data( dataset )
   });
+
+  // $main_dataset_select.on('change', function(){
+  //   $('.spinner').show()
+  //   $('#datasets_to_compare_with').html('')
+  //   load_comparable_datasets( $(this).val() )
+  // });
 
   $('.scale_variant').draggable({revert: "invalid", helper: "clone"})
   $('.droppable').droppable({

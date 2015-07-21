@@ -225,3 +225,25 @@ ul#main, ul#compare{
 .popup-blue-header h2{
   color: white;
 }
+
+a.call-help, a.call-help:hover{
+  background-color: #4670a7;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 57px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+div.help{
+  padding: 50px;
+  height: 312px;
+  font-size: 20px;
+  color: white;
+  background-color: #CACACA;
+}
+
+a.close_popup.i, .close_popup.i:hover{
+  color: white;
+  text-decoration: none;
+}
