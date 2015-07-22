@@ -55,6 +55,10 @@ class CompareController(base.BaseController):
         geo_type = http_request.GET.get('geo_type')
 
         data['filtering_html'] = base.render('compare/snippets/filter_dataset_popup_body.html', extra_vars={'data': data, 'geo_type': geo_type})
+
+        for dim in data['dims']:
+            dim['filter_html'] = base.render('compare/snippets/dimension_filter_body.html', extra_vars={'dim': dim})
+
         return json.dumps({'success': True, 'dataset_data': data})
 
     def load_comparable_datasets(self, dataset_name):

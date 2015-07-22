@@ -3,9 +3,9 @@
 
 {% block page_name %}Compare Data{% endblock %}
 {% block page_description %}
-  <span id="dataset_name_val" style="color: black;">--</span>
+  <h3 class="dataset_1_title" style="color: black;">--</h3>
   <span>vs</span>
-  <span id="compare_with_val" style="color: black;">--</span>
+  <h3 class="dataset_2_title" style="color: black;">--</h3>
 {% endblock %}
 
 {% block main_content %}
@@ -29,23 +29,24 @@
     <div id="matches">
       <ul></ul>
     </div> -->
-
-    <div id="common_dimensions">
+    <br>
+    <div id="matches">
       <h3> Common Dimensions </h3>
-      <div id="content">
-      </div>
+      <ul></ul>
     </div>
 
+    <br>
     <div id="dataset_1_dimensions">
       <h3 class="dataset_1_title"> </h3>
-      <div id="content">
-      </div>
+      <ul class="content">
+      </ul>
     </div>
 
+    <br>
     <div id="dataset_2_dimensions">
       <h3 class="dataset_2_title"> </h3>
-      <div id="content">
-      </div>
+      <ul class="content">
+      </ul>
     </div>
   </div>
 

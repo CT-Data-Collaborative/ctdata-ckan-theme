@@ -37,7 +37,7 @@ div.small select{
   left: -15%;*/
 }
 
-li.scale_variant{
+li.scale_variant, a.filter_dim{
   /*padding: 10px;*/
   border: 1px dashed #BFBDBD;
   border-radius: 3px;
@@ -45,9 +45,23 @@ li.scale_variant{
   background: #F0F0F0;
   width: auto;
   margin: 5px;
-  cursor: all-scroll;
+
   padding: 5px;
   z-index: 999;
+}
+
+a.filter_dim{
+  border: 1px solid #DBDBDB;
+  cursor: default;
+  text-decoration: none;
+  margin: 0px;
+  width: 203px;
+  display: block;
+  margin-top: 5px;
+}
+
+div.panel-collapse.collapse.dim{
+  padding-left: 10px;
 }
 
 .data{

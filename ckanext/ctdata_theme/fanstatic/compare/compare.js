@@ -61,7 +61,8 @@ function get_data(){
 
 }
 function addScale(name){
-  $("#matches ul").append('<li class="scale_variant">' + name + '<a href="javascript:void" class="cancel-drag pull-right icon-remove hidden" ></a></li>')
+  $("#matches ul").append('<li class="scale_variant">' + name + '<a href="javascript:void" class="cancel-drag pull-right icon-remove hidden" ></a></li>');
+  $('.scale_variant').draggable({revert: "invalid", helper: "clone"});
 }
 
 function show_matches_in_popup(dataset_matches){
@@ -188,8 +189,10 @@ function load_comparable_data(dataset){
 
         if (dataset.filter)
           show_filter_popup_for(dataset);
-        else
-          put_data_to_correct_dataset(dataset);
+        else{
+          dataset_number = put_data_to_correct_dataset(dataset);
+          show_dataset_dimensions(dataset, dataset_number)
+        }
 
       }
   });
@@ -210,30 +213,73 @@ function done_with_select_filters(dataset){
     });
 
     dataset.filtered = true
+    dataset_number   = put_data_to_correct_dataset(dataset);
+    show_dataset_dimensions(dataset, dataset_number)
     $('#filter_dataset_popup').modal('hide');
   });
 
   put_data_to_correct_dataset(dataset);
 
-  //show first dataset uner add dataset btn
+  //show first dataset under add dataset btn
 }
+
+function empty_dataset_hash(){
+  return { name: null, title: null, filter: false, filtered: false, geo_type: null, domain: null, dims_data: null, filtering_html: null }
+}
+
+var geo_type  = null,
+    domain    = null,
+    dataset   = null,
+    dataset_1 = empty_dataset_hash(),
+    dataset_2 = empty_dataset_hash();
 
 function put_data_to_correct_dataset(dataset){
-  dataset_1 == empty_dataset_hash ? dataset_1 = dataset : dataset_2 = dataset
+  dataset_number = null
+  if (dataset.name == dataset_1.name || JSON.stringify(dataset_1) == JSON.stringify(empty_dataset_hash()) ){
+    dataset_1 = dataset
+    dataset_number = '1'
+  }
+  else
+    if (dataset.name == dataset_2.name || JSON.stringify(dataset_2) == JSON.stringify(empty_dataset_hash()) ){
+      dataset_2 = dataset;
+      dataset_number = '2'
+    }
+
+  if (dataset_1.name) $('h3.dataset_1_title').text(dataset_1.title);
+  if (dataset_2.name) $('h3.dataset_2_title').text(dataset_2.title);
+
+  if ($('#matches ul').html() == '') {
+    addScale('Geography');
+    addScale('Year');
+    addScale('Measure Type');
+  };
+
+  return dataset_number
 }
 
-var geo_type = null,
-    domain = null,
-    empty_dataset_hash = { name: null, title: null, filter: false, filtered: false, geo_type: null, domain: null, dims_data: null, filtering_html: null },
-    dataset   = null,
-    dataset_1 = empty_dataset_hash,
-    dataset_2 = empty_dataset_hash;
+function show_dataset_dimensions(d, dataset_number){
+  if (d.dims_data){
+    $content = $('#dataset_'+ dataset_number +'_dimensions ul.content');
+    $content.html('')
+
+    $.each(d.dims_data, function(i, item){
+      if (item.name != d.geo_type && ['Year', 'Measure Type', 'Variable'].indexOf(item.name) == -1 )
+        $content.append(item.filter_html);
+      // check selected item after filtering
+      if (item.selected_value){
+        $('.panel-collapse.collapse.dim', $content).last().find('input[value="'+ item.selected_value +'"]').prop('checked', true)
+      }
+    })
+  }
+}
+
 
 $(document).ready(function(){
   close_popup()
 
   $('a#add_dataset').on('click', function(){
     $('#add_dataset_popup').modal('show');
+    dataset = empty_dataset_hash();
   });
 
   $('a.call-help').on('click', function(){
@@ -259,7 +305,7 @@ $(document).ready(function(){
   })
 
   $('a.filter_q').on('click', function(){
-    dataset          = empty_dataset_hash
+    dataset          = empty_dataset_hash()
     dataset.name     = $('select#dataset_name').val();
     dataset.geo_type = geo_type;
     dataset.domain   = domain;
