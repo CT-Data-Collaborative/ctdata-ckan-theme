@@ -263,13 +263,17 @@ function show_dataset_dimensions(d, dataset_number){
     $content.html('')
 
     $.each(d.dims_data, function(i, item){
-      if (item.name != d.geo_type && ['Year', 'Measure Type', 'Variable'].indexOf(item.name) == -1 )
-        $content.append(item.filter_html);
+      if (item.name != d.geo_type && ['Year', 'Measure Type', 'Variable'].indexOf(item.name) == -1 ){
+        $content.append('<li class="content-li" dataset_number="'+ dataset_number +'">' + item.filter_html + '</li>');
+        $('li.content-li', $content).last().find('.scale_variant').attr('dataset_number', dataset_number)
+      }
       // check selected item after filtering
       if (item.selected_value){
         $('.panel-collapse.collapse.dim', $content).last().find('input[value="'+ item.selected_value +'"]').prop('checked', true)
       }
     })
+
+    $('.scale_variant').draggable({revert: "invalid", helper: "clone"})
   }
 }
 
@@ -312,6 +316,18 @@ $(document).ready(function(){
     dataset.filter   = $(this).attr('filter') == "true";
 
     load_comparable_data( dataset )
+  });
+
+  $(document).on('change', 'input.filtering-dataset', function(){
+    dataset_number = $(this).parent().parent().closest('li').attr('dataset_number')
+    val  = $(this).val()
+    name = $(this).attr('name')
+    d    = (dataset_number == "1" ? dataset_1 : dataset_2)
+    dim  = jQuery.grep(d.dims_data, function( dim ) {
+      return  dim.name == name ;
+    });
+
+    dim[0].selected_value = val;
   });
 
   // $main_dataset_select.on('change', function(){
@@ -377,6 +393,37 @@ $(document).ready(function(){
 
     $("#matches ul").append($li )
     $(this).closest('li').closest('div').removeClass('dropped')
+    draw_graph();
+  })
+
+  $(document).on('click', '.cancel-drag-2', function(){
+    $li = $(this).closest('span')
+    // $li.find('a.filter_dim').addClass('hidden')
+
+    dataset_number = $(this).parent().attr('dataset_number')
+
+    id = $(this).closest('li').closest('div').attr('id');
+
+    switch(id) {
+        case "x":
+          x_axe_name = 'x'
+          x_dim = 'data.y'; break;
+        case "y":
+          y_axe_name = 'y';
+          y_dim = 'data.y'; break;
+        case "color_s":
+          color = 'data.color'; break;
+        case "size_s":
+          size  = 'data.size'; break;
+        case "shape_s":
+          shape = 'data.shape'; break;
+    }
+
+
+    $li.insertBefore( $('.panel-collapse.collapse.dim[name="' + $li.find('a.filter_dim').attr('name') + '"]') )
+    $li.closest('div').removeClass('dropped')
+    $li.find('a.cancel-drag-2').hide()
+
     draw_graph();
   })
 

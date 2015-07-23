@@ -1,14 +1,16 @@
-<li class="">
+ <span class="scale_variant" dataset_number="">
 
-<a href="#collapse{{dim['name']|replace(" ", "")|replace("/", "\/")|replace("'", "")}}" data-toggle="collapse" class="togglebtn filter_dim">{{dim['name']}}</a>
+  <a href="#collapse{{dim['name']|replace(" ", "")|replace("/", "\/")|replace("'", "")}}" name="{{dim['name']}}" data-toggle="collapse" class="togglebtn filter_dim">{{dim['name']}}</a>
+  <a href="javascript:void" class="cancel-drag-2 pull-right icon-remove hidden" ></a>
+ </span>
 
 
-<div id="collapse{{dim['name']|replace(" ","")|replace("'", "")}}" class="panel-collapse collapse dim">
+<div id="collapse{{dim['name']|replace(" ","")|replace("'", "")}}" name="{{dim['name']}}" class="panel-collapse collapse dim">
   <ul>
     {% for possible_value in dim['possible_values'] %}
 
       <li class="possible_value">
-        <input type="radio" value="{{possible_value}}" name={{dim['name']}}
+        <input class='filtering-dataset' type="radio" value="{{possible_value}}" name={{dim['name']}}
           {% if possible_value == dim['selected_value'] or  possible_value == dim['possible_values'][0] %} checked="true" {% endif %}
         >
         <label>{{possible_value}}</label>
@@ -17,4 +19,3 @@
     {% endfor %}
   </ul>
 </div>
-</li>
