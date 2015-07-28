@@ -57,7 +57,7 @@ a.filter_dim{
   margin: 0px;
   width: 203px;
   display: block;
-  margin-top: 5px;
+  margin-top: 0px;
 }
 
 div.panel-collapse.collapse.dim{
@@ -88,6 +88,13 @@ div.panel-collapse.collapse.dim{
 .graphic{
   min-height: 500px;
   padding: 0px;
+}
+
+.wizard_option_li{
+  margin: 7px;
+  min-height: 30px;
+  border: 1px dashed #5BB65B;
+  padding: 5px;
 }
 
 #y_axe, #x_axe, #color, #size, #shape{
@@ -267,4 +274,27 @@ a.close_popup.i, .close_popup.i:hover{
   position: relative;
   left: 8px;
   top: 4px;
+}
+
+.match_dims_help .note{
+  border: 2px solid #D2D2D2;
+  padding: 10px;
+}
+
+.match_dims_help .instructions p{
+  position: relative;
+  bottom: -10px;
+  height: 7px;
+}
+
+.match_dims_help h3 {
+  font-weight: 900;
+}
+
+#wizard_logic select{
+  width: 110px;
+}
+
+#wizard_dataset_1, #wizard_dataset_2{
+  border: 1px solid #D2D2D2;
 }

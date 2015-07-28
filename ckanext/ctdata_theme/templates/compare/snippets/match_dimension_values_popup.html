@@ -1,0 +1,76 @@
+<div id="match_wizard" class="modal fade" style="display: none">
+  <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+
+        <div class="modal-header popup-blue-header">
+          <h2> Match Dimension Values
+            <a href="{{h.empty_href()}}" class="close_popup i pull-right"><i class="icon-remove"></i></a>
+          </h2>
+        </div>
+
+        <div class="modal-body" style="padding: 20px 40px;">
+
+          <div class="match_dims_help">
+            <p class="note"> Note: By specifying how dataset dimension values can be linked, you are imposing a relationship between these datasets that may not be justifiable.
+            <br>
+            <br>
+            Proceed with caution and inform your audience of you choices.
+            </p>
+            <b><h3> Instructions </h3></b>
+            <div class="instructions">
+              <p> 1. Select a dimension from each dataset </p>
+              <p> 2. Drag values from one list to the value you want it to match from second list. </p>
+              <p> 3. Repeat for other dimensions. </p>
+              <p> 4. Hit save when you are done. </p>
+            </div>
+          </div>
+
+          <br>
+          <br>
+          <div id="wizard_logic">
+            <div class="row">
+              <div id="wizard_dataset_1_title" class="span1">
+                <h4> Dataset 1 <h4>
+              </div>
+
+              <div class="span2">
+                <select class="macthed_dimensions_select wizard_dataset_1" version-number="1">
+                </select>
+              </div>
+
+              <div class="span1"></div>
+              <div id="wizard_dataset_2_title" class="span1">
+                <h4> Dataset 1 <h4>
+              </div>
+
+              <div class="span2">
+                <select class="macthed_dimensions_select wizard_dataset_2" version-number="2">
+                </select>
+              </div>
+
+            </div>
+
+            <div class="row">
+              <div id="wizard_dataset_1" class="span3 text-center">
+                <ul>
+                </ul>
+              </div>
+
+              <div class="span1"></div>
+              <div id="wizard_dataset_2" class="span3 text-center">
+                 <ul>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <hr>
+        <div class="pull-right" style="padding: 10px 20px;">
+          <a href="{{h.empty_href()}}" class="btn btn-success done_with_select_filters"> Save </a>
+        </div>
+    </div>
+  </div>
+</div>
