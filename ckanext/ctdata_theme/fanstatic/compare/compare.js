@@ -218,8 +218,6 @@ function done_with_select_filters(dataset){
   });
 
   put_data_to_correct_dataset(dataset);
-
-  //show first dataset under add dataset btn
 }
 
 function empty_dataset_hash(){
@@ -231,7 +229,9 @@ var geo_type     = null,
     dataset      = null,
     dataset_1    = empty_dataset_hash(),
     dataset_2    = empty_dataset_hash(),
-    matched_dims = [];
+    matched_dims = [],
+    wizard_matches = []
+    wizard_applied = false;
 
 function put_data_to_correct_dataset(dataset){
   dataset_number = null
@@ -272,9 +272,10 @@ function show_dataset_dimensions(d, dataset_number){
       if (item.selected_value){
         $('.panel-collapse.collapse.dim', $content).last().find('input[value="'+ item.selected_value +'"]').prop('checked', true)
       }
+      delete item.filter_html
     })
 
-    if (dataset_number == '2') fill_matches_for_wizard();
+    if (dataset_number == '2' && !wizard_applied) fill_matches_for_wizard();
   }
 }
 
@@ -302,19 +303,99 @@ function fill_matches_for_wizard(){
 
       css_class = (i == 1 ? '' : 'hidden')
       $.each(item.dataset_1_values, function(j, value){
-        $('div#wizard_dataset_1 ul').append('<li class="wizard_option_li '+ css_class +'" name="'+ item.name +'">' + value + '</li>')
+        $('div#wizard_dataset_1 ul').append('<li class="wizard_option_li '+ css_class +'" name="'+ item.name +'">' + value + '</li><a href="javascript:void" class="cancel-drag pull-right icon-remove hidden"></a>')
       })
 
       $.each(item.dataset_2_values, function(j, value){
-        $('div#wizard_dataset_2 ul').append('<li class="wizard_option_li '+ css_class +'" name="'+ item.name +'">' + value + '</li>')
+        $('div#wizard_dataset_2 ul').append('<li class="wizard_option_li '+ css_class +'" name="'+ item.name +'">' + value + '</li><a href="javascript:void" class="cancel-drag pull-right icon-remove hidden"></a>')
       })
     }
 
   });
-
   move_matched_dimensions_to_common();
+  make_wizard_items_draggable_and_droppable();
   $('#match_wizard').modal('show');
   make_scalable();
+}
+
+function make_wizard_items_draggable_and_droppable(){
+  wizard_matches = {}
+  colors = ['dropped-bluegreen', 'dropped-red', 'dropped-orange', 'dropped-yellow', 'dropped-greenyellow']
+  $('.wizard_option_li').draggable({revert: "invalid", helper: "clone"});
+  $('.wizard_option_li').droppable({
+    accept: ".wizard_option_li",
+    activeClass: "ui-state-hover",
+    hoverClass: "ui-state-active",
+    drop: function( event, ui ) {
+      class_name   = colors[Math.floor(Math.random() * colors.length)];
+      li_drop_area = $(event.target)
+      li_drag_el   = $(ui.draggable)
+
+      li_drop_area.addClass(class_name)
+      li_drag_el.addClass(class_name)
+
+      version_drop_area = li_drop_area.closest('ul').attr('version-number')
+      version_drag_el   = li_drag_el.closest('ul').attr('version-number')
+      drop_dataset      = version_drop_area == "1" ? dataset_1 : dataset_2
+      drag_dataset      = version_drag_el   == "1" ? dataset_1 : dataset_2
+      name = li_drop_area.attr('name')
+
+      dim  = jQuery.grep(drop_dataset.dims_data, function( dim ) {
+        return  dim.name == name ;
+      })[0];
+      hash = {}
+      hash[li_drop_area.text()] = li_drag_el.text()
+      dim.wizard_matches.push(hash)
+
+      dim  = jQuery.grep(drag_dataset.dims_data, function( dim ) {
+        return  dim.name == name ;
+      })[0];
+      hash = {}
+      hash[li_drag_el.text()] = li_drop_area.text()
+      dim.wizard_matches.push(hash)
+    }
+
+  })
+}
+
+function done_with_wizard_filters(){
+  wizard_applied = true
+  $('#match_wizard').modal('hide');
+  get_compared_data_for_grap();
+}
+
+function get_compared_data_for_grap(){
+  // send request to server, get compiled dataset, show the graph
+  delete dataset_1.filtering_html
+  delete dataset_2.filtering_html
+
+  // data = {'dataset_1': dataset_1, 'dataset_2': dataset_2, 'wizard_matches': wizard_matches}
+  $.ajax({type: "POST",
+      url: "/compare_datasets",
+      data: JSON.stringify({'dataset_1': dataset_1, 'dataset_2': dataset_2, 'wizard_matches': wizard_matches}),
+      success: function (data) {
+        data_items = JSON.parse(data).data
+        debugger
+        if (data_items.length > 0){
+            // addScale(variable_2)
+            // y_axe_name = variable_1
+            // x_axe_name = variable_2
+            // y_dim      = 'data.' + variable_2
+            // x_dim      = 'data.' + variable_1
+
+            // dragToDroppable('y', variable_1)
+            // dragToDroppable('x', variable_2)
+            // make_scalable();
+            draw_graph();
+            $('#select_uniq_values_popup').modal('hide');
+
+        }else{
+          $('#container').html('<div id="error">There is no available data to show. </div>')
+          $('#select_uniq_values_popup').modal('hide');
+        }
+      }
+  });
+
 }
 
 function move_matched_dimensions_to_common(){
@@ -330,6 +411,10 @@ function make_scalable(){
 
 $(document).ready(function(){
   close_popup()
+
+  $('.done_with_wizard_filters').on('click',  function(){
+    done_with_wizard_filters()
+  })
 
   $('a#add_dataset').on('click', function(){
     $('#add_dataset_popup').modal('show');
@@ -381,24 +466,10 @@ $(document).ready(function(){
   });
 
   $('.macthed_dimensions_select').on('change', function(){
-    version_number = $(this).attr('version-number')
-    $('#wizard_dataset_' + version_number + ' li.wizard_option_li').addClass('hidden')
-    $('#wizard_dataset_' + version_number + ' li.wizard_option_li[name="' + $(this).val() + '"]').removeClass('hidden')
-
-    $('.wizard_option_li').draggable({revert: "invalid", helper: "clone"});
-    $('.wizard_option_li').droppable({
-      accept: ".wizard_option_li",
-      activeClass: "ui-state-hover",
-      hoverClass: "ui-state-active",
-      drop: function( event, ui ) {
-        $(this).addClass( "dropped" )
-        li_drop_area = event.target
-        li_drag_el   = event.toElement
-      }
-
-      // $(ui.draggable).detach().css({top: 0,left: 0}).appendTo(this);
-
-    })
+    version_number = $(this).attr('version-number');
+    $('#wizard_dataset_' + version_number + ' li.wizard_option_li').addClass('hidden');
+    $('#wizard_dataset_' + version_number + ' li.wizard_option_li[name="' + $(this).val() + '"]').removeClass('hidden');
+    make_wizard_items_draggable_and_droppable();
   });
 
   // $main_dataset_select.on('change', function(){
@@ -431,7 +502,7 @@ $(document).ready(function(){
           shape = "data." + $(ui.draggable).text(); break;
       }
       $(ui.draggable).detach().css({top: 0,left: 0}).appendTo(this);
-
+       debugger
       draw_graph();
     }
   });

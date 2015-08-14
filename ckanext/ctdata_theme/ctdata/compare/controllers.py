@@ -49,7 +49,6 @@ class CompareController(base.BaseController):
 
         return base.render('compare/compare.html', extra_vars={'datasets': datasets, 'geo_types': geo_types, 'domains': domains})
 
-
     def load_comparable_dataset_data(self, dataset_name):
         data     = self.compare_service.get_comparable_dataset_data(dataset_name)
         geo_type = http_request.GET.get('geo_type')
@@ -74,6 +73,41 @@ class CompareController(base.BaseController):
             html = ''
             # html = base.render('compare/snippets/dataset_matches.html', extra_vars={'comparable': comparable})
         return json.dumps({'success': True, 'html': html, 'matches': matches, 'main_geo_type': main_geo_type, 'comparable': comparable, 'dataset_info': dataset_info})
+
+    def compare_datasets(self):
+        json_data = json.loads(http_request.POST.items()[0][0])
+        dataset_1 = json_data['dataset_1']
+        dataset_2 = json_data['dataset_2']
+        filters   = []
+        matches   = []
+
+        for data_item_1 in filter(lambda i: i['matches'] == True, dataset_1['dims_data']):
+                match = {}
+                data_item_2 = filter(lambda i: i['name'] == data_item_1['name'], dataset_2['dims_data'])[0]
+                if data_item_2:
+                    match[data_item_1['name']] = list(set(data_item_1['possible_values']).intersection(data_item_2['possible_values']))
+                    matches.append(match)
+                    values = list(set(data_item_1['possible_values']).intersection(data_item_2['possible_values']))
+                    filters.append({'field': data_item_2['name'], 'values': values})
+
+        for data_item_1 in filter(lambda i: i['matches'] == False, dataset_1['dims_data']):
+            try:
+                value = data_item_1['selected_value'] if data_item_1['selected_value'] else data_item_1['possible_values'][0]
+            except KeyError:
+                value = data_item_1['possible_values'][0]
+            filters.append({'field': data_item_1['name'], 'values': [value]})
+
+        for data_item_2 in filter(lambda i: i['matches'] == False, dataset_2['dims_data']):
+            try:
+                value = data_item_2['selected_value'] if data_item_2['selected_value'] else data_item_2['possible_values'][0]
+            except KeyError:
+                value = data_item_2['possible_values'][0]
+            filters.append({'field': data_item_2['name'], 'values': [value]})
+
+
+        data, minimum, maximum = self.compare_service.get_join_data_for_two_datasets(dataset_1['name'], dataset_2['name'], filters, matches)
+
+        return json.dumps({'success': True, 'data': data, 'min': minimum, 'max': maximum})
 
     def join_for_two_datasets(self):
         json_body    = json.loads(http_request.body, encoding=http_request.charset)

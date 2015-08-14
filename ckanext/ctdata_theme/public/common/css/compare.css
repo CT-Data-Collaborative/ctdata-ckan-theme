@@ -139,6 +139,24 @@ div.panel-collapse.collapse.dim{
   background-color: #F3FBFF !important;
 }
 
+.dropped-bluegreen{
+  background-color: #00A0B0 !important;
+}
+
+.dropped-red{
+   background-color: #CC333F !important;
+}
+
+.dropped-orange{
+   background-color: #EB6841 !important;
+}
+.dropped-yellow{
+   background-color: #EDC951 !important;
+}
+.dropped-greenyellow{
+   background-color: #D3CE3D !important;
+}
+
 .droppable li.scale_variant{
   border:none;
   background: rgba(153, 222, 245, 0.68);

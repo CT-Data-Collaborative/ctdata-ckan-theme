@@ -2,7 +2,7 @@
 
 <div id="dimensions">
   {% for dim in data['dims'] %}
-    {% if dim['name'] != geo_type %}
+    {% if dim['name'] != 'Geography' %}
       <div id="{{dim['name']}}" class="dim">
         <br>
         <h3>{{ dim['name'] }}</h3>

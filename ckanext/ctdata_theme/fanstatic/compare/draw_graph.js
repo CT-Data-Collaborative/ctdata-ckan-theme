@@ -177,6 +177,7 @@ function draw_graph(){
     ]
   };
 
+  debugger
   var data = {table: data_items};
 
   vg.parse.spec(spec, function(chart) {
