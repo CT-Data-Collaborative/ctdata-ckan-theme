@@ -267,6 +267,7 @@ class CompareView(View):
         for data_item in data:
             data_item['label'] = str(data_item['Value'])
             data_item['location_name'] = data_item[geography_param]
+            data_item['Geography'] = data_item[geography_param]
             data_item['x'] = data.index(data_item)
 
             try:
