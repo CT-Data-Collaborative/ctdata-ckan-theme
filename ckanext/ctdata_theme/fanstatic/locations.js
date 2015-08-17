@@ -345,11 +345,12 @@ $(function(){
         $('.location-checkbox.' + type).removeClass('hidden')
         // aggregated = $('#enable_data_aggregation').prop('checked')
         if (type != 'regions'){
-            $('select#regions').hide()
-            // $('select#regions').find('option').first().attr('selected', true)
+            $('select#regions').hide();
         }
-        else
-           $('select#regions').show()
+        else{
+            $('select#regions').show();
+            $('.location-checkbox.' + $('#select_geography_type').val()).removeClass('hidden')
+        }
 
         $("#towns_popup").modal('show');
     })
