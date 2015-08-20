@@ -60,7 +60,7 @@
 {% endif %}
 
 <div id="loaded_topics"></div>
-{% snippet 'communities/snippets/towns_popup.html', locations=locations, displayed_locations=all_current_locations, regions=regions %}
+{% snippet 'communities/snippets/towns_popup.html', locations=locations, displayed_locations=all_current_locations, regions=regions, default_profile = default_profile %}
 
 <div id="message_popup" class="modal fade" style="display: none">
     <div class="modal-dialog modal-lg">
@@ -90,7 +90,6 @@
                     <div id="indicator_adding_error" class="error" style="opacity: 0">
                     </div>
                     <div id="edit_indicator_filters_content">
-                      Boo
                     </div>
                 </div>
 
@@ -113,11 +112,13 @@
   {% resource 'ctdata_theme/html2csv.js' %}
 
   <script>
-    var location_names = []
-    var geo_types      = []
+    var location_names  = []
+    var geo_types       = []
+    var region_id       = 'not_selected'
 
     location_names = '{{towns_names | safe}}'
     geo_types      = '{{geo_types | safe}}'
+    region_id      = '{{default_profile.region_id | safe}}'
   </script>
 
 {% endblock %}

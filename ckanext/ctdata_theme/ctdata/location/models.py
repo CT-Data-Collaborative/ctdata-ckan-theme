@@ -72,7 +72,7 @@ class CtdataProfile(Base):
     global_default = Column(Boolean, default=False)
 
     region_id      = Column(String, ForeignKey('ctdata_regions.id'))
-    region         = relationship(Region,   backref="ctdata_regions")
+    # region         = relationship(Region,   backref="ctdata_regions")
 
     user_id        = Column(String, ForeignKey('ctdata_user_info.ckan_user_id'))
     user           = relationship(UserInfo, backref="user_profiles")
@@ -82,10 +82,11 @@ class CtdataProfile(Base):
     # indicators     = relationship(ProfileIndicator, backref=backref("profile_indicators", lazy='dynamic'))
     indicators     = relationship(ProfileIndicator, backref=backref("profile_indicators"))
 
-    def __init__(self, name, global_default, user_id):
+    def __init__(self, name, global_default, user_id, region_id):
         self.name = name
         self.user_id = user_id
         self.global_default = global_default
+        self.region_id = region_id
 
     def __repr__(self):
         return "Profile %s %s %s" % (self.name, self.user_id, self.global_default)
@@ -98,7 +99,7 @@ class LocationRegion(Base):
     location_id  = Column(Integer, ForeignKey('ctdata_locations.id'))
     region_id    = Column(Integer, ForeignKey('ctdata_regions.id'))
 
-    def __init__(self, location_id, profile_id):
+    def __init__(self, location_id, region_id):
         self.location_id = location_id
         self.region_id   = region_id
 

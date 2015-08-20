@@ -10,7 +10,7 @@ import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 from ckan.common import response as http_response, c, request as http_request
 import ckan.lib.helpers as h
-from models import Location, CtdataProfile, LocationProfile, Region
+from models import Location, CtdataProfile, LocationProfile, Region, LocationRegion
 
 from ..utils import dict_with_key_value
 from ..database import Database
@@ -105,7 +105,9 @@ class LocationsController(base.BaseController):
             json_body   = json.loads(http_request.body, encoding=http_request.charset)
             locations   = json_body.get('locations')
             region_id   = json_body.get('region_id')
-            region      = None
+            save_as_region   = json_body.get('save_as_region')
+            new_region_name  = json_body.get('new_region_name')
+            region           = None
             locations_to_put = []
             region_locations = []
             locations_hash   = {'regions': []}
@@ -123,7 +125,7 @@ class LocationsController(base.BaseController):
                     locations_hash[type]  = map(lambda t: t.name, locations)
                     all_current_locations += locations_hash[type]
 
-            if region_id and region_id != 'not_selected':
+            if save_as_region != 'true' and region_id and region_id != 'not_selected':
                 region = self.location_service.get_region_by_id(region_id)
                 region_locations = map(lambda l: l.name, region.locations)
                 locations_hash['regions'] = [region.name]
@@ -150,7 +152,7 @@ class LocationsController(base.BaseController):
                 }
 
                 indicator = self.location_service.new_indicator(params)
-                ind_data  = self.indicator_data_to_dict(indicator, region, locations_to_put, locations_hash, region_locations, region_id)
+                ind_data  = self.indicator_data_to_dict(indicator, region, locations_to_put, locations_hash, region_locations, region_id, save_as_region, new_region_name)
 
                 self.session.close()
                 return json.dumps({'success': True, 'indicator': ind_data })
@@ -174,11 +176,12 @@ class LocationsController(base.BaseController):
             user       = self.user_service.get_or_create_user_with_session_id(user_name,session_id) if user_name else None
             json_body  = json.loads(http_request.body, encoding=http_request.charset)
             locations  = json_body.get('locations').split(',')
+            region     = json_body.get('region')
             indicators = json_body.get('indicators')
             name       = json_body.get('name')
             global_default  = json_body.get('global_default')
 
-            profile    = self.location_service.create_profile(user, name, indicators, locations, global_default)
+            profile    = self.location_service.create_profile(user, name, indicators, locations, region, global_default)
 
             redirect_link = '/community/' + str(profile.id)
             return json.dumps({'success': True,  'redirect_link': redirect_link})
@@ -194,14 +197,19 @@ class LocationsController(base.BaseController):
             abort(404)
         locations   = self.location_service.get_all_locations()
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
-        geo_types   =  self.location_service.location_geography_types()
-
+        geo_types   =  self.location_service.location_geography_types() + ['regions']
+        region      = 'not_selected'
         locations_hash = {}
         all_current_locations = []
         for type in geo_types:
             locations_to_put = filter(lambda t: t.geography_type == type, default_profile.locations)
             locations_hash[type]  = map(lambda t: t.name, locations_to_put)
             all_current_locations += locations_hash[type]
+
+        if default_profile.region_id:
+            region = self.location_service.get_region_by_id(default_profile.region_id)
+            region_locations = map(lambda l: l.name, region.locations)
+            locations_hash['regions'] = [region.name]
 
         try:
             location_name = towns_names[0]
@@ -211,6 +219,7 @@ class LocationsController(base.BaseController):
         self.session.close()
         return base.render('location/show.html', extra_vars={'location': location_name,
                                                              'locations': locations,
+                                                             'regions': [region],
                                                              'all_current_locations': all_current_locations,
                                                              'towns_names': towns_names,
                                                              'default_profile_id': default_profile.id,
@@ -232,6 +241,8 @@ class LocationsController(base.BaseController):
         user_name         = http_request.environ.get("REMOTE_USER") or "guest_" + session_id
         location_names    = json_body.get('locations')
         region_id         = json_body.get('region_id')
+        save_as_region    = json_body.get('save_as_region')
+        new_region_name   = json_body.get('new_region_name')
         location_names    = location_names.split(',')
 
         profile           = self.location_service.get_profile(profile_id)
@@ -258,7 +269,7 @@ class LocationsController(base.BaseController):
 
         locations_hash['regions'] = []
 
-        if region_id and region_id != 'not_selected':
+        if save_as_region != 'true' and region_id and region_id != 'not_selected' and region_id != 'None':
             region = self.location_service.get_region_by_id(region_id)
             region_locations = map(lambda l: l.name, region.locations)
             locations_hash['regions'] = [region.name]
@@ -267,7 +278,7 @@ class LocationsController(base.BaseController):
 
         if profile:
             for indicator in profile.indicators:
-                data = self.indicator_data_to_dict(indicator, region, locations_to_put, locations_hash, region_locations, region_id)
+                data = self.indicator_data_to_dict(indicator, region, locations_to_put, locations_hash, region_locations, region_id, save_as_region, new_region_name)
                 if indicator.aggregated:
                     ind_data['regions'].append(data)
                 else:
@@ -277,19 +288,22 @@ class LocationsController(base.BaseController):
         return json.dumps({'success': True, 'ind_data': ind_data, 'all_current_locations':  all_current_locations, 'locations_hash': locations_hash})
     #end
 
-    def indicator_data_to_dict(self, indicator, region, locations_to_put, locations_hash, region_locations, region_id):
+    def indicator_data_to_dict(self, indicator, region, locations_to_put, locations_hash, region_locations, region_id, save_as_region, new_region_name):
         geo_type  = indicator.dataset_geography_type()
         if indicator.aggregated:
-            if not region and len(locations_to_put) > 0 and region_id != 'not_selected':
-                region = Region('New region', c.userobj.id)
-                region.locations = locations_to_put
+            # if not region and len(locations_to_put) > 0 and region_id != 'not_selected':
+            if save_as_region == 'true':
+                region = Region(new_region_name, c.userobj.id)
                 self.session.add(region)
+                self.session.commit()
 
-                for location in locations_to_put:
-                    location.region_id = region.id
+                for location_to_put in locations_to_put:
+                    lr = LocationRegion(location_to_put.id, region.id)
+                    self.session.add(lr)
 
                 self.session.commit()
                 region_locations = map(lambda l: l.name, region.locations)
+                locations_hash['regions'].append(region.name)
 
             values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, region_locations)
             values = [sum(map(lambda v: int(v) if v else 0, values))/len(values)] if len(values) > 0 else []

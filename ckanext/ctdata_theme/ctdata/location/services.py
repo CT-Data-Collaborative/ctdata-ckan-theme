@@ -68,6 +68,9 @@ class LocationService(object):
     def get_region_by_id(self, id):
         return self.session.query(Region).filter(Region.id == id).first()
 
+    def get_region_by_name(self, name):
+        return self.session.query(Region).filter(Region.id == name).first()
+
     ################ Profiles   ############################################
     def get_default_location_profile(self):
         profile = self.session.query(CtdataProfile).filter(CtdataProfile.name == 'Location Defauilt Profile').first()
@@ -83,19 +86,25 @@ class LocationService(object):
 
         return profiles
 
-    def create_profile(self, user, name, indicators, locations, global_default):
-        profile = CtdataProfile(name, global_default, user.ckan_user_id)
+    def create_profile(self, user, name, indicators, locations, region, global_default):
+        profile = CtdataProfile(name, global_default, user.ckan_user_id, region)
 
         for location_name in locations:
-            profile.locations.append(self.get_location(location_name))
+            if location_name != '':
+                profile.locations.append(self.get_location(location_name))
 
         for indicator in indicators:
+            years = filter(lambda i: i['field'] == 'Year', json.loads(indicators[0]['filters']))[0]['values']
+            years = map( lambda y: int(y), years)
+
+            variable = filter(lambda i: i['field'] == 'Variable', json.loads(indicators[0]['filters']))[0]['values'][0]
             params  = {
                 'name':       indicator['name'],
                 'filters':    indicator['filters'],
                 'dataset_id': indicator['dataset_id'],
-                'data_type':  indicator['ind_type'],
-                'years':      int(years),
+                'ind_type':   indicator['ind_type'],
+                'aggregated': indicator['aggregated'],
+                'years':      years,
                 'variable':   variable,
                 'visualization_type': 'table',
                 'profile_id': profile.id,
