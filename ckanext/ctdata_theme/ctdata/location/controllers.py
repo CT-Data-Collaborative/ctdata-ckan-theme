@@ -312,7 +312,7 @@ class LocationsController(base.BaseController):
             ind_moes_filters = json.dumps(ind_moes_filters)
 
             values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, region_locations)
-            values = [sum(map(lambda v: float(v) if v else 0, values))/len(values)] if len(values) > 0 else []
+            values = [sum(map(lambda v: float(v) if v else 0, values))] if len(values) > 0 else []
 
             moes_vals = self.location_service.load_indicator_value_for_location(ind_moes_filters, indicator.dataset_id, region_locations)
             moes_vals = filter(lambda v: v != None, moes_vals)
