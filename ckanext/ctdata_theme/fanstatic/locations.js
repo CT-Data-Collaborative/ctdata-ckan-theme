@@ -36,7 +36,9 @@ function build_filters(filter_data) {
     var filters_html = '<ul>';
     $.each(filter_data, function(i, fltr) {
         filters_html += '<li>';
-        filters_html += '<h3 class="indicator-filter-name">' + fltr.name + '</h3>';
+        filters_html += '<h3 class="indicator-filter-name">' + fltr.name + '</h3>' ;
+        if (fltr.name == 'Year')
+            filters_html += '<a href="javascript:void(0);" id="select_latest_year"> latest year available </a>'
         filters_html += '<ul>';
         $.each(fltr.values, function(j, val) {
             filters_html += '<li class="indicator-filter">';
@@ -153,6 +155,9 @@ function build_tr_from_data(indicators_data){
 
     $(ind.values).each(function(i){
         value = ind.values[i] || '-'
+        if (value != '-') value = Math.round(value * 100) / 100;
+        moes  = ind.moes[i] || ''
+        if (moes != '') moes  = ' (±) ' + Math.round( moes * 100) / 100;
         text  = value.toString()
         array = text.split('.')
 
@@ -165,7 +170,7 @@ function build_tr_from_data(indicators_data){
             }
           }
 
-        tr = tr + "<td class='for_csv'><span class='for_csv'>" + value + "</span></td>"
+        tr = tr + "<td class='for_csv'><span class='for_csv'>" + value + "<small>" + moes + "</small></span></td>"
     });
     tr = tr + "<td class='no-border'>\
                     <a href='javascript:void(0)' id=" + id + " dataset='" + ind.dataset_id + "' class='edit_indicator' style='height: inherit;'>\
@@ -204,7 +209,7 @@ function reload_data_for_new_indicators(){
         ind = new_indicators[i]
         $.ajax({type: "POST",
             url: "/location/load_indicator",
-            data: JSON.stringify({ dataset_id: ind['dataset_id'], name: "", ind_type: 'common', aggregated: ind['aggregated'], region_id: region_id,
+            data: JSON.stringify({ dataset_id: ind['dataset_id'], name: $('#new_indicator_name').val(), ind_type: 'common', aggregated: ind['aggregated'], region_id: region_id,
                                    permission: 'public', filters: ind['filters'], description: '', locations: locations, save_as_region: save_as_region,
                                    new_region_name: new_region_name
                                 }),
@@ -334,14 +339,27 @@ $(function(){
 
 
   $('#create_new_region').on('click', function(){
-    $('.location-checkbox.' + $('#select_geography_type').val()).removeClass('hidden');
-    $('.create_region_inputs').removeClass('hidden');
-    save_as_region = 'true'
+    if (save_as_region == 'false') {
+        $('.location-checkbox.' + $('#select_geography_type').val()).removeClass('hidden');
+        $('.create_region_inputs').removeClass('hidden');
+        save_as_region = 'true'
+        $(this).text('Cancel creating')
+    }
+    else {
+        $('.location-checkbox.' + $('#select_geography_type').val()).addClass('hidden');
+        $('.create_region_inputs').addClass('hidden');
+        save_as_region = 'false'
+
+        $(this).text('or Create new one');
+    }
   })
 
   /////////////////////
 
-
+    $(document).on('click', '#select_latest_year', function(){
+        $(this).closest('li').find('input').prop('checked', false);
+        $(this).closest('li').find('input').last().prop('checked', true);
+    });
     $(document).on('click', '.close_popup',function() {
         $(this).closest('div.modal').modal('hide');
     });
@@ -357,14 +375,11 @@ $(function(){
         $('.location-checkbox').addClass('hidden')
         $('.location-checkbox.' + type).removeClass('hidden')
         $('.create_region_inputs').addClass('hidden');
-        // aggregated = $('#enable_data_aggregation').prop('checked')
-        if (type != 'regions'){
-            $('select#regions').hide();
-        }
-        else{
-            $('select#regions').show();
-            // $('.location-checkbox.' + $('#select_geography_type').val()).removeClass('hidden')
-        }
+        aggregated = $('#enable_data_aggregation').prop('checked')
+        if (type != 'regions' || !aggregated )
+            $('div#regions').hide();
+        else
+            $('div#regions').show();
 
         $("#towns_popup").modal('show');
     })
@@ -467,7 +482,7 @@ $(function(){
         find_indicator_by_filters_and_splice_it(JSON.stringify(new_filters));
 
         if ( index == -1 || current_indicator){
-            new_indicators.push({ id: null, dataset_id: current_dataset, name: "", ind_type: 'common', aggregated: aggregated,
+            new_indicators.push({ id: null, dataset_id: current_dataset, name: $('#new_indicator_name').val(), ind_type: 'common', aggregated: aggregated,
                           permission: 'public', filters: JSON.stringify(new_filters), description: ''});
 
             locations = $('#towns').find('input:checked').map(function(i, e) {return $(e).val()}).get();
@@ -475,11 +490,12 @@ $(function(){
 
             $.ajax({type: "POST",
                 url: "/location/load_indicator",
-                data: JSON.stringify({ dataset_id: current_dataset, name: "", ind_type: 'common', aggregated: aggregated, region_id: region_id,
+                data: JSON.stringify({ dataset_id: current_dataset, name: $('#new_indicator_name').val(), ind_type: 'common', aggregated: aggregated, region_id: region_id,
                                        permission: 'public', filters: new_filters, description: '', locations: locations}),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     if (data.success == true){
+                        // TODO fix  the condition
                         if (data.indicator.locations_names.length > 0){
                             geo_type = (data.indicator['aggregated'] ? 'regions' : data.indicator['geo_type'])
                             enable_options_for_profile();
@@ -553,9 +569,6 @@ $(function(){
                 indicators_data = data.ind_data;
                 indicators      = []
                 $('locations_list').text(data.all_current_locations);
-                if (save_as_region) {
-                    $('select#region').append('<option value="">' + new_region_name)
-                };
 
                 $(geo_types).each(function(i){
                     type = geo_types[i]
@@ -573,6 +586,13 @@ $(function(){
                 });
                 $('.spinner').hide();
                 reload_data_for_new_indicators();
+
+                if (save_as_region == 'true' && new_region_name != '') {
+                    $('select#regions').find('option').attr('selected', false)
+                    $('select#regions').append('<option value="' + new_region_name + '" selected="true">' + new_region_name + '</option>')
+                    save_as_region = 'false'
+                };
+
             }
 
         });

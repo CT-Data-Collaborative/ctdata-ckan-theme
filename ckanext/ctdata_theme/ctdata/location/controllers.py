@@ -1,6 +1,7 @@
 import json
 import uuid
 import datetime
+import math
 
 from pylons.controllers.util import abort, redirect
 from pylons import session, url
@@ -39,7 +40,7 @@ class LocationsController(base.BaseController):
         if not default_profile:
             abort(404)
         locations   = self.location_service.get_all_locations()
-        regions     = self.location_service.get_regions()
+        regions     = filter(lambda r: r.user_id == c.userobj.id, self.location_service.get_regions())
         towns_names = ','.join( l for l in map(lambda t: t.name, default_profile.locations))
         geo_types   =  self.location_service.location_geography_types() + ['regions']
 
@@ -291,8 +292,9 @@ class LocationsController(base.BaseController):
     def indicator_data_to_dict(self, indicator, region, locations_to_put, locations_hash, region_locations, region_id, save_as_region, new_region_name):
         geo_type  = indicator.dataset_geography_type()
         if indicator.aggregated:
-            # if not region and len(locations_to_put) > 0 and region_id != 'not_selected':
             if save_as_region == 'true':
+                if new_region_name == '':
+                    new_region_name = 'Region created by ' + c.user
                 region = Region(new_region_name, c.userobj.id)
                 self.session.add(region)
                 self.session.commit()
@@ -305,10 +307,22 @@ class LocationsController(base.BaseController):
                 region_locations = map(lambda l: l.name, region.locations)
                 locations_hash['regions'].append(region.name)
 
+            ind_moes_filters = filter(lambda i: i['field'] != 'Variable' , json.loads(indicator.filters) )
+            ind_moes_filters.append({'field': 'Variable', 'values': ['Margins of Error']})
+            ind_moes_filters = json.dumps(ind_moes_filters)
+
             values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, region_locations)
-            values = [sum(map(lambda v: int(v) if v else 0, values))/len(values)] if len(values) > 0 else []
+            values = [sum(map(lambda v: float(v) if v else 0, values))/len(values)] if len(values) > 0 else []
+
+            moes_vals = self.location_service.load_indicator_value_for_location(ind_moes_filters, indicator.dataset_id, region_locations)
+            moes_vals = filter(lambda v: v != None, moes_vals)
+
+            #apply moes formula from http://www.census.gov/content/dam/Census/library/publications/2009/acs/ACSResearch.pdf (page A-14)
+            moes_vals = [math.sqrt( sum( map( lambda v: float(v)*float(v), moes_vals) ) )]
         else:
+            moes_vals = []
             values = self.location_service.load_indicator_value_for_location(indicator.filters, indicator.dataset_id, locations_hash[geo_type])
+            values = map(lambda v: float(v), values)
 
         ind_data = {
                  'id': indicator.id,
@@ -321,8 +335,9 @@ class LocationsController(base.BaseController):
            'variable': indicator.variable,
            'geo_type': geo_type,
          'aggregated': indicator.aggregated,
-           'values'  : values,
-        'locations_names': region.name if region and indicator.aggregated else locations_hash[geo_type]
+             'values': values,
+               'moes': moes_vals,
+         'locations_names': region.name if region and indicator.aggregated else locations_hash[geo_type]
         }
 
         return ind_data

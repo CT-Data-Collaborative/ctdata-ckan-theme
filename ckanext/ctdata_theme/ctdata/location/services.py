@@ -66,7 +66,11 @@ class LocationService(object):
         return self.session.query(Region).all()
 
     def get_region_by_id(self, id):
-        return self.session.query(Region).filter(Region.id == id).first()
+        try:
+            int(id)
+            return self.session.query(Region).filter(Region.id == id).first()
+        except ValueError:
+            return self.session.query(Region).filter(Region.name == id).first()
 
     def get_region_by_name(self, name):
         return self.session.query(Region).filter(Region.id == name).first()
