@@ -452,3 +452,13 @@ span.column_value{
   background: white;
   z-index: -1 !important;
 }
+
+
+.enable_data_aggregation_div{
+  width: 492px;
+}
+
+#enable_data_aggregation{
+  float: none;
+  top: 0;
+}
