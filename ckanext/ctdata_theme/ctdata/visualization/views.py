@@ -159,10 +159,13 @@ class TableView(View):
 
                 current_mf['data'].append(current_mt)
 
+            # Bond rating is breaking. Going to return value
+            # irrespective of type and see the mayhem ensue.
             try:
                 current_mt['data'].append(float(row['Value']))
             except ValueError:
-                current_mt['data'].append(None)
+                # current_mt['data'].append(None)
+                current_mt['data'].append(row['Value'])
         return result
 
 
