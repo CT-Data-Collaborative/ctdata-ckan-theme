@@ -163,7 +163,7 @@ class TableView(View):
                 current_mt['data'].append(float(row['Value']))
             except ValueError:
                 # current_mt['data'].append(None)
-                current_mt['data'].append(float(1))
+                current_mt['data'].append(float('1'))
         return result
 
 
