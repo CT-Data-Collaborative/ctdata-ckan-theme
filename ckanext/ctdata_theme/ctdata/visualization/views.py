@@ -128,8 +128,7 @@ class TableView(View):
             if cur_row_multifield == "NA":
               continue
             if not 'Variable' in row:
-                row['Variable'] = -9999
-              # row['Variable'] = None
+              row['Variable'] = None
             if row[geography_param] != last_town:
                 current_mt = {'measure_type': row['Measure Type'], 'variable': row['Variable'], 'data': []}
                 last_mt = row['Measure Type']
@@ -161,7 +160,8 @@ class TableView(View):
                 current_mf['data'].append(current_mt)
 
             try:
-                current_mt['data'].append(float(row['Value']))
+                # current_mt['data'].append(float(row['Value']))
+
             except ValueError:
                 current_mt['data'].append(None)
         return result
