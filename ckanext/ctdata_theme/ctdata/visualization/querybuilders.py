@@ -42,7 +42,7 @@ class QueryBuilder(object):
                     aggregate = ',round(AVG(CAST("Value" as Decimal)),2)'  # don't forget to cast average values as well
             columns_string += aggregate
         else:
-        columns_string = ','.join('"%s"' % col for col in self.get_columns(filters))
+            columns_string = ','.join('"%s"' % col for col in self.get_columns(filters))
 
         query = '''SELECT %s FROM public."%s" WHERE %s\n''' % (columns_string, self.dataset.table_name, filters_string)
 
