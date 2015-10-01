@@ -22,7 +22,8 @@ class PageController(base.BaseController):
     def about(self):
         return  base.render('pages/about.html', extra_vars={})
 
-    # def news(self):
+    def news(self):
+        return  base.render('pages/about.html', extra_vars={})
         # return  base.render('pages/news.html', extra_vars={})
 
     def special_projects(self):
