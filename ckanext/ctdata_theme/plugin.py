@@ -354,11 +354,9 @@ class CTDataController(base.BaseController):
         query_builder   = QueryBuilderFactory.get_query_builder(request_view, dataset)
         view            = ViewFactory.get_view(request_view, query_builder)
         data            = view.get_data(request_filters)
-        test            = data
 
-        data['test'] = test
-        if omit_single_values:
-            data = self._hide_dims_with_one_value(data, geography_param)
+        # if omit_single_values:
+        #     data = self._hide_dims_with_one_value(data, geography_param)
 
         data['link'] = _link_to_dataset_with_filters(dataset_name, json.dumps(request_filters), view_param)
 
