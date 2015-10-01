@@ -289,7 +289,7 @@ margin-top:10px; width:35%;}
 .about-news .news-header {border-bottom: 3px #EEEEEE solid; color: #444444;}
 .about-news h3 {margin-top: 10px; margin-bottom: 0px; color: #33bdf2;}
 
-.about > .list > li {
+.about-list li {
     list-style: circle inside;
     margin-left: 2rem;
 }
