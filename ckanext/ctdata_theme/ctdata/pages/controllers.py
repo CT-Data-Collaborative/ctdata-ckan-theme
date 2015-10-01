@@ -23,9 +23,7 @@ class PageController(base.BaseController):
         return  base.render('pages/about.html', extra_vars={})
 
     def news(self):
-        toolkit.redirect_to(controller='PageController', action='about')
-        # return  base.render('pages/about.html', extra_vars={})
-        # return  base.render('pages/news.html', extra_vars={})
+        return  base.render('pages/news.html', extra_vars={})
 
     def special_projects(self):
         return  base.render('pages/special_projects.html', extra_vars={})
