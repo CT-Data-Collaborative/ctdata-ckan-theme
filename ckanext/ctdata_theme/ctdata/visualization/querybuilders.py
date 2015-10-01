@@ -32,10 +32,10 @@ class QueryBuilder(object):
         if groupby_fields:
             columns_string = ','.join('"%s"' % col for col in groupby_fields)
             measure_type = dict_with_key_value('field', 'Measure Type', filters)
-            # aggregate = ',SUM(CAST("Value" as DECIMAL))'  # some of the datasets have text values in the 'Value' column
+            aggregate = ',SUM(CAST("Value" as DECIMAL))'  # some of the datasets have text values in the 'Value' column
                                                           # so we need to cast values to decimals first
-            # filters_string += ' and CAST("Value" as VARCHAR) <> %s'  # and then exclude all the non-castable values from
-            # filters_values.append('NA')                              # the result
+            filters_string += ' and CAST("Value" as VARCHAR) <> %s'  # and then exclude all the non-castable values from
+            filters_values.append('NA')                              # the result
             if measure_type:
                 # we have a problem if both Percent and Number are specified for Measure Type
                 if len(measure_type['values']) == 1 and measure_type['values'][0] == 'Percent':

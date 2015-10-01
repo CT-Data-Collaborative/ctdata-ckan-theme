@@ -128,7 +128,8 @@ class TableView(View):
             if cur_row_multifield == "NA":
               continue
             if not 'Variable' in row:
-              row['Variable'] = None
+                row['Variable'] = -9999
+              # row['Variable'] = None
             if row[geography_param] != last_town:
                 current_mt = {'measure_type': row['Measure Type'], 'variable': row['Variable'], 'data': []}
                 last_mt = row['Measure Type']
