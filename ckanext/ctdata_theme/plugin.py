@@ -207,8 +207,7 @@ class CTDataController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def news(self):
-        abort(401)
-        # return base.render('news.html')
+        return base.render('news.html')
 
     def special_projects(self):
         return base.render('special_projects.html')
