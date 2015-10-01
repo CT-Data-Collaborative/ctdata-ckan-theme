@@ -29,20 +29,20 @@ class QueryBuilder(object):
         filters_values = reduce(lambda acc, f: acc + f['values'],
                                  filters, [])
 
-        if groupby_fields:
-            columns_string = ','.join('"%s"' % col for col in groupby_fields)
-            measure_type = dict_with_key_value('field', 'Measure Type', filters)
-            aggregate = ',SUM(CAST("Value" as DECIMAL))'  # some of the datasets have text values in the 'Value' column
-                                                          # so we need to cast values to decimals first
-            filters_string += ' and CAST("Value" as VARCHAR) <> %s'  # and then exclude all the non-castable values from
-            filters_values.append('NA')                              # the result
-            if measure_type:
-                # we have a problem if both Percent and Number are specified for Measure Type
-                if len(measure_type['values']) == 1 and measure_type['values'][0] == 'Percent':
-                    aggregate = ',round(AVG(CAST("Value" as Decimal)),2)'  # don't forget to cast average values as well
-            columns_string += aggregate
-        else:
-            columns_string = ','.join('"%s"' % col for col in self.get_columns(filters))
+        # if groupby_fields:
+        #     columns_string = ','.join('"%s"' % col for col in groupby_fields)
+        #     measure_type = dict_with_key_value('field', 'Measure Type', filters)
+        #     aggregate = ',SUM(CAST("Value" as DECIMAL))'  # some of the datasets have text values in the 'Value' column
+        #                                                   # so we need to cast values to decimals first
+        #     filters_string += ' and CAST("Value" as VARCHAR) <> %s'  # and then exclude all the non-castable values from
+        #     filters_values.append('NA')                              # the result
+        #     if measure_type:
+        #         # we have a problem if both Percent and Number are specified for Measure Type
+        #         if len(measure_type['values']) == 1 and measure_type['values'][0] == 'Percent':
+        #             aggregate = ',round(AVG(CAST("Value" as Decimal)),2)'  # don't forget to cast average values as well
+        #     columns_string += aggregate
+        # else:
+        columns_string = ','.join('"%s"' % col for col in self.get_columns(filters))
 
         query = '''SELECT %s FROM public."%s" WHERE %s\n''' % (columns_string, self.dataset.table_name, filters_string)
 
