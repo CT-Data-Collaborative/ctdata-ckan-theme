@@ -278,14 +278,22 @@ margin-top:10px; width:35%;}
 .container {color: #000000; font-size: 14px; width: 1180px;}
 .container a { text-decoration:none; color:inherit; outline:none;}
 
+/* Styles for About Page */
+
 .about-text {
-    padding-right: 30px; border-right: 5px #EEEEEE solid; font-size:14px; font-family: 'Roboto', sans-serif; font-weight:300; line-height:23px;
+    padding-right: 30px; padding-top: 1rem; border-right: 5px #EEEEEE solid; font-size:14px; font-family: 'Roboto', sans-serif; font-weight:300; line-height:23px;
 }
 
 .about-news {color: #444444; }
 .about-news a {color: #33bdf2;}
 .about-news .news-header {border-bottom: 3px #EEEEEE solid; color: #444444;}
 .about-news h3 {margin-top: 10px; margin-bottom: 0px; color: #33bdf2;}
+
+.about > .list > li {
+    list-style: circle inside;
+    margin-left: 2rem;
+}
+
 
 .inline-date {vertical-align: middle; margin-top: 20px;}
 
