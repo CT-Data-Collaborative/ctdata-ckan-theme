@@ -8,7 +8,6 @@ from pylons import session, url
 import ckan.lib.base as base
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
-import ckan.lib.helpers as h
 from ckan.common import response as http_response, request as http_request
 
 from ..database import Database
@@ -24,7 +23,7 @@ class PageController(base.BaseController):
         return  base.render('pages/about.html', extra_vars={})
 
     def news(self):
-        h.redirect_to(controller='PageController', action='about')
+        toolkit.redirect_to(controller='PageController', action='about')
         # return  base.render('pages/about.html', extra_vars={})
         # return  base.render('pages/news.html', extra_vars={})
 
