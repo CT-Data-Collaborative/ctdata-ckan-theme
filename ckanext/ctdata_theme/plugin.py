@@ -67,7 +67,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('join_for_two_datasets', '/compare/join_for_two_datasets/', action='join_for_two_datasets')
 
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
-            # m.connect('news', '/news', action='news')
+            m.connect('news', '/news', action='news')
             m.connect('special_projects', '/special_projects', action='special_projects')
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
@@ -126,7 +126,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
             m.connect('page_about', '/pages/about', action='about')
-            # m.connect('page_news', '/pages/news', action='news')
+            m.connect('page_news', '/pages/news', action='news')
             m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
             m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
 
@@ -207,7 +207,8 @@ class CTDataController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def news(self):
-        return base.render('news.html')
+        h.redirect_to('pages_about', id=dataset_name)
+        # return base.render('news.html')
 
     def special_projects(self):
         return base.render('special_projects.html')
