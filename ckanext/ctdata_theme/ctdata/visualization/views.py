@@ -161,7 +161,7 @@ class TableView(View):
 
             try:
                 # current_mt['data'].append(float(row['Value']))
-                current_mt['data'].append(row['Value'])
+                current_mt['data'].append(float(1)
             except ValueError:
                 current_mt['data'].append(None)
         return result
