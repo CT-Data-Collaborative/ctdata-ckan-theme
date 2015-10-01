@@ -126,7 +126,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
             m.connect('page_about', '/pages/about', action='about')
-            m.connect('page_news', '/pages/news', action='news')
+            # m.connect('page_news', '/pages/news', action='news')
             m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
             m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
 
@@ -207,7 +207,8 @@ class CTDataController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def news(self):
-        return base.render('news.html')
+        abort(401)
+        # return base.render('news.html')
 
     def special_projects(self):
         return base.render('special_projects.html')

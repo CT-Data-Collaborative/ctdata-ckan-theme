@@ -281,7 +281,11 @@ margin-top:10px; width:35%;}
 /* Styles for About Page */
 
 .about-text {
-    padding-right: 30px; padding-top: 1rem; border-right: 5px #EEEEEE solid; font-size:14px; font-family: 'Roboto', sans-serif; font-weight:300; line-height:23px;
+    padding-right: 30px; border-right: 5px #EEEEEE solid; font-size:14px; font-family: 'Roboto', sans-serif; font-weight:300; line-height:23px;
+}
+
+.about-text h2 {
+    padding-top: .75rem;
 }
 
 .about-news {color: #444444; }
@@ -290,7 +294,8 @@ margin-top:10px; width:35%;}
 .about-news h3 {margin-top: 10px; margin-bottom: 0px; color: #33bdf2;}
 
 .about-list li {
-    list-style: circle inside;
+    list-style: inherit;
+    list-style-type: disc;
     margin-left: 2rem;
 }
 
