@@ -17,7 +17,7 @@ def upgrade(migrate_engine):
 
     # regions.create()
 
-    locations  = Table('ctdata_locations', meta, autoload=True)
+    # locations  = Table('ctdata_locations', meta, autoload=True)
     profiles   = Table('ctdata_profiles',  meta, autoload=True)
     indicators = Table('ctdata_profile_indicators',  meta, autoload=True)
 
