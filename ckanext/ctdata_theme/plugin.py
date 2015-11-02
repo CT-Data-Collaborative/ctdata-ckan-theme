@@ -60,11 +60,11 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
     def before_map(self, route_map):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.ctdata.compare.controllers:CompareController') as m:
             m.connect('admin_compare', '/admin/compare', action='admin_compare')
-            m.connect('compare', '/compare', action='compare')
-            m.connect('load_comparable_datasets', '/compare/load_comparable_datasets/{dataset_name}', action='load_comparable_datasets')
-            m.connect('update_years_matches', '/compare/update_years_matches', action='update_years_matches')
-            m.connect('add_year_matches', '/compare/add_year_matches', action='create_year_matches')
-            m.connect('join_for_two_datasets', '/compare/join_for_two_datasets/', action='join_for_two_datasets')
+            # m.connect('compare', '/compare', action='compare')
+            # m.connect('load_comparable_datasets', '/compare/load_comparable_datasets/{dataset_name}', action='load_comparable_datasets')
+            # m.connect('update_years_matches', '/compare/update_years_matches', action='update_years_matches')
+            # m.connect('add_year_matches', '/compare/add_year_matches', action='create_year_matches')
+            # m.connect('join_for_two_datasets', '/compare/join_for_two_datasets/', action='join_for_two_datasets')
 
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
             m.connect('news', '/news', action='news')
