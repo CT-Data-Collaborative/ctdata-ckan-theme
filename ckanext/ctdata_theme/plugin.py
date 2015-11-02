@@ -58,8 +58,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         db.init_years_data(config['ckan.datastore.write_url'])
 
     def before_map(self, route_map):
-        with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.ctdata.compare.controllers:CompareController') as m:
-            m.connect('admin_compare', '/admin/compare', action='admin_compare')
+        # with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.ctdata.compare.controllers:CompareController') as m:
+            # m.connect('admin_compare', '/admin/compare', action='admin_compare')
             # m.connect('compare', '/compare', action='compare')
             # m.connect('load_comparable_datasets', '/compare/load_comparable_datasets/{dataset_name}', action='load_comparable_datasets')
             # m.connect('update_years_matches', '/compare/update_years_matches', action='update_years_matches')
@@ -78,14 +78,14 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.ctdata.package.controllers:PackageController') as m:
             m.connect('dataset_groups', '/dataset/groups/{id}', action='groups', ckan_icon='group')
 
-        with routes.mapper.SubMapper(route_map,
-                controller='ckanext.ctdata_theme.ctdata.community.controllers:CommunityProfilesController') as m:
-            m.connect('community_get_filters', '/community/get_filters/{dataset_id}', action='get_filters')
-            m.connect('community_get_incompatibles', '/community/get_incompatibles/{dataset_id}', action='get_incompatibles')
-            m.connect('community_get_topics', '/community/get_topics', action='get_topics')
-            m.connect('community_add_indicator', '/community/add_indicator', action='add_indicator')
-            m.connect('community_update_profile_indicators', '/community/update_profile_indicators', action='update_profile_indicators')
-            m.connect('community_remove_indicator','/community/remove_indicator/{indicator_id}', action='remove_indicator')
+        # with routes.mapper.SubMapper(route_map,
+        #         controller='ckanext.ctdata_theme.ctdata.community.controllers:CommunityProfilesController') as m:
+        #     m.connect('community_get_filters', '/community/get_filters/{dataset_id}', action='get_filters')
+        #     m.connect('community_get_incompatibles', '/community/get_incompatibles/{dataset_id}', action='get_incompatibles')
+        #     m.connect('community_get_topics', '/community/get_topics', action='get_topics')
+        #     m.connect('community_add_indicator', '/community/add_indicator', action='add_indicator')
+        #     m.connect('community_update_profile_indicators', '/community/update_profile_indicators', action='update_profile_indicators')
+        #     m.connect('community_remove_indicator','/community/remove_indicator/{indicator_id}', action='remove_indicator')
 
 
         with routes.mapper.SubMapper(route_map,
@@ -124,9 +124,9 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
 
         with routes.mapper.SubMapper(route_map,
-                controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
-            m.connect('page_about', '/pages/about', action='about')
-            m.connect('page_news', '/pages/news', action='news')
+            controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
+            # m.connect('page_about', '/pages/about', action='about')
+            # m.connect('page_news', '/pages/news', action='news')
             m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
             m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
 
@@ -142,18 +142,18 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('update_group_indicators', '/group/update_group_indicators', action='update_group_indicators')
             m.connect('group_index', '/group', action='index', highlight_actions='index search')
 
-        with routes.mapper.SubMapper(route_map,
-                controller='ckanext.ctdata_theme.ctdata.location.controllers:LocationsController') as m:
-            m.connect('locations', '/location', action='locations_index')
-            m.connect('data_by_location', '/data-by-location', action='data_by_location')
-            m.connect('manage_locations', '/manage-locations', action='manage_locations')
-            m.connect('create_location',  '/create_location',  action='create_location')
-            m.connect('load_indicator_location', '/location/load_indicator', action='load_indicator')
-            m.connect('create_location_profile', '/location/create-profile', action='create_location_profile')
-            m.connect('load_profile_indicators', '/load_profile_indicators/{profile_id}', action='load_profile_indicators')
-            m.connect('save_local_default', '/save_local_default/{profile_id}', action='save_local_default')
-            m.connect('community_profiles', '/community/{profile_id}', action='community_profile')
-            m.connect('remove_location_profile', '/remove_location_profile/{profile_id}', action='remove_location_profile')
+        # with routes.mapper.SubMapper(route_map,
+        #         controller='ckanext.ctdata_theme.ctdata.location.controllers:LocationsController') as m:
+        #     m.connect('locations', '/location', action='locations_index')
+        #     m.connect('data_by_location', '/data-by-location', action='data_by_location')
+        #     m.connect('manage_locations', '/manage-locations', action='manage_locations')
+        #     m.connect('create_location',  '/create_location',  action='create_location')
+        #     m.connect('load_indicator_location', '/location/load_indicator', action='load_indicator')
+        #     m.connect('create_location_profile', '/location/create-profile', action='create_location_profile')
+        #     m.connect('load_profile_indicators', '/load_profile_indicators/{profile_id}', action='load_profile_indicators')
+        #     m.connect('save_local_default', '/save_local_default/{profile_id}', action='save_local_default')
+        #     m.connect('community_profiles', '/community/{profile_id}', action='community_profile')
+        #     m.connect('remove_location_profile', '/remove_location_profile/{profile_id}', action='remove_location_profile')
 
         return route_map
 
