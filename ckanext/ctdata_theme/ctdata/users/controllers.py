@@ -160,7 +160,7 @@ class UserController(UserController):
         c.user  = user_id
         context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
         try:
-            c.user_dict = get_action('user_show')(context, {'id': user_id,'include_num_followers': True})
+            c.user_dict = get_action('user_show')(context, {'id': user_id, 'include_num_followers': True})
         except toolkit.ObjectNotFound:
             abort(404)
 
@@ -204,7 +204,7 @@ class UserController(UserController):
         context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
 
         try:
-            c.user_dict = get_action('user_show')(context, {'id': user_id,'include_num_followers': True})
+            c.user_dict = get_action('user_show')(context, {'id': user_id, 'include_num_followers': True})
         except toolkit.ObjectNotFound:
             abort(404)
         return base.render('user/user_gallery.html', extra_vars={'gallery_indicators': indicators, 'user_name': user_name, 'requested_user_name': requested_user_name})

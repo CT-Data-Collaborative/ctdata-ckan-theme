@@ -337,7 +337,6 @@ $(function(){
 
   })
 
-
   $('#create_new_region').on('click', function(){
     if (save_as_region == 'false') {
         $('.location-checkbox.' + $('#select_geography_type').val()).removeClass('hidden');
@@ -349,12 +348,10 @@ $(function(){
         $('.location-checkbox.' + $('#select_geography_type').val()).addClass('hidden');
         $('.create_region_inputs').addClass('hidden');
         save_as_region = 'false'
-
         $(this).text('or Create new one');
     }
   })
 
-  /////////////////////
 
     $(document).on('click', '#select_latest_year', function(){
         $(this).closest('li').find('input').prop('checked', false);
