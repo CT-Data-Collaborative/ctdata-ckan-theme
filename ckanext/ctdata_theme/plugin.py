@@ -2,7 +2,7 @@ import json
 import yaml
 import ast
 
-from pylons.controllers.util import abort
+from pylons.controllers.util import abort, redirect
 
 import routes.mapper
 
@@ -208,7 +208,7 @@ class CTDataController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def home(self):
-        redirect_to('data_by_topic')
+        redirect('data_by_topic')
 
     def news(self):
         return abort(404)
