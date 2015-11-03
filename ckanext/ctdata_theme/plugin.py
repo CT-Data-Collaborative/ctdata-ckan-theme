@@ -67,6 +67,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             # m.connect('join_for_two_datasets', '/compare/join_for_two_datasets/', action='join_for_two_datasets')
 
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
+            m.connect('home', '/', action='home')
             m.connect('news', '/news', action='news')
             m.connect('special_projects', '/special_projects', action='special_projects')
             m.connect('about', '/about', action='about')
@@ -205,6 +206,9 @@ class CTDataController(base.BaseController):
         self.session = Database().session_factory()
         self.community_profile_service = CommunityProfileService(self.session)
         self.user_service = UserService(self.session)
+
+    def home(self):
+        redirect_to('data_by_topic')
 
     def news(self):
         return abort(404)
