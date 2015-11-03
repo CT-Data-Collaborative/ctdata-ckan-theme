@@ -208,7 +208,8 @@ class CTDataController(base.BaseController):
 
     def news(self):
         # h.redirect_to('pages_about', id=dataset_name)
-        h.redirect_to(h.url_for('http://ctdata.org/news'))
+        # h.redirect_to(h.url_for('http://ctdata.org/news'))
+        return h.url_for('http://ctdata.org/news')
         # return base.render('news.html')
 
     def special_projects(self):
