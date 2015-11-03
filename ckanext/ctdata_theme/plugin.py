@@ -123,12 +123,12 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
 
             m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
 
-        with routes.mapper.SubMapper(route_map,
-            controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
-            # m.connect('page_about', '/pages/about', action='about')
-            # m.connect('page_news', '/pages/news', action='news')
-            m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
-            m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
+        # with routes.mapper.SubMapper(route_map,
+        #     controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
+        #     m.connect('page_about', '/pages/about', action='about')
+        #     m.connect('page_news', '/pages/news', action='news')
+        #     m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
+        #     m.connect('page_data_gallery', '/pages/data-gallery', action='data_gallery')
 
         with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.group.controllers:GroupController') as m:
@@ -208,10 +208,11 @@ class CTDataController(base.BaseController):
 
     def news(self):
         # h.redirect_to('pages_about', id=dataset_name)
-        h.redirect_to(h.url_for('http://ctdata.org'))
+        h.redirect_to(h.url_for('http://ctdata.org/news'))
         # return base.render('news.html')
 
     def special_projects(self):
+        h.redirect_to(h.url_for('http://ctdata.org/special_project'))
         return base.render('special_projects.html')
 
     def data_by_topic(self):
