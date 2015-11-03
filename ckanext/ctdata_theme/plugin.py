@@ -67,9 +67,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             # m.connect('join_for_two_datasets', '/compare/join_for_two_datasets/', action='join_for_two_datasets')
 
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
-            m.connect('news', h.url_for("http://ctdata.org/news"))
             # m.connect('news', '/news', action='news')
-            m.connect('special_projects', '/special_projects', action='special_projects')
+            # m.connect('special_projects', '/special_projects', action='special_projects')
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_vizualization_data', '/vizualization_data/{dataset_name}', action='get_vizualization_data')
@@ -121,7 +120,6 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('/user/logged_out_redirect', action='logged_out_page')
             m.connect('/user/reset', action='request_reset')
             m.connect('/user/set_lang/{lang}', action='set_lang')
-
             m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
 
         # with routes.mapper.SubMapper(route_map,
