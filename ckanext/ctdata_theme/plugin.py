@@ -69,6 +69,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
             m.connect('news', '/news', action='news')
             m.connect('special_projects', '/special_projects', action='special_projects')
+            m.connect('about', '/about', action='about')
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_vizualization_data', '/vizualization_data/{dataset_name}', action='get_vizualization_data')
@@ -206,13 +207,12 @@ class CTDataController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def news(self):
-        # h.redirect_to(h.url_for('http://ctdata.org/news'))
-        # return base.render('news.html')
         return abort(404)
 
     def special_projects(self):
-        # h.redirect_to(h.url_for('http://ctdata.org/special_project'))
-        # return base.render('special_projects.html')
+        return abort(404)
+
+    def about(self):
         return abort(404)
 
     def data_by_topic(self):
