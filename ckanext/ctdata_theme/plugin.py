@@ -67,8 +67,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             # m.connect('join_for_two_datasets', '/compare/join_for_two_datasets/', action='join_for_two_datasets')
 
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
-            # m.connect('news', '/news', action='news')
-            # m.connect('special_projects', '/special_projects', action='special_projects')
+            m.connect('news', '/news', action='news')
+            m.connect('special_projects', '/special_projects', action='special_projects')
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
             m.connect('get_vizualization_data', '/vizualization_data/{dataset_name}', action='get_vizualization_data')
@@ -206,14 +206,14 @@ class CTDataController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def news(self):
-        # h.redirect_to('pages_about', id=dataset_name)
         # h.redirect_to(h.url_for('http://ctdata.org/news'))
-        return h.url_for('http://ctdata.org/news')
         # return base.render('news.html')
+        return abort(404)
 
     def special_projects(self):
-        h.redirect_to(h.url_for('http://ctdata.org/special_project'))
-        return base.render('special_projects.html')
+        # h.redirect_to(h.url_for('http://ctdata.org/special_project'))
+        # return base.render('special_projects.html')
+        return abort(404)
 
     def data_by_topic(self):
         domains = TopicSerivce.get_topics('data_by_topic')
