@@ -67,7 +67,8 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             # m.connect('join_for_two_datasets', '/compare/join_for_two_datasets/', action='join_for_two_datasets')
 
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
-            m.connect('news', '/news', action='news')
+            m.connect('news', h.url_for("http://ctdata.org/news"))
+            # m.connect('news', '/news', action='news')
             m.connect('special_projects', '/special_projects', action='special_projects')
             m.connect('data_by_topic', '/data_by_topic', action='data_by_topic')
             m.connect('visualization', '/visualization/{dataset_name}', action='visualization')
