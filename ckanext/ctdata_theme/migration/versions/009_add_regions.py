@@ -28,8 +28,8 @@ def upgrade(migrate_engine):
     region_id = Column('region_id', Integer, ForeignKey('ctdata_regions.id'))
     region_id.create(profiles)
 
-    aggregated = Column('aggregated', Boolean, default = False)
-    aggregated.create(indicators)
+    # aggregated = Column('aggregated', Boolean, default = False)
+    # aggregated.create(indicators)
 
 def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
