@@ -36,11 +36,11 @@
       {{ h.render_datetime(c.user_dict.created) }}
     </p>
     {% if c.userobj.sysadmin %}
-    <p class="">
+    <div class="">
       <b>API Key:</b>
-      {{ c.user_dict.id }}
-    </p>
-    {% endif %}
+      <p>{{ c.user_dict.id }}</p>
+    </div>
+    {% end %}
   </div>
 
 </div>
