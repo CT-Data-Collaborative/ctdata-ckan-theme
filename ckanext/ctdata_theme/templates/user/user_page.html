@@ -35,10 +35,12 @@
       <b>Member Since:</b>
       {{ h.render_datetime(c.user_dict.created) }}
     </p>
+    {% if c.userobj.sysadmin %}
     <p class="">
       <b>API Key:</b>
       {{ c.user_dict.id }}
     </p>
+    {% endif %}
   </div>
 
 </div>
