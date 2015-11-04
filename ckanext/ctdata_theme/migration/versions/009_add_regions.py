@@ -16,7 +16,7 @@ def upgrade(migrate_engine):
       Column('user_id', String, ForeignKey('ctdata_user_info.ckan_user_id'))
     )
 
-    # regions.create()
+    regions.create()
 
     locations  = Table('ctdata_locations', meta, autoload=True)
     profiles   = Table('ctdata_profiles',  meta, autoload=True)

@@ -25,7 +25,5 @@ setup(
     entry_points='''
         [ckan.plugins]
         ctdata_theme=ckanext.ctdata_theme.plugin:CTDataThemePlugin
-        # Add plugins here, e.g.
-        # myplugin=ckanext.ctdata_theme.plugin:PluginClass
     ''',
 )
