@@ -15,7 +15,7 @@
 <li data-id="{{ res.id }}">
     <span class="format-label" property="dc:format" data-format="{{ res.format.lower() or 'data' }}">{{ res.format }}</span>
     <span><a href="{{ url }}">{{ h.resource_display_name(res) | truncate(50) }}</a></span>
-    <div>{{  _('Last Updated') }}</div>
+    <div>Last Updated: </div>
     <div>{{ h.render_datetime(pkg.last_modified) or h.render_datetime(plg.revision_timestamp) or h.render_datetime(pkg.created) or _('unknown') }}</div>
     <div class="buttons">
         {% if not vars.hidden and not pkg.private %}
