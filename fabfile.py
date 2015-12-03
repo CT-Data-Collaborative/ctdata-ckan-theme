@@ -14,6 +14,6 @@ def deploy():
     code_dir = '/home/ubuntu/ctdata_theme'
     with cd(code_dir), prefix('source /usr/lib/ckan/default/bin/activate'):
         run("git pull")
-        run('python ckanext/ctdata_theme/migration/manage.py upgrade 10')
+        # run('python ckanext/ctdata_theme/migration/manage.py upgrade 10')
         run('python setup.py develop')
         run('sudo service apache2 restart')

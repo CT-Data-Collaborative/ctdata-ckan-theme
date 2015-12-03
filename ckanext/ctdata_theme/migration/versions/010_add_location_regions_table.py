@@ -16,7 +16,7 @@ def upgrade(migrate_engine):
     Column('region_id',   Integer, ForeignKey("ctdata_regions.id"),   nullable = False)
   )
 
-  #locations_regions.create()
+  locations_regions.create()
 
 def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
