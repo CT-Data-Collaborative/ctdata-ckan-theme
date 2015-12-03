@@ -612,3 +612,9 @@ a.underlined_on_hover:hover{
   color: gray;
   font-size: 11px;
 }
+
+#select_latest_year{
+  position: relative;
+  left: 52px;
+  top: -22px;
+}

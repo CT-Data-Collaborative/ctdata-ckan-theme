@@ -207,7 +207,10 @@ class CTDataController(base.BaseController):
         self.user_service = UserService(self.session)
 
     def news(self):
-        abort(401)
+        # former master branch code
+        # abort(401)
+        # new code from develop
+        h.redirect_to('pages_about', id=dataset_name)
         # return base.render('news.html')
 
     def special_projects(self):

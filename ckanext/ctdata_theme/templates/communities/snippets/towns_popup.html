@@ -5,6 +5,29 @@
           Edit Towns
         </div>
         <div class="modal-body">
+          <div id="regions">
+            <h3> Choose a Region: </h3>
+            <select id="regions">
+              <option disabled selected value="not_selected"> -- select an option -- </option>
+              {% for region in regions %}
+                <option value="{{region.id}}"> {{region.name}} </option>
+              {% endfor %}
+            </select>
+
+
+            <a href="javascript:void(0);" id="create_new_region" class="pull-right"> or Create a new one </a>
+
+            <br>
+            <div class="control-group create_region_inputs hidden">
+                <label class="control-label"> Region Name </label>
+                <div class="controls">
+                  <input type="text" id="new_region_name" name="new_region_name">
+                  <input type="hidden" value="false" id="save_as_region">
+                </div>
+              </div>
+            </form>
+
+          </div>
           <div id="towns">
             <ul style="">
               {% for location in locations %}

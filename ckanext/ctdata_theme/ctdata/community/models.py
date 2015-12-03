@@ -50,39 +50,39 @@ class ProfileIndicator(Base):
     __tablename__ = 'ctdata_profile_indicators'
 
     id = Column(Integer, primary_key=True)
-    dataset_id = Column(String)
-    is_global  = Column(Boolean)
-    data_type  = Column(String)
-    year       = Column(Integer)
-    variable   = Column(String)
-    filters    = Column(Text)
-    name       = Column(String)
-    ind_type   = Column(String)
-    temp       = Column(Boolean)
-    permission = Column(String)
-    group_ids  = Column(String)
-    created_at = Column(DateTime)
+    year        = Column(Integer)
+    dataset_id  = Column(String)
+    data_type   = Column(String)
+    variable    = Column(String)
+    name        = Column(String)
+    ind_type    = Column(String)
+    permission  = Column(String)
+    group_ids   = Column(String)
+    created_at  = Column(DateTime)
+    description = Column(Text)
+    filters     = Column(Text)
+    aggregated  = Column(Boolean, default = False)
+    temp        = Column(Boolean)
+    is_global   = Column(Boolean)
+    profile_id  = Column(BigInteger, ForeignKey('ctdata_profiles.id'))
     visualization_type = Column(String)
-    description        = Column(Text)
 
-    profile_id = Column(BigInteger, ForeignKey('ctdata_profiles.id'))
+    def __init__(self, args):
+        self.name         = args['name']
+        self.filters      = args['filters']
+        self.dataset_id   = args['dataset_id']
+        self.data_type    = args['data_type']
+        self.year         = args['years']
+        self.variable     = args['variable']
+        self.ind_type     = args['ind_type']
+        self.permission   = args['permission']  if 'permission'  in args.keys() else 'public'
+        self.profile_id   = args['profile_id']  if 'profile_id'  in args.keys() else None
+        self.group_ids    = args['group_ids']   if 'group_ids'   in args.keys() else ''
+        self.description  = args['description'] if 'description' in args.keys() else ''
+        self.aggregated   = args['aggregated']  if 'aggregated'  in args.keys() else False
 
-    def __init__(self, name, filters, dataset_id, data_type, year, variable, ind_type, visualization_type, profile_id, permission, description, group_ids):
-        self.name       = name
-        self.filters    = filters
-        self.dataset_id = dataset_id
-        # self.is_global  = is_global
-        self.data_type  = data_type
-        self.year       = year
-        self.variable   = variable
-        self.ind_type   = ind_type
-        # self.temp       = temp
-        self.permission = permission
-        self.profile_id = profile_id
-        self.group_ids  = group_ids
-        self.visualization_type  = visualization_type
-        self.description  = description
-        self.created_at = datetime.datetime.now()
+        self.visualization_type  = args['visualization_type']
+        self.created_at   = datetime.datetime.now()
 
     def __repr__(self):
         return "[Indicator: %s; %s; %s; %s; %s; %s;]" % (self.name, self.id, self.dataset_id, self.data_type, self.year, self.permission)
@@ -199,8 +199,9 @@ class UserInfo(Base):
     ckan_user_id = Column(String, primary_key=True)
     is_admin     = Column(Boolean)
 
-    # profiles   = association_proxy("user_profiles", "profile")
+    profiles   = association_proxy("user_profiles", "profile")
     indicators = association_proxy("indicators_links", "indicator")
+    regions    = association_proxy("user_regions", "region")
 
     def __init__(self, ckan_user_id, is_admin=False):
         self.ckan_user_id = ckan_user_id

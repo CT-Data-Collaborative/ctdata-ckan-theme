@@ -49,7 +49,8 @@
 {% endif %}
 
 <div id="loaded_topics"></div>
-{% snippet 'communities/snippets/towns_popup.html', towns=towns, community=location, displayed_towns=towns_names.split(',') %}
+
+{% snippet 'communities/snippets/towns_popup.html', towns=towns, community=location, displayed_towns=towns_names.split(','), regions=regions %}
 
 <div id="message_popup" class="modal fade" style="display: none">
     <div class="modal-dialog modal-lg">

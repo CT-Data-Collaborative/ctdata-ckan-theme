@@ -34,7 +34,13 @@
   <div class="span12">
     <span id="default_profile_id" class="hidden">{{default_profile_id}}</span>
     {% for type in geo_types_array %}
-      <a href="javascript:void(0)" id="{{type}}" class="edit_locations btn btn-default hidden"> Edit {{ type}}s </a>
+      <a href="javascript:void(0)" id="{{type}}" class="edit_locations btn btn-default hidden">
+        {% if type == 'regions' %}
+          Edit Region
+        {% else %}
+          Edit {{ type}}s
+        {% endif %}
+      </a>
       <div class="table-div-{{type}}"></div>
       <br>
       <br>
@@ -54,7 +60,7 @@
 {% endif %}
 
 <div id="loaded_topics"></div>
-{% snippet 'communities/snippets/towns_popup.html', locations=locations, displayed_locations=all_current_locations %}
+{% snippet 'communities/snippets/towns_popup.html', locations=locations, displayed_locations=all_current_locations, regions=regions, default_profile = default_profile %}
 
 <div id="message_popup" class="modal fade" style="display: none">
     <div class="modal-dialog modal-lg">
@@ -84,7 +90,6 @@
                     <div id="indicator_adding_error" class="error" style="opacity: 0">
                     </div>
                     <div id="edit_indicator_filters_content">
-                      Boo
                     </div>
                 </div>
 
@@ -107,11 +112,13 @@
   {% resource 'ctdata_theme/html2csv.js' %}
 
   <script>
-    var location_names = []
-    var geo_types      = []
+    var location_names  = []
+    var geo_types       = []
+    var region_id       = 'not_selected'
 
     location_names = '{{towns_names | safe}}'
     geo_types      = '{{geo_types | safe}}'
+    region_id      = '{{default_profile.region_id | safe}}'
   </script>
 
 {% endblock %}

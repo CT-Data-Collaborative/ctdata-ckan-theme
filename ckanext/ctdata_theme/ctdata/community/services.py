@@ -121,54 +121,6 @@ class CommunityProfileService(object):
 
     ################ PROFILE INDICATORS #################################
 
-    def create_indicator(self, name, filters, dataset_id, owner, ind_type, visualization_type, permission = 'public', description = '', group_ids = ''):
-
-        dataset = DatasetService.get_dataset(dataset_id)
-
-        user_indicators_id = self.session.query(UserIndicatorLink.indicator_id)\
-            .filter(and_(UserIndicatorLink.user_id == owner.ckan_user_id,
-                         UserIndicatorLink.deleted == False)).all()
-        existing_inds = self.session.query(ProfileIndicator)\
-            .filter(and_(ProfileIndicator.dataset_id == dataset.ckan_meta['id'],
-                         ProfileIndicator.id.in_(user_indicators_id)))
-
-        # check that there're currently no such indicators in the db
-        # there's a JSON type for fields in postgre, so maybe there's a way to do it using SQL
-        for ex_ind in existing_inds:
-            ex_fltrs = json.loads(ex_ind.filters)
-            # python allows us to compare lists of dicts
-            if sorted(filters) == sorted(ex_fltrs) and ind_type != 'gallery':
-                raise ProfileAlreadyExists("Profile with such dataset and filters already exists")
-        try:
-            data_type = dict_with_key_value("field", "Measure Type", filters)['values'][0]
-            years = dict_with_key_value("field", "Year", filters)['values'][0]
-        except (TypeError, AttributeError, IndexError):
-            raise toolkit.ObjectNotFound("There must be values for the 'Measure Type' and 'Year' filters")
-
-        variable_fltr = dict_with_key_value("field", "Variable", filters)
-        variable = ''
-        if variable_fltr:
-            variable = variable_fltr["values"][0] if "values" in variable_fltr else None
-
-        try:
-            years = int(years)
-        except ValueError:
-            try:
-                years = datetime.datetime.strptime("2008-09-03 00:00:00", "%Y-%m-%d %H:%M:%S").year
-            except ValueError:
-                raise toolkit.ObjectNotFound("'Year' filter value must be an integer "
-                                             "or have '%Y-%m-%d %H:%M:%S' format")
-
-        is_global = False
-        temp      = False if ind_type == 'headline' or ind_type == 'gallery' else True
-        indicator = ProfileIndicator(name, json.dumps(filters), dataset.ckan_meta['id'], data_type, int(years),
-                                     variable, ind_type, visualization_type, None, permission, description, group_ids)
-        owner.indicators.append(indicator)
-
-        self.session.add(indicator)
-
-        return indicator
-
     def remove_indicator_id_from_profiles(self, indicator_id):
         community_profiles = self.get_all_profiles()
 
@@ -280,6 +232,7 @@ class CommunityProfileService(object):
                                                                     ProfileIndicator.id.in_(ids))).all()
         return indicators
 
+    #TODO: seems like this method not used any more
     def get_indicators(self, community, towns_names, location, user=None):
         location  = self.get_town(location)
         towns, existing_towns, existing_indicators = set([location]), set(), set()

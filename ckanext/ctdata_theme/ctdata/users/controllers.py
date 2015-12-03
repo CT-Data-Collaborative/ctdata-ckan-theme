@@ -2,6 +2,7 @@ import json
 import uuid
 import datetime
 
+from dateutil import parser
 from pylons.controllers.util import abort, redirect
 from pylons import session, url
 
@@ -119,7 +120,7 @@ class UserController(UserController):
         c.followee_list = get_action('followee_list')(context, {'id': c.userobj.id})
         activity_stream = logic.get_action('dashboard_activity_list')(context, data_dict)
 
-        c.dataset_activity = filter(lambda a: len(a['data'].keys()) > 0 and a['data'].keys()[0] == 'package', activity_stream)
+        c.dataset_activity = filter(lambda a: self.is_dataset_activity(a), activity_stream)
         c.group_activity   = filter(lambda a: len(a['data'].keys()) > 0 and a['data'].keys()[0] == 'group',   activity_stream)
 
         extra_vars = {
@@ -139,6 +140,18 @@ class UserController(UserController):
         self.session.close()
         return base.render('user/user_page.html', extra_vars={'profiles': profiles, 'gallery_indicators': indicators, 'groups': groups})
 
+    def is_dataset_activity(self, activity_item):
+        current_date    = datetime.datetime.now()
+        timestamp       = parser.parse(activity_item['timestamp'])
+
+        if len(activity_item['data'].keys()) < 1:
+            return False
+        elif activity_item['data'].keys()[0] != 'package':
+            return False
+        elif (current_date - timestamp).days < 8:
+            return True
+
+        return False
 
     def community_profiles(self, user_id):
         user_name = http_request.environ.get("REMOTE_USER")
