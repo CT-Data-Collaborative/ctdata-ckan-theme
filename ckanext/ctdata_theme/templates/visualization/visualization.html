@@ -197,7 +197,7 @@
                 {% if property['key'] == "Suppression" %}
                   <span class="red">{{property['value']}}</span>
                 {% else %}
-		  {{property['value']safe}}
+		  {{property['value'] | safe}}
                 {% endif %}
             </div>
           </li>
