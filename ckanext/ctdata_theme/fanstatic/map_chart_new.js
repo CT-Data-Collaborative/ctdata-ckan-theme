@@ -175,14 +175,11 @@ function draw_map(){
         else if (break_points.type == 'array')
           legend_items = break_points.array
 
-        layer = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+	layer = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
           minZoom: 9,
           maxZoom: 11,
-          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-            'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-          id: 'examples.map-20v6611k'
-        })
+	  attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ"
+	});
 
         $("#container").html('<div id="map"></div>');
 
