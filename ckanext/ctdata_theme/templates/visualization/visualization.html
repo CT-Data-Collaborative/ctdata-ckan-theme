@@ -191,13 +191,13 @@
       <div id="metadata" class="in collapse">
         <ul>
         {% for property in metadata %}
-          <li id="{{property['key']}}">
-            <a class="" >{{property['key']}}</a>
+	  <li id="{{property['key'] | lower | replace(" ", "-") }}">
+	    <a class="">{{property['key']}}</a>
             <div class="dataValue">
                 {% if property['key'] == "Suppression" %}
                   <span class="red">{{property['value']}}</span>
                 {% else %}
-                  {{property['value']}}
+		  {{property['value']safe}}
                 {% endif %}
             </div>
           </li>
