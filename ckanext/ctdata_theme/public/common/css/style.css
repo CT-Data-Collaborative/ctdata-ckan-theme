@@ -615,9 +615,9 @@ a.underlined_on_hover:hover{
 }
 
 /* Styling for Metadata Fields in Admin */
-.tab_content .additional_info .con_row p { float: right; };
-.tab_content .additional_info .con_row ul { float: right; width: 540px; padding-left: 25px; list-style: initial;};
-.tab_content .additional_info .con_row ul li { padding-bottom: 15px; list-style-type: disc;};
+.tab_content .additional_info .con_row p { float: right; }
+.tab_content .additional_info .con_row ul { float: right; width: 540px; padding-left: 25px; list-style: initial;}
+.tab_content .additional_info .con_row ul li { padding-bottom: 15px; list-style-type: disc;}
 
 /* Styling for Metadata Fields in Visualization */
 #full-description .dataValue ul { list-style: initial; padding-left: 20px; }
