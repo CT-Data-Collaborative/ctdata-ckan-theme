@@ -15,7 +15,7 @@ from ..database import Database
 from ..users.services import UserService
 from ..visualization.services import DatasetService
 from ..community.services import CommunityProfileService
-from ..topic.services import TopicSerivce
+from ..topic.services import TopicService
 from ..location.services import LocationService
 from ckan.controllers.user import UserController
 from IPython import embed

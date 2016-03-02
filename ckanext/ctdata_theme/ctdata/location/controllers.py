@@ -17,7 +17,7 @@ from ..utils import dict_with_key_value
 from ..database import Database
 from ..users.services import UserService
 from ..visualization.services import DatasetService
-from ..topic.services import TopicSerivce
+from ..topic.services import TopicService
 from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
 from ..community.services import ProfileAlreadyExists, CantDeletePrivateIndicator

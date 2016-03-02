@@ -14,7 +14,7 @@ from ..database import Database
 from ..users.services import UserService
 from ..visualization.services import DatasetService
 from ..community.services import CommunityProfileService
-from ..topic.services import TopicSerivce
+from ..topic.services import TopicService
 from ckan.controllers.group import GroupController
 from IPython import embed
 import ckan.lib.navl.dictization_functions as dict_fns

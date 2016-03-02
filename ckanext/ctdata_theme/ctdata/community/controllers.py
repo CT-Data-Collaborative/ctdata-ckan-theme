@@ -14,7 +14,7 @@ import ckan.lib.helpers as h
 from ..database import Database
 from ..users.services import UserService
 from ..visualization.services import DatasetService
-from ..topic.services import TopicSerivce
+from ..topic.services import TopicService
 from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
 from services import CommunityProfileService, ProfileAlreadyExists, CantDeletePrivateIndicator
@@ -92,7 +92,7 @@ class CommunityProfilesController(base.BaseController):
     def get_topics(self):
         http_response.headers['Content-type'] = 'application/json'
         geography_types = self.location_service.location_geography_types()
-        topics          = TopicSerivce.get_topics('community_profile')
+        topics          = TopicService.get_topics('community_profile')
 
 
         html  = base.render('communities/snippets/indicator_popup.html', extra_vars={'topics': topics, 'geography_types': geography_types})

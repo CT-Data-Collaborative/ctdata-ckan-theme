@@ -19,7 +19,7 @@ from ctdata.visualization.services import DatasetService
 from ctdata.visualization.querybuilders import QueryBuilderFactory
 from ctdata.visualization.views import ViewFactory
 from ctdata.community.services import CommunityProfileService
-from ctdata.topic.services import TopicSerivce
+from ctdata.topic.services import TopicService
 from ctdata.users.services import UserService
 from ctdata.location.services import LocationService
 
@@ -67,7 +67,7 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             # m.connect('join_for_two_datasets', '/compare/join_for_two_datasets/', action='join_for_two_datasets')
 
         with routes.mapper.SubMapper(route_map, controller='ckanext.ctdata_theme.plugin:CTDataController') as m:
-            m.connect('home', '/', action='home')
+            # m.connect('home', '/', action='home')
             m.connect('news', '/news', action='news')
             m.connect('special_projects', '/special_projects', action='special_projects')
             m.connect('about', '/about', action='about')
@@ -107,7 +107,6 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('update_community_profiles', '/user/update_community_profiles', action='update_community_profiles')
             m.connect('/user/activity/{id}/{offset}', action='activity')
             m.connect('user_activity_stream', '/user/activity/{id}',action='activity', ckan_icon='time')
-
             m.connect('user_generate_apikey', '/user/generate_key/{id}', action='generate_apikey')
             m.connect('user_follow', '/user/follow/{id}', action='follow')
             m.connect('/user/unfollow/{id}', action='unfollow')
@@ -124,12 +123,13 @@ class CTDataThemePlugin(plugins.SingletonPlugin):
             m.connect('/user/set_lang/{lang}', action='set_lang')
             m.connect('user_datasets', '/user/{id:.*}', action='read',ckan_icon='sitemap')
 
-        with routes.mapper.SubMapper(route_map,
-            controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
-            m.connect('page_about', '/pages/about', action='about')
-            m.connect('page_news', '/pages/news', action='news')
-            m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
-            m.connect('page_data_gallery', '/data-gallery', action='data_gallery')
+        # Disabling Pages
+        # with routes.mapper.SubMapper(route_map,
+        #     controller='ckanext.ctdata_theme.ctdata.pages.controllers:PageController') as m:
+        #     m.connect('page_about', '/pages/about', action='about')
+        #     m.connect('page_news', '/pages/news', action='news')
+        #     m.connect('page_special_projects', '/pages/special-projects', action='special_projects')
+        #     m.connect('page_data_gallery', '/data-gallery', action='data_gallery')
 
         with routes.mapper.SubMapper(route_map,
                 controller='ckanext.ctdata_theme.ctdata.group.controllers:GroupController') as m:
@@ -207,17 +207,19 @@ class CTDataController(base.BaseController):
         self.community_profile_service = CommunityProfileService(self.session)
         self.user_service = UserService(self.session)
 
-    def home(self):
-        redirect('data_by_topic')
-
+    # def home(self):
+    #     redirect('data_by_topic')
+    #
     def news(self):
-        return abort(404)
+        redirect('home')
+        # return abort(404)
 
     def special_projects(self):
+        redirect('home')
         return abort(404)
 
     def data_by_topic(self):
-        domains = TopicSerivce.get_topics('data_by_topic')
+        domains = TopicService.get_topics('data_by_topic')
 
         self.session.close()
         return base.render('data_by_topic.html', extra_vars={'domains': domains})

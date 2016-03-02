@@ -1,64 +1,56 @@
-<div id="topnav" class="row">
-<div class="spacing col-xs-12">
-<ul>
-<li class=""><a href="https://twitter.com/CTOpenData"><i class="fa fa-twitter fa-md"></i></a></li>
-<li class=""><a href="https://www.facebook.com/pages/CT-Data-Collaborative/150954425018093"><i class="fa fa-facebook fa-md"></i></a></li>
-<li class=""><a href='http://ctdata.org/about'>About </a></li>
-<li class=""><a href="http://ctdata.org/blog">Blog</a></li>
-<li class=""><a href="mailto:info@ctdata.org">Contact</a></li>
-{% if c.userobj %}
-    <li>
-        <a href="/dashboard" class="image" title="{{ _('View profile') }}">
-          <i class="icon-dashboard"></i>
-            My Dashboard
-        </a>
-    </li>
-    {% set new_activities = h.new_activities() %}
-    <!-- <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
-    {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)', 'Dashboard (%(num)d new items)', new_activities) %}
-    <a href="{{ h.url_for(controller='user', action='dashboard') }}" title="{{ notifications_tooltip }}">
-        <i class="icon-dashboard"></i>
-        <span>{{ new_activities }}</span>
-    </a>
-    </li> -->
-    <!-- <li>
-        <a href="{{ h.url_for(controller='user', action='edit', id=c.userobj.name) }}" title="{{ _('Edit settings') }}">
-            <i class="icon-cog"></i>
-        </a>
-    </li> -->
-{% else %}
-<li class="">
-  <a href="{{ h.url_for(controller='user', action='login') }}" title="{{ _('Edit settings') }}">
-    <i class="icon-dashboard"></i>
-      My Dashboard
-  </a>
-</li>
-{% endif %}
-</ul>
-</div>
-</div>
-
-<div id="hdr" class="row">
-  <div class="spacing">
-    <div class="logo">
-      {% if c.action != 'data_gallery' %}
-      <a href="/"><img src="/common/images/logo-main.jpg" alt="Connecticut Data Collaborative - Changing the way Connecticut uses data" border="0"/></a>
-      {% else %}
-      <a href="/"><img src="/common/images/logo-ds.jpg" alt="Connecticut Data Collaborative - Changing the way Connecticut uses data" border="0"/></a>
-      {% endif %}
+<nav class="navbar">
+    <!-- /.overlay -->
+    <div class="navbar-brand">
+        <div class="logo">
+            <img src="/common/images/logo.svg">
+        </div>
+        <!-- /.logo -->
     </div>
-
-    <div id="" class="">
-    <ul>
-      <li class=""><a href="/data_by_topic"><i class="fa fa-play-circle"></i>Data by Topic</a></li>
-      <!--<li class=""><a href="/location"><i class="fa fa-play-circle"></i>Data by Location</a></li>-->
-      <li class=""><a href="/organization"><i class="fa fa-play-circle"></i>Datasets by Organization</a></li>
-      <li class=""><a href="/data_gallery"><i class="fa fa-play-circle"></i>Data Gallery</a></li>
-      <li class=""><a href="http://ctdata.org/special-projects"><i class="fa fa-play-circle"></i>Special Projects</a></li>
-      <li class=""><a href="http://nccsweb.urban.org/communityplatform/ct" target="_blank"><i class="fa fa-play-circle"></i>CT Non-profit Strategy Platform</a></li>
-    </ul>
-    </div>
-
-  </div>
-</div>
+    <div class="ctdata-nav">
+        <ul class="ctdata-nav-list">
+            <li class="ctdata-nav-list-item"><a href="http://CT-Data-Collaborative.github.io">Home</a></li>
+            <!-- /.nav-item -->
+            <li class="ctdata-nav-list-item active"><a href="/">Data</a></li>
+            <!-- /.nav-item -->
+            <li class="ctdata-nav-list-item"><a href="http://CT-Data-Collaborative.github.io/services">Services</a></li>
+            <!-- /.nav-item -->
+            <li class="ctdata-nav-list-item"><a href="http://CT-Data-Collaborative.github.io/about">About</a></li>
+            <!-- /.nav-item -->
+            <li class="ctdata-nav-list-item"><a href="http://CT-Data-Collaborative.github.io/news">News</a></li>
+            <!-- /.nav-item -->
+            <li class="ctdata-nav-list-item"><a href="http://CT-Data-Collaborative.github.io/ask">Ask</a></li>
+            <!-- /.nav-item -->
+            {% if c.userobj %}
+                <li class="ctdata-nav-list-item">
+                    <a href="/dashboard" class="image" title="{{ _('View profile') }}">
+                        <i class="icon-dashboard"></i>
+                    </a>
+                </li>
+                {% set new_activities = h.new_activities() %}
+                <!-- <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
+                {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)', 'Dashboard (%(num)d new items)', new_activities) %}
+                <a href="{{ h.url_for(controller='user', action='dashboard') }}" title="{{ notifications_tooltip }}">
+                    <i class="icon-dashboard"></i>
+                    <span>{{ new_activities }}</span>
+                </a>
+                </li> -->
+                            <!-- <li>
+                    <a href="{{ h.url_for(controller='user', action='edit', id=c.userobj.name) }}" title="{{ _('Edit settings') }}">
+                        <i class="icon-cog"></i>
+                    </a>
+                </li> -->
+                        {% else %}
+                <li class="ctdata-nav-list-item">
+                    <a href="{{ h.url_for(controller='user', action='login') }}" title="{{ _('Edit settings') }}">
+                        <i class="icon-dashboard"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div><!--
+    <button class="navbar-toggler hidden-md-up top-right" type="button" data-toggle="collapse" data-target="#collapseableNavbar">
+    menu
+    </button>-->
+</nav>
+<!-- /.navbar -->
 
