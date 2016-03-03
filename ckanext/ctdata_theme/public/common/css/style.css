@@ -1796,6 +1796,21 @@ li.ctdata-nav-list-item.active a {
     margin-right: 3rem;
 }
 
+
+.data-path p.text {
+    padding-top: 1.5rem;
+    font-size: 1.75rem;
+    line-height: 2rem;
+    font-family: 'Roboto Condensed';
+    font-weight: 300;
+    max-width: 75%;
+    /*text-align: left;*/
+}
+
+.data-path a:hover p.text {
+    padding-top: 2rem;
+}
+
 @media screen and (min-width: 30rem) {
    .data-path a p, .data-path a i {
     font-size: 2.5rem;
