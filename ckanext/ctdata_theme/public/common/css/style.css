@@ -402,13 +402,8 @@ span.dot{
   margin-right: -15px;
   /* font-size: 12px; */
   font-weight: 100;
-<<<<<<< HEAD
-
 }
 
-=======
-}
->>>>>>> fedf840476cab5e56665c3ffe133fcbea9776a2e
 @media screen and (max-width: 1070px) {
     .subtopic {
         width: 33.6%;
@@ -618,3 +613,12 @@ a.underlined_on_hover:hover{
   left: 52px;
   top: -22px;
 }
+
+/* Styling for Metadata Fields in Admin */
+.tab_content .additional_info .con_row p { float: right; }
+.tab_content .additional_info .con_row ul { float: right; width: 540px; padding-left: 25px; list-style: initial;}
+.tab_content .additional_info .con_row ul li { padding-bottom: 15px; list-style-type: disc;}
+
+/* Styling for Metadata Fields in Visualization */
+#full-description .dataValue ul { list-style: initial; padding-left: 20px; }
+#full-description .dataValue ul li { list-style-type: disc; padding-bottom: 5px; }

@@ -52,7 +52,11 @@
             {% if key not in ['Default', 'Disabled Dimensions','Disabled Views', 'Hidden In', 'Units', 'Visible Metadata'] %}
             <div class="con_row">
                 <label>{{ _(key) }}</label>
-                <p>{{ value }}</p>
+		{%  if key in ['Full Description', 'Technical Notes'] %}
+		    {{ value | safe }}
+		{% else %}
+		    <p>{{ value }}</p>
+		{% endif %}
             </div>
             {% endif %}
         {% endfor %}
