@@ -738,18 +738,24 @@ var percent_fmt = d3.format(".2%");
 function unit_for_value(value, type){
     console.log('formatting value');
     console.log(value);
-    if (typeof(value) == 'string') {
-        if (units[type] == '$'){
-            return units[type] + value;
-        }
-        else{
-            if (value || value == 0) {
-                return value.toString() + units[type]
-            }
 
-            else {
-                return value;
+    if (typeof(value) == 'string') {
+        console.log('test 1');
+        if ( units[type] != undefined) {
+            if (units[type] == '$') {
+                return units[type] + value;
             }
+            else {
+                if (value || value == 0) {
+                    return value.toString() + units[type]
+                }
+
+                else {
+                    return value;
+                }
+            }
+        } else {
+            return value;
         }
     }
 
@@ -769,6 +775,7 @@ function unit_for_value(value, type){
     }
 
     if (typeLC == 'number') {
+        console.log('test 2')
         if (units[type] == '$') {
             return currency_fmt(value);
         } else {
