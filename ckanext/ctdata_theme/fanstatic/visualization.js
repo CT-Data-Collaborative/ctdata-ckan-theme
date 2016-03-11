@@ -569,6 +569,7 @@ function handle_incompatibilities(compatibles){
     console.log('Finish handle incompatibilities!');
 }
 
+// TODO FIX BUG WITH FORMATTING
 function draw_table(){
     console.log('Start drawing table')
     var dataset_id = $("#dataset_id").val(),
@@ -581,7 +582,7 @@ function draw_table(){
             omit_single_values: true
         }),
         contentType: 'application/json; charset=utf-8'}).done(function(data) {
-        console.log(data)
+        //console.log(data)
         handle_incompatibilities(data['compatibles']);
         if (needed_view_type == 'table')
             change_page_url(data['link']);
@@ -640,6 +641,7 @@ function draw_table(){
                     if (cur_value == SUPPRESSED_VALUE) cur_value = '*'
 
                     text = cur_value.toString()
+
                     array = text.split('.')
 
                     if (jQuery.isNumeric(text) == true && array.length == 1)
@@ -651,12 +653,15 @@ function draw_table(){
                         }
                     }
 
-                    type = data['data'][row_index]['dims']['Measure Type']
+                    type = data['data'][row_index]['dims']['Measure Type'];
                     if (type == undefined && $('input:checked', $('#collapseMeasureType'))[0] != undefined)
                         type = $('input:checked', $('#collapseMeasureType'))[0].value
 
+                    console.log(cur_value);
+                    console.log(type);
                     if (type != undefined)
-                        cur_value = unit_for_value(cur_value, type)
+                        cur_value = unit_for_value(cur_value, type);
+                        console.log("Post unit_for_value call: " + cur_value);
 
                     if (data['data'][row_index]['moes'].length != 0 && cur_value != '*'){
                         moes_value = data['data'][row_index]['moes'][year_index]
@@ -669,7 +674,7 @@ function draw_table(){
                 });
             } else {
                 cur_value = data['data'][row_index]['data'][0];
-                text = cur_value
+                text = cur_value;
                 if (jQuery.isNumeric(text) == true){
                     if (Number(text)===text && text%1 !==0 ) cur_value = parseInt(text).toLocaleString('en-US')
                 }
@@ -728,8 +733,26 @@ var currency_fmt = d3.format("$,d");
 var number_fmt = d3.format(",d");
 var percent_fmt = d3.format(".2%");
 
+
+// TODO FIX BUG WITH FORMATTING FOR TABLES
 function unit_for_value(value, type){
-    //console.log(value);
+    console.log('formatting value');
+    console.log(value);
+    if (typeof(value) == 'string') {
+        if (units[type] == '$'){
+            return units[type] + value;
+        }
+        else{
+            if (value || value == 0) {
+                return value.toString() + units[type]
+            }
+
+            else {
+                return value;
+            }
+        }
+    }
+
     var isSuppressed = (value == '*' || value == -9999 || value == '-' || value == 'Suppressed');
     if (isSuppressed) {
         return value;
@@ -739,22 +762,43 @@ function unit_for_value(value, type){
         return value;
     }
 
-    switch(type.toLowerCase()) {
-        case 'number':
-            return number_fmt(value);
-            break;
-        case 'percent':
-            return percent_fmt(value/100);
-            break;
-        case 'currency':
-            return  currency_fmt(value);
-            break;
-        case 'mill rate':
-            return value;
-            break;
-        default:
-            return value;
+    try {
+        var typeLC = type.toLowerCase();
+    } catch (TypeError) {
+        var typeLC = type;
     }
+
+    if (typeLC == 'number') {
+        if (units[type] == '$') {
+            return currency_fmt(value);
+        } else {
+            return number_fmt(value);
+        }
+    } else if (typeLC == 'percent') {
+        return percent_fmt(value);
+    } else if (typeLC == 'currency') {
+        return currency_fmt(value)
+    } else if (typeLC == 'mill rate') {
+        return value;
+    } else {
+        return value;
+    }
+    //switch(typeLC) {
+    //    case 'number':
+    //        return number_fmt(value);
+    //        break;
+    //    case 'percent':
+    //        return percent_fmt(value/100);
+    //        break;
+    //    case 'currency':
+    //        return  currency_fmt(value);
+    //        break;
+    //    case 'mill rate':
+    //        return value;
+    //        break;
+    //    default:
+    //        return value;
+    //}
     //
     //if ( units[type] != undefined){
     //    if (units[type] == '$'){
