@@ -18,6 +18,9 @@ def dev():
 def uname():
     run('uname -a')
 
+def newProd():
+    env.hosts = ['ckan-data-2']
+
 def beta():
     env.hosts = ['beta']
 
