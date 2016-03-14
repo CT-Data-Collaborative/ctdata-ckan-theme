@@ -108,4 +108,4 @@ def deploy(migrate=None):
             migrateStr = "python ckanext/ctdata_theme/migration/manage.py upgrade {}".format(migrate)
             run(migrateStr)
         run('python setup.py develop')
-        run('sudo service apache2 restart')
+        run('sudo service nginx restart')
