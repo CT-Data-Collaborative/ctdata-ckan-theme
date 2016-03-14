@@ -7,6 +7,7 @@ def upgrade(migrate_engine):
   meta = MetaData(bind=migrate_engine)
 
   ######################## locations_regions #########################################
+  # Commented out lines are for dealing with migrations in setting up development server #
   locations = Table('ctdata_locations', meta, autoload=True)
   regions   = Table('ctdata_regions',   meta, autoload=True)
 
@@ -16,7 +17,7 @@ def upgrade(migrate_engine):
     Column('region_id',   Integer, ForeignKey("ctdata_regions.id"),   nullable = False)
   )
 
-  locations_regions.create()
+  # locations_regions.create()
 
 def downgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)

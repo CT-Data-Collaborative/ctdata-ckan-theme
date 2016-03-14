@@ -4,186 +4,254 @@
 
 {% block content %}
 {% block maintag %}{{ super() }}{% endblock %}
-<link   rel="stylesheet" type="text/css" href="/common/css/carousel.css">
-<link   rel="stylesheet" type="text/css" href="/common/css/pygments-manni.css">
-<link   rel="stylesheet" type="text/css" href="/common/css/docs.css">
-<link   rel="stylesheet" type="text/css" href="/common/css/bootstrap.css">
-<link   rel="stylesheet" type="text/css" href="/common/css/bootstrap.css.map">
-<link   rel="stylesheet" type="text/css" href="/common/css/font-awesome.min.css">
-
-<div id="myCarousel" class="carousel slide" data-ride="carousel">
-<ol class="carousel-indicators-new">
-<li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-<li data-target="#myCarousel" data-slide-to="1"></li>
-<li data-target="#myCarousel" data-slide-to="2"></li>
-<li data-target="#myCarousel" data-slide-to="3"></li>
-</ol>
-<div class="carousel-inner">
-
-
-<div class="item active">
-<img src="common/images/ctcapitol.jpg" alt="First slide">
-<div class="container">
-<div class="carousel-caption-new">
-<h1>Changing the way <br />Connecticut uses data</h1>
-<p>CTDC is a public-private partnership working to increase the quality and availability of data for effective planning and policy.</p>
-</div>
-</div>
-</div>
-
-<div class="item">
-<img src="common/images/ct-college.jpg" alt="Second slide">
-<div class="container">
-<div class="carousel-caption-new">
-<h1>Advocacy</h1>
-<p>Advocating for the public availability of all state data to inform public debate and to drive planning, policy, budgeting and decision making in state government.</p>
-</div>
-</div>
-</div>
-
-<div class="item">
-<img src="common/images/ct-aerial.jpg" alt="Third slide">
-<div class="container">
-<div class="carousel-caption-new">
-<h1>Building Capacity</h1>
-<p>Create a learning community of data users to engage, analyze and understand data by utilizing consumer friendly interactive visualization tools that help tell the data story.</p>
-</div>
-</div>
-</div>
-
-<div class="item">
-<img src="common/images/ctlegislative.jpg" alt="Fourth slide">
-<div class="container">
-<div class="carousel-caption-new">
-<h1>Access</h1>
-<p>Meeting demands for public access to data through the Collaborative's data portal, CTData.org, and the associated Connecticut Nonprofit Strategy Platform.</p>
-</div>
-</div>
-</div>
-
-</div>
-<a class="left carousel-control-new" href="#myCarousel" role="button" data-slide="prev"><span class="">
-  <img src="common/images/aleft.png" border="0" ></span>
-</a>
-<a class="right carousel-control-new" href="#myCarousel" role="button" data-slide="next">
-  <span class=""><img src="common/images/aright.png" border="0" ></span>
-</a>
-</div>
-
-<div align="center">
-<div id="master">
-
-<div id="databytopic">
-  <div class="spacing">
-    <h2>Explore Data by Topic</h2>
-    <ul>
-      <li><a href="/data_by_topic#civic_vitality"><i class="fa fa-institution fa-2x"></i>     <br/>Civic Vitality</a></li>
-      <li><a href="/data_by_topic#demographics">  <i class="fa fa-pie-chart fa-2x"></i>       <br/>Demographics</a></li>
-      <li><a href="/data_by_topic#economy">       <i class="fa fa-line-chart fa-2x"></i>      <br/>Economy</a></li>
-      <li><a href="/data_by_topic#health">        <i class="fa fa-medkit fa-2x"></i>          <br/>Health</a></li>
-      <li><a href="/data_by_topic#education">     <i class="fa fa-graduation-cap fa-2x"></i>  <br/>Education</a></li>
-      <li><a href="/data_by_topic#housing">       <i class="fa fa-home fa-2x"></i>            <br/>Housing</a></li>
-      <li><a href="/data_by_topic#safety">        <i class="fa fa-lock fa-2x"></i>            <br/>Safety</a></li>
-    </ul>
-    <br clear="all" />
-  </div>
-</div>
-
-  </div>
-</div>
-
-<div id="databylocation" class="location">
-<div class="spacing">
-  <a name="data-by-location" class="data_by_location"><h2>Explore Town Profiles</h2></a>
-  <a href="http://profiles.ctdata.org"> <button class="button-warning button-get-started button-xlarge pure-button"> Get Started </button></a>
-  <br clear="all" />
-</div>
-</div>
-
-<div id="newsmods">
-  <div class="spacing">
-    <div class="newsbox">
-      <img src="common/images/ctdata-emotional.jpg" alt="" border="0" />
-      <a href="/organization/uscensus">
-        <h2>2010-2014 US Census ACS Data Posted</h2>
-      </a>
-      <p>The US Census has released the latest 5-year American Community Survey (ACS) data. Check Data by Organization
-          to view the latest data.
-      </p>
-      <br />
-      <a href="/organization/uscensus">
-        Explore
-        <i class="fa fa-arrow-circle-right"></i>
-      </a>
+{#<link   rel="stylesheet" type="text/css" href="/common/css/carousel.css">#}
+{#<link   rel="stylesheet" type="text/css" href="/common/css/pygments-manni.css">#}
+{#<link   rel="stylesheet" type="text/css" href="/common/css/docs.css">#}
+{#<link   rel="stylesheet" type="text/css" href="/common/css/bootstrap.css">#}
+{#<link   rel="stylesheet" type="text/css" href="/common/css/bootstrap.css.map">#}
+{#<link   rel="stylesheet" type="text/css" href="/common/css/font-awesome.min.css">#}
+{##}
+{#<div id="myCarousel" class="carousel slide" data-ride="carousel">#}
+{#<ol class="carousel-indicators-new">#}
+{#<li data-target="#myCarousel" data-slide-to="0" class="active"></li>#}
+{#<li data-target="#myCarousel" data-slide-to="1"></li>#}
+{#<li data-target="#myCarousel" data-slide-to="2"></li>#}
+{#<li data-target="#myCarousel" data-slide-to="3"></li>#}
+{#</ol>#}
+{#<div class="carousel-inner">#}
+{##}
+{##}
+{#<div class="item active">#}
+{#<img src="common/images/ctcapitol.jpg" alt="First slide">#}
+{#<div class="container">#}
+{#<div class="carousel-caption-new">#}
+{#<h1>Changing the way <br />Connecticut uses data</h1>#}
+{#<p>CTDC is a public-private partnership working to increase the quality and availability of data for effective planning and policy.</p>#}
+{#</div>#}
+{#</div>#}
+{#</div>#}
+{##}
+{#<div class="item">#}
+{#<img src="common/images/ct-college.jpg" alt="Second slide">#}
+{#<div class="container">#}
+{#<div class="carousel-caption-new">#}
+{#<h1>Advocacy</h1>#}
+{#<p>Advocating for the public availability of all state data to inform public debate and to drive planning, policy, budgeting and decision making in state government.</p>#}
+{#</div>#}
+{#</div>#}
+{#</div>#}
+{##}
+{#<div class="item">#}
+{#<img src="common/images/ct-aerial.jpg" alt="Third slide">#}
+{#<div class="container">#}
+{#<div class="carousel-caption-new">#}
+{#<h1>Building Capacity</h1>#}
+{#<p>Create a learning community of data users to engage, analyze and understand data by utilizing consumer friendly interactive visualization tools that help tell the data story.</p>#}
+{#</div>#}
+{#</div>#}
+{#</div>#}
+{##}
+{#<div class="item">#}
+{#<img src="common/images/ctlegislative.jpg" alt="Fourth slide">#}
+{#<div class="container">#}
+{#<div class="carousel-caption-new">#}
+{#<h1>Access</h1>#}
+{#<p>Meeting demands for public access to data through the Collaborative's data portal, CTData.org, and the associated Connecticut Nonprofit Strategy Platform.</p>#}
+{#</div>#}
+{#</div>#}
+{#</div>#}
+{##}
+{#</div>#}
+{#<a class="left carousel-control-new" href="#myCarousel" role="button" data-slide="prev"><span class="">#}
+{#  <img src="common/images/aleft.png" border="0" ></span>#}
+{#</a>#}
+{#<a class="right carousel-control-new" href="#myCarousel" role="button" data-slide="next">#}
+{#  <span class=""><img src="common/images/aright.png" border="0" ></span>#}
+{#</a>#}
+{#</div>#}
+{##}
+{#<div align="center">#}
+{#<div id="master">#}
+{##}
+{#<div id="databytopic">#}
+{#  <div class="spacing">#}
+{#    <h2>Explore Data by Topic</h2>#}
+{#    <ul>#}
+{#      <li><a href="/data_by_topic#civic_vitality"><i class="fa fa-institution fa-2x"></i>     <br/>Civic Vitality</a></li>#}
+{#      <li><a href="/data_by_topic#demographics">  <i class="fa fa-pie-chart fa-2x"></i>       <br/>Demographics</a></li>#}
+{#      <li><a href="/data_by_topic#economy">       <i class="fa fa-line-chart fa-2x"></i>      <br/>Economy</a></li>#}
+{#      <li><a href="/data_by_topic#health">        <i class="fa fa-medkit fa-2x"></i>          <br/>Health</a></li>#}
+{#      <li><a href="/data_by_topic#education">     <i class="fa fa-graduation-cap fa-2x"></i>  <br/>Education</a></li>#}
+{#      <li><a href="/data_by_topic#housing">       <i class="fa fa-home fa-2x"></i>            <br/>Housing</a></li>#}
+{#      <li><a href="/data_by_topic#safety">        <i class="fa fa-lock fa-2x"></i>            <br/>Safety</a></li>#}
+{#    </ul>#}
+{#    <br clear="all" />#}
+{#  </div>#}
+{#</div>#}
+{##}
+{#  </div>#}
+{#</div>#}
+{##}
+{#<div id="databylocation" class="location">#}
+{#<div class="spacing">#}
+{#  <a name="data-by-location" class="data_by_location"><h2>Explore Town Profiles</h2></a>#}
+{#  <a href="http://profiles.ctdata.org"> <button class="button-warning button-get-started button-xlarge pure-button"> Get Started </button></a>#}
+{#  <br clear="all" />#}
+{#</div>#}
+{#</div>#}
+{##}
+{#<div id="newsmods">#}
+{#  <div class="spacing">#}
+{#    <div class="newsbox">#}
+{#      <img src="common/images/ctdata-emotional.jpg" alt="" border="0" />#}
+{#      <a href="/organization/uscensus">#}
+{#        <h2>2010-2014 US Census ACS Data Posted</h2>#}
+{#      </a>#}
+{#      <p>The US Census has released the latest 5-year American Community Survey (ACS) data. Check Data by Organization#}
+{#          to view the latest data.#}
+{#      </p>#}
+{#      <br />#}
+{#      <a href="/organization/uscensus">#}
+{#        Explore#}
+{#        <i class="fa fa-arrow-circle-right"></i>#}
+{#      </a>#}
+{#    </div>#}
+{##}
+{#    <div class="newsbox">#}
+{#      <img src="common/images/ctrp3-thumb.jpg" alt="" border="0" />#}
+{#      <a href="http://ctrp3.ctdata.org/news/year_two_first_look">#}
+{#        <h2>A First Look at Oct. 2014 to March 2015 Traffic Stop Data</h2>#}
+{#      </a>#}
+{#      Explore some summary graphics detailing changing trends in the newly released traffic stop data.#}
+{#      <br />#}
+{#      <a href="http://ctrp3.ctdata.org/news/year_two_first_look">#}
+{#        Explore#}
+{#        <i class="fa fa-arrow-circle-right"></i>#}
+{#      </a>#}
+{#    </div>#}
+{##}
+{#    <div class="newsbox">#}
+{#      <img src="common/images/ctrp3-thumb.jpg" alt="" border="0" />#}
+{#      <a href="http://ctrp3.ctdata.org/news/report_story">#}
+{#        <h2>Explore Racial Profiling Statistical Techniques Data Story</h2>#}
+{#      </a>#}
+{#      Read our latest data story which details statistical techniques used in the April 2015 IMRP report.#}
+{#      <br />#}
+{#      <a href="http://ctrp3.ctdata.org/news/report_story">#}
+{#        Explore#}
+{#        <i class="fa fa-arrow-circle-right"></i>#}
+{#      </a>#}
+{#    </div>#}
+{##}
+{#<!--#}
+{#    <div class="newsbox">#}
+{#      <img src="common/images/ctdata-lob.jpg" alt="" border="0" />#}
+{#      <a href="http://ofa.ctdata.org">#}
+{#        <h2>State Grants to Towns</h2>#}
+{#      </a>#}
+{#        Explore interactive visualizations of state grant data provided to municipalities and provided here in partnership with the Legislative Office of Fiscal Analysis.#}
+{#      <br />#}
+{#      <a href="http://ofa.ctdata.org/">#}
+{#        Explore#}
+{#        <i class="fa fa-arrow-circle-right"></i>#}
+{#      </a>#}
+{#=======#}
+{#{% block styles %}#}
+{##}
+{#    <!--<link rel="stylesheet" type="text/css" href="/common/css/carousel.css">-->#}
+{#    <link rel="stylesheet" type="text/css" href="/common/css/pygments-manni.css">#}
+{#    <link rel="stylesheet" type="text/css" href="/common/css/docs.css">#}
+{#    <link rel="stylesheet" type="text/css" href="/common/css/bootstrap.css">#}
+{#    <link rel="stylesheet" type="text/css" href="/common/css/bootstrap.css.map">#}
+{#    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">#}
+{#    {{ super() }}#}
+{#{% endblock %}#}
+{##}
+{#{% block header %}#}
+{#    <div id="homepageHeader">{{ super() }}</div>{% endblock %}#}
+{#{% block content %}#}
+{#    {% block maintag %}{{ super() }}{% endblock %}#}
+{#    <div class="hero">#}
+{#        <img src="common/images/ctlegislative.jpg" alt="">#}
+{#        <div class="top-gradient"></div>#}
+{#        <div class="page-title"><p>We make accessing data easy!</p></div>#}
+{#        <!-- /.page-title -->#}
+{#        <!-- /.top-gradient -->#}
+{#    </div>#}
+    <!-- /.hero -->
+<div class="container-fluid" id="home">
+    <div class="row white">
+        <div class="col-sm-10 col-sm-offset-1">
+            <h3>Our data portal contains over 135 public datasets that we have
+                curated and processed into a machine-readable structure. Use our custom data-exploration tools
+                to visualize the data, download the raw data and explore it on your own, or explore town-level data
+                through our <a href="profiles.ctdata.org">Connecticut Town Profiles</a> portal.</h3>
+        </div>
+        <!-- /.col-sm-12 -->
     </div>
+    <!-- /.row -->
+    <div class="row blue">
+                     <div class="col-sm-12 col-md-10 col-md-offset-1">
+                     <div class="row">
+                     <!-- /.col-sm-12 col-md-10 col-md-offset-1 -->
+                     <div class="col-xs-10 col-xs-offset-1 col-sm-4 col-sm-offset-0">
+                     <div class="data-path" id="dataByTopic">
+                     <a href="/data_by_topic">
+                     <i class="fa fa-tags fa-inverse fa-2x"></i>
+                     <p class="white">Data by Topic</p>
+                     <p class="white text">Explore data with our custom visualization tools. Filter, chart, map and download
+                     it to share.</p>
+                     </a>
+                     </div>
+                     </div>
+                     <div class="col-xs-10 col-xs-offset-1 col-sm-4 col-sm-offset-0">
+                     <div class="data-path">
+                     <a href="http://profiles.ctdata.org">
+                     <i class="fa fa-map-o fa-2x fa-inverse"></i>
+                     <p class="white">Data by Location</p>
+                     <p class="white text">Compare core indicators by town, county, and with state values.</p>
+                     </a>
+                     </div>
+                     <!-- /.dataPath -->
+                     </div>
+                     <div class="col-xs-10 col-xs-offset-1 col-sm-4 col-sm-offset-0">
+                     <div class="data-path">
+                     <a href="/dataset">
+                     <i class="fa fa-database fa-2x fa-inverse"></i>
+                     <p class="white">Raw Data</p>
+                     <p class="white text">Find public state and federal datasets grouped by the source organization. If you
+                     are a developer, use the CKAN API to access our datasets directly.</p>
+                     </a>
+                     </div>
+                     <!-- /.dataPath -->
+                     </div>
+                     </div>
+                     <!-- /.row -->
+                     </div>
+                     </div>
+    <div class="row white">
+                      <div class="col-sm-10 col-sm-offset-1">
+                      <h3>
+                      If you can't find a dataset you're looking for, please submit a <a href="#">dataset request</a>.
+                      </h3>
+                      <h3>To explore our special projects, please view our project list <a href="#">here</a>.</h3>
+                      </div>
+                      </div>
+    <!-- /.row -->
 
-    <div class="newsbox">
-      <img src="common/images/ctrp3-thumb.jpg" alt="" border="0" />
-      <a href="http://ctrp3.ctdata.org/news/year_two_first_look">
-        <h2>A First Look at Oct. 2014 to March 2015 Traffic Stop Data</h2>
-      </a>
-      Explore some summary graphics detailing changing trends in the newly released traffic stop data.
-      <br />
-      <a href="http://ctrp3.ctdata.org/news/year_two_first_look">
-        Explore
-        <i class="fa fa-arrow-circle-right"></i>
-      </a>
-    </div>
-
-    <div class="newsbox">
-      <img src="common/images/ctrp3-thumb.jpg" alt="" border="0" />
-      <a href="http://ctrp3.ctdata.org/news/report_story">
-        <h2>Explore Racial Profiling Statistical Techniques Data Story</h2>
-      </a>
-      Read our latest data story which details statistical techniques used in the April 2015 IMRP report.
-      <br />
-      <a href="http://ctrp3.ctdata.org/news/report_story">
-        Explore
-        <i class="fa fa-arrow-circle-right"></i>
-      </a>
-    </div>
-
-<!--
-    <div class="newsbox">
-      <img src="common/images/ctdata-lob.jpg" alt="" border="0" />
-      <a href="http://ofa.ctdata.org">
-        <h2>State Grants to Towns</h2>
-      </a>
-        Explore interactive visualizations of state grant data provided to municipalities and provided here in partnership with the Legislative Office of Fiscal Analysis.
-      <br />
-      <a href="http://ofa.ctdata.org/">
-        Explore
-        <i class="fa fa-arrow-circle-right"></i>
-      </a>
-    </div>
-
-    <div class="newsbox">
-      <img src="common/images/ctdata-emotional.jpg" alt="" border="0" />
-      <a href="http://ctrp3.ctdata.org/">
-        <h2>Six More Months of Traffic Stop Data</h2>
-      </a>
-      The Racial Profiling Prohibition Project Data Portal has been updated with an additional six months of traffic stop data, covering October 2014 to March 2015.
-      <br />
-      <a href="http://ctrp3.ctdata.org/">
-        Explore
-        <i class="fa fa-arrow-circle-right"></i>
-      </a>
-    </div>
--->
-  </div>
 </div>
+<!-- /.container-fluid -->
 
 {% endblock %}
-
 {% block scripts %}
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <script src="/common/js/docs.min.js"></script>
-  <script src="/common/js/bootstrap.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="/common/js/docs.min.js"></script>
+    <script src="/common/js/bootstrap.js"></script>
 
-  <script src="/common/js/ie-emulation-modes-warning.js"></script>
-  <script src="/common/js/ie8-responsive-file-warning.js"></script>
-  <script src="/common/js/ie10-viewport-bug-workaround.js"></script>
-  <script src="/common/js/ZeroClipboard.js"></script>
-  <script src="/common/js/index_page.js"></script>
+    <script src="/common/js/ie-emulation-modes-warning.js"></script>
+    <script src="/common/js/ie8-responsive-file-warning.js"></script>
+    <script src="/common/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="/common/js/ZeroClipboard.js"></script>
+    <script src="/common/js/index_page.js"></script>
 {% endblock %}
 <!-- -->

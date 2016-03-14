@@ -6,12 +6,24 @@ import datetime
 env.use_ssh_config = True
 
 
+
 # CKAN Hosts
+
+def dev():
+    env.hosts = ['192.168.33.15']
+    env.user = 'vagrant'
+    result = local('vagrant ssh-config 261e56d | grep IdentityFile', capture=True)
+    env.key_filename=result.split()[1]
+
+def uname():
+    run('uname -a')
+
 def beta():
     env.hosts = ['beta']
 
 def production():
     env.hosts = ['ckan']
+
 
 # Data dump functions
 def getTimestamp(ts=None):
@@ -77,6 +89,14 @@ def dumpAndDownload(passwd, localpath):
 
 
 # Deployment Functions
+def develop():
+    code_dir = '/home/vagrant/theme' 
+    with cd(code_dir), prefix('source /usr/lib/ckan/default/bin/activate'):
+        #run("git pull")
+        #run('python ckanext/ctdata_theme/migration/manage.py upgrade 8')
+        run('python setup.py develop')
+        run('sudo service nginx restart')
+
 def deploy(migrate=None):
     code_dir = '/home/ubuntu/ctdata_theme'
     with cd(code_dir), prefix('source /usr/lib/ckan/default/bin/activate'):

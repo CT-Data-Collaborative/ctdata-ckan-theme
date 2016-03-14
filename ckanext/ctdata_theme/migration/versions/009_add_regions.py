@@ -6,6 +6,7 @@ meta = MetaData()
 
 
 def upgrade(migrate_engine):
+    # Commented out lines are for dealing with migrations in setting up development server #
     meta = MetaData(bind=migrate_engine)
     user_info  = Table('ctdata_user_info', meta, autoload=True)
 
@@ -21,8 +22,8 @@ def upgrade(migrate_engine):
     profiles   = Table('ctdata_profiles',  meta, autoload=True)
     indicators = Table('ctdata_profile_indicators',  meta, autoload=True)
 
-    region_id = Column('region_id', Integer, ForeignKey('ctdata_regions.id'))
-    region_id.create(locations)
+    # region_id = Column('region_id', Integer, ForeignKey('ctdata_regions.id'))
+    # region_id.create(locations)
 
     region_id = Column('region_id', Integer, ForeignKey('ctdata_regions.id'))
     region_id.create(profiles)

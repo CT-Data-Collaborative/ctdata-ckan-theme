@@ -6,7 +6,7 @@ from ..visualization.services import DatasetService
 from ..community.services import CommunityProfileService
 from IPython import embed
 
-class TopicSerivce(object):
+class TopicService(object):
 
     @staticmethod
     def get_topics_with_indicators(action):

@@ -1,8 +1,17 @@
 {% ckan_extends %}
+{% block styles %}
 
+<!--<link rel="stylesheet" type="text/css" href="/common/css/carousel.css">-->
+<link rel="stylesheet" type="text/css" href="/common/css/pygments-manni.css">
+<link rel="stylesheet" type="text/css" href="/common/css/docs.css">
+<link rel="stylesheet" type="text/css" href="/common/css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="/common/css/bootstrap.css.map">
+<link rel="stylesheet" type="text/css" href="/common/css/font-awesome.min.css">
+    {{ super() }}
+{% endblock %}
 {% block content %}
 
-    {%- block underheader %}
+    {% block underheader %}
     <section>
         <div id="about_block">
             <div class="spacing text-center">
@@ -12,7 +21,8 @@
         </div>
     </section>
 
-    {% endblock -%}
+    {% endblock %}
+
     <section class="main_body_content">
     {% block flash %}
         {% set flash_messages = h.flash.pop_messages() | list %}

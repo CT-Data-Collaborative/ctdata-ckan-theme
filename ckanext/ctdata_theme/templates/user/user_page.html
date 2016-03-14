@@ -35,6 +35,12 @@
       <b>Member Since:</b>
       {{ h.render_datetime(c.user_dict.created) }}
     </p>
+    {% if c.userobj.sysadmin %}
+    <div class="">
+      <b>API Key:</b>
+      <p>{{ c.user_dict.id }}</p>
+    </div>
+    {% endif %}
   </div>
 
 </div>
@@ -167,6 +173,10 @@
     <div class="text-center"><h2> Profiles </h2></div>
 
     <div class="block-content">
+    <span class="gray_text">
+        Profiles have been temporarily disabled.
+      </span>
+    <!--
     {% if profiles %}
       <ul>
         {% for profile in profiles %}
@@ -186,6 +196,7 @@
         To create your own profile visit <a href="/location"> Data by Location </a> page.
       </span>
     {% endif %}
+    -->
     </div>
   </div>
 

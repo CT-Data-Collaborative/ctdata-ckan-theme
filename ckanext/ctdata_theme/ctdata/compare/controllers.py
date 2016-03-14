@@ -14,7 +14,7 @@ import ckan.lib.helpers as h
 from ..database import Database
 from ..users.services import UserService
 from ..visualization.services import DatasetService
-from ..topic.services import TopicSerivce
+from ..topic.services import TopicService
 from ..visualization.querybuilders import QueryBuilderFactory
 from ..visualization.views import ViewFactory
 from ..location.services import LocationService
