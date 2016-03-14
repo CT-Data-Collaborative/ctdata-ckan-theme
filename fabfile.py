@@ -101,7 +101,7 @@ def develop():
         run('sudo service nginx restart')
 
 def deploy(migrate=None):
-    code_dir = '/home/ubuntu/ctdata_theme'
+    code_dir = '/home/ubuntu/theme'
     with cd(code_dir), prefix('source /usr/lib/ckan/default/bin/activate'):
         run("git pull")
         if migrate is not None:

@@ -16,9 +16,6 @@ input, textarea {
     resize: none;
 }
 
-*
-
-/
 img {
     border: none;
     outline: none;
@@ -1231,16 +1228,6 @@ label {
     /*list-style-type: circle;*/
 }
 
-<<<<<<< HEAD
-span.dot{
-  color: #eee;
-  position: relative;
-  top: -5px;
-  left: -21px;
-  margin-right: -15px;
-  /* font-size: 12px; */
-  font-weight: 100;
-=======
 span.dot {
     color: #eee;
     position: relative;
@@ -1249,7 +1236,16 @@ span.dot {
     margin-right: -15px;
     /* font-size: 12px; */
     font-weight: 100;
->>>>>>> cms-integration
+}
+
+span.dot {
+    color: #eee;
+    position: relative;
+    top: -5px;
+    left: -21px;
+    margin-right: -15px;
+    /* font-size: 12px; */
+    font-weight: 100;
 }
 
 @media screen and (max-width: 1070px) {
@@ -1724,56 +1720,28 @@ li.ctdata-nav-list-item.active a {
     padding-bottom: 2rem;
 }
 
+.row.blue {
+    background: #4670a7;
+}
+
 .white {
     color: white;
 }
+
 .upper {
     text-transform: uppercase;
 }
 
-#homepageHeader > .navbar {
-    background: none;
+/*#homepageHeader > .navbar {*/
+/*background: black;*/
+/*}*/
+
+#homepageHeader {
+    background: black;
 }
 
-.hero {
-    overflow-y: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 40vh;
-    background: none;
-}
-.hero img {
-    max-width: 100%;
-    position: relative;
-    height: auto;
-    width: 100%;
-}
 
-.hero .top-gradient {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 500;
-    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.75), transparent);
-    height: 100%;
-}
-
-.hero .page-title {
-    position: absolute;
-    top: 15rem;
-    left: 0;
-    right: 0;
-    z-index: 999;
-    color: white;
-    font-weight: bold;
-    font-size: 5rem;
-}
-
-.hero .page-title p { text-align: center;}
-
-#home {
+.container-fluid#home {
     padding-top: 30vh;
 }
 
@@ -1782,6 +1750,7 @@ li.ctdata-nav-list-item.active a {
     padding-bottom: 4rem;
     text-align: center;
 }
+
 .data-path h3 {
     font-family: Roboto;
     text-align: center;
@@ -1790,6 +1759,7 @@ li.ctdata-nav-list-item.active a {
 .data-path a {
     text-align: center;
 }
+
 .data-path a p, .data-path a i {
     display: inline-block;
     font-size: 3rem;
@@ -1807,7 +1777,6 @@ li.ctdata-nav-list-item.active a {
     margin-right: 3rem;
 }
 
-
 .data-path p.text {
     padding-top: 1.5rem;
     font-size: 1.75rem;
@@ -1823,36 +1792,157 @@ li.ctdata-nav-list-item.active a {
 }
 
 @media screen and (min-width: 30rem) {
-   .data-path a p, .data-path a i {
-    font-size: 2.5rem;
+    .data-path a p, .data-path a i {
+        font-size: 2.5rem;
+    }
 }
-
-}
-
 
 /* Styling for Metadata Fields in Admin */
-.tab_content .additional_info .con_row p { float: right; }
-.tab_content .additional_info .con_row ul { float: right; width: 540px; padding-left: 25px; list-style: initial;}
-.tab_content .additional_info .con_row ul li { padding-bottom: 15px; list-style-type: disc;}
+.tab_content .additional_info .con_row p {
+    float: right;
+}
+
+.tab_content .additional_info .con_row ul {
+    float: right;
+    width: 540px;
+    padding-left: 25px;
+    list-style: initial;
+}
+
+.tab_content .additional_info .con_row ul li {
+    padding-bottom: 15px;
+    list-style-type: disc;
+}
 
 /* Styling for Metadata Fields in Visualization */
-#full-description .dataValue ul { list-style: initial; padding-left: 20px; }
-#full-description .dataValue ul li { list-style-type: disc; padding-bottom: 5px; }
+#full-description .dataValue ul {
+    list-style: initial;
+    padding-left: 20px;
+}
 
+#full-description .dataValue ul li {
+    list-style-type: disc;
+    padding-bottom: 5px;
+}
 
 @media screen and (min-width: 57rem) {
-   .data-path a p, .data-path a i {
-    font-size: 3rem;
-}
+    .data-path a p, .data-path a i {
+        font-size: 3rem;
+    }
 
 }
 
 @media screen and (max-width: 40rem) {
-    .hero {
-      display: none;
-    }
     #homepageHeader > .navbar {
         background: black;
     }
 }
 
+.jumbo-image {
+    position: absolute;
+    top: 8rem;
+    left: 0;
+    right: 0;
+    height: 20rem;
+    overflow-y: hidden;
+}
+
+.jumbo-image img {
+    width: 100%;
+}
+
+.jumbo-image .titlebox {
+    position: absolute;
+    top: 3rem;
+    width: 100%;
+    height: 9.5rem;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.jumbo-image .text {
+    padding-top: 10rem;
+    color: white;
+    text-align: center;
+    z-index: 100;
+    font-size: 3rem;
+    text-shadow: #4670A7 0 1px 1px;
+}
+
+.module {
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("/common/images/ctlegislative.jpg");
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    position: relative;
+    float: left;
+}
+
+.mid h1 {
+    padding-top: 2rem;
+    color: white;
+    text-align: center;
+    z-index: 100;
+    font-size: 2rem;
+    text-shadow: #4670A7 0 1px 1px;
+}
+
+@media (min-width: 48em) {
+    .jumbo-image {
+        height: 20rem;
+    }
+
+    .jumbo-image .titlebox {
+        height: 12rem;
+    }
+
+    .jumbo-image .text {
+        padding-top: 10rem;
+        font-size: 3rem;
+    }
+}
+
+@media (min-width: 62em) {
+    .jumbo-image {
+        height: 26rem;
+    }
+
+    .jumbo-image .titlebox {
+        height: 16rem;
+    }
+
+    .jumbo-image .text {
+        padding-top: 10rem;
+        font-size: 4rem;
+    }
+}
+
+@media (min-width: 75em) {
+    .jumbo-image {
+        height: 28rem;
+    }
+
+    .jumbo-image .titlebox {
+        height: 18rem;
+    }
+
+    .jumbo-image .text {
+        padding-top: 10rem;
+        font-size: 4rem;
+    }
+}
+
+@media (min-width: 86em) {
+    .jumbo-image {
+        height: 32rem;
+    }
+
+    .jumbo-image .titlebox {
+        height: 22rem;
+    }
+
+    .jumbo-image .text {
+        padding-top: 14rem;
+        font-size: 4rem;
+    }
+}
