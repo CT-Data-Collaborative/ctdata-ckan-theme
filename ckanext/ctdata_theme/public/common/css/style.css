@@ -1627,6 +1627,7 @@ li.ctdata-nav-list-item.active a {
     width: 100%;
     min-height: 300px;
     color: #999;
+    font-family: Roboto;
 }
 
 #footer .footer-spacing {
