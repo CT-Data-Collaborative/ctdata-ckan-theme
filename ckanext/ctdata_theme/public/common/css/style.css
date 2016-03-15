@@ -1721,6 +1721,7 @@ li.ctdata-nav-list-item.active a {
     padding-bottom: 2rem;
 }
 
+
 .row.blue {
     background: #4670a7;
 }
@@ -1947,3 +1948,5 @@ li.ctdata-nav-list-item.active a {
         font-size: 4rem;
     }
 }
+
+.row.white a { text-decoration: underline; }
