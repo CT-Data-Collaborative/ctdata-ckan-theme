@@ -1869,7 +1869,7 @@ li.ctdata-nav-list-item.active a {
     text-shadow: #4670A7 0 1px 1px;
 }
 
-.module {
+.jumbo-module {
     background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("/common/images/ctlegislative.jpg");
     background-size: cover;
     width: 100%;
