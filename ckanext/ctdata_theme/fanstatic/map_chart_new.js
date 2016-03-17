@@ -45,6 +45,7 @@ function getColor(d) {
 
 function getBuckets(values, break_points, array) {
   var buckets = break_points.buckets;
+  console.log(arguments)
   var legend_items = new Array(buckets).fill(0);
    do {
     if (break_points.type == 'jenks') {

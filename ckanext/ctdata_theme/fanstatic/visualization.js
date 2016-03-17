@@ -333,8 +333,9 @@ function set_map_checkbox(){
     checkboxes_except_town.unbind("change");
     //Uncheck all but the first checked for each filter
     filter_lists = $('.filter');
+    console.log(filter_lists);
     $.each(filter_lists, function(i){
-        $(filter_lists[i]).find("input:checked:not(." + geography_param+ ", .Year)[value != 'Margins of Error']").slice(1).prop('checked', false);
+        $(filter_lists[i]).find("input:checked:not(." + geography_param.replace('/','\\/') + ", .Year)[value != 'Margins of Error']").slice(1).prop('checked', false);
     });
 
     //Check most recent year
@@ -565,7 +566,7 @@ function handle_incompatibilities(compatibles){
     });
 
     console.log('compatibles:');
-    console.log(compatibles);
+    //console.log(compatibles);
     console.log('Finish handle incompatibilities!');
 }
 
