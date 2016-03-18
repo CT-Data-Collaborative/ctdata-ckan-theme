@@ -1,9 +1,3 @@
-var legend_items = [0, 10, 20, 50, 100, 200, 500, 1000, 2000];
-
-var brew = [
-  'rgb(12,44,132)', 'rgb(34,94,168)', 'rgb(29,145,192)', 'rgb(65,182,196)', 'rgb(127,205,187)',
-  'rgb(199,233,180)', 'rgb(237,248, 177)', 'rgb(255,255,217)'];
-
 var YlGnBu = {
   3: ["#edf8b1","#7fcdbb","#2c7fb8"],
   4: ["#ffffcc","#a1dab4","#41b6c4","#225ea8"],
@@ -14,42 +8,27 @@ var YlGnBu = {
   9: ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"]
 };
 
-var brew = YlGnBu[7];
-console.log(break_points);
-//function getColor(d) {
-//  return d >=  legend_items[7] ?  'rgb(1,  35, 73)'  :
-//         d >=  legend_items[6] ?  'rgb(0,  56, 117)' :
-//         d >=  legend_items[5] ?  'rgb(34, 82, 137)' :
-//         d >=  legend_items[4] ?  'rgb(68,108,156)' :
-//         d >=  legend_items[3] ?  'rgb(102,134,176)' :
-//         d >=  legend_items[2] ?  'rgb(137,161,196)' :
-//         d >=  legend_items[1] ?  'rgb(171,187,216)' :
-//         d >=  legend_items[0] - 1 ?  'rgb(239,239,255)' :
-//
-//         d > -10000 ? 'rgb(222, 134, 9)':
-//                      '';
-//}
+var brew = YlGnBu[5];
 
 function getColor(d) {
-  return d >= legend_items[6] ? brew[7] :
-      d >= legend_items[5] ? brew[6] :
-      d >= legend_items[4] ? brew[5] :
-      d >= legend_items[3] ? brew[4] :
+  return d >= legend_items[3] ? brew[4] :
       d >= legend_items[2] ? brew[3] :
       d >= legend_items[1] ? brew[2] :
       d >= legend_items[0] ? brew[1] :
       d >= 0 ? brew[0] :
+          d > -10000 ? 'rgb(222,134,9)':
                                       '';
 }
 /********************************** MAIN *****************************/
 
 function getBuckets(values, break_points, array) {
+  values.unshift(0);
   var buckets = break_points.buckets;
-  console.log(arguments)
   var legend_items = new Array(buckets).fill(0);
    do {
     if (break_points.type == 'jenks') {
-      var legend_items = ss.jenks(values, buckets);
+      legend_items = ss.jenks(values, buckets);
+      legend_items.shift(0);
     } else if (break_points.type == 'quintile' || break_points.type == 'quantile' || break_points.type == 'quartile') {
       legend_items = ss.quantile(values, array);
     } else if (break_points.type == 'array') {
@@ -222,7 +201,6 @@ function draw_map(){
       legend_items = legend_items_obj.legend;
       var b = legend_items_obj.buckets;
 
-      console.log(legend_items_obj);
 
       layer = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
         minZoom: 8,
@@ -243,7 +221,11 @@ function draw_map(){
         [40.987213,-73.664703]
       ]);
 
-      var stripes = new L.StripePattern({weight: 1});
+      var stripes = new L.StripePattern(
+          {
+            weight: 1,
+            angle: -45
+          });
       stripes.addTo(map);
 
       var mapCenter = new L.LatLng(42.050942,-73.491669);
@@ -268,17 +250,19 @@ function draw_map(){
       info.update = function (props) {
         if (props){
           var value = props['Value'];
-          if (value === "" || value === '-8888') {
-            console.log(value);
-            value = 'No value';
+
+          var moes  = props["MOEs"];
+          if (value === "" || value === '-8888' || value === -8888 | value == '*') {
+            value = 'No data available';
+            moes = '';
           } else if (value == '-9999') {
-            value = 'Suppressed';
+            value = 'Data suppressed';
+            moes = '';
           } else {
             value = unit_for_value(value, cur_mt);
           }
 
 
-          var moes  = props["MOEs"];
           if (moes != '') {
             moes = "<span class='moes'>  ± " + unit_for_value(moes, cur_mt) + "</span>";
           }
@@ -326,52 +310,77 @@ function draw_map(){
         var div = L.DomUtil.create('div', 'info legend'),
             buckets = legend_items,
             ranges = [0];
+        div.innerHTML += '<i id="nodata"></i> No data available <br>';
         div.innerHTML += '<i style="background: rgb(222, 134, 9)"></i> Suppressed <br>';
-        //console.log(buckets);
+
         for (var i = 0; i < buckets.length ; i++){
           ranges.push(buckets[i]);
         }
-        //console.log(ranges);
-        for (var i = 0; i < ranges.length ; i++){
-
-
-          div.innerHTML +=
-              '<i style="background:' + getColor(ranges[i] + 1) + '"></i> ' +
-              unit_for_value(ranges[i], cur_mt) + (unit_for_value(ranges[i + 1], cur_mt) ? ' &ndash; ' + unit_for_value(ranges[i + 1],cur_mt) + '<br>' : ' + ');
-        }
+        for (var i = 0; i < ranges.length -1 ; i++){
+               div.innerHTML +=
+                 '<i style="background:' + getColor(ranges[i] + 1) + '"></i> ' +
+                 unit_for_value(ranges[i], cur_mt) + ' &ndash; ' + unit_for_value(ranges[i + 1], cur_mt) + '<br>';
+             }
         div.innerHTML += '<br> Breaks type: ' + break_points.type
         return div;
       };
 
       legend.addTo(map);
+      var svg = d3.select("#nodata").append("svg");
+
+      svg
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .append('defs')
+        .append('pattern')
+          .attr('id', 'diagonalHatch')
+          .attr('patternUnits', 'userSpaceOnUse')
+          .attr('width', 4)
+          .attr('height', 4)
+        .append('path')
+          .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+          .attr('stroke', '#000000')
+          .attr('stroke-width', 1);
+      svg.append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", 15)
+            .attr("height", 15)
+            .style("fill", 'url(#diagonalHatch)');
+
       L.easyPrint().addTo(map)
       $('.operations').hide();
 
       function style(feature) {
         value = feature.properties['Value'];
-
-        var empty = {
-                  weight: 1,
-                  opacity: 1,
-                  color: '#767676',
-                  fillOpacity: 0.9,
-                  fillPattern: stripes,
-                };
-        switch (value) {
-          case '':
-                var fStyle = empty;
-                break;
-          case '-8888':
-                var fStyle = empty;
-                break;
-          case '-9999':
-                var fStyle = {
+        var suppressed = {
                   weight: 1,
                   opacity: 1,
                   color: '#767676',
                   fillOpacity: 0.9,
                   fillColor:'rgb(222, 134, 9)'
                 };
+
+        var empty = {
+                  weight: 1,
+                  opacity: 1,
+                  color: '#767676',
+                  fillOpacity: 0.9,
+                  fillPattern: stripes
+                };
+
+        switch (value) {
+          case '':
+                var fStyle = empty;
+                break;
+          case '*':
+                var fStyle = empty;
+                break
+          case '-8888':
+                var fStyle = suppressed;
+                break;
+          case '-9999':
+                var fStyle = suppressed;
                 break;
           default:
                 var fStyle = {
@@ -383,25 +392,7 @@ function draw_map(){
                 }
         }
         return fStyle;
-        //if ((value === '-8888' || value === "" || value === 'No value') && value != 0){
-        //  return {
-        //    weight: 1,
-        //    opacity: 1,
-        //    color: '#767676',
-        //    fillOpacity: 0.9,
-        //    fillPattern: stripes,
-        //  }
-        //} else {
-        //  return  {
-        //    weight: 1,
-        //    opacity: 1,
-        //    color: '#767676',
-        //    fillOpacity: 0.9,
-        //    fillColor: getColor(feature.properties['Value']),
-        //  }
-        //}
       }
-
 
       geojs = L.geoJson(new_geojson, {style: style, onEachFeature: onEachFeature}).addTo(map);
       L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container); // fix zoom error

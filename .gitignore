@@ -2,3 +2,4 @@ ckanext_ctdata_theme.egg-info/
 *.pyc
 .DS_Store
 .idea/
+node_modules/

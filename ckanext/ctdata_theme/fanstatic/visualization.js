@@ -737,9 +737,6 @@ var percent_fmt = d3.format(".2%");
 
 // TODO FIX BUG WITH FORMATTING FOR TABLES
 function unit_for_value(value, type){
-    //console.log('formatting value');
-    //console.log(value);
-
     if (typeof(value) == 'string') {
         //console.log('test 1');
         if ( units[type] != undefined) {
@@ -783,7 +780,7 @@ function unit_for_value(value, type){
             return number_fmt(value);
         }
     } else if (typeLC == 'percent') {
-        return percent_fmt(value);
+        return percent_fmt(value/100);
     } else if (typeLC == 'currency') {
         return currency_fmt(value)
     } else if (typeLC == 'mill rate') {
