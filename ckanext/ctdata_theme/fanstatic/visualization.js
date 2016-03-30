@@ -733,7 +733,7 @@ function draw_table(){
 var currency_fmt = d3.format("$,d");
 var number_fmt = d3.format(",d");
 var percent_fmt = d3.format(".2%");
-
+var mill_rate_fmt = d3.format(".2f");
 
 // TODO FIX BUG WITH FORMATTING FOR TABLES
 function unit_for_value(value, type){
@@ -784,7 +784,7 @@ function unit_for_value(value, type){
     } else if (typeLC == 'currency') {
         return currency_fmt(value)
     } else if (typeLC == 'mill rate') {
-        return value;
+        return mill_rate_fmt(value);
     } else {
         return value;
     }
