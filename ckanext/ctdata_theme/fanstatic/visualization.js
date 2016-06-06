@@ -734,6 +734,7 @@ var currency_fmt = d3.format("$,d");
 var number_fmt = d3.format(",d");
 var percent_fmt = d3.format(".2%");
 var mill_rate_fmt = d3.format(".2f");
+var rate_fmt = d3.format(",f");
 
 // TODO FIX BUG WITH FORMATTING FOR TABLES
 function unit_for_value(value, type){
@@ -785,9 +786,17 @@ function unit_for_value(value, type){
         return currency_fmt(value)
     } else if (typeLC == 'mill rate') {
         return mill_rate_fmt(value);
+    } else if (typeLC == 'rate (per 100,000)') {
+        if (value < 1.0) {
+            return d3.format(".1f")(value)
+        } else {
+            return rate_fmt(value);
+        }
+
     } else {
         return value;
     }
+
     //switch(typeLC) {
     //    case 'number':
     //        return number_fmt(value);
