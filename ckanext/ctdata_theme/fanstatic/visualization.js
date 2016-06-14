@@ -736,6 +736,17 @@ var percent_fmt = d3.format(".2%");
 var mill_rate_fmt = d3.format(".2f");
 var rate_fmt = d3.format(",f");
 
+
+function decimal_test(value) {
+    var characters = String(value).split("");
+    var decimal_pos = characters.indexOf('.');
+    if (decimal_pos == -1) {
+        return false;
+    } else {
+        var precision = d3.min([2,characters.length - 1 - decimal_pos]);
+        return d3.format("." + precision + "f");
+    }
+}
 // TODO FIX BUG WITH FORMATTING FOR TABLES
 function unit_for_value(value, type){
     if (typeof(value) == 'string') {
@@ -772,13 +783,26 @@ function unit_for_value(value, type){
     } catch (TypeError) {
         var typeLC = type;
     }
+    if (typeLC == 'number') {
+        var dt = decimal_test(value);
+        if (dt) {
+            typeLC = 'decimal';
+            var decimal_fmt = dt;
+        }
+    }
+
 
     if (typeLC == 'number') {
         //console.log('test 2')
         if (units[type] == '$') {
             return currency_fmt(value);
         } else {
-            return number_fmt(value);
+            var dt = decimal_test(value);
+            if (dt) {
+                return dt(value);
+            } else {
+                return number_fmt(value);
+            }
         }
     } else if (typeLC == 'percent') {
         return percent_fmt(value/100);
@@ -786,6 +810,8 @@ function unit_for_value(value, type){
         return currency_fmt(value)
     } else if (typeLC == 'mill rate') {
         return mill_rate_fmt(value);
+    } else if (typeLC == 'decimal') {
+        return decimal_fmt(value)
     } else if (typeLC == 'rate (per 100,000)') {
         if (value < 1.0) {
             return d3.format(".1f")(value)
