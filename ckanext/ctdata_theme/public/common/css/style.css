@@ -1950,3 +1950,7 @@ li.ctdata-nav-list-item.active a {
 }
 
 .row.white a { text-decoration: underline; }
+
+.modal.ctdata-modal {
+    left: 50%;
+}
