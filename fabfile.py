@@ -25,7 +25,7 @@ def beta():
     env.hosts = ['beta']
 
 def production():
-    env.hosts = ['ckan']
+    env.hosts = ['ckan-data']
 
 
 # Data dump functions
@@ -107,5 +107,5 @@ def deploy(migrate=None):
         if migrate is not None:
             migrateStr = "python ckanext/ctdata_theme/migration/manage.py upgrade {}".format(migrate)
             run(migrateStr)
-        run('python setup.py develop')
+        run('sudo python setup.py develop')
         run('sudo service nginx restart')
