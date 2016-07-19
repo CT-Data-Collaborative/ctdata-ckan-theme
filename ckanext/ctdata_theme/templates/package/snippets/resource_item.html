@@ -1,6 +1,7 @@
 {% set can_edit = h.check_access('package_update', {'id':pkg.id }) %}
 {% set url_action = 'resource_edit' if url_is_edit and can_edit else 'resource_read' %}
 {% set url = h.url_for(controller='package', action=url_action, id=pkg.name, resource_id=res.id) %}
+{% set api_info_url = h.url_for(controller='api', action='snippet', ver=1, snippet_path='api_info.html', datastore_root_url=datastore_root_url, resource_id=res.id) %}
 
 {% set vars = {'hidden': False} %}
 
@@ -20,5 +21,8 @@
           <a href="/visualization/{{ pkg.name }}" class="blue_btn">PREVIEW</a>
         {% endif %}
         <a href="{{ res.url }}" class="grey_btn">DOWNLOAD</a>
+        <a class="btn btn-success api-btn" href="{{ api_info_url }}" data-module="api-info" data-module-template="{{ api_info_url }}" data-loading-text="{{ loading_text }}">
+            <i class="icon-beaker icon-large"></i> {{ _('Data API') }}
+        </a>
     </div>
 </li>

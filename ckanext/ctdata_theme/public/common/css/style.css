@@ -1954,3 +1954,14 @@ li.ctdata-nav-list-item.active a {
 .modal.ctdata-modal {
     left: 50%;
 }
+
+.modal.ctdata-modal > .modal-body {
+    max-height: 100%;
+}
+
+.btn.api-btn {
+    border-radius: 0;
+    border: none;
+    line-height: 20px;
+    margin-top: -3px;
+}
