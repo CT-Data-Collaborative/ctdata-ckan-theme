@@ -197,7 +197,7 @@
             <div class="dataValue">
                 {% if property['key'] == "Suppression" %}
                     <span class="red">{{property['value']}}</span>
-                {% elif property['key'] == "Source" and socrata %}
+                {% elif property['key'] == "Source" and socrata == True %}
                     {{property['value'] | safe}}, accessed via <a href="https://data.ct.gov">data.ct.gov</a>
                 {% else %}
                     {{property['value'] | safe}}
@@ -206,7 +206,7 @@
         </li>
         {% endfor %}
         </ul>
-        {{ socrata }}
+      <div class="socrata_check">{{ socrata }}</div>
         <div class="full_metadata_link">
         <a href="/dataset/{{dataset.name}}#additional_info" >View Full Metadata</a>
       <div>
