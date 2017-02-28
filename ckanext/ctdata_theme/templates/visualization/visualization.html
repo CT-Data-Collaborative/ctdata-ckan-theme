@@ -206,7 +206,6 @@
         </li>
         {% endfor %}
         </ul>
-      <div class="socrata_check">{{ socrata }}</div>
         <div class="full_metadata_link">
         <a href="/dataset/{{dataset.name}}#additional_info" >View Full Metadata</a>
       <div>
@@ -237,6 +236,9 @@
 
 {% block scripts %}
 {{ super() }}
+<script>
+console.log('Socrata is: {{ socrata }}');
+</script>
 <link rel="stylesheet" type="text/css" href="/common/css/visualization.css">
 <link rel="stylesheet" type="text/css" href="/common/css/jquery.dataTables.css">
 <link rel="stylesheet" type="text/css" href="/common/css/tableTools.css">
