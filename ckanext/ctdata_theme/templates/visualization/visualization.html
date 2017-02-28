@@ -190,19 +190,21 @@
     <div id="collapseMetadata">
       <div id="metadata" class="in collapse">
         <ul>
+        {#   metadata defined in plugin.py. References ckan_extras fields #}
         {% for property in metadata %}
-	  <li id="{{property['key'] | lower | replace(" ", "-") }}">
-	    <a class="">{{property['key']}}</a>
+	    <li id="{{property['key'] | lower | replace(" ", "-") }}">
+	        <a class="">{{property['key']}}</a>
             <div class="dataValue">
                 {% if property['key'] == "Suppression" %}
-                  <span class="red">{{property['value']}}</span>
+                    <span class="red">{{property['value']}}</span>
+                {% elif property['key'] == "Source" and socrata %}
+                    {{property['value'] | safe}}, accessed via <a href="https://data.ct.gov">data.ct.gov</a>
                 {% else %}
-		  {{property['value'] | safe}}
+                    {{property['value'] | safe}}
                 {% endif %}
             </div>
-          </li>
+        </li>
         {% endfor %}
-
         </ul>
         <div class="full_metadata_link">
         <a href="/dataset/{{dataset.name}}#additional_info" >View Full Metadata</a>

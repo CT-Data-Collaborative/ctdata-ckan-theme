@@ -199,6 +199,13 @@ def _geography_types():
     sess.close()
     return geography_types
 
+
+def _socrata(metadata):
+    for k,v in metadata:
+        if k == 'Socrata' and v == 'True':
+            return True
+    return False
+
 ####### Main Controller ##########
 
 class CTDataController(base.BaseController):
@@ -269,6 +276,8 @@ class CTDataController(base.BaseController):
         break_points    = DatasetService.get_dataset_meta_break_points(dataset_name)
         defaults        = DatasetService.get_dataset_meta_default_metadata(dataset_name)
         metadata        = filter(lambda x: x['key'] in metadata_fields, dataset.ckan_meta['extras'])
+        # Trying to set a Socrata flag here so that we can override the display of the Source field
+        socrata         = _socrata(metadata)
         map_json_url    = DatasetService.get_dataset_map_json_url(dataset_name)
 
         disable_visualizations = DatasetService.get_dataset_meta_hidden_in(dataset_name)
@@ -306,6 +315,7 @@ class CTDataController(base.BaseController):
                                                              'dimensions': dataset.dimensions,
                                                              'units':    metadata_units,
                                                              'metadata': metadata,
+                                                             'socrata': socrata,
                                                              'disabled': disabled,
                                                              'default_filters': default_filters,
                                                              'headline_indicators': headline_indicators,
