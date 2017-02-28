@@ -190,6 +190,7 @@
     <div id="collapseMetadata">
       <div id="metadata" class="in collapse">
         <ul>
+        <li>{{ socrata }}</li>
         {#   metadata defined in plugin.py. References ckan_extras fields #}
         {% for property in metadata %}
 	    <li id="{{property['key'] | lower | replace(" ", "-") }}">

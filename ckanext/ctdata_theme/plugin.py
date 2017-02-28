@@ -270,7 +270,6 @@ class CTDataController(base.BaseController):
         break_points    = DatasetService.get_dataset_meta_break_points(dataset_name)
         defaults        = DatasetService.get_dataset_meta_default_metadata(dataset_name)
         metadata        = filter(lambda x: x['key'] in metadata_fields, dataset.ckan_meta['extras'])
-        # Trying to set a Socrata flag here so that we can override the display of the Source field
         socrata         = DatasetService.get_dataset_socrata(dataset_name)
         map_json_url    = DatasetService.get_dataset_map_json_url(dataset_name)
 

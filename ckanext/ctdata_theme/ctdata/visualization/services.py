@@ -100,10 +100,8 @@ class DatasetService(object):
 
     @staticmethod
     def get_dataset_socrata(dataset_id):
-        default = False
+        default = 'False'
         value = DatasetService.get_dataset_meta_field(dataset_id, "Socrata", default)
-        if value == 'True':
-            return True
         return value
 
     @staticmethod
