@@ -99,6 +99,14 @@ class DatasetService(object):
         return value
 
     @staticmethod
+    def get_dataset_socrata(dataset_id):
+        default = False
+        value = DatasetService.get_dataset_meta_field(dataset_id, "Socrata", default)
+        if value == 'True':
+            return True
+        return value
+
+    @staticmethod
     def get_dataset_meta_visible_metadata(dataset_id):
         default = ['Description', 'Full Description', 'Suppression' ,'Source', 'Contributor']
         value   = DatasetService.get_dataset_meta_field(dataset_id, "Visible Metadata", default)
