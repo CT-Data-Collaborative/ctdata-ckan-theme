@@ -315,7 +315,7 @@ class CTDataController(base.BaseController):
                                                              'dimensions': dataset.dimensions,
                                                              'units':    metadata_units,
                                                              'metadata': metadata,
-                                                             'socrata': socrata,
+                                                             'socrata': True,
                                                              'disabled': disabled,
                                                              'default_filters': default_filters,
                                                              'headline_indicators': headline_indicators,
