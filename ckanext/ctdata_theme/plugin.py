@@ -277,7 +277,7 @@ class CTDataController(base.BaseController):
         defaults        = DatasetService.get_dataset_meta_default_metadata(dataset_name)
         metadata        = filter(lambda x: x['key'] in metadata_fields, dataset.ckan_meta['extras'])
         # Trying to set a Socrata flag here so that we can override the display of the Source field
-        socrata         = _socrata(metadata)
+        socrata         = True
         map_json_url    = DatasetService.get_dataset_map_json_url(dataset_name)
 
         disable_visualizations = DatasetService.get_dataset_meta_hidden_in(dataset_name)
