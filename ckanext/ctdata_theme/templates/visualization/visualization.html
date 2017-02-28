@@ -199,7 +199,8 @@
                 {% if property['key'] == "Suppression" %}
                     <span class="red">{{property['value']}}</span>
                 {% elif property['key'] == "Source" and socrata == True %}
-                    {{property['value'] | safe}}, accessed via <a style="text-decoration:underline;border-bottom: 0;margin-left:0;margin-top:0;"
+                    {{property['value'] | safe}}, accessed via <a style="width:inherit;text-decoration:underline;
+                    border-bottom: 0;margin-left:0;margin-top:0;"
                                                                   href="https://data.ct.gov">data.ct.gov</a>.
                 {% else %}
                     {{property['value'] | safe}}
