@@ -100,9 +100,16 @@ class DatasetService(object):
 
     @staticmethod
     def get_dataset_socrata(dataset_id):
-        default = 'False'
-        value = DatasetService.get_dataset_meta_field(dataset_id, "Socrata", default)
-        return value
+        meta = toolkit.get_action('package_show')(data_dict={'id': dataset_id})['extras']
+        data = [x['value'] for x in meta if x['key'] == 'Socrata']
+        try:
+            value = data[0]
+        except IndexError:
+            return False
+        if value == 'True':
+            return True
+        else:
+            return False
 
     @staticmethod
     def get_dataset_meta_visible_metadata(dataset_id):
