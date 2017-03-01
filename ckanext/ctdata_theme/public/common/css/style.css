@@ -96,6 +96,10 @@ header .ctdata-wrapper {
     clear: both;
 }
 
+header.page-header {
+    float: none;
+}
+
 .top_bar {
     width: 100%;
     background: #3970ba;
@@ -531,6 +535,7 @@ header nav ul li a:hover {
     float: left;
     width: 70%;
     margin-left: 3%; /*padding-bottom:1000px; margin-bottom:-1000px;*/
+    min-height: 400px;
 }
 
 .raw_tabs {
@@ -1417,7 +1422,9 @@ a.underlined {
 
 .modal {
     width: 700px;
+    left: 50%;
 }
+
 
 .edit_matches {
     font-size: 10px;
@@ -1951,9 +1958,9 @@ li.ctdata-nav-list-item.active a {
 
 .row.white a { text-decoration: underline; }
 
-.modal.ctdata-modal {
-    left: 50%;
-}
+/*.modal.ctdata-modal {*/
+    /*left: 50%;*/
+/*}*/
 
 .modal.ctdata-modal > .modal-body {
     max-height: 100%;
